@@ -32,3 +32,6 @@ Thumbs.db
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Generated CSS (Tailwind output)
+src/index.css
