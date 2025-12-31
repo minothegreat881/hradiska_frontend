@@ -24,7 +24,8 @@ export const hradiskaData: Hradisko[] = [
     okres: "Levoča",
     kraj: "Prešovský",
     nadmorskaVyska: 634,
-    unesco: true
+    unesco: true,
+    fotka: "https://place-hold.it/800x400/2a2a2a/ffffff&text=Spišský+hrad"
   },
   
   // Bratislavský kraj
@@ -35,9 +36,9 @@ export const hradiskaData: Hradisko[] = [
     description: "Dominanta hlavného mesta SR, zrekonštruovaný hrad s bohatou históriou. Sídlo slovenských panovníkov a významné národné kultúrne centrum.",
     rok: "9. storočie",
     stav: "rekonštruovaný",
-    okres: "Bratislava I",
     kraj: "Bratislavský",
-    nadmorskaVyska: 212
+    nadmorskaVyska: 212,
+    fotka: "https://place-hold.it/800x400/2a2a2a/ffffff&text=Bratislavský+hrad"
   },
   {
     name: "Devín",

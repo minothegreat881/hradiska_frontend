@@ -64,7 +64,7 @@ interface InkSplotchProps {
 export function InkSplotch({ className = '', size = 100 }: InkSplotchProps) {
   return (
     <motion.div
-      className={`absolute ${className}`}
+      className={`absolute pointer-events-none ${className}`}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 0.15 }}
       transition={{ duration: 1, ease: 'easeOut' }}

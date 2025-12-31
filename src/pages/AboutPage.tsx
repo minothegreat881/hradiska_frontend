@@ -41,7 +41,7 @@ export function AboutPage() {
     <div id="main-content" className="min-h-screen bg-white dark:bg-stone-950">
       {/* Hero */}
       <section className="relative bg-gradient-to-b from-clay-50 to-white dark:from-stone-900 dark:to-stone-950 overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1702234458473-978dff0d6b1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpZXZhbCUyMGZvcnRyZXNzfGVufDF8fHx8MTc2MjE3OTA1NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
             alt=""

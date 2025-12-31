@@ -88,7 +88,7 @@ export function SiteCard({ site }: SiteCardProps) {
         {/* Shine effect on hover */}
         {isHovered && (
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-200/20 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-200/20 to-transparent pointer-events-none"
             initial={{ x: '-100%' }}
             animate={{ x: '100%' }}
             transition={{ duration: 0.8, ease: 'easeInOut' }}
@@ -109,12 +109,12 @@ export function SiteCard({ site }: SiteCardProps) {
             🏛️
           </motion.div>
           {/* Vignette effect */}
-          <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/20"></div>
-          
+          <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/20 pointer-events-none"></div>
+
           {/* Animated overlay on hover */}
           {isHovered && (
             <motion.div
-              className="absolute inset-0 bg-gradient-to-t from-amber-900/40 via-transparent to-transparent"
+              className="absolute inset-0 bg-gradient-to-t from-amber-900/40 via-transparent to-transparent pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}

@@ -48,7 +48,7 @@ export function CommentSection() {
     <div className="relative">
       {/* Decorative header with parchment style */}
       <div className="flex items-center justify-center gap-4 mb-10 relative">
-        <div className="absolute inset-0 flex items-center">
+        <div className="absolute inset-0 flex items-center pointer-events-none">
           <div className="w-full h-px bg-gradient-to-r from-transparent via-amber-600/30 to-transparent"></div>
         </div>
         <div className="relative px-6 py-3 bg-gradient-to-br from-amber-100 via-amber-50 to-stone-50 dark:from-amber-950/40 dark:via-stone-900 dark:to-stone-950 border-4 border-double border-amber-600/40 rounded-lg shadow-lg">

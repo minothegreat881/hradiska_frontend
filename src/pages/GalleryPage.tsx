@@ -309,12 +309,12 @@ export function GalleryPage() {
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 pointer-events-none"></div>
         </div>
 
         {/* Decorative pattern overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute inset-0 pointer-events-none" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30z' fill='%23ffffff' fill-opacity='0.3'/%3E%3C/svg%3E")`,
             backgroundSize: '60px 60px'
           }}></div>

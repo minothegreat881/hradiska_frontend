@@ -326,8 +326,8 @@ export function InteractiveMap() {
             onMouseLeave={handleMouseUp}
           >
             {/* Slovakia Map Background */}
-            <div 
-              className="absolute inset-0"
+            <div
+              className="absolute inset-0 pointer-events-none"
               style={{
                 backgroundImage: 'url(https://images.unsplash.com/photo-1756478054877-3556f34c8652?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzbG92YWtpYSUyMG1hcCUyMHRvcG9ncmFwaGljfGVufDF8fHx8MTc2MjI0NDM0Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral)',
                 backgroundSize: 'cover',
@@ -336,9 +336,9 @@ export function InteractiveMap() {
                 filter: 'sepia(0.3) brightness(1.1)'
               }}
             />
-            
+
             {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-stone-900/20" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-stone-900/20 pointer-events-none" />
             
             <svg 
               width={mapSize.width} 

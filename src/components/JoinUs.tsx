@@ -34,7 +34,7 @@ export function JoinUs() {
   return (
     <section className="relative py-20 md:py-32 overflow-hidden border-t-2 border-amber-900/20">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-amber-50/30 via-orange-50/20 to-amber-50/30 dark:from-amber-950/20 dark:via-orange-950/10 dark:to-amber-950/20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-amber-50/30 via-orange-50/20 to-amber-50/30 dark:from-amber-950/20 dark:via-orange-950/10 dark:to-amber-950/20 pointer-events-none" />
       
       {/* Animated particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -146,7 +146,7 @@ export function JoinUs() {
 
             {/* Glow effect */}
             <motion.div
-              className="absolute inset-0 rounded-3xl"
+              className="absolute inset-0 rounded-3xl pointer-events-none"
               animate={{
                 opacity: [0.3, 0.5, 0.3],
                 scale: [0.98, 1.02, 0.98],
@@ -161,11 +161,11 @@ export function JoinUs() {
 
             <div className="relative rounded-3xl overflow-hidden border-2 border-amber-200/50 dark:border-amber-800/50 shadow-2xl backdrop-blur-sm">
               {/* Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-50/95 via-orange-50/90 to-amber-100/95 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-amber-900/40" />
-              
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-50/95 via-orange-50/90 to-amber-100/95 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-amber-900/40 pointer-events-none" />
+
               {/* Texture */}
-              <div 
-                className="absolute inset-0 opacity-20 dark:opacity-10"
+              <div
+                className="absolute inset-0 opacity-20 dark:opacity-10 pointer-events-none"
                 style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E")`,
                 }}

@@ -72,7 +72,15 @@ function App() {
       const target = e.target as HTMLElement;
       const link = target.closest('a');
 
-      if (link && link.href.startsWith(window.location.origin)) {
+      if (!link) return;
+
+      // Skip gallery links (lightGallery handles these)
+      if (link.closest('.gallery-grid') || link.closest('.lg-container') || link.hasAttribute('data-lg-size')) {
+        return;
+      }
+
+      // Skip external links and non-origin links
+      if (link.href.startsWith(window.location.origin) && !link.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
         e.preventDefault();
         window.history.pushState({}, '', link.href);
         handleNavigation();

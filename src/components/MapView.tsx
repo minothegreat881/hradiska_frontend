@@ -26,7 +26,7 @@ export function MapView({ sites, selectedSiteId, onSiteSelect }: MapViewProps) {
       {/* Map placeholder - ilustruje pozície lokalít */}
       <div className="relative w-full h-full min-h-[400px] bg-gradient-to-br from-clay-200 via-stone-200 to-sky-100 dark:from-clay-900 dark:via-stone-900 dark:to-sky-950">
         {/* Grid overlay */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
           <svg width="100%" height="100%">
             <defs>
               <pattern

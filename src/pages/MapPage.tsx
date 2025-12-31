@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import CustomMapSlovakia from '../components/CustomMapSlovakia';
+import MapboxMap from '../components/MapboxMap';
 import { InkEffect, InkSplotch } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 
@@ -73,14 +73,14 @@ export function MapPage() {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-16 md:py-20 bg-stone-900">
-        <div className="container">
-          <CustomMapSlovakia />
-          
-          {/* Map Instructions */}
-          <motion.div 
-            className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
+      {/* Map Section - Full Width */}
+      <section className="bg-stone-900">
+        <MapboxMap />
+
+        {/* Map Instructions */}
+        <div className="container py-12">
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}

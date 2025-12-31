@@ -138,8 +138,8 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
           </motion.div>
 
           {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-amber-950/90 via-amber-950/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-orange-900/20 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-amber-950/90 via-amber-950/40 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-orange-900/20 mix-blend-multiply pointer-events-none" />
 
           {/* Enhanced title overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-5 border-t-2 border-amber-400/30 bg-gradient-to-t from-black/70 to-transparent">

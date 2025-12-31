@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Moon, Sun, Castle } from 'lucide-react';
+import { Menu, X, Moon, Sun } from 'lucide-react';
 import { mainNavigation } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
 import { MegaMenu } from './MegaMenu';
@@ -9,15 +9,32 @@ import { MegaMenu } from './MegaMenu';
 export function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+
+      // Update scrolled state for styling
+      setScrolled(currentScrollY > 20);
+
+      // Hide/show based on scroll direction (with small delta threshold)
+      const delta = currentScrollY - lastScrollY;
+      if (delta > 5 && currentScrollY > 50) {
+        // Scrolling down fast enough & past threshold - hide
+        setHidden(true);
+      } else if (delta < -5) {
+        // Scrolling up fast enough - show
+        setHidden(false);
+      }
+
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark');
@@ -33,8 +50,8 @@ export function NavBar() {
     <>
       <motion.nav
         initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        animate={{ y: hidden ? -120 : 0 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
         className={`sticky top-0 z-50 transition-all duration-500 ${
           scrolled
             ? 'bg-white/95 dark:bg-stone-950/95 backdrop-blur-md shadow-lg border-b border-amber-200 dark:border-amber-900/30'
@@ -42,38 +59,20 @@ export function NavBar() {
         }`}
       >
         <div className="container">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-28 py-4">
             {/* Logo */}
             <motion.a
               href="/"
-              className="flex items-center gap-3 group"
-              aria-label="Hradiska.sk - domov"
-              whileHover={{ scale: 1.02 }}
+              className="flex items-center group"
+              aria-label="Slovanské hradiská - domov"
+              whileHover={{ scale: 1.03 }}
               transition={{ type: "spring", stiffness: 400 }}
             >
-              <div className="relative">
-                <motion.div 
-                  className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300"
-                  whileHover={{ rotate: -5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Castle className="w-7 h-7 text-amber-50" />
-                </motion.div>
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-amber-950 dark:text-amber-50 uppercase tracking-wide" style={{
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                  letterSpacing: '0.1em'
-                }}>
-                  Hradiska.sk
-                </div>
-                <div className="text-xs text-stone-500 dark:text-stone-400" style={{
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontStyle: 'italic'
-                }}>
-                  Archeologická databáza
-                </div>
-              </div>
+              <img
+                src="/logo_slovanske_hradiska.jpg"
+                alt="Slovanské hradiská"
+                className="h-24 w-auto drop-shadow-lg"
+              />
             </motion.a>
 
             {/* Desktop Navigation */}
@@ -108,7 +107,7 @@ export function NavBar() {
         </div>
 
         {/* Animated bottom accent line */}
-        <motion.div 
+        <motion.div
           className="h-0.5 bg-gradient-to-r from-transparent via-amber-500 to-transparent"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: scrolled ? 1 : 0 }}
@@ -119,14 +118,14 @@ export function NavBar() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden fixed inset-0 top-20 bg-white/98 dark:bg-stone-950/98 backdrop-blur-lg z-40 overflow-y-auto"
+            className="lg:hidden fixed inset-0 top-28 bg-white/98 dark:bg-stone-950/98 backdrop-blur-lg z-40 overflow-y-auto"
           >
-            <motion.div 
+            <motion.div
               initial={{ y: 20 }}
               animate={{ y: 0 }}
               exit={{ y: 20 }}

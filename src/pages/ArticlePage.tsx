@@ -1,7 +1,15 @@
 'use client';
 
-import { ArrowLeft, Calendar, Clock, BookOpen, Tag, Scroll, Feather, Quote } from 'lucide-react';
+import { useCallback, useRef } from 'react';
+import { ArrowLeft, Calendar, Clock, BookOpen, Tag, Scroll, Feather, Quote, ZoomIn, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
+import LightGallery from 'lightgallery/react';
+import type { LightGallery as LightGalleryType } from 'lightgallery/lightgallery';
+import lgZoom from 'lightgallery/plugins/zoom';
+import lgFullscreen from 'lightgallery/plugins/fullscreen';
+import 'lightgallery/css/lightgallery.css';
+import 'lightgallery/css/lg-zoom.css';
+import 'lightgallery/css/lg-fullscreen.css';
 import { mockArticles } from '../data/mock-data';
 import { ArticleCard } from '../components/ArticleCard';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
@@ -9,13 +17,61 @@ import { InkEffect, InkSplotch } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { SocialShare } from '../components/SocialShare';
 import { CommentSection } from '../components/CommentSection';
+import { HistoricalGallery } from '../components/HistoricalGallery';
+import { ArticleSidebar } from '../components/ArticleSidebar';
+import { useBlogPost, useBlogPosts } from '../hooks/useStrapi';
+import { getStrapiImageUrl, convertStrapiPostToArticle, StrapiQuote } from '../lib/strapi';
+import { QuoteBlock } from '../components/QuoteBlock';
+import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 
 interface ArticlePageProps {
   articleSlug: string;
 }
 
 export function ArticlePage({ articleSlug }: ArticlePageProps) {
-  const article = mockArticles.find((a) => a.slug === articleSlug);
+  // Try to fetch from Strapi first
+  const { post: strapiPost, loading, error } = useBlogPost(articleSlug);
+
+  // Always check mock data first for full template experience
+  const mockArticle = mockArticles.find((a) => a.slug === articleSlug);
+
+  // Use mock article if available (for full template with images, quotes, etc.)
+  // Only use Strapi if no mock exists for this slug
+  const article = mockArticle || (strapiPost
+    ? {
+        ...convertStrapiPostToArticle(strapiPost),
+        content: strapiPost.content, // Keep original blocks content
+        author: { name: strapiPost.authorName || 'Hradiská.sk', avatar: '/avatar.jpg' },
+        images: strapiPost.gallery?.map(img => ({
+          url: getStrapiImageUrl(img),
+          caption: img.caption || img.alternativeText || ''
+        })) || [],
+        gallery: [],
+        quotes: strapiPost.quotes || [],
+        blocks: strapiPost.blocks || [], // Dynamic zone blocks
+        bibliography: [],
+      }
+    : null);
+
+  // Get Strapi quotes separately for rendering
+  const strapiQuotes: StrapiQuote[] = strapiPost?.quotes || [];
+
+  // Loading state - only show if no mock article available
+  if (loading && !mockArticle) {
+    return (
+      <div className="min-h-screen parchment flex items-center justify-center">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="w-12 h-12 text-amber-700 mx-auto mb-4" />
+          </motion.div>
+          <p className="text-amber-800 dark:text-amber-200">Načítavam článok...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -47,54 +103,145 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
     aktuality: 'Aktuality',
   };
 
-  // Helper function to render content with images and quotes
-  const renderContent = (content: string) => {
-    const paragraphs = content.split('\n\n');
-    
+  // Timeline data - use Strapi data if available
+  const timelineData = strapiPost?.timeline?.length
+    ? strapiPost.timeline.map(t => ({
+        year: t.year,
+        title: t.title,
+        description: t.description,
+        type: 'local' as const
+      }))
+    : [
+        { year: '800', title: 'Založenie hradiska', description: 'Prvé osídlenie lokality', type: 'local' as const },
+        { year: '833', title: 'Pribinovo kniežatstvo', description: 'Vznik prvého štátneho útvaru', type: 'global' as const },
+        { year: '863', title: 'Príchod Cyrila a Metoda', description: 'Začiatok christianizácie', type: 'global' as const },
+        { year: '894', title: 'Smrť Svätopluka', description: 'Koniec zlatého veku Veľkej Moravy', type: 'global' as const },
+        { year: '~906', title: 'Zánik hradiska', description: 'Zničenie pri maďarských nájazdoch', type: 'local' as const },
+      ];
+
+  // Coordinates - use Strapi location if available
+  const articleCoordinates = strapiPost?.location
+    ? { lat: strapiPost.location.latitude, lng: strapiPost.location.longitude }
+    : { lat: 48.5833, lng: 18.0333 };
+
+  // Location name from Strapi
+  const locationName = strapiPost?.location?.name || 'Bojná - Valy';
+
+  // Key facts from Strapi
+  const keyFactsData = strapiPost?.keyFacts?.map((f, i) => ({
+    number: i + 1,
+    title: f.label,
+    description: f.value
+  }));
+
+  // Helper function to render Strapi blocks content
+  const renderStrapiBlocks = (blocks: any[]) => {
+    return blocks.map((block, idx) => {
+      if (block.type === 'paragraph') {
+        const text = block.children?.map((child: any) => child.text).join('') || '';
+        return (
+          <p
+            key={idx}
+            className="article-paragraph text-lg leading-relaxed mb-6"
+            style={{ fontFamily: 'var(--font-serif)' }}
+          >
+            {text}
+          </p>
+        );
+      }
+      if (block.type === 'heading') {
+        const text = block.children?.map((child: any) => child.text).join('') || '';
+        const level = block.level || 2;
+        if (level === 2) {
+          return (
+            <motion.h2
+              key={idx}
+              className="mb-6 mt-12 flex items-center gap-3 text-2xl"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                color: '#1f1a12',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase'
+              }}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="w-1 h-8 bg-gradient-to-b from-amber-600 to-transparent rounded-full"></div>
+              {text}
+            </motion.h2>
+          );
+        }
+        return <h3 key={idx} className="mb-4 mt-8 text-xl" style={{ fontFamily: 'var(--font-heading)', color: '#2d2418' }}>{text}</h3>;
+      }
+      if (block.type === 'list') {
+        return (
+          <ul key={idx} className="space-y-4 my-8 ml-6">
+            {block.children?.map((item: any, i: number) => (
+              <li key={i} className="leading-relaxed relative pl-6 text-lg" style={{ fontFamily: 'var(--font-serif)', color: '#2d2418' }}>
+                <span className="absolute left-0 top-2.5 w-2 h-2 bg-amber-600 rounded-full"></span>
+                {item.children?.map((child: any) => child.text).join('')}
+              </li>
+            ))}
+          </ul>
+        );
+      }
+      return null;
+    });
+  };
+
+  // Helper function to render content with images and quotes (for string content)
+  const renderContent = (content: string | any[]) => {
+    // If content is Strapi blocks array
+    if (Array.isArray(content)) {
+      return renderStrapiBlocks(content);
+    }
+
+    // Otherwise treat as string (mock data)
+    const paragraphs = (content as string).split('\n\n');
+    let paragraphCount = 0; // Track actual text paragraphs for drop cap
+
     return paragraphs.map((paragraph, idx) => {
       // Check for image placeholder
       if (paragraph.match(/\[IMAGE:(\d+)\]/)) {
         const imageIndex = parseInt(paragraph.match(/\[IMAGE:(\d+)\]/)![1]);
         const image = article.images?.[imageIndex];
-        
+
         if (image) {
+          // Alternate between right and left based on image index
+          const isRight = imageIndex % 2 === 0;
+
           return (
-            <motion.figure 
+            <figure
               key={idx}
-              className="my-12 -mx-8"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+              style={{
+                float: isRight ? 'right' : 'left',
+                width: '50%',
+                margin: isRight ? '0.5rem 0 1.5rem 1.5rem' : '0.5rem 1.5rem 1.5rem 0',
+                clear: 'both'
+              }}
             >
-              <div className="relative group">
-                {/* Decorative corners */}
-                <div className="absolute -top-4 -left-4 w-8 h-8 border-t-2 border-l-2 border-amber-600 dark:border-amber-500 opacity-60"></div>
-                <div className="absolute -top-4 -right-4 w-8 h-8 border-t-2 border-r-2 border-amber-600 dark:border-amber-500 opacity-60"></div>
-                <div className="absolute -bottom-4 -left-4 w-8 h-8 border-b-2 border-l-2 border-amber-600 dark:border-amber-500 opacity-60"></div>
-                <div className="absolute -bottom-4 -right-4 w-8 h-8 border-b-2 border-r-2 border-amber-600 dark:border-amber-500 opacity-60"></div>
-                
-                <div className="rounded-lg overflow-hidden border-4 border-amber-800/30 shadow-2xl bg-gradient-to-br from-amber-50 to-stone-100 dark:from-stone-900 dark:to-amber-950 p-3">
+              <a
+                href={image.url}
+                data-sub-html={`<h4 style="color: #fef3c7; font-family: Georgia, serif; font-style: italic;">${image.caption || ''}</h4>`}
+                className="article-gallery-item block relative group cursor-zoom-in"
+              >
+                <div className="rounded-lg overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700 transition-all duration-300 group-hover:shadow-xl group-hover:border-amber-500/50">
                   <ImageWithFallback
                     src={image.url}
                     alt={image.caption}
-                    className="w-full h-auto rounded"
+                    className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
                   />
+                  {/* Zoom overlay on hover */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                    <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg" />
+                  </div>
                 </div>
-              </div>
-              <figcaption 
-                className="mt-6 text-center px-8 py-4 bg-amber-50/50 dark:bg-amber-950/20 rounded-lg border-l-4 border-r-4 border-amber-600/30"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-              >
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Scroll className="w-4 h-4 text-amber-600 dark:text-amber-500" />
-                  <span className="text-xs uppercase tracking-widest text-amber-800 dark:text-amber-400">Ilustrácia</span>
-                </div>
-                <p className="text-sm text-stone-600 dark:text-stone-400 italic leading-relaxed">
-                  {image.caption}
-                </p>
+              </a>
+              <figcaption className={`mt-2 text-xs italic text-stone-500 dark:text-stone-400 ${isRight ? 'text-right pr-1' : 'text-left pl-1'}`}>
+                {image.caption}
               </figcaption>
-            </motion.figure>
+            </figure>
           );
         }
       }
@@ -116,10 +263,13 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
             >
               <blockquote className="relative p-8 bg-gradient-to-br from-amber-50 to-stone-50 dark:from-amber-950/30 dark:to-stone-900/50 border-l-4 border-amber-600 dark:border-amber-500 rounded-r-xl shadow-lg">
                 <Quote className="w-6 h-6 text-amber-600 dark:text-amber-500 mb-4" />
-                
-                <p 
-                  className="text-xl text-stone-800 dark:text-stone-200 italic leading-relaxed mb-6"
-                  style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+
+                <p
+                  className="text-xl italic leading-relaxed mb-6"
+                  style={{
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    color: '#3a3024' /* WCAG AAA - 9.2:1 */
+                  }}
                 >
                   {quote.text}
                 </p>
@@ -142,10 +292,15 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
       // Regular content rendering
       if (paragraph.startsWith('## ')) {
         return (
-          <motion.h2 
-            key={idx} 
-            className="text-amber-900 dark:text-amber-200 mb-6 mt-12 flex items-center gap-3"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          <motion.h2
+            key={idx}
+            className="mb-6 mt-12 flex items-center gap-3 text-2xl"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: '#1f1a12', /* WCAG AAA - 13.5:1 */
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase'
+            }}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -157,10 +312,14 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
       }
       if (paragraph.startsWith('### ')) {
         return (
-          <h3 
-            key={idx} 
-            className="text-stone-800 dark:text-stone-200 mb-4 mt-8"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          <h3
+            key={idx}
+            className="mb-4 mt-8 text-xl"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: '#2d2418', /* WCAG AAA - 11.2:1 */
+              letterSpacing: '0.03em'
+            }}
           >
             {paragraph.replace('### ', '')}
           </h3>
@@ -171,16 +330,19 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
         return (
           <ul key={idx} className="space-y-4 my-8 ml-6">
             {items.map((item, i) => (
-              <motion.li 
-                key={i} 
-                className="text-stone-700 dark:text-stone-300 leading-relaxed relative pl-6"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+              <motion.li
+                key={i}
+                className="leading-relaxed relative pl-6 text-lg"
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  color: '#2d2418' /* WCAG AAA - 11.2:1 */
+                }}
                 initial={{ opacity: 0, x: -10 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <span className="absolute left-0 top-2 w-2 h-2 bg-amber-600 dark:text-amber-500 rounded-full"></span>
+                <span className="absolute left-0 top-2.5 w-2 h-2 bg-amber-600 rounded-full"></span>
                 {item.replace(/^[*-]\s/, '').replace(/^\*\*/, '').replace(/\*\*$/, '')}
               </motion.li>
             ))}
@@ -202,11 +364,14 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
         );
       }
       if (paragraph.trim()) {
+        const isFirstParagraph = paragraphCount === 0;
+        paragraphCount++;
+
         return (
-          <p 
-            key={idx} 
-            className="text-stone-700 dark:text-stone-300 text-lg leading-relaxed mb-6 first-letter:text-5xl first-letter:font-bold first-letter:text-amber-900 dark:first-letter:text-amber-400 first-letter:mr-2 first-letter:float-left"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          <p
+            key={idx}
+            className={`article-paragraph text-lg leading-relaxed mb-6 ${isFirstParagraph ? 'article-first-paragraph' : ''}`}
+            style={{ fontFamily: 'var(--font-serif)' }}
           >
             {paragraph}
           </p>
@@ -217,7 +382,10 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
   };
 
   return (
-    <div className="min-h-screen parchment relative overflow-hidden">
+    <div
+      className="min-h-screen parchment relative overflow-hidden"
+      style={{ pointerEvents: 'auto', userSelect: 'text' }}
+    >
       {/* SVG Filters */}
       <InkEffect />
       
@@ -250,231 +418,245 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
         </motion.a>
       </div>
 
-      {/* Header */}
-      <article className="container py-8 md:py-12 relative z-10">
-        <div className="max-w-4xl mx-auto">
-          {/* Meta */}
-          <motion.div 
-            className="flex flex-wrap items-center gap-4 text-sm mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <span 
-              className="px-4 py-1.5 bg-gradient-to-r from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-950/20 text-amber-800 dark:text-amber-300 rounded-full border-2 border-amber-800/20 shadow-sm"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              {categoryLabels[article.category!]}
-            </span>
-            <span className="flex items-center gap-1 text-stone-600 dark:text-stone-400" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-              <Calendar className="w-4 h-4" />
-              {new Date(article.publishedAt).toLocaleDateString('sk-SK', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </span>
-            <span className="flex items-center gap-1 text-stone-600 dark:text-stone-400" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-              <Clock className="w-4 h-4" />
-              {article.readTime} min čítania
-            </span>
-          </motion.div>
+      {/* SCEAR Layout Pattern - Everything inside one article container */}
+      <section className="py-8 md:py-12 container mx-auto px-4 relative z-10">
+        <article className="bg-white dark:bg-stone-900 rounded-xl shadow-lg overflow-hidden">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gap: 0 }} className="grid-layout">
 
-          {/* Decorative line */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="h-1 w-32 bg-gradient-to-r from-amber-600 via-amber-500 to-transparent rounded-full mb-6"
-          />
-
-          {/* Title */}
-          <motion.h1 
-            className="text-amber-950 dark:text-amber-100 mb-8 leading-tight relative"
-            style={{ 
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              letterSpacing: '0.02em'
-            }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            {article.title}
-            {/* Decorative underline */}
-            <div className="absolute -bottom-3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-600/30 to-transparent"></div>
-          </motion.h1>
-
-          {/* Excerpt */}
-          <motion.div
-            className="relative p-6 bg-gradient-to-br from-amber-50/50 to-stone-50/50 dark:from-amber-950/20 dark:to-stone-900/30 rounded-xl border-l-4 border-amber-600 dark:border-amber-500 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <p 
-              className="text-xl text-stone-700 dark:text-stone-300 italic leading-relaxed"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              {article.excerpt}
-            </p>
-          </motion.div>
-
-          {/* Author */}
-          <motion.div 
-            className="flex items-center gap-4 pb-8 mb-8 border-b-2 border-double border-amber-800/30"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center text-white border-4 border-white dark:border-stone-900 shadow-xl" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-              <span className="text-xl">{article.author.name.charAt(0)}</span>
-            </div>
-            <div>
-              <div className="text-lg text-stone-900 dark:text-stone-100" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                {article.author.name}
-              </div>
-              <div className="text-sm text-stone-500 dark:text-stone-400 italic flex items-center gap-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                <Feather className="w-3 h-3" />
-                Archeológ a vedec
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Cover Image */}
-        <div className="max-w-6xl mx-auto my-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.6 }}
-            className="relative"
-          >
-            {/* Decorative frame corners */}
-            <div className="absolute -top-6 -left-6 w-16 h-16 border-t-4 border-l-4 border-amber-600 dark:border-amber-500 opacity-40"></div>
-            <div className="absolute -top-6 -right-6 w-16 h-16 border-t-4 border-r-4 border-amber-600 dark:border-amber-500 opacity-40"></div>
-            <div className="absolute -bottom-6 -left-6 w-16 h-16 border-b-4 border-l-4 border-amber-600 dark:border-amber-500 opacity-40"></div>
-            <div className="absolute -bottom-6 -right-6 w-16 h-16 border-b-4 border-r-4 border-amber-600 dark:border-amber-500 opacity-40"></div>
-            
-            <div className="aspect-[21/9] rounded-2xl overflow-hidden bg-gradient-to-br from-amber-100 to-stone-200 dark:from-amber-950 dark:to-stone-900 border-8 border-amber-800/20 shadow-2xl p-2">
+            {/* Hero Image - Full Width (12 columns) - SMALLER */}
+            <div style={{ gridColumn: 'span 12' }} className="relative h-48 md:h-64">
               <ImageWithFallback
                 src={article.coverImage}
                 alt={article.title}
-                className="w-full h-full object-cover rounded-lg brightness-110 contrast-95"
+                className="w-full h-full object-cover"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
+                <div className="text-sm text-white/80 mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+                  {new Date(article.publishedAt).toLocaleDateString('sk-SK', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })} • {categoryLabels[article.category!]} • Autor: {article.author.name}
+                </div>
+                <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+                  {article.title}
+                </h1>
+                <p className="text-lg text-white/90 max-w-3xl">{article.excerpt}</p>
+              </div>
             </div>
-          </motion.div>
-        </div>
 
-        {/* Main Content - Centered */}
-        <div className="max-w-4xl mx-auto">
-          {/* Main Article Content */}
-          <div>
-            <motion.div 
-              className="article-content bg-white/30 dark:bg-stone-900/30 backdrop-blur-sm p-8 rounded-2xl border-2 border-amber-800/10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              {renderContent(article.content)}
-            </motion.div>
+            {/* Main Content - 8 columns */}
+            <div style={{ gridColumn: 'span 8' }} className="p-8">
+              {/* Dynamic Zone Blocks - full control over content order */}
+              {(article as any).blocks && (article as any).blocks.length > 0 ? (
+                <LightGallery
+                  elementClassNames="article-content-gallery"
+                  speed={500}
+                  plugins={[lgZoom, lgFullscreen]}
+                  selector=".article-gallery-item"
+                  licenseKey="0000-0000-000-0000"
+                  download={false}
+                  counter={true}
+                  hideScrollbar={true}
+                  addClass="lg-custom-article"
+                >
+                  <div className="prose prose-stone dark:prose-invert max-w-none article-content" style={{ display: 'flow-root' }}>
+                    <DynamicZoneRenderer blocks={(article as any).blocks} />
+                  </div>
+                </LightGallery>
+              ) : article.content ? (
+                /* Fallback to legacy content field */
+                <LightGallery
+                  elementClassNames="article-content-gallery"
+                  speed={500}
+                  plugins={[lgZoom, lgFullscreen]}
+                  selector=".article-gallery-item"
+                  licenseKey="0000-0000-000-0000"
+                  download={false}
+                  counter={true}
+                  hideScrollbar={true}
+                  addClass="lg-custom-article"
+                >
+                  <div className="prose prose-stone dark:prose-invert max-w-none article-content" style={{ display: 'flow-root' }}>
+                    {renderContent(article.content)}
+                    {/* Clearfix for floating images */}
+                    <div className="clear-both"></div>
+                  </div>
+                </LightGallery>
+              ) : (
+                /* No content available */
+                <div className="prose prose-stone dark:prose-invert max-w-none">
+                  <p className="text-stone-500 dark:text-stone-400 italic">Obsah článku zatiaľ nebol pridaný.</p>
+                </div>
+              )}
 
-            {/* Bibliography */}
-            {article.bibliography && article.bibliography.length > 0 && (
-              <motion.div 
-                className="mt-16 p-8 bg-gradient-to-br from-stone-50 to-amber-50/30 dark:from-stone-900 dark:to-amber-950/20 rounded-2xl border-4 border-amber-800/20 shadow-xl"
+              {/* Strapi Quotes (legacy - for posts without dynamic zone) */}
+              {strapiQuotes.length > 0 && !(article as any).blocks?.length && (
+                <div className="my-8">
+                  {strapiQuotes.map((quote, idx) => (
+                    <QuoteBlock
+                      key={quote.id || idx}
+                      text={quote.text}
+                      author={quote.author}
+                      source={quote.source}
+                      variant={quote.text.includes('\n') ? 'poem' : 'default'}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Bibliography */}
+              {article.bibliography && article.bibliography.length > 0 && (
+                <>
+                <div className="clear-both" />
+                <motion.div
+                  className="mt-8 p-8 bg-gradient-to-br from-stone-50 to-amber-50/30 dark:from-stone-900 dark:to-amber-950/20 rounded-2xl border-4 border-amber-800/20 shadow-xl"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-amber-600/30">
+                    <div className="p-3 bg-amber-600 dark:bg-amber-700 rounded-lg shadow-md">
+                      <BookOpen className="w-6 h-6 text-white" />
+                    </div>
+                    <h3
+                      className="text-2xl text-amber-900 dark:text-amber-200 uppercase tracking-wide"
+                      style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
+                    >
+                      Bibliografia
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    {article.bibliography.map((ref, idx) => (
+                      <motion.div
+                        key={idx}
+                        className="flex gap-4 p-4 bg-white/50 dark:bg-stone-800/50 rounded-lg border border-amber-800/10 hover:border-amber-800/30 transition-colors"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.1 }}
+                      >
+                        <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-amber-600 dark:bg-amber-700 text-white rounded-full text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+                          {idx + 1}
+                        </span>
+                        <p
+                          className="text-sm leading-relaxed"
+                          style={{
+                            fontFamily: 'Georgia, "Times New Roman", serif',
+                            color: '#2d2418'
+                          }}
+                        >
+                          {ref}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+                </>
+              )}
+
+              {/* Clearfix before ornament */}
+              <div className="clear-both" />
+
+              {/* Decorative bottom ornament */}
+              <motion.div
+                className="flex justify-center my-8 clear-both"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <svg width="200" height="40" viewBox="0 0 200 40" className="text-amber-700/40 dark:text-amber-600/40">
+                  <path d="M0 20 L200 20" stroke="currentColor" strokeWidth="1" fill="none"/>
+                  <circle cx="100" cy="20" r="8" stroke="currentColor" strokeWidth="2" fill="none"/>
+                  <circle cx="60" cy="20" r="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <circle cx="140" cy="20" r="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                  <path d="M85 20 L90 15 L95 20 L90 25 Z" stroke="currentColor" strokeWidth="1" fill="currentColor" opacity="0.3"/>
+                  <path d="M105 20 L110 15 L115 20 L110 25 Z" stroke="currentColor" strokeWidth="1" fill="currentColor" opacity="0.3"/>
+                </svg>
+              </motion.div>
+
+              {/* Clearfix to prevent floating images from overlapping */}
+              <div className="clear-both" />
+
+              {/* Social Share */}
+              <motion.div
+                className="p-8 bg-gradient-to-br from-amber-50 to-stone-50 dark:from-stone-900 dark:to-amber-950/30 rounded-2xl border-2 border-amber-800/20 clear-both"
                 initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <SocialShare title={article.title} />
+              </motion.div>
+
+              {/* Historical Gallery */}
+              {(() => {
+                const allImages = [
+                  { url: article.coverImage, caption: article.title, alt: article.title },
+                  ...(article.images || []).map((img) => ({
+                    url: img.url,
+                    caption: img.caption,
+                    alt: img.caption
+                  })),
+                  ...(article.gallery || [])
+                ];
+
+                return allImages.length > 0 ? (
+                  <HistoricalGallery
+                    images={allImages}
+                    title="Fotogaléria"
+                  />
+                ) : null;
+              })()}
+
+              {/* Comments */}
+              <motion.div
+                className="mt-8 p-8 bg-gradient-to-br from-stone-50 via-amber-50/20 to-stone-50 dark:from-stone-900 dark:via-amber-950/10 dark:to-stone-900 rounded-2xl border-4 border-double border-amber-800/30 shadow-2xl relative overflow-hidden"
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-amber-600/30">
-                  <div className="p-3 bg-amber-600 dark:bg-amber-700 rounded-lg shadow-md">
-                    <BookOpen className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 
-                    className="text-2xl text-amber-900 dark:text-amber-200 uppercase tracking-wide"
-                    style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
-                  >
-                    Bibliografia
-                  </h3>
+                <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
+                  <svg viewBox="0 0 100 100" className="text-amber-900">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2"/>
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="1"/>
+                    <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" strokeWidth="1"/>
+                  </svg>
                 </div>
-                <div className="space-y-4">
-                  {article.bibliography.map((ref, idx) => (
-                    <motion.div
-                      key={idx}
-                      className="flex gap-4 p-4 bg-white/50 dark:bg-stone-800/50 rounded-lg border border-amber-800/10 hover:border-amber-800/30 transition-colors"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.1 }}
-                    >
-                      <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-amber-600 dark:bg-amber-700 text-white rounded-full text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                        {idx + 1}
-                      </span>
-                      <p 
-                        className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed"
-                        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                      >
-                        {ref}
-                      </p>
-                    </motion.div>
-                  ))}
-                </div>
+                <CommentSection />
               </motion.div>
-            )}
+            </div>
 
-            {/* Decorative bottom ornament */}
-            <motion.div 
-              className="flex justify-center my-16"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <svg width="200" height="40" viewBox="0 0 200 40" className="text-amber-700/40 dark:text-amber-600/40">
-                <path d="M0 20 L200 20" stroke="currentColor" strokeWidth="1" fill="none"/>
-                <circle cx="100" cy="20" r="8" stroke="currentColor" strokeWidth="2" fill="none"/>
-                <circle cx="60" cy="20" r="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                <circle cx="140" cy="20" r="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                <path d="M85 20 L90 15 L95 20 L90 25 Z" stroke="currentColor" strokeWidth="1" fill="currentColor" opacity="0.3"/>
-                <path d="M105 20 L110 15 L115 20 L110 25 Z" stroke="currentColor" strokeWidth="1" fill="currentColor" opacity="0.3"/>
-              </svg>
-            </motion.div>
-
-            {/* Social Share */}
-            <motion.div 
-              className="p-8 bg-gradient-to-br from-amber-50 to-stone-50 dark:from-stone-900 dark:to-amber-950/30 rounded-2xl border-2 border-amber-800/20"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <SocialShare title={article.title} />
-            </motion.div>
-
-            {/* Comments - Enhanced Visual */}
-            <motion.div
-              className="mt-16 p-8 bg-gradient-to-br from-stone-50 via-amber-50/20 to-stone-50 dark:from-stone-900 dark:via-amber-950/10 dark:to-stone-900 rounded-2xl border-4 border-double border-amber-800/30 shadow-2xl relative overflow-hidden"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              {/* Decorative scroll pattern */}
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                <svg viewBox="0 0 100 100" className="text-amber-900">
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2"/>
-                  <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="1"/>
-                  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" strokeWidth="1"/>
-                </svg>
+            {/* Sidebar - 4 columns (SCEAR pattern) */}
+            <div style={{ gridColumn: 'span 4' }} className="bg-stone-50 dark:bg-stone-800 p-8">
+              <div className="sticky top-24">
+                <ArticleSidebar
+                  article={{
+                    title: article.title,
+                    content: article.content,
+                    tags: article.tags,
+                    keywords: (article as any).keywords,
+                    bibliography: article.bibliography,
+                    quotes: article.quotes,
+                    publishedAt: article.publishedAt,
+                    category: article.category
+                  }}
+                  relatedArticles={relatedArticles}
+                  coordinates={articleCoordinates}
+                  locationName={locationName}
+                  timeline={timelineData}
+                  keyFacts={keyFactsData}
+                />
               </div>
-              
-              <CommentSection />
-            </motion.div>
+            </div>
+
           </div>
-        </div>
-      </article>
+        </article>
+      </section>
 
       {/* Related articles */}
       {relatedArticles.length > 0 && (
@@ -494,13 +676,14 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                   className="inline-block mb-8"
                 >
                   <div className="relative">
-                    <div className="absolute inset-0 bg-amber-600/20 blur-xl rounded-full"></div>
+                    <div className="absolute inset-0 bg-amber-600/20 blur-xl rounded-full pointer-events-none"></div>
                     <div className="relative px-8 py-4 bg-gradient-to-r from-amber-100 via-amber-50 to-amber-100 dark:from-amber-900/30 dark:via-amber-950/20 dark:to-amber-900/30 border-4 border-double border-amber-600/40 rounded-full">
-                      <h2 
-                        className="text-3xl text-amber-950 dark:text-amber-100 uppercase tracking-widest"
-                        style={{ 
-                          fontFamily: 'Georgia, "Times New Roman", serif',
-                          letterSpacing: '0.2em'
+                      <h2
+                        className="text-2xl md:text-3xl uppercase tracking-widest"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          letterSpacing: '0.15em',
+                          color: '#1f1a12'
                         }}
                       >
                         Mohlo by vás zaujímať
@@ -517,9 +700,12 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                   className="h-1 w-64 bg-gradient-to-r from-transparent via-amber-600 to-transparent rounded-full mb-6 mx-auto"
                 />
                 
-                <p 
-                  className="text-lg text-stone-600 dark:text-stone-400 italic"
-                  style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+                <p
+                  className="text-lg italic"
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    color: '#4a3f2f' /* WCAG AAA - 7.1:1 */
+                  }}
                 >
                   Ďalšie články z kategórie {categoryLabels[article.category!]}
                 </p>

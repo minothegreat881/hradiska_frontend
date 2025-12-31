@@ -54,9 +54,9 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
       {/* Hero */}
       <div className="relative overflow-hidden">
         {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/20 via-cyan-500/20 to-amber-500/20 animate-pulse"></div>
-        
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/20 via-cyan-500/20 to-amber-500/20 animate-pulse pointer-events-none"></div>
+
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1753368226646-091196f6d706?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbmNpZW50JTIwY2FzdGxlJTIwcnVpbnN8ZW58MXx8fHwxNzYyMTc5MDU1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
             alt=""

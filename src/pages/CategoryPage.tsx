@@ -2,8 +2,9 @@
 
 import { motion } from 'motion/react';
 import { ArticleCard } from '../components/ArticleCard';
-import { mockArticles, categories, Category } from '../data/mock-data';
-import { BookOpen, ArrowLeft, Crown, Scroll } from 'lucide-react';
+import { categories, Category } from '../data/mock-data';
+import { useBlogPosts, useCategory } from '../hooks/useStrapi';
+import { BookOpen, ArrowLeft, Crown, Scroll, Loader2 } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { ParticleEffect } from '../components/ParticleEffect';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
@@ -13,9 +14,45 @@ interface CategoryPageProps {
 }
 
 export function CategoryPage({ categorySlug }: CategoryPageProps) {
-  const category = categories.find(c => c.value === categorySlug);
+  // Get category info from local data (for UI like image, icon)
+  const localCategory = categories.find(c => c.value === categorySlug);
 
-  if (!category) {
+  // Fetch category from Strapi
+  const { category: strapiCategory, loading: categoryLoading } = useCategory(categorySlug);
+
+  // Fetch articles for this category from Strapi
+  const { posts: strapiArticles, loading: articlesLoading, error } = useBlogPosts({
+    categorySlug: categorySlug,
+    pageSize: 50,
+  });
+
+  const isLoading = categoryLoading || articlesLoading;
+
+  // Use Strapi category name if available, fallback to local
+  const categoryName = strapiCategory?.name || localCategory?.label || categorySlug;
+  const categoryDescription = strapiCategory?.description || localCategory?.description || '';
+  const categoryImage = localCategory?.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200';
+  const categoryIcon = localCategory?.icon || '📜';
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen parchment flex items-center justify-center">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="w-12 h-12 text-amber-700 mx-auto mb-4" />
+          </motion.div>
+          <p className="text-amber-800 dark:text-amber-200">Načítavam články...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If no category found in Strapi and no local category
+  if (!strapiCategory && !localCategory) {
     return (
       <div className="container py-24 text-center">
         <h1 className="text-stone-900 dark:text-stone-50 mb-4">Kategória nebola nájdená</h1>
@@ -26,10 +63,8 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
     );
   }
 
-  // Filter articles by category
-  const categoryArticles = mockArticles.filter(article => 
-    article.hradiskaCategory && article.hradiskaCategory.includes(category.value as Category)
-  );
+  // Use Strapi articles, or empty array if error/none
+  const categoryArticles = strapiArticles || [];
 
   return (
     <div className="min-h-screen parchment">
@@ -62,15 +97,15 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
             {/* Main header with image */}
             <div className="relative rounded-3xl overflow-hidden bg-stone-900 shadow-2xl">
               {/* Background Image */}
-              <motion.div 
+              <motion.div
                 className="absolute inset-0"
                 initial={{ scale: 1.2 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
               >
                 <ImageWithFallback
-                  src={category.image}
-                  alt={category.label}
+                  src={categoryImage}
+                  alt={categoryName}
                   className="w-full h-full object-cover"
                 />
                 {/* Overlay gradients */}
@@ -116,7 +151,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                       Kategória
                     </span>
                   </motion.div>
-                  
+
                   {/* Title with decorative element */}
                   <div className="mb-6">
                     <motion.div
@@ -134,7 +169,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                         textShadow: '2px 4px 8px rgba(0,0,0,0.5)',
                       }}
                     >
-                      {category.label}
+                      {categoryName}
                     </motion.h1>
                     <motion.div
                       initial={{ scaleX: 0 }}
@@ -143,7 +178,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                       className="h-0.5 w-32 bg-gradient-to-r from-amber-600 to-transparent rounded-full"
                     />
                   </div>
-                  
+
                   {/* Description */}
                   <motion.p
                     initial={{ opacity: 0, y: 20 }}
@@ -154,7 +189,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                       textShadow: '1px 2px 4px rgba(0,0,0,0.5)',
                     }}
                   >
-                    {category.description}
+                    {categoryDescription}
                   </motion.p>
 
                   {/* Stats bar */}
@@ -170,7 +205,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                         <strong className="text-amber-50">{categoryArticles.length}</strong> {categoryArticles.length === 1 ? 'článok' : categoryArticles.length < 5 ? 'články' : 'článkov'}
                       </span>
                     </div>
-                    
+
                     {/* Decorative scroll indicator */}
                     <motion.div
                       animate={{ y: [0, 8, 0] }}
@@ -185,7 +220,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
               </div>
 
               {/* Bottom decorative wave */}
-              <motion.div 
+              <motion.div
                 className="absolute bottom-0 left-0 right-0 h-1"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
@@ -221,12 +256,25 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
         </div>
       </div>
 
+      {/* Error state */}
+      {error && (
+        <section className="py-8">
+          <div className="container">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
+              <p className="text-red-700 dark:text-red-300">
+                Nepodarilo sa načítať články. Skúste to prosím neskôr.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Articles Section */}
       {categoryArticles.length > 0 && (
         <section className="py-12 md:py-16 relative">
           {/* Section background */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-50/20 to-transparent dark:via-orange-950/10" />
-          
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-50/20 to-transparent dark:via-orange-950/10 pointer-events-none" />
+
           <div className="container relative">
             <ScrollReveal>
               <div className="mb-10">
@@ -245,7 +293,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     />
                     <BookOpen className="w-6 h-6 text-amber-50 relative z-10" />
                   </motion.div>
-                  
+
                   <div>
                     <h2 className="text-amber-950 dark:text-amber-50">Články a štúdie</h2>
                     <p className="text-sm text-amber-800/70 dark:text-amber-200/60">
@@ -277,7 +325,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
       )}
 
       {/* Empty State */}
-      {categoryArticles.length === 0 && (
+      {categoryArticles.length === 0 && !error && (
         <section className="py-16 md:py-24 relative">
           <div className="container">
             <ScrollReveal>
@@ -303,7 +351,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-amber-700 via-amber-600 to-amber-800 flex items-center justify-center shadow-2xl border-4 border-amber-900/30 relative">
                       <div className="absolute inset-2 rounded-full border-2 border-amber-400/30" />
                       <span className="text-6xl relative z-10 drop-shadow-lg">
-                        {category.icon}
+                        {categoryIcon}
                       </span>
                     </div>
                   </motion.div>
@@ -311,12 +359,12 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   <h3 className="text-amber-950 dark:text-amber-50 mb-3">
                     Zatiaľ žiadny obsah
                   </h3>
-                  
+
                   <p className="text-amber-900/70 dark:text-amber-100/60 mb-8 leading-relaxed">
                     V tejto kategórii zatiaľ nemáme pridané žiadne články.
                     Pracujeme na pridávaní nového obsahu.
                   </p>
-                  
+
                   <motion.a
                     href="/"
                     className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-700 to-amber-800 text-amber-50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-amber-900/20"

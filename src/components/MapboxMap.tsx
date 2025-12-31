@@ -6,9 +6,10 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { hradiskaData, Hradisko } from '../data/hradiska';
 import { Search, Filter, Maximize2, RotateCcw, Mountain, Shuffle, X } from 'lucide-react';
 
-// DÔLEŽITÉ: Nahraďte 'YOUR_MAPBOX_TOKEN' vaším skutočným Mapbox API kľúčom
-// Získajte ho na: https://account.mapbox.com/access-tokens/
-mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
+// Mapbox Access Token - Tento token je pre DEMO účely
+// Pre produkčné dlhodobé použitie si vytvorte VLASTNÝ token ZADARMO na: https://account.mapbox.com/
+// Registrácia trvá 1 minútu, žiadna platobná karta, 50,000 zobrazení/mesiac zadarmo!
+mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
 
 const MapboxMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -24,9 +25,15 @@ const MapboxMap = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
 
   const typeColors = {
-    hrad: '#e74c3c',
-    hradisko: '#f39c12',
-    zamok: '#9b59b6'
+    hrad: '#ff7f50', // Coral
+    hradisko: '#4682b4', // SteelBlue
+    zamok: '#9370db'  // MediumPurple
+  };
+
+  const svgIcons = {
+    hrad: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${typeColors.hrad}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-castle"><path d="M22 21v-9l-6-4.5V3h-3v3.5L8 2v18h14zM2 21v-9l6-4.5V8h3v3.5L16 2v18H2zM6 12h12"/></svg>`,
+    hradisko: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${typeColors.hradisko}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palisade"><path d="M4 17h16"/><path d="M4 10v7"/><path d="M8 10v7"/><path d="M12 10v7"/><path d="M16 10v7"/><path d="M20 10v7"/><path d="M5 10a7 7 0 0 0-3-6 2 2 0 0 1 3 3"/><path d="M19 10a7 7 0 0 1 3-6 2 2 0 0 0-3 3"/></svg>`,
+    zamok: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${typeColors.zamok}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>`,
   };
 
   const typeLabels = {
@@ -41,12 +48,16 @@ const MapboxMap = () => {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      style: 'mapbox://styles/mapbox/standard',
       center: [19.5, 48.7], // Stred Slovenska
-      zoom: 7,
-      pitch: 0,
-      bearing: 0,
+      zoom: 7.5,
+      pitch: 45,
+      bearing: 17.5,
       antialias: true
+    });
+    
+    map.current.on('style.load', () => {
+      map.current!.setConfigProperty('basemap', 'lightPreset', 'night');
     });
 
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -63,9 +74,9 @@ const MapboxMap = () => {
         maxzoom: 14
       });
       
-      map.current!.setTerrain({ source: 'mapbox-dem', exaggeration: 1.7 });
+      map.current!.setTerrain({ source: 'mapbox-dem', exaggeration: 2.5 });
       
-      // Add sky layer
+      // Add sky layer for atmospheric effects
       map.current!.addLayer({
         id: 'sky',
         type: 'sky',
@@ -76,7 +87,23 @@ const MapboxMap = () => {
         }
       });
 
+      // Add atmospheric fog
+      map.current!.setFog({
+        'range': [0.5, 10],
+        'color': 'white',
+        'horizon-blend': 0.05
+      });
+
       addMarkers();
+      
+      // Animate camera on load
+      map.current!.flyTo({
+          zoom: 8,
+          pitch: 60,
+          bearing: 0,
+          duration: 3000,
+          essential: true
+      });
     });
 
     return () => {
@@ -109,61 +136,71 @@ const MapboxMap = () => {
       // Create marker element
       const el = document.createElement('div');
       el.className = 'marker';
-      el.style.width = '30px';
-      el.style.height = '30px';
+      el.innerHTML = svgIcons[hradisko.type as keyof typeof svgIcons];
+      el.style.width = '40px';
+      el.style.height = '40px';
+      el.style.display = 'flex';
+      el.style.justifyContent = 'center';
+      el.style.alignItems = 'center';
+      el.style.backgroundColor = 'rgba(12, 10, 29, 0.7)';
       el.style.borderRadius = '50%';
-      el.style.backgroundColor = typeColors[hradisko.type];
-      el.style.border = '3px solid white';
-      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      el.style.border = `2px solid ${typeColors[hradisko.type]}`;
+      el.style.boxShadow = `0 0 15px ${typeColors[hradisko.type]}`;
       el.style.cursor = 'pointer';
-      el.style.transition = 'transform 0.2s';
-      
+      el.style.transition = 'transform 0.2s, box-shadow 0.2s';
+      el.style.backdropFilter = 'blur(4px)';
+
       if (hradisko.unesco) {
-        el.style.border = '3px solid gold';
-        el.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.6)';
+        el.style.border = '2px solid gold';
+        el.style.boxShadow = '0 0 25px gold';
       }
 
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.3)';
+        el.style.transform = 'scale(1.2)';
+        el.style.boxShadow = `0 0 30px ${hradisko.unesco ? 'gold' : typeColors[hradisko.type]}`;
       });
 
       el.addEventListener('mouseleave', () => {
         el.style.transform = 'scale(1)';
+        el.style.boxShadow = `0 0 15px ${hradisko.unesco ? 'gold' : typeColors[hradisko.type]}`;
       });
 
       // Create popup
       const popup = new mapboxgl.Popup({ 
-        offset: 25,
+        offset: 35,
         closeButton: false,
         className: 'custom-popup'
       }).setHTML(`
-        <div style="font-family: system-ui; min-width: 200px;">
-          <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">
+        <div style="font-family: system-ui; min-width: 220px; background-color: rgba(12, 10, 29, 0.85); color: #f0f0f0; border-radius: 8px; padding: 12px; border: 1px solid ${typeColors[hradisko.type]}; backdrop-filter: blur(5px);">
+          <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: white;">
             ${hradisko.name}
-            ${hradisko.unesco ? ' <span style="color: gold;">★</span>' : ''}
+            ${hradisko.unesco ? ' <span style="color: gold; font-size: 20px;">★</span>' : ''}
           </h3>
-          <p style="margin: 4px 0; font-size: 13px; color: #666;">
+          <p style="margin: 4px 0; font-size: 13px; color: #ccc;">
             <strong>Typ:</strong> ${typeLabels[hradisko.type]}
           </p>
-          <p style="margin: 4px 0; font-size: 13px; color: #666;">
+          <p style="margin: 4px 0; font-size: 13px; color: #ccc;">
             <strong>Obdobie:</strong> ${hradisko.rok}
           </p>
-          <p style="margin: 4px 0; font-size: 13px; color: #666;">
+          <p style="margin: 4px 0; font-size: 13px; color: #ccc;">
             <strong>Stav:</strong> ${hradisko.stav}
           </p>
           <button 
             onclick="window.showDetailedInfo('${hradisko.name}')"
             style="
-              margin-top: 10px;
-              padding: 6px 12px;
+              margin-top: 12px;
+              padding: 8px 12px;
               background: ${typeColors[hradisko.type]};
               color: white;
               border: none;
               border-radius: 4px;
               cursor: pointer;
-              font-size: 12px;
+              font-size: 13px;
               width: 100%;
+              transition: background-color 0.2s;
             "
+            onmouseover="this.style.backgroundColor='${typeColors[hradisko.type]}cc'"
+            onmouseout="this.style.backgroundColor='${typeColors[hradisko.type]}'"
           >
             Viac informácií
           </button>
@@ -198,6 +235,25 @@ const MapboxMap = () => {
       addMarkers();
     }
   }, [selectedTypes, searchQuery, mapLoaded]);
+
+  // Hide all markers and popups when detail is open
+  useEffect(() => {
+    if (selectedHradisko) {
+      // Hide all markers
+      markersRef.current.forEach(marker => {
+        marker.getElement().style.display = 'none';
+      });
+      // Close all popups
+      popupsRef.current.forEach(popup => {
+        popup.remove();
+      });
+    } else {
+      // Show all markers
+      markersRef.current.forEach(marker => {
+        marker.getElement().style.display = 'flex';
+      });
+    }
+  }, [selectedHradisko]);
 
   // Global function for detailed info button
   useEffect(() => {
@@ -263,7 +319,7 @@ const MapboxMap = () => {
   };
 
   return (
-    <div className="relative w-full h-[700px] bg-stone-900">
+    <div className="relative w-full h-[calc(100vh-80px)] min-h-[600px] bg-stone-900">
       {/* Header Panel */}
       <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-stone-900/95 to-stone-900/80 backdrop-blur-sm border-b border-stone-700/50 p-4">
         <div className="max-w-7xl mx-auto">
@@ -362,89 +418,194 @@ const MapboxMap = () => {
       </div>
 
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full" />
+      <div ref={mapContainer} className="absolute inset-0 w-full h-full" />
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-10 bg-stone-900/95 backdrop-blur-sm border border-stone-700 rounded p-4 max-w-xs">
-        <h3 className="text-stone-100 mb-3 text-sm">Legenda:</h3>
+      <div className="absolute bottom-4 left-4 z-10 bg-stone-900/80 backdrop-blur-md border border-stone-700 rounded-lg p-4 max-w-xs shadow-2xl">
+        <h3 className="text-stone-100 mb-3 text-sm font-semibold">Legenda:</h3>
         <div className="space-y-2">
           {Object.entries(typeLabels).map(([type, label]) => (
-            <div key={type} className="flex items-center gap-2">
-              <span 
-                className="w-4 h-4 rounded-full border-2 border-white shadow-lg" 
-                style={{ backgroundColor: typeColors[type as keyof typeof typeColors] }}
-              />
+            <div key={type} className="flex items-center gap-3">
+              <div 
+                className="w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ 
+                  backgroundColor: 'rgba(12, 10, 29, 0.7)',
+                  border: `2px solid ${typeColors[type as keyof typeof typeColors]}`
+                }}
+              >
+                <div dangerouslySetInnerHTML={{ __html: svgIcons[type as keyof typeof svgIcons] }} />
+              </div>
               <span className="text-stone-300 text-xs">{label}</span>
             </div>
           ))}
-          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-stone-700">
-            <span className="w-4 h-4 rounded-full border-2 border-yellow-400 shadow-lg bg-amber-600" />
+          <div className="flex items-center gap-3 mt-3 pt-3 border-t border-stone-700">
+            <div 
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ 
+                backgroundColor: 'rgba(12, 10, 29, 0.7)',
+                border: '2px solid gold',
+                boxShadow: '0 0 10px gold'
+              }}
+            >
+              <div dangerouslySetInnerHTML={{ __html: svgIcons.hrad }} />
+            </div>
             <span className="text-stone-300 text-xs">UNESCO pamiatka</span>
           </div>
         </div>
       </div>
 
-      {/* Detail Modal */}
+      {/* Detail Card - Parchment style overlay with historical motifs */}
       {selectedHradisko && (
-        <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-stone-900 border border-stone-700 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h2 className="text-stone-100 mb-1">
-                    {selectedHradisko.name}
-                    {selectedHradisko.unesco && <span className="text-yellow-400 ml-2">★ UNESCO</span>}
-                  </h2>
-                  <span 
-                    className="inline-block px-3 py-1 rounded text-xs text-white"
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6">
+          {/* Solid overlay - completely opaque */}
+          <div
+            className="absolute inset-0"
+            style={{ backgroundColor: '#1a1714' }}
+            onClick={() => setSelectedHradisko(null)}
+          />
+
+          {/* Card - parchment style - larger with decorations */}
+          <div
+            className="relative w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl"
+            style={{
+              background: 'linear-gradient(to bottom, #f9f6f0, #f5f1e8, #ebe5d8)',
+              border: '3px solid #c4a574'
+            }}
+          >
+            {/* Top decorative border with pattern */}
+            <div className="h-3 flex items-center justify-center" style={{ backgroundColor: '#c4a574' }}>
+              <div className="flex gap-4">
+                <span style={{ color: '#8b6914' }}>◆</span>
+                <span style={{ color: '#8b6914' }}>❖</span>
+                <span style={{ color: '#8b6914' }}>◆</span>
+              </div>
+            </div>
+
+            {/* Corner ornaments */}
+            <div className="absolute top-6 left-6 text-3xl opacity-20" style={{ color: '#8b7355' }}>❧</div>
+            <div className="absolute top-6 right-6 text-3xl opacity-20" style={{ color: '#8b7355', transform: 'scaleX(-1)' }}>❧</div>
+
+            <div className="p-10 flex gap-8 items-start">
+              {/* Left: Photo - larger */}
+              <div className="flex-shrink-0 mt-4">
+                <div
+                  className="relative rounded-xl overflow-hidden shadow-xl"
+                  style={{ width: '280px', height: '280px', border: '4px solid #c4a574' }}
+                >
+                  {selectedHradisko.fotka ? (
+                    <img
+                      src={selectedHradisko.fotka}
+                      alt={selectedHradisko.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ backgroundColor: '#e8dcc8' }}
+                    >
+                      <div
+                        className="w-20 h-20 rounded-full flex items-center justify-center"
+                        style={{
+                          backgroundColor: '#f5f1e8',
+                          border: `3px solid ${typeColors[selectedHradisko.type]}`
+                        }}
+                      >
+                        <div dangerouslySetInnerHTML={{ __html: svgIcons[selectedHradisko.type as keyof typeof svgIcons] }} />
+                      </div>
+                    </div>
+                  )}
+                  {/* Type badge */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 py-2 text-center text-sm text-white font-bold uppercase tracking-wider"
                     style={{ backgroundColor: typeColors[selectedHradisko.type] }}
                   >
                     {typeLabels[selectedHradisko.type]}
-                  </span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setSelectedHradisko(null)}
-                  className="p-2 hover:bg-stone-800 rounded transition-colors"
-                >
-                  <X className="w-5 h-5 text-stone-400" />
-                </button>
+
+                {/* Decorative element under photo */}
+                <div className="text-center mt-3" style={{ color: '#c4a574' }}>
+                  ═══════════
+                </div>
               </div>
 
-              <div className="space-y-4 text-sm">
-                <p className="text-stone-300 leading-relaxed">
-                  {selectedHradisko.description}
-                </p>
+              {/* Right: Info */}
+              <div className="flex-1 min-w-0">
+                {/* Header with ornament */}
+                <div className="flex items-start justify-between gap-4 mb-2">
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <span style={{ color: '#c4a574', fontSize: '20px' }}>⚜</span>
+                      <h3
+                        className="font-bold text-4xl"
+                        style={{ color: '#2d1810', fontFamily: 'Georgia, "Times New Roman", serif' }}
+                      >
+                        {selectedHradisko.name}
+                      </h3>
+                      <span style={{ color: '#c4a574', fontSize: '20px' }}>⚜</span>
+                    </div>
+                    {selectedHradisko.unesco && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-yellow-500 rounded-lg text-sm text-stone-900 font-bold uppercase">
+                        ★ UNESCO Pamiatka
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSelectedHradisko(null)}
+                    className="p-2 hover:bg-amber-100 rounded-full transition-colors"
+                  >
+                    <X className="w-7 h-7" style={{ color: '#5d4e37' }} />
+                  </button>
+                </div>
 
-                <div className="grid grid-cols-2 gap-4 py-4 border-y border-stone-800">
+                {/* Decorative divider */}
+                <div className="flex items-center gap-2 mb-5" style={{ color: '#c4a574' }}>
+                  <div className="flex-1 h-px" style={{ backgroundColor: '#c4a574' }}></div>
+                  <span>✦</span>
+                  <div className="flex-1 h-px" style={{ backgroundColor: '#c4a574' }}></div>
+                </div>
+
+                {/* Description if available */}
+                {selectedHradisko.description && (
+                  <p
+                    className="mb-5 text-base leading-relaxed"
+                    style={{ color: '#4a3f35', fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}
+                  >
+                    "{selectedHradisko.description.substring(0, 150)}..."
+                  </p>
+                )}
+
+                {/* Info grid - larger with ornate styling */}
+                <div
+                  className="grid grid-cols-2 gap-5 mb-6 p-5 rounded-xl relative"
+                  style={{ backgroundColor: 'rgba(194, 164, 118, 0.2)', border: '2px solid #c4a574' }}
+                >
+                  {/* Corner decorations */}
+                  <span className="absolute -top-2 -left-2 text-lg" style={{ color: '#c4a574' }}>┌</span>
+                  <span className="absolute -top-2 -right-2 text-lg" style={{ color: '#c4a574' }}>┐</span>
+                  <span className="absolute -bottom-2 -left-2 text-lg" style={{ color: '#c4a574' }}>└</span>
+                  <span className="absolute -bottom-2 -right-2 text-lg" style={{ color: '#c4a574' }}>┘</span>
+
                   <div>
-                    <p className="text-stone-500 text-xs mb-1">Obdobie vzniku:</p>
-                    <p className="text-stone-200">{selectedHradisko.rok}</p>
+                    <span className="text-xs uppercase tracking-wider font-medium" style={{ color: '#8b7355' }}>⏳ Obdobie</span>
+                    <p className="font-semibold text-xl" style={{ color: '#2d1810' }}>{selectedHradisko.rok}</p>
                   </div>
                   <div>
-                    <p className="text-stone-500 text-xs mb-1">Súčasný stav:</p>
-                    <p className="text-stone-200">{selectedHradisko.stav}</p>
+                    <span className="text-xs uppercase tracking-wider font-medium" style={{ color: '#8b7355' }}>📜 Stav</span>
+                    <p className="font-semibold text-xl" style={{ color: '#2d1810' }}>{selectedHradisko.stav}</p>
                   </div>
                   <div>
-                    <p className="text-stone-500 text-xs mb-1">Okres:</p>
-                    <p className="text-stone-200">{selectedHradisko.okres}</p>
+                    <span className="text-xs uppercase tracking-wider font-medium" style={{ color: '#8b7355' }}>📍 Okres</span>
+                    <p className="font-semibold text-xl" style={{ color: '#2d1810' }}>{selectedHradisko.okres || '-'}</p>
                   </div>
                   <div>
-                    <p className="text-stone-500 text-xs mb-1">Kraj:</p>
-                    <p className="text-stone-200">{selectedHradisko.kraj}</p>
-                  </div>
-                  <div>
-                    <p className="text-stone-500 text-xs mb-1">Nadmorská výška:</p>
-                    <p className="text-stone-200">{selectedHradisko.nadmorskaVyska} m n.m.</p>
-                  </div>
-                  <div>
-                    <p className="text-stone-500 text-xs mb-1">Súradnice:</p>
-                    <p className="text-stone-200 text-xs">
-                      {selectedHradisko.coordinates[1].toFixed(4)}°N, {selectedHradisko.coordinates[0].toFixed(4)}°E
-                    </p>
+                    <span className="text-xs uppercase tracking-wider font-medium" style={{ color: '#8b7355' }}>⛰️ Nadmorská výška</span>
+                    <p className="font-semibold text-xl" style={{ color: '#2d1810' }}>{selectedHradisko.nadmorskaVyska} m n.m.</p>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                {/* Actions - larger buttons */}
+                <div className="flex gap-4">
                   <button
                     onClick={() => {
                       if (map.current) {
@@ -455,20 +616,53 @@ const MapboxMap = () => {
                           duration: 2000
                         });
                       }
+                      setSelectedHradisko(null);
                     }}
-                    className="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors"
+                    className="flex-1 px-6 py-3.5 text-white rounded-xl font-semibold transition-colors text-lg"
+                    style={{ backgroundColor: '#7d4f1d' }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#5e3c16'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#7d4f1d'}
                   >
-                    Priblížiť na mape
+                    🗺️ Priblížiť na mape
                   </button>
                   <button
                     onClick={() => setSelectedHradisko(null)}
-                    className="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded transition-colors"
+                    className="px-6 py-3.5 rounded-xl font-semibold transition-colors text-lg"
+                    style={{ backgroundColor: '#e8dcc8', color: '#5d4e37', border: '2px solid #c4a574' }}
                   >
                     Zavrieť
                   </button>
                 </div>
+
+                {/* Google Maps link - moved lower */}
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => {
+                      window.open(`https://www.google.com/maps?q=${selectedHradisko.coordinates[1]},${selectedHradisko.coordinates[0]}`, '_blank');
+                    }}
+                    className="text-sm underline transition-colors"
+                    style={{ color: '#7d4f1d' }}
+                    onMouseOver={(e) => e.currentTarget.style.color = '#5e3c16'}
+                    onMouseOut={(e) => e.currentTarget.style.color = '#7d4f1d'}
+                  >
+                    📍 Otvoriť v Google Maps →
+                  </button>
+                </div>
               </div>
             </div>
+
+            {/* Bottom decorative border with pattern */}
+            <div className="h-3 flex items-center justify-center" style={{ backgroundColor: '#c4a574' }}>
+              <div className="flex gap-4">
+                <span style={{ color: '#8b6914' }}>◆</span>
+                <span style={{ color: '#8b6914' }}>❖</span>
+                <span style={{ color: '#8b6914' }}>◆</span>
+              </div>
+            </div>
+
+            {/* Bottom corner ornaments */}
+            <div className="absolute bottom-6 left-6 text-3xl opacity-20" style={{ color: '#8b7355', transform: 'rotate(180deg)' }}>❧</div>
+            <div className="absolute bottom-6 right-6 text-3xl opacity-20" style={{ color: '#8b7355', transform: 'rotate(180deg) scaleX(-1)' }}>❧</div>
           </div>
         </div>
       )}

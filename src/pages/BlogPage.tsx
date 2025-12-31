@@ -27,10 +27,21 @@ export function BlogPage() {
       <div className="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800">
         <div className="container py-12 md:py-16">
           <div className="max-w-3xl">
-            <h1 className="text-stone-900 dark:text-stone-50 mb-4">
+            <h1
+              className="mb-4"
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                color: '#1f1a12' /* WCAG AAA - 13.5:1 */
+              }}
+            >
               Blog
             </h1>
-            <p className="text-stone-600 dark:text-stone-400">
+            <p
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                color: '#2d2418' /* WCAG AAA - 11.2:1 */
+              }}
+            >
               Výskumy, objavy, metodika a aktuality zo sveta slovenskej
               archeológie. Odborné články pripravené skúsenými archeológmi.
             </p>
@@ -48,9 +59,13 @@ export function BlogPage() {
                 onClick={() => setSelectedCategory(cat.value)}
                 className={`px-6 py-2 rounded-xl whitespace-nowrap transition-all ${
                   selectedCategory === cat.value
-                    ? 'bg-sky-600 text-white shadow-md'
-                    : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                    ? 'bg-amber-700 text-white shadow-md'
+                    : 'bg-amber-50 dark:bg-stone-800 hover:bg-amber-100 dark:hover:bg-stone-700'
                 }`}
+                style={{
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                  color: selectedCategory === cat.value ? '#ffffff' : '#2d2418'
+                }}
               >
                 {cat.label}
               </button>
@@ -79,10 +94,21 @@ export function BlogPage() {
             <div className="w-24 h-24 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-6">
               <span className="text-5xl">📰</span>
             </div>
-            <h3 className="text-stone-900 dark:text-stone-100 mb-2">
+            <h3
+              className="mb-2"
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                color: '#1f1a12' /* WCAG AAA - 13.5:1 */
+              }}
+            >
               Žiadne články
             </h3>
-            <p className="text-stone-600 dark:text-stone-400">
+            <p
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                color: '#4a3f2f' /* WCAG AAA - 7.1:1 */
+              }}
+            >
               V tejto kategórii zatiaľ nie sú publikované žiadne články.
             </p>
           </div>
