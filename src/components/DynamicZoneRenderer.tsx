@@ -1,10 +1,17 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'motion/react';
+import { ZoomIn } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { QuoteBlock } from './QuoteBlock';
 import { BlogMedia, BlogMediaAspectRatio, BlogMediaWidth } from './BlogMedia';
 import { getStrapiImageUrl, StrapiImage } from '../lib/strapi';
+
+// Helper: open gallery modal with specific image
+function openGalleryWithImage(imageUrl: string) {
+  window.dispatchEvent(new CustomEvent('openGalleryModal', { detail: { imageUrl } }));
+}
 
 // =============================================================================
 // TYPES
@@ -22,8 +29,7 @@ interface ImageBlock {
   image: StrapiImage;
   alt?: string;
   caption?: string;
-  // NEW: SCEAR-style position and pairing
-  position?: 'left' | 'right' | 'center' | 'full';
+  position?: 'left' | 'right' | 'center' | 'full' | 'breakout';
   pairWithNext?: boolean;
   width?: '30' | '40' | '50' | '60' | '100';
   aspectRatio?: '3:2' | '16:9' | '4:3' | '1:1' | '2:3' | '9:16' | '3:4' | 'auto';
@@ -31,11 +37,6 @@ interface ImageBlock {
   showCaption?: boolean;
   rounded?: boolean;
   shadow?: boolean;
-  // LEGACY fields (backward compatibility)
-  secondImage?: StrapiImage;
-  layout?: 'full-width' | 'left-float' | 'right-float' | 'center' | 'side-by-side' | 'breakout';
-  size?: 'small' | 'medium' | 'large';
-  alignment?: 'left' | 'center' | 'right' | 'full';
 }
 
 interface QuoteBlockType {
@@ -53,7 +54,21 @@ interface ImageGalleryBlock {
   columns?: '2' | '3' | '4';
 }
 
-type DynamicBlock = RichTextBlock | ImageBlock | QuoteBlockType | ImageGalleryBlock;
+interface SourceItem {
+  id?: number;
+  text?: string | null;
+  url?: string | null;
+}
+
+interface SourcesBlock {
+  __component: 'content.sources';
+  id: number;
+  title?: string | null;
+  intro?: string | null;
+  items: SourceItem[];
+}
+
+type DynamicBlock = RichTextBlock | ImageBlock | QuoteBlockType | ImageGalleryBlock | SourcesBlock;
 
 interface DynamicZoneRendererProps {
   blocks: DynamicBlock[];
@@ -68,46 +83,23 @@ function arePositionsOpposite(pos1?: string, pos2?: string): boolean {
 }
 
 // =============================================================================
-// HELPER: Get effective position from block (supports legacy layout field)
+// HELPER: Get position from block
 // =============================================================================
 
-function getEffectivePosition(block: ImageBlock): 'left' | 'right' | 'center' | 'full' {
-  // New position field takes priority
-  if (block.position) return block.position;
-
-  // Legacy layout field mapping
-  if (block.layout) {
-    switch (block.layout) {
-      case 'left-float': return 'left';
-      case 'right-float': return 'right';
-      case 'full-width':
-      case 'breakout': return 'full';
-      default: return 'center';
-    }
-  }
-
-  // Legacy alignment field
-  if (block.alignment) {
-    switch (block.alignment) {
-      case 'left': return 'left';
-      case 'right': return 'right';
-      case 'full': return 'full';
-      default: return 'center';
-    }
-  }
-
-  return 'center';
+function getPosition(block: ImageBlock): 'left' | 'right' | 'center' | 'full' | 'breakout' {
+  return block.position || 'center';
 }
 
 // =============================================================================
 // HELPER: Map position to BlogMedia variant
 // =============================================================================
 
-function positionToVariant(position: 'left' | 'right' | 'center' | 'full'): string {
+function positionToVariant(position: 'left' | 'right' | 'center' | 'full' | 'breakout'): string {
   switch (position) {
     case 'left': return 'left-float';
     case 'right': return 'right-float';
     case 'full': return 'full-width';
+    case 'breakout': return 'breakout';
     default: return 'center';
   }
 }
@@ -117,7 +109,7 @@ function positionToVariant(position: 'left' | 'right' | 'center' | 'full'): stri
 // =============================================================================
 
 function isFloatPosition(block: ImageBlock): boolean {
-  const pos = getEffectivePosition(block);
+  const pos = getPosition(block);
   return pos === 'left' || pos === 'right';
 }
 
@@ -165,19 +157,28 @@ function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
           : '66.67%')
       : ASPECT_RATIO_PADDING[aspectRatio] || '66.67%';
 
+    const imageUrl = getStrapiImageUrl(block.image);
     return (
       <>
-        <div
-          className={`relative overflow-hidden ${rounded ? 'rounded-lg' : ''} ${shadow ? 'shadow-lg' : ''}`}
+        <button
+          onClick={() => openGalleryWithImage(imageUrl)}
+          className={`relative overflow-hidden ${rounded ? 'rounded-lg' : ''} ${shadow ? 'shadow-lg' : ''} w-full cursor-pointer group`}
           style={{ paddingBottom }}
+          title="Kliknutím zobraziť v galérii"
         >
           <ImageWithFallback
             src={getStrapiImageUrl(block.image)}
             alt={altText}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             style={{ objectPosition }}
           />
-        </div>
+          {/* Hover overlay with zoom icon */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3 bg-white/30 backdrop-blur-sm rounded-full">
+              <ZoomIn className="w-6 h-6 text-white drop-shadow-lg" />
+            </div>
+          </div>
+        </button>
         {showCaption && block.caption && (
           <p
             className="mt-2 text-sm text-stone-500 dark:text-stone-400 text-center italic"
@@ -223,10 +224,10 @@ function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
 // RICH TEXT RENDERER with clear-before-heading pattern
 // =============================================================================
 
-function renderRichText(body: any[], isFirstBlock: boolean = false, hasPrecedingFloat: boolean = false) {
+function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasPrecedingFloat: boolean = false) {
   if (!body) return null;
 
-  let isFirstParagraph = isFirstBlock;
+  let isFirstParagraphInBlock = true; // First paragraph of THIS block (for indent)
   const elements: React.ReactNode[] = [];
 
   body.forEach((block, idx) => {
@@ -236,15 +237,48 @@ function renderRichText(body: any[], isFirstBlock: boolean = false, hasPreceding
     }
 
     if (block.type === 'paragraph') {
-      const text = block.children?.map((child: any) => child.text).join('') || '';
-      if (!text.trim()) return;
+      // Inline children môžu byť `text` ALEBO `link` (so vnoreným text child-om).
+      // Predtým mapovanie len `child.text` stratilo paragraphy s len `link` — napríklad
+      // celú sekciu "Zdroje a literatúra" v ktorej sú URL ako <link> elementy.
+      const renderInline = (children: any[] = []): React.ReactNode[] =>
+        children.map((child: any, ci: number) => {
+          if (child.type === 'link') {
+            const linkText = child.children?.map((c: any) => c.text).join('') || child.url;
+            return (
+              <a
+                key={ci}
+                href={child.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-700 dark:text-amber-400 underline hover:text-amber-900 dark:hover:text-amber-300 break-all"
+              >
+                {linkText}
+              </a>
+            );
+          }
+          // type === 'text' (môže mať bold/italic/underline)
+          let node: React.ReactNode = child.text || '';
+          if (child.bold) node = <strong key={ci}>{node}</strong>;
+          if (child.italic) node = <em key={ci}>{node}</em>;
+          if (child.underline) node = <u key={ci}>{node}</u>;
+          return <React.Fragment key={ci}>{node}</React.Fragment>;
+        });
 
-      const shouldDropCap = isFirstParagraph && text.length > 0;
-      if (isFirstParagraph) isFirstParagraph = false;
+      const plainText = (block.children || [])
+        .map((c: any) =>
+          c.type === 'link' ? c.children?.map((x: any) => x.text).join('') || c.url : c.text || '',
+        )
+        .join('');
+      if (!plainText.trim()) return;
+
+      // Drop cap ONLY for the very first paragraph of the very first Rich Text block
+      const shouldDropCap = isFirstRichTextBlock && isFirstParagraphInBlock && plainText.length > 0;
+      const shouldIndent = isFirstParagraphInBlock;
+      if (isFirstParagraphInBlock) isFirstParagraphInBlock = false;
 
       if (shouldDropCap) {
-        const firstLetter = text.charAt(0);
-        const restOfText = text.slice(1);
+        const firstLetter = plainText.charAt(0);
+        const restOfText = plainText.slice(1);
         elements.push(
           <p
             key={idx}
@@ -252,13 +286,17 @@ function renderRichText(body: any[], isFirstBlock: boolean = false, hasPreceding
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
             <span
-              className="float-left text-5xl md:text-6xl font-bold text-amber-700 dark:text-amber-500 mr-2 mt-1"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif', lineHeight: '0.8' }}
+              className="float-left text-6xl md:text-7xl font-bold text-amber-700 dark:text-amber-500 mr-3 leading-none"
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                lineHeight: '0.75',
+                marginTop: '0.1em',
+              }}
             >
               {firstLetter}
             </span>
             {restOfText}
-          </p>
+          </p>,
         );
         return;
       }
@@ -267,10 +305,13 @@ function renderRichText(body: any[], isFirstBlock: boolean = false, hasPreceding
         <p
           key={idx}
           className="text-base md:text-lg leading-relaxed mb-4 text-stone-700 dark:text-stone-300"
-          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            textIndent: shouldIndent ? '2em' : undefined,
+          }}
         >
-          {text}
-        </p>
+          {renderInline(block.children)}
+        </p>,
       );
       return;
     }
@@ -303,9 +344,32 @@ function renderRichText(body: any[], isFirstBlock: boolean = false, hasPreceding
 
     if (block.type === 'list') {
       elements.push(
-        <ul key={idx} className="list-disc list-inside space-y-2 my-4 text-stone-700 dark:text-stone-300">
+        <ul
+          key={idx}
+          className="space-y-2 my-4 text-stone-700 dark:text-stone-300"
+          style={{ listStyle: 'none', paddingLeft: '1.25rem', marginLeft: 0 }}
+        >
           {block.children?.map((item: any, i: number) => (
-            <li key={i} style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+            <li
+              key={i}
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                position: 'relative',
+                paddingLeft: '1rem',
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: '0.75em',
+                  width: 6,
+                  height: 6,
+                  borderRadius: 9999,
+                  background: '#a87437',
+                }}
+              />
               {item.children?.map((child: any) => child.text).join('')}
             </li>
           ))}
@@ -324,50 +388,24 @@ function renderRichText(body: any[], isFirstBlock: boolean = false, hasPreceding
 
 function RichTextRenderer({
   block,
-  isFirstBlock = false,
+  isFirstRichTextBlock = false,
   hasPrecedingFloat = false
 }: {
   block: RichTextBlock;
-  isFirstBlock?: boolean;
+  isFirstRichTextBlock?: boolean;
   hasPrecedingFloat?: boolean;
 }) {
-  return <div className="mb-6">{renderRichText(block.body, isFirstBlock, hasPrecedingFloat)}</div>;
+  return <div className="mb-6">{renderRichText(block.body, isFirstRichTextBlock, hasPrecedingFloat)}</div>;
 }
 
 function ImageBlockRenderer({ block }: { block: ImageBlock }) {
-  const position = getEffectivePosition(block);
+  const position = getPosition(block);
   const variant = positionToVariant(position);
   const altText = block.alt || block.image?.alternativeText || block.caption || 'Obrázok';
-
-  // LEGACY: Handle old secondImage + side-by-side layout
-  if (block.secondImage && block.layout === 'side-by-side') {
-    return (
-      <BlogMedia
-        variant="side-by-side"
-        size={block.size || 'medium'}
-        widthPercent={block.width as BlogMediaWidth}
-        aspectRatio={(block.aspectRatio || 'auto') as BlogMediaAspectRatio}
-        objectPosition={block.objectPosition || 'center center'}
-        src={getStrapiImageUrl(block.image)}
-        alt={altText}
-        width={block.image?.width}
-        height={block.image?.height}
-        caption={block.caption}
-        showCaption={block.showCaption ?? true}
-        rounded={block.rounded ?? true}
-        shadow={block.shadow ?? true}
-        secondSrc={getStrapiImageUrl(block.secondImage)}
-        secondAlt={block.secondImage?.alternativeText || block.secondImage?.caption || altText}
-        secondWidth={block.secondImage?.width}
-        secondHeight={block.secondImage?.height}
-      />
-    );
-  }
 
   return (
     <BlogMedia
       variant={variant as any}
-      size={block.size || 'medium'}
       widthPercent={block.width as BlogMediaWidth}
       aspectRatio={(block.aspectRatio || 'auto') as BlogMediaAspectRatio}
       objectPosition={block.objectPosition || 'center center'}
@@ -392,6 +430,46 @@ function QuoteBlockRenderer({ block, needsClearBefore }: { block: QuoteBlockType
         author={block.author}
         source={block.source}
       />
+    </>
+  );
+}
+
+function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; needsClearBefore?: boolean }) {
+  const items = block.items || [];
+  if (items.length === 0 && !block.intro) return null;
+  return (
+    <>
+      {needsClearBefore && <div className="clear-both" />}
+      <section className="sources-block my-8 clear-both not-prose">
+        {block.title && (
+          <h2 className="text-2xl font-serif text-stone-900 mb-3">{block.title}</h2>
+        )}
+        {block.intro && (
+          <p className="text-stone-700 mb-3 leading-relaxed">{block.intro}</p>
+        )}
+        <ul className="list-none p-0 m-0 space-y-1.5">
+          {items.map((it, j) => {
+            const text = (it.text || '').trim();
+            const url = (it.url || '').trim();
+            return (
+              <li key={it.id || j} className="text-stone-700 leading-relaxed">
+                {url ? (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-700 hover:text-amber-900 hover:underline break-all"
+                  >
+                    {text || url}
+                  </a>
+                ) : (
+                  <span>{text}</span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
     </>
   );
 }
@@ -472,8 +550,8 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
         nextBlock.__component === 'content.image-block'
       ) {
         const nextImgBlock = nextBlock as ImageBlock;
-        const currentPos = getEffectivePosition(imgBlock);
-        const nextPos = getEffectivePosition(nextImgBlock);
+        const currentPos = getPosition(imgBlock);
+        const nextPos = getPosition(nextImgBlock);
 
         if (arePositionsOpposite(currentPos, nextPos)) {
           // Render as paired row
@@ -513,7 +591,7 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
           <RichTextRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as RichTextBlock}
-            isFirstBlock={idx === firstRichTextIndex}
+            isFirstRichTextBlock={idx === firstRichTextIndex}
             hasPrecedingFloat={isPrevFloat}
           />
         );
@@ -534,6 +612,16 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
           <ImageGalleryRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as ImageGalleryBlock}
+            needsClearBefore={isPrevFloat}
+          />
+        );
+        break;
+
+      case 'content.sources':
+        renderedElements.push(
+          <SourcesRenderer
+            key={`${block.__component}-${block.id || idx}`}
+            block={block as SourcesBlock}
             needsClearBefore={isPrevFloat}
           />
         );

@@ -1,160 +1,257 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, MapPin } from 'lucide-react';
 
 interface MegaMenuProps {
   item: NavigationItem;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
 }
 
-export function MegaMenu({ item }: MegaMenuProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const hasChildren = item.children && item.children.length > 0;
+const GOLD = '#c4a574';
+const GOLD_BRIGHT = '#e8c56e';
+const TEXT_LIGHT = '#f0e8dc';
+const DROPDOWN_BG = '#2e2317';
+const HOVER_BG = 'rgba(196,165,116,0.15)';
+const ACTIVE_BG = 'rgba(196,165,116,0.20)';
+const BORDER_GOLD = 'rgba(196,165,116,0.25)';
+const PILL_BG = 'rgba(196,165,116,0.18)';
+
+function pluralLokalit(n: number): string {
+  if (n === 1) return 'lokalitu';
+  if (n < 5) return 'lokality';
+  return 'lokalít';
+}
+
+export function MegaMenu({ item, isOpen, onToggle, onClose }: MegaMenuProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const hasChildren = !!(item.children && item.children.length > 0);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('mousedown', onDocClick);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onEsc);
+    };
+  }, [isOpen, onClose]);
+
+  // Flatten children → grandchildren (ako predtým), limit 12
+  const allItems: NavigationItem[] = hasChildren
+    ? (item.children as NavigationItem[]).flatMap((c) =>
+        c.children && c.children.length > 0 ? c.children : [c]
+      )
+    : [];
+  const limit = 12;
+  const displayedItems = allItems.slice(0, limit);
+  const hasMore = allItems.length > limit;
+
+  // Dropdown sa zobrazí len pre kategórie s child položkami
+  const canOpen = hasChildren && allItems.length > 0;
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-    >
-      <a
-        href={item.slug || '#'}
-        className="px-3 py-2 text-sm text-stone-700 dark:text-stone-300 hover:text-amber-700 dark:hover:text-amber-400 transition-colors rounded-lg hover:bg-amber-50/50 dark:hover:bg-stone-900/50 flex items-center gap-1 group"
-        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+    <div ref={rootRef} style={{ position: 'relative' }}>
+      <button
+        type="button"
+        onClick={() => {
+          if (canOpen) onToggle();
+          else if (item.slug) window.location.href = item.slug;
+        }}
+        aria-expanded={isOpen}
+        aria-haspopup={canOpen ? 'menu' : undefined}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 14px',
+          background: isOpen ? ACTIVE_BG : 'transparent',
+          border: 0,
+          borderRadius: 8,
+          color: isOpen ? GOLD_BRIGHT : TEXT_LIGHT,
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          fontSize: 14,
+          cursor: 'pointer',
+          transition: 'background 0.15s, color 0.15s',
+          whiteSpace: 'nowrap',
+        }}
+        onMouseEnter={(e) => {
+          if (!isOpen) (e.currentTarget as HTMLElement).style.background = 'rgba(196,165,116,0.12)';
+        }}
+        onMouseLeave={(e) => {
+          if (!isOpen) (e.currentTarget as HTMLElement).style.background = 'transparent';
+        }}
       >
-        {item.label}
-        {item.count !== undefined && (
-          <span className="text-xs text-amber-600 dark:text-amber-400 font-semibold">
-            ({item.count})
+        <span>{item.label}</span>
+        {typeof item.count === 'number' && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: 22,
+              height: 18,
+              padding: '0 6px',
+              borderRadius: 9999,
+              background: PILL_BG,
+              color: GOLD_BRIGHT,
+              fontSize: 10.5,
+              fontWeight: 600,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {item.count}
           </span>
         )}
-        {hasChildren && (
-          <motion.div
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChevronDown className="w-3.5 h-3.5" />
-          </motion.div>
+        {canOpen && (
+          <ChevronDown
+            style={{
+              width: 13,
+              height: 13,
+              transition: 'transform 0.15s',
+              transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+              opacity: 0.8,
+            }}
+          />
         )}
-      </a>
+      </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown */}
       <AnimatePresence>
-        {isOpen && hasChildren && (
+        {isOpen && canOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute left-0 top-full mt-2 w-[550px] bg-white dark:bg-stone-900 rounded-xl shadow-2xl border border-amber-200 dark:border-amber-900/30 overflow-hidden z-50"
-            onWheel={(e) => e.stopPropagation()}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            role="menu"
+            aria-label={`${item.label} navigation`}
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 'calc(100% + 8px)',
+              width: 520,
+              maxWidth: 'calc(100vw - 32px)',
+              background: DROPDOWN_BG,
+              border: `1px solid ${BORDER_GOLD}`,
+              borderRadius: 12,
+              padding: 8,
+              boxShadow: '0 12px 28px rgba(15,10,5,0.5)',
+              zIndex: 60,
+            }}
           >
-            {/* Scrollable Content - Clean List of Chapter Titles Only */}
-            <nav
-              className="scrollable-dropdown-content"
-              role="navigation"
-              aria-label={`${item.label} navigation`}
+            <div
               style={{
-                height: '320px',
-                overflowY: 'scroll',
-                overflowX: 'hidden',
-                position: 'relative'
-              }}
-              onMouseEnter={(e) => {
-                document.body.style.overflow = 'hidden';
-              }}
-              onMouseLeave={(e) => {
-                document.body.style.overflow = '';
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 2,
               }}
             >
-              <style dangerouslySetInnerHTML={{
-                __html: `
-                  .scrollable-dropdown-content {
-                    scrollbar-width: thin;
-                    scrollbar-color: #f59e0b #fef3c7;
-                  }
+              {displayedItems.map((child) => (
+                <a
+                  key={(child.slug || child.label) + child.label}
+                  href={child.slug || '#'}
+                  onClick={onClose}
+                  role="menuitem"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '10px 12px',
+                    borderRadius: 8,
+                    color: TEXT_LIGHT,
+                    textDecoration: 'none',
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    fontSize: 13.5,
+                    transition: 'background 0.12s, color 0.12s',
+                  }}
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget;
+                    el.style.background = HOVER_BG;
+                    el.style.color = GOLD_BRIGHT;
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget;
+                    el.style.background = 'transparent';
+                    el.style.color = TEXT_LIGHT;
+                  }}
+                >
+                  <MapPin
+                    style={{
+                      width: 12,
+                      height: 12,
+                      color: '#a87437',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {child.label}
+                  </span>
+                </a>
+              ))}
+            </div>
 
-                  .scrollable-dropdown-content::-webkit-scrollbar {
-                    width: 12px;
-                  }
-
-                  .scrollable-dropdown-content::-webkit-scrollbar-track {
-                    background: #fef3c7;
-                    border-radius: 8px;
-                    margin: 4px 0;
-                  }
-
-                  .scrollable-dropdown-content::-webkit-scrollbar-thumb {
-                    background: #f59e0b;
-                    border-radius: 8px;
-                    border: 2px solid #fef3c7;
-                  }
-
-                  .scrollable-dropdown-content::-webkit-scrollbar-thumb:hover {
-                    background: #d97706;
-                  }
-
-                  .dark .scrollable-dropdown-content::-webkit-scrollbar-track {
-                    background: #292524;
-                  }
-
-                  .dark .scrollable-dropdown-content::-webkit-scrollbar-thumb {
-                    background: #d97706;
-                    border-color: #292524;
-                  }
-
-                  .dark .scrollable-dropdown-content::-webkit-scrollbar-thumb:hover {
-                    background: #f59e0b;
-                  }
-                `
-              }} />
-
-              {/* Chapter Titles List */}
-              <ul className="p-3" role="list">
-                {item.children.flatMap((child) => {
-                  // If child has grandchildren, return them
-                  if (child.children && child.children.length > 0) {
-                    return child.children.map((grandchild) => (
-                      <li key={grandchild.slug || grandchild.label} role="listitem">
-                        <motion.a
-                          href={grandchild.slug || '#'}
-                          whileHover={{ x: 4, backgroundColor: 'rgba(251, 191, 36, 0.1)' }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-stone-700 dark:text-stone-300 hover:text-amber-700 dark:hover:text-amber-400 rounded-md transition-all border-l-2 border-transparent hover:border-amber-500"
-                          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                        >
-                          <span className="inline-block w-1.5 h-1.5 bg-amber-500 rounded-full flex-shrink-0"></span>
-                          <span className="font-medium text-sm leading-snug whitespace-nowrap overflow-hidden text-ellipsis">
-                            {grandchild.label}
-                          </span>
-                        </motion.a>
-                      </li>
-                    ));
-                  }
-                  // Otherwise return the child itself
-                  return (
-                    <li key={child.slug || child.label} role="listitem">
-                      <motion.a
-                        href={child.slug || '#'}
-                        whileHover={{ x: 4, backgroundColor: 'rgba(251, 191, 36, 0.1)' }}
-                        className="flex items-center gap-3 px-4 py-2.5 text-stone-700 dark:text-stone-300 hover:text-amber-700 dark:hover:text-amber-400 rounded-md transition-all border-l-2 border-transparent hover:border-amber-500"
-                        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                      >
-                        <span className="inline-block w-1.5 h-1.5 bg-amber-500 rounded-full flex-shrink-0"></span>
-                        <span className="font-medium text-sm leading-snug whitespace-nowrap overflow-hidden text-ellipsis">
-                          {child.label}
-                        </span>
-                      </motion.a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
+            {hasMore && item.slug && (
+              <div
+                style={{
+                  marginTop: 8,
+                  paddingTop: 8,
+                  borderTop: `1px solid ${BORDER_GOLD}`,
+                }}
+              >
+                <a
+                  href={item.slug}
+                  onClick={onClose}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                    padding: '10px 12px',
+                    borderRadius: 8,
+                    color: GOLD_BRIGHT,
+                    textDecoration: 'none',
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    letterSpacing: '0.02em',
+                    transition: 'background 0.12s',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = HOVER_BG;
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  }}
+                >
+                  <span>
+                    Zobraziť všetkých {allItems.length} {pluralLokalit(allItems.length)}
+                  </span>
+                  <span style={{ fontSize: 14 }}>→</span>
+                </a>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
 }
-

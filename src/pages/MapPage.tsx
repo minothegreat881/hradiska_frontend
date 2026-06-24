@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react';
 import MapboxMap from '../components/MapboxMap';
-import { InkEffect, InkSplotch } from '../components/InkEffect';
+import { InkEffect } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 
 export function MapPage() {
@@ -19,8 +19,8 @@ export function MapPage() {
 
       {/* Hero Section */}
       <section className="py-16 md:py-20 border-b-2 border-amber-900/20 relative">
-        <InkSplotch className="top-10 right-10" size={150} />
-        
+        {/* InkSplotch dekorácia odstránená */}
+
         <div className="container relative z-10">
           <ScrollReveal direction="fade">
             <div className="text-center mb-12 max-w-4xl mx-auto">
@@ -126,8 +126,8 @@ export function MapPage() {
 
       {/* Statistics Section */}
       <section className="py-16 md:py-20 border-t-2 border-amber-900/20 relative">
-        <InkSplotch className="bottom-10 left-10" size={120} />
-        
+        {/* InkSplotch dekorácia odstránená */}
+
         <div className="container relative z-10">
           <ScrollReveal direction="up">
             <div className="text-center mb-12">

@@ -6,10 +6,107 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { hradiskaData, Hradisko } from '../data/hradiska';
 import { Search, Filter, Maximize2, RotateCcw, Mountain, Shuffle, X } from 'lucide-react';
 
-// Mapbox Access Token - Tento token je pre DEMO účely
-// Pre produkčné dlhodobé použitie si vytvorte VLASTNÝ token ZADARMO na: https://account.mapbox.com/
-// Registrácia trvá 1 minútu, žiadna platobná karta, 50,000 zobrazení/mesiac zadarmo!
-mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+// Mapbox Access Token — set VITE_MAPBOX_TOKEN in .env (or Vercel project env).
+// Free token (50k views/mo, no card): https://account.mapbox.com/
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+
+// ---------- Vintage pin ikony ----------
+const PIN_CREAM = '#F5E9D0';
+const PIN_UNESCO = '#E8C56E';
+
+const PIN_FILL = {
+  hrad:     '#8B2E2E', // tmavá bordová / karmínová
+  hradisko: '#7D5A2A', // tmavá zem / okrová
+  zamok:    '#3A2A5A', // hlboká modrofialová
+} as const;
+
+type PinKind = keyof typeof PIN_FILL;
+
+// Pin tvar (teardrop) – width 36, height 48, špička v (18,48)
+const PIN_PATH = 'M18 47 C 13 41, 4 31, 4 18 A 14 14 0 1 1 32 18 C 32 31, 23 41, 18 47 Z';
+
+function pinInner(type: PinKind): string {
+  if (type === 'hrad') {
+    // Kamenná veža s cimburím
+    return `
+      <g fill="${PIN_CREAM}" stroke="${PIN_CREAM}" stroke-linejoin="round" stroke-width="0.4">
+        <!-- cimburie: 4 zuby -->
+        <rect x="10" y="10" width="2.5" height="3.5"/>
+        <rect x="13.75" y="10" width="2.5" height="3.5"/>
+        <rect x="17.5" y="10" width="2.5" height="3.5"/>
+        <rect x="21.25" y="10" width="2.5" height="3.5"/>
+        <!-- vrchná línia cimburia -->
+        <rect x="10" y="13.5" width="14" height="1.8"/>
+        <!-- telo veže -->
+        <rect x="10" y="13.5" width="14" height="13"/>
+        <!-- okno -->
+        <rect x="16.25" y="17.5" width="1.5" height="3.2" fill="${PIN_FILL.hrad}" stroke="none"/>
+        <!-- oblúkový vchod -->
+        <path d="M14 26.5 v-3.2 a3 3 0 0 1 6 0 v3.2 z" fill="${PIN_FILL.hrad}" stroke="none"/>
+      </g>
+    `;
+  }
+  if (type === 'hradisko') {
+    // Top-down kruhový val s palisádou (lúče) a vstupnou bránou dole
+    return `
+      <g stroke="${PIN_CREAM}" stroke-linecap="round" fill="none">
+        <!-- val (kruh) -->
+        <circle cx="17" cy="18" r="7.5" stroke-width="1.4"/>
+        <!-- palisádové koly ako lúče smerujúce von -->
+        <g stroke-width="1.3">
+          <line x1="17" y1="7.6" x2="17" y2="10"/>            <!-- N -->
+          <line x1="23.4" y1="9.9" x2="22" y2="11.6"/>        <!-- NE -->
+          <line x1="27.4" y1="18"  x2="25" y2="18"/>          <!-- E -->
+          <line x1="23.4" y1="26.1" x2="22" y2="24.4"/>       <!-- SE -->
+          <line x1="10.6" y1="26.1" x2="12" y2="24.4"/>       <!-- SW -->
+          <line x1="6.6"  y1="18"  x2="9"  y2="18"/>          <!-- W -->
+          <line x1="10.6" y1="9.9" x2="12" y2="11.6"/>        <!-- NW -->
+        </g>
+        <!-- vstupná brána: dva krátke stĺpiky dole, oddelené medzerou -->
+        <line x1="15" y1="25.5" x2="15" y2="28" stroke-width="1.3"/>
+        <line x1="19" y1="25.5" x2="19" y2="28" stroke-width="1.3"/>
+      </g>
+    `;
+  }
+  // zamok – dve špicaté vežičky + stredné krídlo + brána
+  return `
+    <g fill="${PIN_CREAM}" stroke="${PIN_CREAM}" stroke-linejoin="round" stroke-width="0.4">
+      <!-- ľavá veža -->
+      <rect x="7.5" y="14" width="5" height="12.5"/>
+      <polygon points="6,14 10,8.5 14,14"/>
+      <!-- pravá veža -->
+      <rect x="21.5" y="14" width="5" height="12.5"/>
+      <polygon points="20,14 24,8.5 28,14"/>
+      <!-- stredné krídlo -->
+      <rect x="12.5" y="17.5" width="9" height="9"/>
+      <!-- oblúková brána -->
+      <path d="M15 26.5 v-3 a2 2 0 0 1 4 0 v3 z" fill="${PIN_FILL.zamok}" stroke="none"/>
+    </g>
+  `;
+}
+
+function makePinSvg(type: PinKind, isUnesco = false): string {
+  const fill = PIN_FILL[type];
+  const stroke = isUnesco ? PIN_UNESCO : PIN_CREAM;
+  // Hradisko potrebuje silnejší outline – aby nesplývalo s hnedým terénom
+  const strokeW = isUnesco ? 2 : (type === 'hradisko' ? 2 : 1.5);
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48" style="overflow:visible; display:block;">
+      <path d="${PIN_PATH}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeW}" stroke-linejoin="round"/>
+      ${pinInner(type)}
+    </svg>
+  `;
+}
+
+// Mini pin pre legendu (zachová proporcie, ale menší)
+function makeMiniPinSvg(type: PinKind): string {
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="29" viewBox="0 0 36 48" style="overflow:visible; display:block; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,0.45));">
+      <path d="${PIN_PATH}" fill="${PIN_FILL[type]}" stroke="${PIN_CREAM}" stroke-width="${type === 'hradisko' ? 2 : 1.5}" stroke-linejoin="round"/>
+      ${pinInner(type)}
+    </svg>
+  `;
+}
 
 const MapboxMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -24,16 +121,14 @@ const MapboxMap = () => {
   const [selectedHradisko, setSelectedHradisko] = useState<Hradisko | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  const typeColors = {
-    hrad: '#ff7f50', // Coral
-    hradisko: '#4682b4', // SteelBlue
-    zamok: '#9370db'  // MediumPurple
-  };
+  // Značkové farby zladené s pin výplňami – používajú sa v popupe, detail karte a filtri
+  const typeColors = PIN_FILL;
 
+  // Mini ikony pre legendu / detail karty (top-down miniature pins)
   const svgIcons = {
-    hrad: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${typeColors.hrad}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-castle"><path d="M22 21v-9l-6-4.5V3h-3v3.5L8 2v18h14zM2 21v-9l6-4.5V8h3v3.5L16 2v18H2zM6 12h12"/></svg>`,
-    hradisko: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${typeColors.hradisko}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palisade"><path d="M4 17h16"/><path d="M4 10v7"/><path d="M8 10v7"/><path d="M12 10v7"/><path d="M16 10v7"/><path d="M20 10v7"/><path d="M5 10a7 7 0 0 0-3-6 2 2 0 0 1 3 3"/><path d="M19 10a7 7 0 0 1 3-6 2 2 0 0 0-3 3"/></svg>`,
-    zamok: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${typeColors.zamok}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-2"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>`,
+    hrad: makeMiniPinSvg('hrad'),
+    hradisko: makeMiniPinSvg('hradisko'),
+    zamok: makeMiniPinSvg('zamok'),
   };
 
   const typeLabels = {
@@ -133,36 +228,32 @@ const MapboxMap = () => {
     });
 
     filteredData.forEach(hradisko => {
-      // Create marker element
+      // Create marker element – vintage pin so špičkou na presnej polohe
       const el = document.createElement('div');
-      el.className = 'marker';
-      el.innerHTML = svgIcons[hradisko.type as keyof typeof svgIcons];
-      el.style.width = '40px';
-      el.style.height = '40px';
-      el.style.display = 'flex';
-      el.style.justifyContent = 'center';
-      el.style.alignItems = 'center';
-      el.style.backgroundColor = 'rgba(12, 10, 29, 0.7)';
-      el.style.borderRadius = '50%';
-      el.style.border = `2px solid ${typeColors[hradisko.type]}`;
-      el.style.boxShadow = `0 0 15px ${typeColors[hradisko.type]}`;
+      el.className = 'castle-pin';
+      el.innerHTML = makePinSvg(hradisko.type as PinKind, !!hradisko.unesco);
+      el.style.width = '36px';
+      el.style.height = '48px';
       el.style.cursor = 'pointer';
-      el.style.transition = 'transform 0.2s, box-shadow 0.2s';
-      el.style.backdropFilter = 'blur(4px)';
-
-      if (hradisko.unesco) {
-        el.style.border = '2px solid gold';
-        el.style.boxShadow = '0 0 25px gold';
-      }
+      el.style.transformOrigin = '50% 100%'; // pivot na špičke
+      el.style.transition = 'transform 180ms ease-out, filter 180ms ease-out';
+      el.style.willChange = 'transform';
+      const baseShadow = 'drop-shadow(0 3px 3px rgba(0,0,0,0.45))';
+      const hoverShadow = hradisko.unesco
+        ? 'drop-shadow(0 6px 7px rgba(0,0,0,0.55)) drop-shadow(0 0 4px rgba(232,197,110,0.65))'
+        : 'drop-shadow(0 6px 7px rgba(0,0,0,0.55)) drop-shadow(0 0 4px rgba(245,233,208,0.55))';
+      el.style.filter = baseShadow;
 
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.2)';
-        el.style.boxShadow = `0 0 30px ${hradisko.unesco ? 'gold' : typeColors[hradisko.type]}`;
+        el.style.transform = 'scale(1.12)';
+        el.style.filter = hoverShadow;
+        el.style.zIndex = '5';
       });
 
       el.addEventListener('mouseleave', () => {
         el.style.transform = 'scale(1)';
-        el.style.boxShadow = `0 0 15px ${hradisko.unesco ? 'gold' : typeColors[hradisko.type]}`;
+        el.style.filter = baseShadow;
+        el.style.zIndex = '';
       });
 
       // Create popup
@@ -209,8 +300,8 @@ const MapboxMap = () => {
 
       popupsRef.current.push(popup);
 
-      // Create marker
-      const marker = new mapboxgl.Marker({ element: el })
+      // Create marker – anchor 'bottom' aby špička pinu presne ukazovala na lokalitu
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
         .setLngLat(hradisko.coordinates)
         .setPopup(popup)
         .addTo(map.current!);
@@ -332,10 +423,13 @@ const MapboxMap = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
               <input
+                id="mapbox-search"
+                name="mapbox-search"
                 type="text"
                 placeholder="Vyhľadať hradisko, okres alebo kraj..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Vyhľadať hradisko, okres alebo kraj"
                 className="w-full pl-10 pr-4 py-2 bg-stone-800/80 border border-stone-700 rounded text-stone-100 placeholder-stone-400 focus:outline-none focus:border-amber-600 text-sm"
               />
             </div>
@@ -386,11 +480,14 @@ const MapboxMap = () => {
               <h3 className="text-stone-100 mb-3 text-sm">Filtrovať podľa typu:</h3>
               <div className="flex flex-wrap gap-3">
                 {Object.entries(typeLabels).map(([type, label]) => (
-                  <label key={type} className="flex items-center gap-2 cursor-pointer">
+                  <label key={type} htmlFor={`mapbox-filter-${type}`} className="flex items-center gap-2 cursor-pointer">
                     <input
+                      id={`mapbox-filter-${type}`}
+                      name={`mapbox-filter-${type}`}
                       type="checkbox"
                       checked={selectedTypes.includes(type)}
                       onChange={() => toggleType(type)}
+                      aria-label={`Filtrovať: ${label}`}
                       className="w-4 h-4 rounded border-stone-600 text-amber-600 focus:ring-amber-600 focus:ring-offset-stone-900"
                     />
                     <span className="flex items-center gap-2 text-stone-200 text-sm">
@@ -421,35 +518,27 @@ const MapboxMap = () => {
       <div ref={mapContainer} className="absolute inset-0 w-full h-full" />
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-10 bg-stone-900/80 backdrop-blur-md border border-stone-700 rounded-lg p-4 max-w-xs shadow-2xl">
-        <h3 className="text-stone-100 mb-3 text-sm font-semibold">Legenda:</h3>
+      <div className="absolute bottom-4 left-4 z-10 bg-stone-900/85 backdrop-blur-md border border-amber-900/40 rounded-lg p-4 max-w-xs shadow-2xl">
+        <h3 className="text-amber-100 mb-3 text-sm font-semibold tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>Legenda</h3>
         <div className="space-y-2">
           {Object.entries(typeLabels).map(([type, label]) => (
             <div key={type} className="flex items-center gap-3">
-              <div 
-                className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ 
-                  backgroundColor: 'rgba(12, 10, 29, 0.7)',
-                  border: `2px solid ${typeColors[type as keyof typeof typeColors]}`
-                }}
-              >
-                <div dangerouslySetInnerHTML={{ __html: svgIcons[type as keyof typeof svgIcons] }} />
+              <div className="w-7 h-9 flex items-end justify-center">
+                <div dangerouslySetInnerHTML={{ __html: makeMiniPinSvg(type as PinKind) }} />
               </div>
-              <span className="text-stone-300 text-xs">{label}</span>
+              <span className="text-stone-200 text-xs">{label}</span>
             </div>
           ))}
-          <div className="flex items-center gap-3 mt-3 pt-3 border-t border-stone-700">
-            <div 
-              className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ 
-                backgroundColor: 'rgba(12, 10, 29, 0.7)',
-                border: '2px solid gold',
-                boxShadow: '0 0 10px gold'
-              }}
-            >
-              <div dangerouslySetInnerHTML={{ __html: svgIcons.hrad }} />
+          <div className="flex items-center gap-3 mt-3 pt-3 border-t border-amber-900/30">
+            <div className="w-7 h-9 flex items-end justify-center">
+              <div dangerouslySetInnerHTML={{ __html: `
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="29" viewBox="0 0 36 48" style="overflow:visible; display:block; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,0.45));">
+                  <path d="${PIN_PATH}" fill="${PIN_FILL.hrad}" stroke="${PIN_UNESCO}" stroke-width="2.2" stroke-linejoin="round"/>
+                  ${pinInner('hrad')}
+                </svg>
+              ` }} />
             </div>
-            <span className="text-stone-300 text-xs">UNESCO pamiatka</span>
+            <span className="text-stone-200 text-xs">UNESCO – zlatý rámik</span>
           </div>
         </div>
       </div>

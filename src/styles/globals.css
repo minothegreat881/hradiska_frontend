@@ -280,7 +280,6 @@ p {
   font-family: var(--font-serif);
   font-size: 1.2rem;
   line-height: 1.9;
-  max-width: 70ch;
   color: #2d2418; /* Hlavný text - 11.2:1 kontrast ✓ AAA */
   text-align: justify;
   text-justify: inter-word;
@@ -322,11 +321,14 @@ p {
   color: #f0e8dc;
 }
 
-/* Article paragraphs - zarovnané do bloku */
+/* Article paragraphs - knižné justify s hyphenation */
 .article-paragraph {
   color: #2d2418 !important; /* WCAG AAA - 11.2:1 */
   text-align: justify !important;
-  text-justify: inter-word;
+  text-justify: inter-word !important;
+  hyphens: auto !important;
+  -webkit-hyphens: auto !important;
+  -ms-hyphens: auto !important;
 }
 
 .dark .article-paragraph {
@@ -382,14 +384,26 @@ p {
   color: #e8a86e;
 }
 
-/* Citáty */
+/* Citáty - flat redesign, ploché s zlatohnedým border */
 .article-content blockquote {
-  border-left-color: #9a5d1f;
-  color: #3a3024; /* 9.2:1 kontrast ✓ AAA */
+  margin: 32px 0 !important;
+  padding: 16px 20px;
+  border-left: 3px solid #a87437;
+  background: rgba(196,165,116,0.08);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  line-height: 1.7;
+  color: #2d2418; /* AAA kontrast */
+  text-align: left !important;
+}
+
+.article-content blockquote p {
+  white-space: pre-line;
+  text-align: left !important;
+  margin-bottom: 0.5em;
 }
 
 .dark .article-content blockquote {
-  border-left-color: #d4915a;
   color: #e0d6c8;
 }
 
@@ -662,6 +676,108 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   pointer-events: auto !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ARTICLE DETAIL — LIGHT PARCHMENT OVERRIDE
+ * Vynútiť svetlé čitateľné telo článku bez ohľadu na prefers-color-scheme.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.article-content,
+.article-content * {
+  color: #2d2418 !important;
+}
+
+.article-content a {
+  color: #7d4f1d !important;
+}
+.article-content a:hover {
+  text-decoration: underline;
+}
+
+/* Knižné justify + hyphenation pre odseky aj zoznamy */
+.article-content p,
+.article-content li {
+  text-align: justify !important;
+  hyphens: auto !important;
+  -webkit-hyphens: auto !important;
+  -ms-hyphens: auto !important;
+  word-break: normal !important;
+}
+
+.article-content p {
+  font-size: 16.5px;
+  line-height: 1.75;
+  margin-bottom: 1.25em;
+}
+
+/* Výnimky: nadpisy, citáty a captions nie sú zarovnané justify */
+.article-content blockquote,
+.article-content blockquote * {
+  text-align: left !important;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+  text-align: left !important;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+}
+
+.article-content figcaption,
+.article-caption {
+  text-align: left !important;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+}
+
+.article-content h2 {
+  font-family: Georgia, serif !important;
+  font-size: 26px !important;
+  color: #2d1810 !important;
+  margin-top: 2rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.article-content h3 {
+  font-family: Georgia, serif !important;
+  font-size: 20px !important;
+  color: #2d1810 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Article body wrapper - jednotná šírka obsahu */
+.article-body-wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.article-body-wrapper > * {
+  max-width: 100%;
+}
+
+/* Responzívne grid v article detaile — na mobile sidebar pod obsahom */
+@media (max-width: 1023px) {
+  .article-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .article-main-col,
+  .article-sidebar-col {
+    grid-column: span 1 !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .article-main-col {
+    grid-column: span 8;
+  }
+  .article-sidebar-col {
+    grid-column: span 4;
+  }
+}
+
 /* Reset any motion-related blocking */
 [data-motion-pop-id],
 [data-framer-appear-id] {
@@ -806,6 +922,102 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 
 .animate-marker-glow {
   animation: marker-glow 2s ease-in-out infinite;
+}
+
+/* Hover tooltip nad markerom – iba fade-in (transform riadi JS, animation ho nesmie overridnúť) */
+@keyframes tooltip-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-tooltip-in {
+  animation: tooltip-in 130ms ease-out;
+}
+
+/* Aktuality skeleton shimmer */
+@keyframes aktualita-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* Footer link hover – plná opacita + zlatý odtieň */
+.footer-link:hover {
+  color: #f5e9d0 !important;
+}
+
+/* Footer responsive grid: 1 col mobile → 2 col tablet → 4 col desktop */
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+@media (min-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr !important;
+    gap: 56px !important;
+  }
+}
+
+/* Spodná lišta: na desktop dva stĺpce vedľa seba */
+@media (min-width: 768px) {
+  .footer-bottom {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .footer-bottom > p {
+    text-align: left !important;
+  }
+}
+/* Footer social – outline → vyplnenie zlatou pri hover */
+.footer-social {
+  background: transparent;
+}
+.footer-social:hover {
+  background: #c4a574;
+  color: #2d2418 !important;
+  border-color: #c4a574 !important;
+  transform: translateY(-1px);
+}
+
+/* Aktuality feed – tenký vintage vertikálny scrollbar */
+.aktuality-list::-webkit-scrollbar {
+  width: 10px;
+}
+.aktuality-list::-webkit-scrollbar-track {
+  background: rgba(196, 165, 116, 0.15);
+  border-radius: 5px;
+}
+.aktuality-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c4a574, #a87437);
+  border-radius: 5px;
+  border: 2px solid rgba(196, 165, 116, 0.05);
+  background-clip: padding-box;
+}
+.aktuality-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #a87437, #7d4f1d);
+  background-clip: padding-box;
+}
+.aktuality-list {
+  scrollbar-color: #a87437 rgba(196, 165, 116, 0.15);
+  scrollbar-width: thin;
+}
+
+
+
+
+/* Hero search input – vintage placeholder + odstrániť default browser styling */
+.hero-search-input::placeholder {
+  color: #8b7355;
+  opacity: 1;
+  font-style: normal;
+}
+.hero-search-input:-webkit-autofill,
+.hero-search-input:-webkit-autofill:hover,
+.hero-search-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #2d1810;
+  -webkit-box-shadow: 0 0 0 1000px #fdfbf6 inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Hide scrollbar utility */

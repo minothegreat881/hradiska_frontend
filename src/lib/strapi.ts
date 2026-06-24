@@ -198,7 +198,7 @@ export async function getBlogPosts(options?: {
  */
 export async function getBlogPostBySlug(slug: string): Promise<StrapiBlogPost | null> {
   // Deep populate for all fields including dynamic zone components
-  const query = `filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage&populate[1]=gallery&populate[2]=category&populate[3]=tags&populate[4]=quotes&populate[5]=blocks.image&populate[6]=blocks.images&populate[7]=blocks.secondImage&populate[8]=location&populate[9]=keyFacts&populate[10]=timeline`;
+  const query = `filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage&populate[1]=gallery&populate[2]=category&populate[3]=tags&populate[4]=quotes&populate[5]=blocks.image&populate[6]=blocks.images&populate[7]=blocks.secondImage&populate[8]=location&populate[9]=keyFacts&populate[10]=timeline&populate[11]=blocks.items`;
 
   const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
     `/blog-posts?${query}`
@@ -231,6 +231,57 @@ export function getStrapiImageUrl(image: StrapiImage | undefined, size?: 'thumbn
 
   // Otherwise use original
   return image.url.startsWith('http') ? image.url : `${STRAPI_URL}${image.url}`;
+}
+
+// ============================================================================
+// AKTUALITY – krátke príspevky o činnosti združenia
+// ============================================================================
+
+export type AktualitaTyp =
+  | 'brigada'
+  | 'nova_tabula'
+  | 'socha_pamatnik'
+  | 'podujatie'
+  | 'vyskum'
+  | 'ine';
+
+export interface StrapiAktualita {
+  id: number;
+  documentId: string;
+  nazov: string;
+  obsah?: string;
+  fotky?: StrapiImage[];
+  typAktivity: AktualitaTyp;
+  datum: string; // YYYY-MM-DD
+  hradiskoSlug?: string;
+  zvyraznene?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+/**
+ * Načítaj aktuality. Server-side zoradenie: zvýraznené prvé, potom podľa dátumu zostupne.
+ */
+export async function getAktuality(options?: {
+  page?: number;
+  pageSize?: number;
+}): Promise<{ items: StrapiAktualita[]; pagination: any }> {
+  const queryParts: string[] = [
+    'populate=fotky',
+    'sort[0]=zvyraznene:desc',
+    'sort[1]=datum:desc',
+  ];
+  if (options?.page) queryParts.push(`pagination[page]=${options.page}`);
+  if (options?.pageSize) queryParts.push(`pagination[pageSize]=${options.pageSize}`);
+
+  const response = await fetchStrapi<StrapiResponse<StrapiAktualita[]>>(
+    `/aktuality?${queryParts.join('&')}`
+  );
+  return {
+    items: response.data,
+    pagination: response.meta?.pagination,
+  };
 }
 
 /**

@@ -53,6 +53,11 @@
       target: 'esnext',
       outDir: 'dist',
     },
+    optimizeDeps: {
+      esbuildOptions: {
+        target: 'esnext',
+      },
+    },
     server: {
       port: 3000,
       open: true,

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { MapPin, ChevronRight, ExternalLink } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { MapPin, ChevronRight } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -92,28 +92,8 @@ function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; ln
 
     map.current.on('load', () => {
       if (map.current) {
-        // Add 3D terrain - SAME as main map
-        map.current.addSource('terrainSource', {
-          type: 'raster-dem',
-          url: 'https://demotiles.maplibre.org/terrain-tiles/tiles.json',
-          tileSize: 256
-        });
-
-        map.current.setTerrain({
-          source: 'terrainSource',
-          exaggeration: 1.5
-        });
-
-        // Add sky layer - SAME as main map
-        map.current.addLayer({
-          'id': 'sky',
-          'type': 'sky',
-          'paint': {
-            'sky-type': 'atmosphere',
-            'sky-atmosphere-sun': [0.0, 90.0],
-            'sky-atmosphere-sun-intensity': 15
-          }
-        });
+        // 3D terrain a sky layer odstránené — MapLibre demotiles nepokrýva Slovensko (404)
+        // a 'type: sky' je Mapbox-only feature.
 
         // Create marker element - SAME style as main map
         const el = document.createElement('div');
@@ -168,7 +148,7 @@ function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; ln
               <strong>Typ:</strong> Hradisko
             </p>
             <p style="margin: 4px 0 0 0; font-size: 11px; color: #888;">
-              ${coordinates.lat.toFixed(4)}°N, ${coordinates.lng.toFixed(4)}°E
+              ${coordinates.lat.toFixed(4)}° N · ${coordinates.lng.toFixed(4)}° E
             </p>
           </div>
         `);
@@ -207,92 +187,208 @@ function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; ln
   );
 }
 
+// Shared design tokens for sidebar cards
+const cardStyle: React.CSSProperties = {
+  background: '#fffdf8',
+  border: '1px solid rgba(196,165,116,0.4)',
+  borderRadius: 12,
+  boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
+  padding: 16,
+  marginBottom: 20,
+};
+
+const cardTitleStyle: React.CSSProperties = {
+  fontFamily: 'Georgia, serif',
+  fontSize: 13,
+  fontWeight: 600,
+  color: '#a87437',
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+  marginBottom: 12,
+  marginTop: 0,
+};
+
 export function ArticleSidebar({
   article,
   relatedArticles = [],
   timeline = [],
   keyFacts,
-  coordinates = { lat: 48.5833, lng: 18.0333 }, // Bojná default
-  locationName = 'Bojná'
-}: ArticleSidebarProps & { coordinates?: { lat: number; lng: number }; locationName?: string }) {
-  // Generate key facts from article data if not provided
-  const facts: KeyFact[] = keyFacts || [
-    { title: 'Obdobie', description: 'Veľkomoravské obdobie (9. storočie)' },
-    { title: 'Lokalita', description: 'Západné Slovensko' },
-    { title: 'Typ', description: article.category === 'vyskum' ? 'Archeologický výskum' : 'Historická lokalita' },
-    { title: 'Význam', description: 'Národná kultúrna pamiatka' }
-  ];
+  coordinates,
+  locationName,
+}: ArticleSidebarProps) {
+  // Key facts — NO default fallback. If empty, card is hidden.
+  const facts: KeyFact[] = keyFacts || [];
+
+  // Show location card only if we have both coordinates AND a name
+  const hasLocation = !!coordinates && !!locationName && locationName.trim().length > 0;
+  const capitalizedName = hasLocation
+    ? locationName!.charAt(0).toUpperCase() + locationName!.slice(1).toLowerCase()
+    : '';
 
   return (
-    <div className="space-y-0">
-      {/* Location Map */}
-      <h3 className="text-xl font-bold mb-4 pb-2 border-b border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100">
-        Lokalita
-      </h3>
-      <div className="mb-8">
-        <MiniMap coordinates={coordinates} locationName={locationName} />
-        <p className="text-xs text-stone-500 dark:text-stone-400 mt-2 text-center">
-          {locationName} • {coordinates.lat.toFixed(4)}°N, {coordinates.lng.toFixed(4)}°E
-        </p>
-      </div>
+    <div>
+      {/* Location Card — only shown if coordinates + name are provided */}
+      {hasLocation && (
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Lokalita</h3>
+          <MiniMap coordinates={coordinates!} locationName={capitalizedName} />
+          <div style={{ marginTop: 10 }}>
+            <h4
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 18,
+                color: '#2d1810',
+                fontWeight: 600,
+                margin: 0,
+              }}
+            >
+              {capitalizedName}
+            </h4>
+            <p
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 13,
+                color: '#8b7a5e',
+                margin: 0,
+                marginTop: 4,
+              }}
+            >
+              {coordinates!.lat.toFixed(4)}° N · {coordinates!.lng.toFixed(4)}° E
+            </p>
+          </div>
+        </div>
+      )}
 
-      {/* Key Facts - Clean Card Style */}
+      {/* Key Facts — only if there are real facts */}
       {facts.length > 0 && (
-        <>
-          <h3 className="text-xl font-bold mb-4 pb-2 border-b border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100">
-            Kľúčové fakty
-          </h3>
-          <div className="space-y-3 mb-8">
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Kľúčové fakty</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {facts.map((fact, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 bg-white dark:bg-stone-700/50 rounded-lg shadow-sm border border-stone-100 dark:border-stone-600">
-                <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 12,
+                }}
+              >
+                <div
+                  style={{
+                    flexShrink: 0,
+                    width: 24,
+                    height: 24,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #a87437 0%, #7d4f1d 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    boxShadow: '0 1px 2px rgba(70,40,20,0.15)',
+                  }}
+                >
                   {fact.number || index + 1}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: '#a87437',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
                     {fact.title}
                   </div>
-                  <div className="text-sm text-stone-700 dark:text-stone-300 mt-0.5">
+                  <div
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 14,
+                      color: '#2d2418',
+                      marginTop: 2,
+                      lineHeight: 1.45,
+                    }}
+                  >
                     {fact.description}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Timeline - Clean Design */}
+      {/* Timeline */}
       {timeline.length > 0 && (
-        <>
-          <h3 className="text-xl font-bold mt-8 mb-4 pb-2 border-b border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100">
-            Časová os
-          </h3>
-          <div className="space-y-0 mb-8">
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Časová os</h3>
+          <div>
             {timeline.map((item, index) => (
-              <div key={index} className="flex gap-4 group">
-                {/* Year column */}
-                <div className="w-14 flex-shrink-0 text-right">
-                  <span className="text-sm font-bold text-amber-700 dark:text-amber-500">
-                    {item.year}
-                  </span>
+              <div key={index} style={{ display: 'flex', gap: 12 }}>
+                <div
+                  style={{
+                    width: 48,
+                    flexShrink: 0,
+                    textAlign: 'right',
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: '#7d4f1d',
+                    paddingTop: 1,
+                  }}
+                >
+                  {item.year}
                 </div>
 
-                {/* Dot and line */}
-                <div className="flex flex-col items-center">
-                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-amber-600" />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: '50%',
+                      background: '#a87437',
+                      marginTop: 5,
+                      flexShrink: 0,
+                    }}
+                  />
                   {index < timeline.length - 1 && (
-                    <div className="w-0.5 flex-1 min-h-[2rem] bg-stone-200 dark:bg-stone-600" />
+                    <div
+                      style={{
+                        width: 2,
+                        flex: 1,
+                        minHeight: '2rem',
+                        background: 'rgba(196,165,116,0.4)',
+                      }}
+                    />
                   )}
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 pb-4">
-                  <div className="text-sm font-medium text-stone-800 dark:text-stone-200">
+                <div style={{ flex: 1, paddingBottom: 12 }}>
+                  <div
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 14,
+                      color: '#2d2418',
+                      fontWeight: 600,
+                    }}
+                  >
                     {item.title}
                   </div>
                   {item.description && (
-                    <div className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                    <div
+                      style={{
+                        fontFamily: 'Georgia, serif',
+                        fontSize: 12,
+                        color: '#6b5d4d',
+                        marginTop: 2,
+                        lineHeight: 1.4,
+                      }}
+                    >
                       {item.description}
                     </div>
                   )}
@@ -300,63 +396,114 @@ export function ArticleSidebar({
               </div>
             ))}
           </div>
-
-        </>
+        </div>
       )}
 
-      {/* Tags - Pill Style */}
-      {(article.tags && article.tags.length > 0) && (
-        <>
-          <h3 className="text-xl font-bold mt-8 mb-4 pb-2 border-b border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100">
-            Témy
-          </h3>
-          <div className="flex flex-wrap gap-2 mb-8">
+      {/* Tags */}
+      {article.tags && article.tags.length > 0 && (
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Témy</h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {article.tags.slice(0, 8).map((tag, index) => (
               <a
                 key={index}
                 href={`/?search=${encodeURIComponent(tag)}`}
-                className="px-3 py-1.5 bg-white dark:bg-stone-700 text-stone-600 dark:text-stone-300 text-xs font-medium rounded-full border border-stone-200 dark:border-stone-600 hover:border-amber-400 hover:text-amber-700 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all shadow-sm"
+                style={{
+                  display: 'inline-block',
+                  padding: '5px 12px',
+                  background: 'rgba(196,165,116,0.10)',
+                  border: '1px solid rgba(196,165,116,0.45)',
+                  color: '#7d4f1d',
+                  fontFamily: 'Georgia, serif',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  borderRadius: 999,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(196,165,116,0.22)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(196,165,116,0.10)';
+                }}
               >
                 {tag}
               </a>
             ))}
           </div>
-        </>
+        </div>
       )}
 
-      {/* Related Articles - Card Style */}
+      {/* Related Articles */}
       {relatedArticles.length > 0 && (
-        <>
-          <h3 className="text-xl font-bold mt-8 mb-4 pb-2 border-b border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100">
-            Súvisiace články
-          </h3>
-          <div className="space-y-2">
+        <div style={cardStyle}>
+          <h3 style={cardTitleStyle}>Súvisiace články</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {relatedArticles.slice(0, 3).map((related) => (
               <a
                 key={related.id}
                 href={`/blog/${related.slug}`}
-                className="flex items-center gap-3 p-2 rounded-lg bg-white dark:bg-stone-700/50 border border-stone-100 dark:border-stone-600 hover:border-amber-300 dark:hover:border-amber-600 hover:shadow-md transition-all group"
+                className="group"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: 8,
+                  borderRadius: 10,
+                  border: '1px solid rgba(196,165,116,0.25)',
+                  textDecoration: 'none',
+                  background: '#fffdf8',
+                  transition: 'all 0.2s',
+                }}
               >
-                <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-stone-100 dark:bg-stone-600">
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 8,
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    background: 'rgba(196,165,116,0.15)',
+                  }}
+                >
                   <img
                     src={related.coverImage}
                     alt={related.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    className="group-hover:scale-105 transition-transform"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-stone-700 dark:text-stone-200 line-clamp-2 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h4
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 14,
+                      color: '#2d2418',
+                      fontWeight: 600,
+                      lineHeight: 1.35,
+                      margin: 0,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                    className="group-hover:text-amber-800"
+                  >
                     {related.title}
                   </h4>
                 </div>
-                <ChevronRight className="w-4 h-4 text-stone-300 dark:text-stone-500 group-hover:text-amber-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                <ChevronRight
+                  className="group-hover:translate-x-1 transition-all"
+                  style={{ width: 16, height: 16, color: '#a87437', flexShrink: 0 }}
+                />
               </a>
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

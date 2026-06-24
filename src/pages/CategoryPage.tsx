@@ -6,7 +6,6 @@ import { categories, Category } from '../data/mock-data';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
 import { BookOpen, ArrowLeft, Crown, Scroll, Loader2 } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { ParticleEffect } from '../components/ParticleEffect';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 
 interface CategoryPageProps {
@@ -68,11 +67,6 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
 
   return (
     <div className="min-h-screen parchment">
-      {/* Particle background */}
-      <div className="fixed inset-0 pointer-events-none opacity-30">
-        <ParticleEffect />
-      </div>
-
       {/* Hero Section with Image */}
       <section className="relative overflow-hidden">
         <div className="container relative py-8 md:py-12">
@@ -84,18 +78,32 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
             {/* Back button */}
             <motion.a
               href="/"
-              className="inline-flex items-center gap-2 text-amber-800 dark:text-amber-300 hover:text-amber-950 dark:hover:text-amber-100 mb-8 transition-colors group"
+              className="inline-flex items-center gap-2 mb-8 group"
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                color: 'var(--color-sepia-link, #8b4513)',
+                fontSize: 14,
+                fontWeight: 500,
+                textDecoration: 'none',
+              }}
               whileHover={{ x: -4 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span className="border-b border-amber-800/0 group-hover:border-amber-800/50 dark:border-amber-300/0 dark:group-hover:border-amber-300/50 transition-colors">
+              <span className="border-b border-transparent group-hover:border-current transition-colors">
                 Späť na domovskú stránku
               </span>
             </motion.a>
 
             {/* Main header with image */}
-            <div className="relative rounded-3xl overflow-hidden bg-stone-900 shadow-2xl">
+            <div
+              className="relative rounded-2xl overflow-hidden"
+              style={{
+                background: '#1f1a12',
+                boxShadow: '0 10px 28px rgba(20,15,10,0.25), 0 20px 48px rgba(20,15,10,0.18)',
+                border: '1px solid rgba(196,165,116,0.28)',
+              }}
+            >
               {/* Background Image */}
               <motion.div
                 className="absolute inset-0"
@@ -108,9 +116,22 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   alt={categoryName}
                   className="w-full h-full object-cover"
                 />
-                {/* Overlay gradients */}
-                <div className="absolute inset-0 bg-gradient-to-r from-stone-900/95 via-stone-900/80 to-stone-900/40" />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/90 via-stone-900/50 to-transparent" />
+                {/* Gradient overlay — darker on left where text sits, image visible on right */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'linear-gradient(to right, rgba(20,15,10,0.92) 0%, rgba(20,15,10,0.78) 35%, rgba(20,15,10,0.45) 65%, rgba(20,15,10,0.20) 100%)',
+                  }}
+                />
+                {/* Subtle bottom darkening */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'linear-gradient(to top, rgba(20,15,10,0.55) 0%, rgba(20,15,10,0) 50%)',
+                  }}
+                />
               </motion.div>
 
               {/* Animated particles overlay */}
@@ -146,8 +167,17 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="mb-6"
                   >
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600/20 text-amber-200 rounded-full text-sm backdrop-blur-md border border-amber-500/30">
-                      <Scroll className="w-4 h-4" />
+                    <span
+                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs backdrop-blur-sm"
+                      style={{
+                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        fontStyle: 'italic',
+                        background: 'rgba(31,26,18,0.55)',
+                        color: '#fef9f0',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                      }}
+                    >
+                      <Scroll className="w-3 h-3" />
                       Kategória
                     </span>
                   </motion.div>
@@ -199,10 +229,23 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     transition={{ duration: 0.6, delay: 0.7 }}
                     className="flex flex-wrap items-center gap-4"
                   >
-                    <div className="flex items-center gap-2 px-5 py-3 bg-amber-900/40 rounded-full border border-amber-700/40 backdrop-blur-md">
-                      <BookOpen className="w-5 h-5 text-amber-300" />
-                      <span className="text-amber-100">
-                        <strong className="text-amber-50">{categoryArticles.length}</strong> {categoryArticles.length === 1 ? 'článok' : categoryArticles.length < 5 ? 'články' : 'článkov'}
+                    <div
+                      className="flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-sm"
+                      style={{
+                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        background: 'rgba(31,26,18,0.55)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        color: '#fef9f0',
+                      }}
+                    >
+                      <BookOpen className="w-4 h-4" style={{ color: '#f4c87a' }} />
+                      <span style={{ fontSize: 13 }}>
+                        <strong>{categoryArticles.length}</strong>{' '}
+                        {categoryArticles.length === 1
+                          ? 'článok'
+                          : categoryArticles.length < 5
+                          ? 'články'
+                          : 'článkov'}
                       </span>
                     </div>
 
@@ -295,8 +338,27 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   </motion.div>
 
                   <div>
-                    <h2 className="text-amber-950 dark:text-amber-50">Články a štúdie</h2>
-                    <p className="text-sm text-amber-800/70 dark:text-amber-200/60">
+                    <h2
+                      style={{
+                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        color: 'var(--color-sepia-text, #2d2418)',
+                        fontSize: 26,
+                        fontWeight: 600,
+                        letterSpacing: '0.01em',
+                        margin: 0,
+                      }}
+                    >
+                      Články a štúdie
+                    </h2>
+                    <p
+                      style={{
+                        fontFamily: 'Georgia, "Times New Roman", serif',
+                        color: 'var(--color-sepia-secondary, #4a3f2f)',
+                        fontSize: 14,
+                        margin: 0,
+                        marginTop: 4,
+                      }}
+                    >
                       Odborné publikácie a výskum
                     </p>
                   </div>

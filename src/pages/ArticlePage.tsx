@@ -1,19 +1,11 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
-import { ArrowLeft, Calendar, Clock, BookOpen, Tag, Scroll, Feather, Quote, ZoomIn, Loader2 } from 'lucide-react';
+import { ArrowLeft, Feather, Quote, ZoomIn, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import LightGallery from 'lightgallery/react';
-import type { LightGallery as LightGalleryType } from 'lightgallery/lightgallery';
-import lgZoom from 'lightgallery/plugins/zoom';
-import lgFullscreen from 'lightgallery/plugins/fullscreen';
-import 'lightgallery/css/lightgallery.css';
-import 'lightgallery/css/lg-zoom.css';
-import 'lightgallery/css/lg-fullscreen.css';
 import { mockArticles } from '../data/mock-data';
 import { ArticleCard } from '../components/ArticleCard';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-import { InkEffect, InkSplotch } from '../components/InkEffect';
+import { InkEffect } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { SocialShare } from '../components/SocialShare';
 import { CommentSection } from '../components/CommentSection';
@@ -46,7 +38,11 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
           url: getStrapiImageUrl(img),
           caption: img.caption || img.alternativeText || ''
         })) || [],
-        gallery: [],
+        gallery: (strapiPost.gallery || []).map((img: any) => ({
+          url: getStrapiImageUrl(img),
+          caption: img.caption || img.alternativeText || '',
+          alt: img.alternativeText || img.caption || '',
+        })),
         quotes: strapiPost.quotes || [],
         blocks: strapiPost.blocks || [], // Dynamic zone blocks
         bibliography: [],
@@ -119,13 +115,14 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
         { year: '~906', title: 'Zánik hradiska', description: 'Zničenie pri maďarských nájazdoch', type: 'local' as const },
       ];
 
-  // Coordinates - use Strapi location if available
-  const articleCoordinates = strapiPost?.location
-    ? { lat: strapiPost.location.latitude, lng: strapiPost.location.longitude }
-    : { lat: 48.5833, lng: 18.0333 };
+  // Coordinates - use Strapi location if available (NO default fallback)
+  const articleCoordinates =
+    strapiPost?.location && typeof strapiPost.location.latitude === 'number' && typeof strapiPost.location.longitude === 'number'
+      ? { lat: strapiPost.location.latitude, lng: strapiPost.location.longitude }
+      : undefined;
 
-  // Location name from Strapi
-  const locationName = strapiPost?.location?.name || 'Bojná - Valy';
+  // Location name from Strapi (only meaningful if coordinates exist)
+  const locationName = strapiPost?.location?.name;
 
   // Key facts from Strapi
   const keyFactsData = strapiPost?.keyFacts?.map((f, i) => ({
@@ -136,13 +133,16 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
 
   // Helper function to render Strapi blocks content
   const renderStrapiBlocks = (blocks: any[]) => {
+    let paragraphCount = 0; // Track first paragraph for drop cap
     return blocks.map((block, idx) => {
       if (block.type === 'paragraph') {
         const text = block.children?.map((child: any) => child.text).join('') || '';
+        const isFirstParagraph = paragraphCount === 0;
+        paragraphCount++;
         return (
           <p
             key={idx}
-            className="article-paragraph text-lg leading-relaxed mb-6"
+            className={`article-paragraph text-lg leading-relaxed mb-6 ${isFirstParagraph ? 'article-first-paragraph' : ''}`}
             style={{ fontFamily: 'var(--font-serif)' }}
           >
             {text}
@@ -221,23 +221,22 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                 clear: 'both'
               }}
             >
-              <a
-                href={image.url}
-                data-sub-html={`<h4 style="color: #fef3c7; font-family: Georgia, serif; font-style: italic;">${image.caption || ''}</h4>`}
-                className="article-gallery-item block relative group cursor-zoom-in"
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('openGalleryModal', { detail: { imageUrl: image.url } }))}
+                className="block relative group cursor-zoom-in w-full p-0 border-0 bg-transparent text-left"
               >
-                <div className="rounded-lg overflow-hidden shadow-lg border border-stone-200 dark:border-stone-700 transition-all duration-300 group-hover:shadow-xl group-hover:border-amber-500/50">
+                <div className="rounded-lg overflow-hidden shadow-lg border border-stone-200 transition-all duration-300 group-hover:shadow-xl group-hover:border-amber-500/50">
                   <ImageWithFallback
                     src={image.url}
                     alt={image.caption}
                     className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
                   />
-                  {/* Zoom overlay on hover */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
                     <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg" />
                   </div>
                 </div>
-              </a>
+              </button>
               <figcaption className={`mt-2 text-xs italic text-stone-500 dark:text-stone-400 ${isRight ? 'text-right pr-1' : 'text-left pl-1'}`}>
                 {image.caption}
               </figcaption>
@@ -389,39 +388,61 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
       {/* SVG Filters */}
       <InkEffect />
       
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-        <InkSplotch className="top-20 right-10" size={200} />
-        <InkSplotch className="top-[40%] left-5" size={150} />
-        <InkSplotch className="bottom-40 right-20" size={180} />
-      </div>
-      
+      {/* Decorative background elements odstránené — InkSplotch SVG kosoštvorce
+          rušili čítanie a vyzerali ako rendering chyba (sivohnedé tvary v dark mode). */}
+
       {/* Decorative header border */}
       <div className="w-full h-3 bg-repeat-x relative z-10" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6 L25 0 L50 6 L75 0 L100 6' stroke='%237d4f1d' stroke-width='2' fill='none'/%3E%3C/svg%3E")`,
         opacity: 0.3
       }}></div>
 
-      {/* Back button */}
-      <div className="container pt-8 relative z-10">
-        <motion.a
+      {/* Back link — decentný textový odkaz, zarovnaný s container okrajom hero karty */}
+      <div className="container pt-8 pb-5 relative z-10">
+        <a
           href="/blog"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-stone-900/50 backdrop-blur-sm border-2 border-amber-800/20 rounded-lg text-stone-600 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-400 hover:border-amber-800/40 transition-all"
-          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          whileHover={{ scale: 1.05 }}
+          className="back-to-blog"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 14,
+            color: '#7d4f1d',
+            textDecoration: 'none',
+            transition: 'color 0.15s',
+            background: 'transparent',
+            padding: 0,
+            margin: 0,
+          }}
         >
-          <ArrowLeft className="w-4 h-4" />
-          Späť na blog
-        </motion.a>
+          <ArrowLeft className="back-to-blog-arrow" style={{ width: 16, height: 16, transition: 'transform 0.15s' }} />
+          <span>Späť na blog</span>
+        </a>
+        <style>{`
+          .back-to-blog:hover {
+            color: #5d3a14 !important;
+          }
+          .back-to-blog:hover .back-to-blog-arrow {
+            transform: translateX(-2px);
+          }
+          .back-to-blog:hover span {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+          }
+        `}</style>
       </div>
 
       {/* SCEAR Layout Pattern - Everything inside one article container */}
       <section className="py-8 md:py-12 container mx-auto px-4 relative z-10">
-        <article className="bg-white dark:bg-stone-900 rounded-xl shadow-lg overflow-hidden">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gap: 0 }} className="grid-layout">
+        <article
+          className="rounded-xl shadow-lg overflow-hidden"
+          style={{ background: '#faf7f1', color: '#2d2418' }}
+        >
+          <div
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gap: 0 }}
+            className="grid-layout article-grid"
+          >
 
             {/* Hero Image - Full Width (12 columns) - SMALLER */}
             <div style={{ gridColumn: 'span 12' }} className="relative h-48 md:h-64">
@@ -433,57 +454,44 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
                 <div className="text-sm text-white/80 mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                  {new Date(article.publishedAt).toLocaleDateString('sk-SK', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })} • {categoryLabels[article.category!]} • Autor: {article.author.name}
+                  {[
+                    new Date(article.publishedAt).toLocaleDateString('sk-SK', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    }),
+                    article.author?.name && `Autor: ${article.author.name}`,
+                    (article as any).readTime && `${(article as any).readTime} min čítania`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+                <h1 className="text-2xl md:text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
                   {article.title}
                 </h1>
-                <p className="text-lg text-white/90 max-w-3xl">{article.excerpt}</p>
+                {article.excerpt && article.excerpt.trim() !== article.title.trim() && (
+                  <p className="text-lg text-white/90 max-w-3xl">{article.excerpt}</p>
+                )}
               </div>
             </div>
 
-            {/* Main Content - 8 columns */}
-            <div style={{ gridColumn: 'span 8' }} className="p-8">
+            {/* Main Content - 8 columns (full width on mobile) */}
+            <div className="p-6 md:p-8 article-main-col">
+              <div
+                className="article-body-wrapper"
+                lang="sk"
+                style={{ maxWidth: 720, margin: '0 auto' }}
+              >
               {/* Dynamic Zone Blocks - full control over content order */}
               {(article as any).blocks && (article as any).blocks.length > 0 ? (
-                <LightGallery
-                  elementClassNames="article-content-gallery"
-                  speed={500}
-                  plugins={[lgZoom, lgFullscreen]}
-                  selector=".article-gallery-item"
-                  licenseKey="0000-0000-000-0000"
-                  download={false}
-                  counter={true}
-                  hideScrollbar={true}
-                  addClass="lg-custom-article"
-                >
-                  <div className="prose prose-stone dark:prose-invert max-w-none article-content" style={{ display: 'flow-root' }}>
-                    <DynamicZoneRenderer blocks={(article as any).blocks} />
-                  </div>
-                </LightGallery>
+                <div className="prose prose-stone max-w-none article-content" style={{ display: 'flow-root' }}>
+                  <DynamicZoneRenderer blocks={(article as any).blocks} />
+                </div>
               ) : article.content ? (
-                /* Fallback to legacy content field */
-                <LightGallery
-                  elementClassNames="article-content-gallery"
-                  speed={500}
-                  plugins={[lgZoom, lgFullscreen]}
-                  selector=".article-gallery-item"
-                  licenseKey="0000-0000-000-0000"
-                  download={false}
-                  counter={true}
-                  hideScrollbar={true}
-                  addClass="lg-custom-article"
-                >
-                  <div className="prose prose-stone dark:prose-invert max-w-none article-content" style={{ display: 'flow-root' }}>
-                    {renderContent(article.content)}
-                    {/* Clearfix for floating images */}
-                    <div className="clear-both"></div>
-                  </div>
-                </LightGallery>
+                <div className="prose prose-stone max-w-none article-content" style={{ display: 'flow-root' }}>
+                  {renderContent(article.content)}
+                  <div className="clear-both"></div>
+                </div>
               ) : (
                 /* No content available */
                 <div className="prose prose-stone dark:prose-invert max-w-none">
@@ -506,54 +514,93 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                 </div>
               )}
 
-              {/* Bibliography */}
+              {/* Bibliography - flat redesign */}
               {article.bibliography && article.bibliography.length > 0 && (
                 <>
                 <div className="clear-both" />
-                <motion.div
-                  className="mt-8 p-8 bg-gradient-to-br from-stone-50 to-amber-50/30 dark:from-stone-900 dark:to-amber-950/20 rounded-2xl border-4 border-amber-800/20 shadow-xl"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-amber-600/30">
-                    <div className="p-3 bg-amber-600 dark:bg-amber-700 rounded-lg shadow-md">
-                      <BookOpen className="w-6 h-6 text-white" />
-                    </div>
-                    <h3
-                      className="text-2xl text-amber-900 dark:text-amber-200 uppercase tracking-wide"
-                      style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
-                    >
+                <section style={{ margin: '48px 0', scrollMarginTop: 32 }}>
+                  {/* Nadpis sekcie */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                    <h2 style={{
+                      fontFamily: 'Georgia, "Times New Roman", serif',
+                      fontSize: 22,
+                      fontWeight: 600,
+                      color: '#2d1810',
+                      margin: 0,
+                    }}>
                       Bibliografia
-                    </h3>
+                    </h2>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: 24,
+                      height: 24,
+                      padding: '0 8px',
+                      borderRadius: 9999,
+                      background: '#a87437',
+                      color: '#fffdf8',
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}>
+                      {article.bibliography.length}
+                    </span>
                   </div>
-                  <div className="space-y-4">
+                  <hr style={{
+                    height: 1,
+                    background: 'linear-gradient(90deg, #c4a574 0%, rgba(196,165,116,0) 100%)',
+                    margin: '8px 0 24px',
+                    border: 0,
+                  }} />
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {article.bibliography.map((ref, idx) => (
                       <motion.div
                         key={idx}
-                        className="flex gap-4 p-4 bg-white/50 dark:bg-stone-800/50 rounded-lg border border-amber-800/10 hover:border-amber-800/30 transition-colors"
-                        initial={{ opacity: 0, x: -20 }}
+                        style={{
+                          display: 'flex',
+                          gap: 12,
+                          alignItems: 'flex-start',
+                          background: '#fffdf8',
+                          border: '1px solid rgba(196,165,116,0.4)',
+                          borderRadius: 10,
+                          padding: 14,
+                        }}
+                        initial={{ opacity: 0, x: -10 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: idx * 0.1 }}
+                        transition={{ delay: Math.min(idx, 6) * 0.05 }}
                       >
-                        <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-amber-600 dark:bg-amber-700 text-white rounded-full text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+                        <span style={{
+                          flexShrink: 0,
+                          width: 26,
+                          height: 26,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: '#a87437',
+                          color: '#fffdf8',
+                          borderRadius: 9999,
+                          fontFamily: 'Georgia, serif',
+                          fontSize: 12,
+                          fontWeight: 600,
+                        }}>
                           {idx + 1}
                         </span>
-                        <p
-                          className="text-sm leading-relaxed"
-                          style={{
-                            fontFamily: 'Georgia, "Times New Roman", serif',
-                            color: '#2d2418'
-                          }}
-                        >
+                        <p style={{
+                          fontFamily: 'Georgia, "Times New Roman", serif',
+                          fontSize: 14,
+                          lineHeight: 1.6,
+                          color: '#2d2418',
+                          margin: 0,
+                        }}>
                           {ref}
                         </p>
                       </motion.div>
                     ))}
                   </div>
-                </motion.div>
+                </section>
                 </>
               )}
 
@@ -582,58 +629,32 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
               <div className="clear-both" />
 
               {/* Social Share */}
-              <motion.div
-                className="p-8 bg-gradient-to-br from-amber-50 to-stone-50 dark:from-stone-900 dark:to-amber-950/30 rounded-2xl border-2 border-amber-800/20 clear-both"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
+              <div className="clear-both">
                 <SocialShare title={article.title} />
-              </motion.div>
+              </div>
 
-              {/* Historical Gallery */}
-              {(() => {
-                const allImages = [
-                  { url: article.coverImage, caption: article.title, alt: article.title },
-                  ...(article.images || []).map((img) => ({
-                    url: img.url,
-                    caption: img.caption,
-                    alt: img.caption
-                  })),
-                  ...(article.gallery || [])
-                ];
+              {/* Historical Gallery — len top-level `gallery` field zo Strapi.
+                  Obsahuje obrázky bez popisu (no-caption images) ktoré extract.mjs
+                  odložil sem namiesto vkladania do tela. Captioned obrázky v tele
+                  článku tu NEsú duplikovaní — sú už vo svojom kontexte. */}
+              {(article.gallery || []).length > 0 && (
+                <HistoricalGallery
+                  images={article.gallery as { url: string; caption?: string; alt?: string }[]}
+                  title="Fotogaléria"
+                />
+              )}
 
-                return allImages.length > 0 ? (
-                  <HistoricalGallery
-                    images={allImages}
-                    title="Fotogaléria"
-                  />
-                ) : null;
-              })()}
-
-              {/* Comments */}
-              <motion.div
-                className="mt-8 p-8 bg-gradient-to-br from-stone-50 via-amber-50/20 to-stone-50 dark:from-stone-900 dark:via-amber-950/10 dark:to-stone-900 rounded-2xl border-4 border-double border-amber-800/30 shadow-2xl relative overflow-hidden"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-                  <svg viewBox="0 0 100 100" className="text-amber-900">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2"/>
-                    <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="1"/>
-                    <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" strokeWidth="1"/>
-                  </svg>
-                </div>
-                <CommentSection />
-              </motion.div>
+              {/* Comments — Strapi-backed (visitor POST allowed, admin moderation) */}
+              <CommentSection postDocumentId={strapiPost?.documentId} />
+              </div>
             </div>
 
             {/* Sidebar - 4 columns (SCEAR pattern) */}
-            <div style={{ gridColumn: 'span 4' }} className="bg-stone-50 dark:bg-stone-800 p-8">
-              <div className="sticky top-24">
+            <div
+              className="p-6 md:p-8 article-sidebar-col"
+              style={{ background: '#f5efe3' }}
+            >
+              <div className="lg:sticky lg:top-6">
                 <ArticleSidebar
                   article={{
                     title: article.title,
@@ -661,8 +682,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
       {/* Related articles */}
       {relatedArticles.length > 0 && (
         <section className="bg-gradient-to-b from-stone-100 to-amber-50/30 dark:from-stone-900 dark:to-amber-950/20 py-16 md:py-24 border-t-4 border-double border-amber-800/30 relative overflow-hidden">
-          <InkSplotch className="bottom-20 left-10" size={120} />
-          <InkSplotch className="top-20 right-20" size={140} />
+          {/* InkSplotch dekorácie odstránené (sivohnedé kosoštvorce rušili obsah) */}
           
           <div className="container relative z-10">
             <ScrollReveal direction="up">

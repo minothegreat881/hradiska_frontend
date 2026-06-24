@@ -1,28 +1,28 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'motion/react';
+import { lazy, Suspense } from 'react';
+import { motion } from 'motion/react';
 import { HeroSearch } from '../components/HeroSearch';
+import AktualityFeed from '../components/AktualityFeed';
 import { JoinUs } from '../components/JoinUs';
 import { CategoryCard } from '../components/CategoryCard';
-import Slovakia3DReliefMap from '../components/Slovakia3DReliefMap';
 import { categories } from '../data/mock-data';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-import { ParticleEffect } from '../components/ParticleEffect';
-import { InkEffect, InkSplotch } from '../components/InkEffect';
+import { InkEffect } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 
-export function HomePage() {
-  const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 500], [0, 150]);
+// PERF: 3D mapa (Three.js + R3F + custom GLSL shader + SRTM) je najťažší bundle (~500KB) a najťažšia
+// scene na GPU. Lazy-load + Suspense ju načítajú až keď sa skutočne potrebuje. Pôvodne bol klasický
+// import na vrchu súboru — pre obnovu vráť statický `import Slovakia3DReliefMap from '...'` a odstráň
+// lazy/Suspense wrapper.
+const Slovakia3DReliefMap = lazy(() => import('../components/Slovakia3DReliefMap'));
 
+export function HomePage() {
   return (
     <div className="min-h-screen parchment relative">
       {/* SVG Filters */}
       <InkEffect />
-      
-      {/* Particle Effect */}
-      <ParticleEffect />
-      
+
       {/* Decorative header border */}
       <motion.div 
         className="w-full h-3 bg-repeat-x relative z-10" 
@@ -35,8 +35,8 @@ export function HomePage() {
       }}></motion.div>
 
       {/* Hero Section with Image */}
-      <section className="relative">
-        <div className="container relative py-8 md:py-12">
+      <section className="relative" style={{ zIndex: 30 }}>
+        <div className="container relative pt-8 md:pt-12 pb-8 md:pb-16">
           {/* Image Container - Full image visible */}
           <div className="rounded-3xl overflow-hidden shadow-2xl bg-stone-900">
             <ImageWithFallback
@@ -46,28 +46,64 @@ export function HomePage() {
             />
           </div>
 
-          {/* Search Bar Below Image */}
-          <div className="mt-8 md:mt-12 max-w-5xl mx-auto">
+          {/* Search Bar Below Image – vycentrovaný v krémovom páse */}
+          <div className="mt-6 md:mt-12 px-4 md:px-2">
+            {/* Subtílny ozdobný oddeľovač – ladí s fleur-de-lis motívmi v sekcii mapy */}
+            <div className="flex items-center justify-center gap-2 mb-4 opacity-60" aria-hidden="true">
+              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, transparent, #c4a574)' }} />
+              <span style={{ color: '#c4a574', fontSize: 12, lineHeight: 1 }}>⚜</span>
+              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, #c4a574, transparent)' }} />
+            </div>
             <HeroSearch />
           </div>
         </div>
       </section>
 
+      {/* Aktuality feed – kronika brigád, podujatí, obnov */}
+      <AktualityFeed />
+
       {/* Interactive Map Section - Full Width */}
-      <section className="bg-stone-900">
-        <Slovakia3DReliefMap />
+      <section
+        className="relative bg-stone-900"
+        style={{
+          zIndex: 5, // pod hero (z:30) aby search dropdown bol nad mapou
+          // Plynulý prechod z krémovej do tmavej – tenká gold hairline + jemný shadow falloff
+          boxShadow: 'inset 0 1px 0 rgba(196, 165, 116, 0.45), inset 0 -1px 0 rgba(196, 165, 116, 0.45), 0 -8px 16px -8px rgba(125, 79, 29, 0.18)',
+        }}
+      >
+        <Suspense
+          fallback={
+            <div
+              style={{
+                width: '100%',
+                height: 600,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#c4a574',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontSize: 14,
+                letterSpacing: '0.1em',
+                background: '#1f1611',
+              }}
+            >
+              ✦ Načítavam mapu...
+            </div>
+          }
+        >
+          <Slovakia3DReliefMap />
+        </Suspense>
       </section>
 
       {/* Kategórie */}
       <section className="py-16 md:py-20 border-b-2 border-amber-900/20 relative">
-        <InkSplotch className="top-10 right-10" size={150} />
-        <InkSplotch className="bottom-20 left-10" size={120} />
-        
+        {/* InkSplotch dekorácie odstránené (vyzerali ako rendering chyba) */}
+
         <div className="container relative z-10">
           <ScrollReveal direction="fade">
-            <div className="text-center mb-12">
-              <motion.h2 
-                className="text-amber-950 dark:text-amber-100 mb-4 uppercase tracking-wide relative inline-block" 
+            <div className="text-center mb-10 md:mb-12">
+              <motion.h2
+                className="uppercase tracking-wide"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -75,22 +111,39 @@ export function HomePage() {
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
                   letterSpacing: '0.15em',
-                  borderBottom: '2px solid',
-                  borderColor: 'rgb(120 53 15 / 0.3)',
-                  paddingBottom: '0.5rem',
+                  fontSize: 'clamp(24px, 3.4vw, 34px)',
+                  color: '#2d1810',
+                  fontWeight: 600,
+                  margin: 0,
                 }}
               >
-                Kategórie Hradísk
+                Kategórie hradísk
               </motion.h2>
-              <motion.p 
-                className="text-stone-600 dark:text-stone-400 max-w-2xl mx-auto mt-4" 
+              {/* Zlatá ozdobná linka pod nadpisom */}
+              <motion.div
+                className="mx-auto mt-3"
+                initial={{ scaleX: 0 }}
+                whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                style={{
+                  width: 56,
+                  height: 2,
+                  background: 'linear-gradient(90deg, transparent, #a87437, transparent)',
+                  transformOrigin: 'center',
+                }}
+              />
+              <motion.p
+                className="max-w-2xl mx-auto mt-4"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
-                  fontStyle: 'italic'
+                  fontStyle: 'italic',
+                  color: '#7a6b56',
+                  fontSize: 15,
                 }}
               >
                 Preskúmajte archeologické lokality podľa ich historickej funkcie a významu
@@ -98,7 +151,11 @@ export function HomePage() {
             </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Fixne 3 stĺpce na desktope, 2 na tablete, 1 na mobile */}
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto"
+            style={{ gap: '36px 28px' }}
+          >
             {categories.map((category, idx) => (
               <CategoryCard key={category.value} category={category} index={idx} />
             ))}

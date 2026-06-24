@@ -25,7 +25,7 @@ export const hradiskaData: Hradisko[] = [
     kraj: "Prešovský",
     nadmorskaVyska: 634,
     unesco: true,
-    fotka: "https://place-hold.it/800x400/2a2a2a/ffffff&text=Spišský+hrad"
+    fotka: "https://images.unsplash.com/photo-1568797629485-c2a3f1e37e14?w=1280&h=720&fit=crop&q=80"
   },
   
   // Bratislavský kraj
@@ -38,7 +38,7 @@ export const hradiskaData: Hradisko[] = [
     stav: "rekonštruovaný",
     kraj: "Bratislavský",
     nadmorskaVyska: 212,
-    fotka: "https://place-hold.it/800x400/2a2a2a/ffffff&text=Bratislavský+hrad"
+    fotka: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=1280&h=720&fit=crop&q=80"
   },
   {
     name: "Devín",
@@ -49,7 +49,8 @@ export const hradiskaData: Hradisko[] = [
     stav: "ruiny",
     okres: "Bratislava IV",
     kraj: "Bratislavský",
-    nadmorskaVyska: 212
+    nadmorskaVyska: 212,
+    fotka: "https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1280&h=720&fit=crop&q=80"
   },
   {
     name: "Pajštún",
@@ -71,7 +72,8 @@ export const hradiskaData: Hradisko[] = [
     stav: "zachovaný",
     okres: "Pezinok",
     kraj: "Bratislavský",
-    nadmorskaVyska: 390
+    nadmorskaVyska: 390,
+    fotka: "https://images.unsplash.com/photo-1555990538-1c5c9f04ca58?w=1280&h=720&fit=crop&q=80"
   },
   {
     name: "Plavecký hrad",
@@ -95,7 +97,8 @@ export const hradiskaData: Hradisko[] = [
     stav: "ruiny",
     okres: "Nové Mesto nad Váhom",
     kraj: "Trnavský",
-    nadmorskaVyska: 373
+    nadmorskaVyska: 373,
+    fotka: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1280&h=720&fit=crop&q=80"
   },
   {
     name: "Čachtický hrad",

@@ -1,462 +1,440 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, Mail, Camera, FileText, Send, CheckCircle, Sparkles } from 'lucide-react';
+import { Users, Send, CheckCircle, Loader2 } from 'lucide-react';
+
+type FieldErrors = Partial<Record<'name' | 'email' | 'message', string>>;
+
+// TODO (backend): zatiaľ atrapa – formulár sa neodosiela nikam.
+// Pre produkciu: napojiť na Strapi collection "kontakt" alebo /api/mail endpoint
+// alebo služby ako Resend / EmailJS / Formspree.
+async function submitForm(_data: { name: string; email: string; message: string }) {
+  await new Promise(r => setTimeout(r, 900));
+  return { ok: true };
+}
 
 export function JoinUs() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    contributionType: '',
-    message: ''
+    message: '',
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  const contributionTypes = [
-    { value: 'photos', label: 'Fotografie z hradísk', icon: Camera },
-    { value: 'findings', label: 'Archeologické nálezy', icon: Sparkles },
-    { value: 'articles', label: 'Odborné články', icon: FileText },
-    { value: 'research', label: 'Výskum a spolupráca', icon: Users },
-  ];
+  // JS-driven viewport check pre bočné medailóny (>= 1200 px)
+  const [viewportWidth, setViewportWidth] = useState(0);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const update = () => setViewportWidth(window.innerWidth);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  const showMedailony = viewportWidth >= 1200;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validate = (): FieldErrors => {
+    const next: FieldErrors = {};
+    if (!formData.name.trim()) next.name = 'Meno je povinné';
+    if (!formData.email.trim()) next.email = 'E-mail je povinný';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formData.email.trim())) {
+      next.email = 'Zadajte platnú e-mailovú adresu';
+    }
+    if (!formData.message.trim()) next.message = 'Správa nesmie byť prázdna';
+    return next;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock submission
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setFormData({ name: '', email: '', contributionType: '', message: '' });
-      setIsSubmitted(false);
-    }, 5000);
+    const v = validate();
+    setErrors(v);
+    if (Object.keys(v).length > 0) return;
+    setSubmitting(true);
+    try {
+      await submitForm(formData);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Submit failed:', err);
+      setErrors({ message: 'Odoslanie zlyhalo, skúste neskôr.' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Field props helper
+  const fieldClass = (err?: string) => ({
+    height: 44,
+    width: '100%',
+    padding: '0 14px',
+    background: '#fff',
+    color: '#2d1810',
+    border: `1px solid ${err ? '#c44561' : 'rgba(125,79,29,0.35)'}`,
+    borderRadius: 8,
+    fontFamily: 'Georgia, serif',
+    fontSize: 14,
+    outline: 'none',
+    transition: 'border-color 150ms ease, box-shadow 150ms ease',
+  } as React.CSSProperties);
+
+  const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    e.currentTarget.style.borderColor = '#a87437';
+    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(196,165,116,0.25)';
+  };
+  const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>, fieldName: keyof FieldErrors) => {
+    e.currentTarget.style.boxShadow = 'none';
+    e.currentTarget.style.borderColor = errors[fieldName] ? '#c44561' : 'rgba(125,79,29,0.35)';
   };
 
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden border-t-2 border-amber-900/20">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-amber-50/30 via-orange-50/20 to-amber-50/30 dark:from-amber-950/20 dark:via-orange-950/10 dark:to-amber-950/20 pointer-events-none" />
-      
-      {/* Animated particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-amber-500/30"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.6, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 4 + Math.random() * 3,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="container relative z-10">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <motion.div
-              className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-amber-100/50 dark:bg-amber-900/30 rounded-full border-2 border-amber-300/50 dark:border-amber-700/50"
-              animate={{
-                boxShadow: [
-                  '0 0 20px rgba(217, 119, 6, 0.2)',
-                  '0 0 30px rgba(217, 119, 6, 0.4)',
-                  '0 0 20px rgba(217, 119, 6, 0.2)',
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Users className="w-6 h-6 text-amber-700 dark:text-amber-400" />
-              <span 
-                className="text-amber-900 dark:text-amber-100 uppercase tracking-wider"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.15em' }}
-              >
-                Pridajte sa k nám
-              </span>
-            </motion.div>
-
-            <h2 
-              className="text-amber-950 dark:text-amber-100 mb-6"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              Staňte sa súčasťou nашej komunity
-            </h2>
-            
-            <p 
-              className="text-lg text-stone-600 dark:text-stone-400 max-w-3xl mx-auto leading-relaxed"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}
-            >
-              Pomôžte nám uchovať a zdieľať našu históriu. Či už vlastníte fotografie z hradísk, 
-              archeologické nálezy alebo chcete prispieť odbornými poznatkami – budeme radi za každú formu spolupráce.
-            </p>
-          </motion.div>
-
-          {/* Form Container */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative"
-          >
-            {/* Decorative corners */}
-            {[
-              { top: -3, left: -3, rotate: 0 },
-              { top: -3, right: -3, rotate: 90 },
-              { bottom: -3, right: -3, rotate: 180 },
-              { bottom: -3, left: -3, rotate: 270 },
-            ].map((pos, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-8 h-8 pointer-events-none z-10"
-                style={pos}
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
-              >
-                <svg viewBox="0 0 32 32" className="w-full h-full">
-                  <path
-                    d="M 0 8 Q 0 0 8 0 M 0 16 Q 0 0 16 0"
-                    stroke="#d97706"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    opacity="0.6"
-                  />
-                </svg>
-              </motion.div>
-            ))}
-
-            {/* Glow effect */}
-            <motion.div
-              className="absolute inset-0 rounded-3xl pointer-events-none"
-              animate={{
-                opacity: [0.3, 0.5, 0.3],
-                scale: [0.98, 1.02, 0.98],
-              }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+    <section
+      className="relative py-16 md:py-24 border-t-2 border-amber-900/20"
+      style={{ backgroundColor: '#f7f1e3', overflowX: 'clip' }}
+    >
+      {/* Slovanské zlaté medailóny po stranách formulára – viewport >= 1200 px.
+          mix-blend-mode: multiply skrýva biele pozadie PNG na krémovej stránke,
+          zlatá ostane plne viditeľná.
+          PERF: <picture> načíta WebP (~100 KB, 1400px) namiesto pôvodného PNG (5.8 MB, 2506px).
+          PNG ostáva ako fallback + záloha pri obnove. */}
+      {showMedailony && (
+        <>
+          <picture>
+            <source srcSet="/medailon-bojna.webp" type="image/webp" />
+            <img
+              src="/medailon-bojna.png"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
               style={{
-                background: 'radial-gradient(circle at center, rgba(217, 119, 6, 0.15), transparent 70%)',
-                filter: 'blur(30px)',
-                zIndex: -1,
+                position: 'absolute',
+                // Vycentrované medzi okrajom viewportu a kartou (max-w 640 → 320 polovica)
+                left: 'calc((50% - 320px - 470px) / 2)',
+                top: '50%',
+                transform: 'translateY(-50%) rotate(-4deg)',
+                width: 'clamp(380px, 30vw, 560px)',
+                opacity: 0.65,
+                mixBlendMode: 'multiply',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+          </picture>
+          <picture>
+            <source srcSet="/medailon-bojna.webp" type="image/webp" />
+            <img
+              src="/medailon-bojna.png"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              style={{
+                position: 'absolute',
+                right: 'calc((50% - 320px - 470px) / 2)',
+                top: '50%',
+                transform: 'translateY(-50%) rotate(4deg)',
+                width: 'clamp(380px, 30vw, 560px)',
+                opacity: 0.65,
+                mixBlendMode: 'multiply',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            /></picture>
+        </>
+      )}
+
+      <div className="container relative" style={{ zIndex: 2 }}>
+        <div className="max-w-3xl mx-auto">
+          {/* HLAVIČKA SEKCIE */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-10"
+          >
+            {/* Pill badge */}
+            <span
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-medium uppercase mb-5"
+              style={{
+                background: 'rgba(196,165,116,0.18)',
+                border: '1px solid rgba(125,79,29,0.3)',
+                color: '#7d4f1d',
+                fontFamily: 'Georgia, serif',
+                letterSpacing: '0.12em',
+              }}
+            >
+              <Users className="w-3.5 h-3.5" />
+              Pridajte sa k nám
+            </span>
+
+            {/* Nadpis – tmavohnedý, garantovane viditeľný */}
+            <h2
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontSize: 'clamp(24px, 3.5vw, 34px)',
+                fontWeight: 600,
+                color: '#2d1810',
+                letterSpacing: '0.02em',
+                lineHeight: 1.2,
+                margin: 0,
+              }}
+            >
+              Staňte sa súčasťou našej komunity
+            </h2>
+
+            {/* Zlatá ozdobná linka */}
+            <div
+              className="mx-auto mt-3"
+              style={{
+                width: 56,
+                height: 2,
+                background: 'linear-gradient(90deg, transparent, #a87437, transparent)',
               }}
             />
 
-            <div className="relative rounded-3xl overflow-hidden border-2 border-amber-200/50 dark:border-amber-800/50 shadow-2xl backdrop-blur-sm">
-              {/* Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-50/95 via-orange-50/90 to-amber-100/95 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-amber-900/40 pointer-events-none" />
+            {/* Podtitul */}
+            <p
+              className="mx-auto mt-4"
+              style={{
+                color: '#7a6b56',
+                fontFamily: 'Georgia, serif',
+                fontStyle: 'italic',
+                fontSize: 15,
+                lineHeight: 1.55,
+                maxWidth: 480,
+              }}
+            >
+              Pomôžte nám uchovať a zdieľať našu históriu — fotografie z hradísk, archeologické nálezy aj odborné poznatky sú vítané.
+            </p>
+          </motion.div>
 
-              {/* Texture */}
-              <div
-                className="absolute inset-0 opacity-20 dark:opacity-10 pointer-events-none"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E")`,
-                }}
-              />
+          {/* KARTA FORMULÁRA */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            style={{
+              background: '#fffdf8',
+              borderRadius: 12,
+              border: '1px solid rgba(196,165,116,0.4)',
+              boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 14px rgba(70,40,20,0.06)',
+              padding: '28px',
+              maxWidth: 640,
+              margin: '0 auto',
+            }}
+          >
+            <AnimatePresence mode="wait">
+              {!submitted ? (
+                <motion.form
+                  key="form"
+                  onSubmit={handleSubmit}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  noValidate
+                >
+                  {/* Meno + E-mail v 2 stĺpcoch desktop */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label htmlFor="join-name">Vaše meno</Label>
+                      <input
+                        id="join-name"
+                        name="name"
+                        type="text"
+                        autoComplete="name"
+                        value={formData.name}
+                        onChange={(e) => { setFormData({ ...formData, name: e.target.value }); if (errors.name) setErrors({ ...errors, name: undefined }); }}
+                        onFocus={onFocus}
+                        onBlur={(e) => onBlur(e, 'name')}
+                        placeholder="Jana Nováková"
+                        style={fieldClass(errors.name)}
+                        aria-invalid={!!errors.name}
+                        aria-describedby={errors.name ? 'join-name-err' : undefined}
+                      />
+                      {errors.name && <ErrorMsg id="join-name-err">{errors.name}</ErrorMsg>}
+                    </div>
+                    <div>
+                      <Label htmlFor="join-email">E-mail</Label>
+                      <input
+                        id="join-email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        value={formData.email}
+                        onChange={(e) => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors({ ...errors, email: undefined }); }}
+                        onFocus={onFocus}
+                        onBlur={(e) => onBlur(e, 'email')}
+                        placeholder="meno@domena.sk"
+                        style={fieldClass(errors.email)}
+                        aria-invalid={!!errors.email}
+                        aria-describedby={errors.email ? 'join-email-err' : undefined}
+                      />
+                      {errors.email && <ErrorMsg id="join-email-err">{errors.email}</ErrorMsg>}
+                    </div>
+                  </div>
 
-              <div className="relative p-8 md:p-12">
-                <AnimatePresence mode="wait">
-                  {!isSubmitted ? (
-                    <motion.form
-                      key="form"
-                      onSubmit={handleSubmit}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-6"
-                    >
-                      {/* Name field */}
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                      >
-                        <label 
-                          className="block text-amber-950 dark:text-amber-100 mb-2 uppercase tracking-wide text-sm"
-                          style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
-                        >
-                          Vaše meno
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            required
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            onFocus={() => setFocusedField('name')}
-                            onBlur={() => setFocusedField(null)}
-                            className="w-full px-4 py-3 bg-white/50 dark:bg-amber-950/20 border-2 border-amber-200/50 dark:border-amber-700/50 rounded-xl outline-none transition-all text-amber-950 dark:text-amber-50"
-                            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                          />
-                          <motion.div
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: focusedField === 'name' ? 1 : 0 }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </div>
-                      </motion.div>
+                  {/* Správa */}
+                  <div className="mb-5">
+                    <Label htmlFor="join-message">Vaša správa</Label>
+                    <textarea
+                      id="join-message"
+                      name="message"
+                      rows={5}
+                      value={formData.message}
+                      onChange={(e) => { setFormData({ ...formData, message: e.target.value }); if (errors.message) setErrors({ ...errors, message: undefined }); }}
+                      onFocus={onFocus}
+                      onBlur={(e) => onBlur(e, 'message')}
+                      placeholder="Popíšte, čím by ste chceli prispieť…"
+                      style={{ ...fieldClass(errors.message), height: 'auto', padding: '10px 14px', resize: 'vertical' }}
+                      aria-invalid={!!errors.message}
+                      aria-describedby={errors.message ? 'join-msg-err' : undefined}
+                    />
+                    {errors.message && <ErrorMsg id="join-msg-err">{errors.message}</ErrorMsg>}
+                  </div>
 
-                      {/* Email field */}
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        <label 
-                          className="block text-amber-950 dark:text-amber-100 mb-2 uppercase tracking-wide text-sm"
-                          style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
-                        >
-                          Email
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="email"
-                            required
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            onFocus={() => setFocusedField('email')}
-                            onBlur={() => setFocusedField(null)}
-                            className="w-full px-4 py-3 bg-white/50 dark:bg-amber-950/20 border-2 border-amber-200/50 dark:border-amber-700/50 rounded-xl outline-none transition-all text-amber-950 dark:text-amber-50"
-                            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                          />
-                          <Mail className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-600/40 dark:text-amber-400/40 pointer-events-none" />
-                          <motion.div
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: focusedField === 'email' ? 1 : 0 }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </div>
-                      </motion.div>
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl font-medium hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed"
+                    style={{
+                      height: 48,
+                      background: 'linear-gradient(135deg, #7d4f1d 0%, #a87437 100%)',
+                      color: '#faf7f1',
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 15,
+                      letterSpacing: '0.02em',
+                      boxShadow: '0 4px 12px rgba(125,79,29,0.3)',
+                      border: 'none',
+                      cursor: submitting ? 'wait' : 'pointer',
+                      transition: 'filter 150ms ease',
+                    }}
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Odosielam…
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Odoslať správu
+                      </>
+                    )}
+                  </button>
 
-                      {/* Contribution type */}
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        <label 
-                          className="block text-amber-950 dark:text-amber-100 mb-3 uppercase tracking-wide text-sm"
-                          style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
-                        >
-                          Typ príspevku
-                        </label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {contributionTypes.map((type, idx) => {
-                            const Icon = type.icon;
-                            return (
-                              <motion.label
-                                key={type.value}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.4 + idx * 0.05 }}
-                                className="relative cursor-pointer"
-                              >
-                                <input
-                                  type="radio"
-                                  name="contributionType"
-                                  value={type.value}
-                                  checked={formData.contributionType === type.value}
-                                  onChange={(e) => setFormData({ ...formData, contributionType: e.target.value })}
-                                  className="sr-only"
-                                />
-                                <motion.div
-                                  className={`relative p-4 rounded-xl border-2 transition-all ${
-                                    formData.contributionType === type.value
-                                      ? 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/60 dark:to-orange-900/50 border-amber-500 dark:border-amber-600 shadow-lg'
-                                      : 'bg-white/30 dark:bg-amber-950/10 border-amber-200/50 dark:border-amber-700/50 hover:border-amber-400 dark:hover:border-amber-600'
-                                  }`}
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <Icon className={`w-5 h-5 ${
-                                      formData.contributionType === type.value
-                                        ? 'text-amber-700 dark:text-amber-400'
-                                        : 'text-amber-600/60 dark:text-amber-400/60'
-                                    }`} />
-                                    <span 
-                                      className={`text-sm ${
-                                        formData.contributionType === type.value
-                                          ? 'text-amber-950 dark:text-amber-50'
-                                          : 'text-amber-900/70 dark:text-amber-100/70'
-                                      }`}
-                                      style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                                    >
-                                      {type.label}
-                                    </span>
-                                  </div>
-                                  {formData.contributionType === type.value && (
-                                    <motion.div
-                                      initial={{ scale: 0 }}
-                                      animate={{ scale: 1 }}
-                                      className="absolute top-2 right-2"
-                                    >
-                                      <CheckCircle className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-                                    </motion.div>
-                                  )}
-                                </motion.div>
-                              </motion.label>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-
-                      {/* Message field */}
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.5 }}
-                      >
-                        <label 
-                          className="block text-amber-950 dark:text-amber-100 mb-2 uppercase tracking-wide text-sm"
-                          style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
-                        >
-                          Vaša správa
-                        </label>
-                        <div className="relative">
-                          <textarea
-                            required
-                            rows={5}
-                            value={formData.message}
-                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                            onFocus={() => setFocusedField('message')}
-                            onBlur={() => setFocusedField(null)}
-                            placeholder="Popíšte čím by ste chceli prispieť..."
-                            className="w-full px-4 py-3 bg-white/50 dark:bg-amber-950/20 border-2 border-amber-200/50 dark:border-amber-700/50 rounded-xl outline-none transition-all resize-none text-amber-950 dark:text-amber-50 placeholder:text-amber-800/40 dark:placeholder:text-amber-200/30"
-                            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                          />
-                          <motion.div
-                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: focusedField === 'message' ? 1 : 0 }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </div>
-                      </motion.div>
-
-                      {/* Submit button */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.6 }}
-                        className="flex justify-center pt-4"
-                      >
-                        <motion.button
-                          type="submit"
-                          className="relative px-8 py-4 bg-gradient-to-r from-amber-700 to-amber-800 hover:from-amber-800 hover:to-amber-900 text-amber-50 rounded-xl overflow-hidden group shadow-lg"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          {/* Shimmer effect */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            animate={{
-                              x: ['-200%', '200%'],
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              repeatDelay: 1,
-                              ease: 'linear',
-                            }}
-                          />
-                          
-                          <span 
-                            className="relative flex items-center gap-3 uppercase tracking-wider"
-                            style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.15em' }}
-                          >
-                            <Send className="w-5 h-5" />
-                            Odoslať správu
-                          </span>
-                        </motion.button>
-                      </motion.div>
-                    </motion.form>
-                  ) : (
-                    <motion.div
-                      key="success"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      className="text-center py-12"
-                    >
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                      >
-                        <CheckCircle className="w-20 h-20 text-green-600 dark:text-green-400 mx-auto mb-6" />
-                      </motion.div>
-                      
-                      <h3 
-                        className="text-amber-950 dark:text-amber-100 mb-4"
-                        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                      >
-                        Ďakujeme za váš záujem!
-                      </h3>
-                      
-                      <p 
-                        className="text-stone-600 dark:text-stone-400 max-w-md mx-auto"
-                        style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic' }}
-                      >
-                        Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími informáciami o spolupráci.
-                      </p>
-
-                      {/* Sparkles animation */}
-                      {[...Array(8)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          className="absolute w-1 h-1 rounded-full bg-amber-500"
-                          style={{
-                            left: '50%',
-                            top: '50%',
-                          }}
-                          initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                          animate={{
-                            opacity: [0, 1, 0],
-                            scale: [0, 1.5, 0],
-                            x: Math.cos((i / 8) * Math.PI * 2) * 100,
-                            y: Math.sin((i / 8) * Math.PI * 2) * 100,
-                          }}
-                          transition={{
-                            duration: 1,
-                            delay: i * 0.05,
-                            ease: "easeOut"
-                          }}
-                        />
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
+                  {/* Poznámka o použití údajov */}
+                  <p
+                    className="text-center mt-3"
+                    style={{
+                      color: '#7a6b56',
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 12,
+                      fontStyle: 'italic',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    Vaše údaje použijeme len na odpoveď na túto správu. Neposkytujeme ich tretím stranám.
+                  </p>
+                </motion.form>
+              ) : (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  className="text-center py-6"
+                >
+                  <CheckCircle className="w-14 h-14 mx-auto mb-4" style={{ color: '#2D7F4F' }} />
+                  <h3
+                    className="mb-2"
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontSize: 22,
+                      fontWeight: 600,
+                      color: '#2d1810',
+                    }}
+                  >
+                    Ďakujeme, ozveme sa vám
+                  </h3>
+                  <p
+                    className="mx-auto"
+                    style={{
+                      color: '#7a6b56',
+                      fontFamily: 'Georgia, serif',
+                      fontStyle: 'italic',
+                      fontSize: 14.5,
+                      maxWidth: 380,
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími informáciami o spolupráci.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFormData({ name: '', email: '', message: '' });
+                    }}
+                    className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px]"
+                    style={{
+                      background: 'transparent',
+                      color: '#7d4f1d',
+                      border: '1px solid rgba(125,79,29,0.35)',
+                      fontFamily: 'Georgia, serif',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Poslať ďalšiu správu
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       </div>
     </section>
+  );
+}
+
+// ----- helpers -----
+function Label({ htmlFor, children, as = 'label' }: { htmlFor?: string; children: React.ReactNode; as?: 'label' | 'div' }) {
+  const Tag: any = as;
+  return (
+    <Tag
+      htmlFor={htmlFor}
+      style={{
+        display: 'block',
+        marginBottom: 6,
+        fontFamily: 'Georgia, serif',
+        fontSize: 13,
+        fontWeight: 500,
+        color: '#3d3528',
+        letterSpacing: '0.02em',
+      }}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+function ErrorMsg({ id, children }: { id?: string; children: React.ReactNode }) {
+  return (
+    <div
+      id={id}
+      role="alert"
+      style={{
+        marginTop: 5,
+        color: '#c44561',
+        fontFamily: 'Georgia, serif',
+        fontSize: 12,
+        fontStyle: 'italic',
+      }}
+    >
+      {children}
+    </div>
   );
 }

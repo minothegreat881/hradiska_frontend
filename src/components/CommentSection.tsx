@@ -1,260 +1,712 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
-import { MessageCircle, Send, ThumbsUp, Reply, Feather, Calendar } from 'lucide-react';
+import { ThumbsUp, Reply, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
 
 interface Comment {
   id: string;
+  documentId: string;
+  inReplyTo?: string;
   author: string;
   content: string;
   date: string;
   likes: number;
+  sourceBlogger?: boolean;
   replies?: Comment[];
 }
 
-const mockComments: Comment[] = [
-  {
-    id: '1',
-    author: 'Marián Novák',
-    content: 'Vynikajúci článok! Veľmi zaujímavé informácie o Veľkej Morave. Určite navštívim Bojnú.',
-    date: '2025-01-15',
-    likes: 12,
-    replies: [
-      {
-        id: '1-1',
-        author: 'Peter Horváth',
-        content: 'Súhlasím, Bojná je určite stojí za návštevu. Odporúčam aj múzeum v Nitre.',
-        date: '2025-01-16',
-        likes: 5,
-      }
-    ]
-  },
-  {
-    id: '2',
-    author: 'Jana Kováčová',
-    content: 'Zaujímavé archeologické nálezy. Máte aj informácie o výskumoch v Pobedime?',
-    date: '2025-01-14',
-    likes: 8,
-  },
-];
+interface StrapiComment {
+  id: number;
+  documentId: string;
+  authorName: string;
+  authorEmail?: string;
+  content: string;
+  approved: boolean;
+  sourceBlogger?: boolean;
+  sourceBloggerId?: string;
+  inReplyTo?: string;
+  likes?: number;
+  originalDate?: string;
+  createdAt: string;
+}
 
-export function CommentSection() {
-  const [comments] = useState<Comment[]>(mockComments);
-  const [newComment, setNewComment] = useState('');
+const LIKED_STORAGE_KEY = 'hradiska:liked-comments';
+
+function getLikedSet(): Set<string> {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    const raw = window.localStorage.getItem(LIKED_STORAGE_KEY);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw);
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveLikedSet(set: Set<string>) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(LIKED_STORAGE_KEY, JSON.stringify([...set]));
+  } catch {
+    // ignore quota / privacy errors
+  }
+}
+
+const FALLBACK_COMMENTS: Comment[] = [];
+
+interface CommentItemProps {
+  comment: Comment;
+  depth?: number;
+  onLike: (documentId: string) => void;
+  onReply: (documentId: string, authorName: string) => void;
+  likedSet: Set<string>;
+  replyingToDocId: string | null;
+}
+
+function CommentItem({
+  comment,
+  depth = 0,
+  onLike,
+  onReply,
+  likedSet,
+  replyingToDocId,
+}: CommentItemProps) {
+  const liked = likedSet.has(comment.documentId);
+  const isBeingRepliedTo = replyingToDocId === comment.documentId;
+  return (
+    <div style={{ marginLeft: depth > 0 ? 32 : 0, marginTop: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 12,
+          alignItems: 'flex-start',
+          background: '#fffdf8',
+          border: `1px solid ${isBeingRepliedTo ? '#a87437' : 'rgba(196,165,116,0.4)'}`,
+          borderRadius: 10,
+          padding: 16,
+          transition: 'border-color 0.2s',
+        }}
+      >
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 9999,
+            background: 'linear-gradient(135deg, #c4a574 0%, #a87437 100%)',
+            color: '#fffdf8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'Georgia, serif',
+            fontSize: 14,
+            fontWeight: 600,
+            flexShrink: 0,
+          }}
+        >
+          {(comment.author || '?').charAt(0).toUpperCase()}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 10,
+              marginBottom: 6,
+              flexWrap: 'wrap',
+            }}
+          >
+            <strong
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 14,
+                color: '#2d1810',
+              }}
+            >
+              {comment.author}
+            </strong>
+            <span
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 12,
+                color: '#7a6b56',
+              }}
+            >
+              {comment.date}
+            </span>
+            {comment.sourceBlogger && (
+              <span
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  fontSize: 10,
+                  color: '#a87437',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  background: 'rgba(196,165,116,0.15)',
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                }}
+              >
+                z pôvodného blogu
+              </span>
+            )}
+          </div>
+          <p
+            style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: 14,
+              lineHeight: 1.6,
+              color: '#2d2418',
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {comment.content}
+          </p>
+          <div
+            style={{
+              display: 'flex',
+              gap: 16,
+              marginTop: 12,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => onLike(comment.documentId)}
+              title={liked ? 'Zrušiť reakciu' : 'Páči sa mi'}
+              aria-pressed={liked}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: 'transparent',
+                border: 0,
+                padding: 0,
+                cursor: 'pointer',
+                fontFamily: 'Georgia, serif',
+                fontSize: 12,
+                color: liked ? '#a87437' : '#7a6b56',
+                fontWeight: liked ? 600 : 400,
+                transition: 'color 0.15s',
+              }}
+            >
+              <ThumbsUp
+                style={{
+                  width: 14,
+                  height: 14,
+                  fill: liked ? '#a87437' : 'transparent',
+                  strokeWidth: liked ? 2.2 : 2,
+                  transition: 'fill 0.15s',
+                }}
+              />
+              {comment.likes || 0}
+            </button>
+            <button
+              type="button"
+              onClick={() => onReply(comment.documentId, comment.author)}
+              title="Odpovedať na tento komentár"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: 'transparent',
+                border: 0,
+                padding: 0,
+                cursor: 'pointer',
+                fontFamily: 'Georgia, serif',
+                fontSize: 12,
+                color: '#7a6b56',
+              }}
+            >
+              <Reply style={{ width: 14, height: 14 }} />
+              Odpovedať
+            </button>
+          </div>
+        </div>
+      </div>
+      {comment.replies?.map((r) => (
+        <CommentItem
+          key={r.id}
+          comment={r}
+          depth={depth + 1}
+          onLike={onLike}
+          onReply={onReply}
+          likedSet={likedSet}
+          replyingToDocId={replyingToDocId}
+        />
+      ))}
+    </div>
+  );
+}
+
+function formatDate(iso?: string) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('sk-SK', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  } catch {
+    return iso.slice(0, 10);
+  }
+}
+
+function mapStrapiComment(c: StrapiComment): Comment {
+  return {
+    id: String(c.documentId || c.id),
+    documentId: c.documentId,
+    inReplyTo: c.inReplyTo,
+    author: c.authorName || 'Anonym',
+    content: c.content || '',
+    date: formatDate(c.originalDate || c.createdAt),
+    likes: c.likes ?? 0,
+    sourceBlogger: c.sourceBlogger,
+  };
+}
+
+/** Imutabilný update like-count v nested strome (recursion). */
+function mapTree(tree: Comment[], fn: (c: Comment) => Comment): Comment[] {
+  return tree.map((c) => ({
+    ...fn(c),
+    replies: c.replies ? mapTree(c.replies, fn) : c.replies,
+  }));
+}
+
+function bumpLikesInTree(tree: Comment[], docId: string, delta: number): Comment[] {
+  return mapTree(tree, (c) =>
+    c.documentId === docId ? { ...c, likes: Math.max(0, (c.likes || 0) + delta) } : c,
+  );
+}
+
+function setLikesInTree(tree: Comment[], docId: string, value: number): Comment[] {
+  return mapTree(tree, (c) =>
+    c.documentId === docId ? { ...c, likes: value } : c,
+  );
+}
+
+/** Z plain list-u komentárov zostav nested tree podľa inReplyTo.
+ *  inReplyTo obsahuje documentId parent komentára. Komentáre bez
+ *  inReplyTo (alebo s neexistujúcim parentom) sú top-level. */
+function buildCommentTree(flat: Comment[]): Comment[] {
+  const byDocId = new Map<string, Comment>();
+  for (const c of flat) byDocId.set(c.documentId, { ...c, replies: [] });
+  const roots: Comment[] = [];
+  for (const c of byDocId.values()) {
+    if (c.inReplyTo && byDocId.has(c.inReplyTo)) {
+      byDocId.get(c.inReplyTo)!.replies!.push(c);
+    } else {
+      roots.push(c);
+    }
+  }
+  return roots;
+}
+
+interface CommentSectionProps {
+  postDocumentId?: string;
+}
+
+export function CommentSection({ postDocumentId }: CommentSectionProps) {
+  const [comments, setComments] = useState<Comment[]>(FALLBACK_COMMENTS);
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [newComment, setNewComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [likedSet, setLikedSet] = useState<Set<string>>(() => getLikedSet());
+  const [replyingTo, setReplyingTo] = useState<{ docId: string; author: string } | null>(null);
+  const formRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchComments = useCallback(async () => {
+    if (!postDocumentId) {
+      setComments(FALLBACK_COMMENTS);
+      return;
+    }
+    setLoading(true);
+    try {
+      const url = new URL(`${STRAPI_URL}/api/blog-comments`);
+      url.searchParams.set('filters[post][documentId][$eq]', postDocumentId);
+      url.searchParams.set('sort[0]', 'originalDate:desc');
+      url.searchParams.set('sort[1]', 'createdAt:desc');
+      url.searchParams.set('pagination[pageSize]', '100');
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const list: StrapiComment[] = json.data || [];
+      // Build nested tree: replies sa zobrazia vnorené pod parent komentárom
+      // (oddelené visually cez `depth` v CommentItem).
+      setComments(buildCommentTree(list.map(mapStrapiComment)));
+    } catch (e) {
+      console.warn('[CommentSection] fetch failed:', e);
+      setComments([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [postDocumentId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '10px 14px',
+    background: '#fdfbf6',
+    border: '1px solid rgba(196,165,116,0.5)',
+    borderRadius: 8,
+    outline: 'none',
+    fontFamily: 'Georgia, serif',
+    fontSize: 14,
+    color: '#2d2418',
+    transition: 'border-color 0.2s',
+    boxSizing: 'border-box',
+  };
+
+  const canSubmit = !!postDocumentId && !!name.trim() && !!newComment.trim() && !submitting;
+
+  const handleLike = useCallback(
+    async (commentDocId: string) => {
+      const wasLiked = likedSet.has(commentDocId);
+      const action = wasLiked ? 'unlike' : 'like';
+      const delta = wasLiked ? -1 : +1;
+
+      // Optimistic update — UI hneď reaguje, server response zafixuje finálnu hodnotu.
+      setLikedSet((prev) => {
+        const next = new Set(prev);
+        if (wasLiked) next.delete(commentDocId);
+        else next.add(commentDocId);
+        saveLikedSet(next);
+        return next;
+      });
+      setComments((prev) => bumpLikesInTree(prev, commentDocId, delta));
+
+      try {
+        const res = await fetch(
+          `${STRAPI_URL}/api/blog-comments/${commentDocId}/${action}`,
+          { method: 'POST' },
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        const serverLikes = json?.data?.likes;
+        if (typeof serverLikes === 'number') {
+          setComments((prev) => setLikesInTree(prev, commentDocId, serverLikes));
+        }
+      } catch (e) {
+        // Rollback optimistic update
+        setLikedSet((prev) => {
+          const next = new Set(prev);
+          if (wasLiked) next.add(commentDocId);
+          else next.delete(commentDocId);
+          saveLikedSet(next);
+          return next;
+        });
+        setComments((prev) => bumpLikesInTree(prev, commentDocId, -delta));
+        toast.error(wasLiked ? 'Nepodarilo sa zrušiť reakciu.' : 'Nepodarilo sa zaznamenať reakciu.');
+      }
+    },
+    [likedSet],
+  );
+
+  const handleReply = useCallback((commentDocId: string, authorName: string) => {
+    setReplyingTo({ docId: commentDocId, author: authorName });
+    // Scroll k formuláru
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  }, []);
+
+  const handleCancelReply = useCallback(() => setReplyingTo(null), []);
+
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${STRAPI_URL}/api/blog-comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: {
+            authorName: name.trim(),
+            authorEmail: email.trim() || undefined,
+            content: newComment.trim(),
+            post: postDocumentId,
+            inReplyTo: replyingTo?.docId,
+          },
+        }),
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(`HTTP ${res.status}: ${t.slice(0, 200)}`);
+      }
+      setName('');
+      setEmail('');
+      setNewComment('');
+      setReplyingTo(null);
+      toast.success(
+        'Komentár bol odoslaný. Po schválení administrátorom sa zobrazí v diskusii.',
+      );
+      // Komentár nepridávame do zoznamu — je v admin moderation queue, fetch vráti
+      // len schválené. Užívateľ vidí toast a formulár sa vyčistí.
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('[CommentSection] submit failed:', e);
+      toast.error(`Nepodarilo sa odoslať komentár: ${msg.slice(0, 120)}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="relative">
-      {/* Decorative header with parchment style */}
-      <div className="flex items-center justify-center gap-4 mb-10 relative">
-        <div className="absolute inset-0 flex items-center pointer-events-none">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-amber-600/30 to-transparent"></div>
-        </div>
-        <div className="relative px-6 py-3 bg-gradient-to-br from-amber-100 via-amber-50 to-stone-50 dark:from-amber-950/40 dark:via-stone-900 dark:to-stone-950 border-4 border-double border-amber-600/40 rounded-lg shadow-lg">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-600 dark:bg-amber-700 rounded-full">
-              <MessageCircle className="w-5 h-5 text-white" />
-            </div>
-            <h2 
-              className="text-2xl text-amber-950 dark:text-amber-100 uppercase tracking-widest"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.15em' }}
-            >
-              Diskusia
-            </h2>
-            <span className="px-3 py-1 bg-amber-600 dark:bg-amber-700 text-white rounded-full text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-              {comments.length}
-            </span>
+    <section id="discussion" style={{ margin: '48px 0 0', scrollMarginTop: 32 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+        <h2
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 22,
+            fontWeight: 600,
+            color: '#2d1810',
+            margin: 0,
+          }}
+        >
+          Diskusia
+        </h2>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: 24,
+            height: 24,
+            padding: '0 8px',
+            borderRadius: 9999,
+            background: '#a87437',
+            color: '#fffdf8',
+            fontFamily: 'Georgia, serif',
+            fontSize: 12,
+            fontWeight: 600,
+          }}
+        >
+          {loading
+            ? '…'
+            : (function countAll(list: Comment[]): number {
+                return list.reduce((sum, c) => sum + 1 + countAll(c.replies || []), 0);
+              })(comments)}
+        </span>
+      </div>
+      <hr
+        style={{
+          height: 1,
+          background: 'linear-gradient(90deg, #c4a574 0%, rgba(196,165,116,0) 100%)',
+          margin: '8px 0 24px',
+          border: 0,
+        }}
+      />
+
+      {/* Komentáre */}
+      <div>
+        {loading && comments.length === 0 ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              color: '#7a6b56',
+              fontFamily: 'Georgia, serif',
+              fontSize: 14,
+              fontStyle: 'italic',
+              padding: 16,
+            }}
+          >
+            <Loader2 style={{ width: 16, height: 16 }} className="animate-spin" />
+            Načítavam komentáre…
           </div>
-        </div>
+        ) : comments.length === 0 ? (
+          <p
+            style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: 14,
+              color: '#7a6b56',
+              fontStyle: 'italic',
+              padding: 16,
+              background: '#fffdf8',
+              border: '1px dashed rgba(196,165,116,0.4)',
+              borderRadius: 10,
+              margin: 0,
+            }}
+          >
+            Zatiaľ tu nie sú žiadne komentáre. Buďte prvý, kto napíše svoj názor.
+          </p>
+        ) : (
+          comments.map((c) => (
+            <CommentItem
+              key={c.id}
+              comment={c}
+              onLike={handleLike}
+              onReply={handleReply}
+              likedSet={likedSet}
+              replyingToDocId={replyingTo?.docId || null}
+            />
+          ))
+        )}
       </div>
 
-      {/* Comment form - Parchment style */}
-      <motion.div 
-        className="mb-12 p-8 bg-gradient-to-br from-amber-50 via-stone-50 to-amber-50/50 dark:from-stone-900 dark:via-amber-950/20 dark:to-stone-950 border-4 border-amber-800/30 rounded-2xl shadow-xl relative overflow-hidden"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      {/* Formulár */}
+      <motion.div
+        ref={formRef as React.Ref<HTMLDivElement>}
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        style={{
+          marginTop: 32,
+          background: '#fffdf8',
+          border: replyingTo ? '1px solid #a87437' : '1px solid rgba(196,165,116,0.4)',
+          borderRadius: 12,
+          padding: 20,
+          transition: 'border-color 0.2s',
+        }}
       >
-        {/* Decorative corners */}
-        <div className="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-amber-600/40 rounded-tl-lg"></div>
-        <div className="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-amber-600/40 rounded-tr-lg"></div>
-        <div className="absolute bottom-2 left-2 w-8 h-8 border-b-2 border-l-2 border-amber-600/40 rounded-bl-lg"></div>
-        <div className="absolute bottom-2 right-2 w-8 h-8 border-b-2 border-r-2 border-amber-600/40 rounded-br-lg"></div>
-        
-        {/* Quill icon header */}
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-dashed border-amber-600/30">
-          <div className="p-2 bg-amber-600 dark:bg-amber-700 rounded-lg">
-            <Feather className="w-5 h-5 text-white" />
-          </div>
-          <h3 
-            className="text-xl text-amber-900 dark:text-amber-200 uppercase tracking-wide"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
+        <h3
+          style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#a87437',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            margin: 0,
+          }}
+        >
+          {replyingTo ? `Odpovedať na ${replyingTo.author}` : 'Pridať komentár'}
+        </h3>
+        {replyingTo && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              marginTop: 10,
+              padding: '8px 12px',
+              background: 'rgba(196,165,116,0.12)',
+              borderRadius: 8,
+              fontFamily: 'Georgia, serif',
+              fontSize: 13,
+              color: '#5d3a14',
+            }}
           >
-            Pridať komentár
-          </h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label 
-              className="block text-sm text-stone-600 dark:text-stone-400 mb-2"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            <span>
+              Odpovedáte na komentár od <strong>{replyingTo.author}</strong>.
+            </span>
+            <button
+              type="button"
+              onClick={handleCancelReply}
+              style={{
+                marginLeft: 'auto',
+                background: 'transparent',
+                border: 0,
+                padding: 0,
+                cursor: 'pointer',
+                fontFamily: 'Georgia, serif',
+                fontSize: 12,
+                color: '#7a6b56',
+                textDecoration: 'underline',
+              }}
             >
-              Meno
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Vaše meno"
-              className="w-full px-5 py-3 bg-white dark:bg-stone-800 border-2 border-amber-600/30 dark:border-amber-700/30 rounded-xl focus:border-amber-600 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-600/20 outline-none transition-all text-stone-900 dark:text-stone-100 shadow-sm"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            />
+              Zrušiť
+            </button>
           </div>
-
-          <div>
-            <label 
-              className="block text-sm text-stone-600 dark:text-stone-400 mb-2"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              Komentár
-            </label>
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Napište svoj komentár..."
-              rows={5}
-              className="w-full px-5 py-4 bg-white dark:bg-stone-800 border-2 border-amber-600/30 dark:border-amber-700/30 rounded-xl focus:border-amber-600 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-600/20 outline-none transition-all resize-none text-stone-900 dark:text-stone-100 shadow-sm"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            />
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 dark:from-amber-600 dark:to-amber-700 dark:hover:from-amber-700 dark:hover:to-amber-800 text-white rounded-xl transition-all flex items-center gap-3 shadow-lg hover:shadow-xl border-2 border-amber-800/30"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+        )}
+        {!postDocumentId && (
+          <p
+            style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: 13,
+              color: '#a87437',
+              fontStyle: 'italic',
+              margin: '12px 0 0',
+            }}
           >
-            <Feather className="w-5 h-5" />
-            <span className="uppercase tracking-wide text-sm">Odoslať komentár</span>
-          </motion.button>
+            Komentovanie tohto článku nie je momentálne dostupné.
+          </p>
+        )}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 12,
+            marginTop: 16,
+            opacity: postDocumentId ? 1 : 0.55,
+            pointerEvents: postDocumentId ? 'auto' : 'none',
+          }}
+        >
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Vaše meno *"
+            maxLength={100}
+            style={inputStyle}
+            disabled={submitting}
+          />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="E-mail (nezobrazí sa, slúži len adminovi)"
+            maxLength={150}
+            style={inputStyle}
+            disabled={submitting}
+          />
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Napíšte svoj komentár…"
+            rows={4}
+            maxLength={5000}
+            style={{ ...inputStyle, resize: 'vertical', fontFamily: 'Georgia, serif' }}
+            disabled={submitting}
+          />
+          <button
+            type="button"
+            disabled={!canSubmit}
+            onClick={handleSubmit}
+            style={{
+              alignSelf: 'flex-start',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '10px 24px',
+              background: canSubmit ? '#a87437' : 'rgba(168,116,55,0.3)',
+              color: '#fffdf8',
+              border: 0,
+              borderRadius: 8,
+              fontFamily: 'Georgia, serif',
+              fontSize: 14,
+              fontWeight: 600,
+              letterSpacing: '0.05em',
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
+              transition: 'background 0.2s',
+            }}
+          >
+            {submitting && <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />}
+            {submitting ? 'Odosielam…' : 'Odoslať'}
+          </button>
+          <p
+            style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: 12,
+              color: '#7a6b56',
+              fontStyle: 'italic',
+              margin: 0,
+            }}
+          >
+            Komentár sa po odoslaní zobrazí až po schválení administrátorom.
+          </p>
         </div>
       </motion.div>
-
-      {/* Comments list - Scroll/Parchment style */}
-      <div className="space-y-6">
-        {comments.map((comment, idx) => (
-          <motion.div
-            key={comment.id}
-            initial={{ opacity: 0, y: 20, rotateX: -10 }}
-            animate={{ opacity: 1, y: 0, rotateX: 0 }}
-            transition={{ delay: idx * 0.1, duration: 0.5 }}
-            className="p-8 bg-gradient-to-br from-white via-amber-50/30 to-stone-50 dark:from-stone-900/80 dark:via-amber-950/20 dark:to-stone-950/80 border-l-4 border-amber-600 dark:border-amber-500 rounded-xl shadow-lg hover:shadow-xl transition-shadow relative overflow-hidden"
-            whileHover={{ y: -4 }}
-          >
-            {/* Decorative corner stamp */}
-            <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-amber-600/10 dark:bg-amber-500/10 flex items-center justify-center">
-              <MessageCircle className="w-5 h-5 text-amber-600/40 dark:text-amber-500/40" />
-            </div>
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 flex items-center justify-center text-white border-4 border-white dark:border-stone-900 shadow-lg" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                  <span className="text-lg">{comment.author.charAt(0)}</span>
-                </div>
-                <div>
-                  <div className="text-lg text-stone-900 dark:text-stone-100 flex items-center gap-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                    {comment.author}
-                    <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 text-xs rounded uppercase tracking-wide">
-                      Čitateľ
-                    </span>
-                  </div>
-                  <div className="text-xs text-stone-500 dark:text-stone-400 mt-1 flex items-center gap-1" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                    <Calendar className="w-3 h-3" />
-                    {new Date(comment.date).toLocaleDateString('sk-SK', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric'
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p 
-              className="text-stone-700 dark:text-stone-300 mb-6 leading-relaxed text-base"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              {comment.content}
-            </p>
-
-            <div className="flex items-center gap-4 pt-4 border-t border-amber-600/20">
-              <motion.button 
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <ThumbsUp className="w-4 h-4" />
-                <span style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>{comment.likes}</span>
-              </motion.button>
-              <motion.button 
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Reply className="w-4 h-4" />
-                <span style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>Odpovedať</span>
-              </motion.button>
-            </div>
-
-            {/* Replies - Nested parchment style */}
-            {comment.replies && comment.replies.length > 0 && (
-              <div className="mt-6 ml-8 space-y-4 pl-4 border-l-2 border-dashed border-amber-600/30">
-                {comment.replies.map((reply) => (
-                  <motion.div
-                    key={reply.id}
-                    className="p-5 bg-gradient-to-br from-stone-50 to-amber-50/50 dark:from-stone-800/50 dark:to-amber-950/10 border-2 border-amber-800/20 rounded-lg shadow-md relative"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    {/* Reply indicator */}
-                    <div className="absolute -left-[18px] top-6 w-4 h-px bg-amber-600/30"></div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                        {reply.author.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="text-sm text-stone-900 dark:text-stone-100" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                          {reply.author}
-                        </div>
-                        <div className="text-xs text-stone-500 dark:text-stone-400" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                          {new Date(reply.date).toLocaleDateString('sk-SK', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                    <p 
-                      className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed"
-                      style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                    >
-                      {reply.content}
-                    </p>
-                    <div className="flex items-center gap-4 mt-3">
-                      <button className="flex items-center gap-1 text-xs text-stone-600 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-400 transition-colors">
-                        <ThumbsUp className="w-3 h-3" />
-                        <span style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>{reply.likes}</span>
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        ))}
-      </div>
-    </div>
+    </section>
   );
 }

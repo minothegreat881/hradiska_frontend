@@ -1,7 +1,14 @@
 'use client';
 
 import { motion } from 'motion/react';
+import { ZoomIn } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+
+// Helper: open gallery modal with specific image
+function openGalleryWithImage(imageUrl: string) {
+  // Dispatch custom event that HistoricalGallery listens to
+  window.dispatchEvent(new CustomEvent('openGalleryModal', { detail: { imageUrl } }));
+}
 
 // =============================================================================
 // TYPES
@@ -10,19 +17,15 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 export type BlogMediaVariant =
   | 'left-float'
   | 'right-float'
-  | 'side-by-side'
   | 'full-width'
   | 'breakout'
   | 'center';
-
-export type BlogMediaSize = 'small' | 'medium' | 'large';
 export type BlogMediaWidth = '30' | '40' | '50' | '60' | '100';
 export type BlogMediaAspectRatio = '3:2' | '16:9' | '4:3' | '1:1' | '2:3' | '9:16' | '3:4' | 'auto';
 
 export interface BlogMediaProps {
   // Layout
   variant?: BlogMediaVariant;
-  size?: BlogMediaSize;
   widthPercent?: BlogMediaWidth;
   aspectRatio?: BlogMediaAspectRatio;
   objectPosition?: string;
@@ -33,15 +36,8 @@ export interface BlogMediaProps {
   width?: number;
   height?: number;
 
-  // Second image (for side-by-side)
-  secondSrc?: string;
-  secondAlt?: string;
-  secondWidth?: number;
-  secondHeight?: number;
-
   // Captions
   caption?: string;
-  captions?: [string?, string?];
   credit?: string;
   sourceUrl?: string;
 
@@ -59,13 +55,6 @@ export interface BlogMediaProps {
 // =============================================================================
 // CONSTANTS
 // =============================================================================
-
-// Size → Width fallback mapping (backward compatibility)
-const SIZE_TO_WIDTH: Record<BlogMediaSize, BlogMediaWidth> = {
-  small: '30',
-  medium: '50',
-  large: '60',
-};
 
 // Width → CSS percentage
 const WIDTH_PERCENT: Record<BlogMediaWidth, string> = {
@@ -92,12 +81,9 @@ const ASPECT_RATIO_PADDING: Record<BlogMediaAspectRatio, string | null> = {
 // HELPER: Get effective width
 // =============================================================================
 
-function getEffectiveWidth(widthPercent?: BlogMediaWidth, size?: BlogMediaSize): string {
+function getEffectiveWidth(widthPercent?: BlogMediaWidth): string {
   if (widthPercent) {
     return WIDTH_PERCENT[widthPercent];
-  }
-  if (size) {
-    return WIDTH_PERCENT[SIZE_TO_WIDTH[size]];
   }
   return WIDTH_PERCENT['50']; // default 50%
 }
@@ -203,18 +189,26 @@ function ImageWrapper({
   const shadowClass = shadow ? 'shadow-lg' : '';
 
   return (
-    <div
-      className={`relative overflow-hidden ${roundedClass} ${shadowClass} ${className}`}
+    <button
+      onClick={() => openGalleryWithImage(src)}
+      className={`relative overflow-hidden ${roundedClass} ${shadowClass} ${className} cursor-pointer group block w-full text-left`}
       style={{ paddingBottom: paddingBottom || '66.67%' }}
+      title="Kliknutím zobraziť v galérii"
     >
       <ImageWithFallback
         src={src}
         {...imgProps}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         style={{ objectPosition }}
         loading={priority ? 'eager' : 'lazy'}
       />
-    </div>
+      {/* Hover overlay with zoom icon */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3 bg-white/30 backdrop-blur-sm rounded-full">
+          <ZoomIn className="w-6 h-6 text-white drop-shadow-lg" />
+        </div>
+      </div>
+    </button>
   );
 }
 
@@ -227,7 +221,6 @@ function FloatLayout({
   src,
   alt,
   widthPercent,
-  size = 'medium',
   aspectRatio = 'auto',
   objectPosition = 'center center',
   width,
@@ -243,7 +236,7 @@ function FloatLayout({
 }: BlogMediaProps & { variant: 'left-float' | 'right-float' }) {
   const isLeft = variant === 'left-float';
   const captionAlign = isLeft ? 'left' : 'right';
-  const effectiveWidth = getEffectiveWidth(widthPercent, size);
+  const effectiveWidth = getEffectiveWidth(widthPercent);
 
   return (
     <motion.figure
@@ -281,97 +274,6 @@ function FloatLayout({
         align={captionAlign}
         show={showCaption}
       />
-    </motion.figure>
-  );
-}
-
-// =============================================================================
-// VARIANT: Side by Side (two images)
-// =============================================================================
-
-function SideBySideLayout({
-  src,
-  alt,
-  secondSrc,
-  secondAlt,
-  aspectRatio = 'auto',
-  objectPosition = 'center center',
-  width,
-  height,
-  secondWidth,
-  secondHeight,
-  caption,
-  captions,
-  credit,
-  sourceUrl,
-  showCaption = true,
-  rounded = true,
-  shadow = true,
-  priority,
-  decorative,
-}: BlogMediaProps) {
-  const [caption1, caption2] = captions || [undefined, undefined];
-
-  return (
-    <motion.figure
-      className="w-full mb-6 clear-both"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* First image */}
-        <div>
-          <ImageWrapper
-            src={src}
-            alt={alt}
-            aspectRatio={aspectRatio}
-            objectPosition={objectPosition}
-            width={width}
-            height={height}
-            priority={priority}
-            decorative={decorative}
-            rounded={rounded}
-            shadow={shadow}
-          />
-          {caption1 && showCaption && (
-            <Figcaption caption={caption1} align="center" show={showCaption} />
-          )}
-        </div>
-
-        {/* Second image */}
-        {secondSrc && (
-          <div>
-            <ImageWrapper
-              src={secondSrc}
-              alt={secondAlt || alt}
-              aspectRatio={aspectRatio}
-              objectPosition={objectPosition}
-              width={secondWidth}
-              height={secondHeight}
-              priority={priority}
-              decorative={decorative}
-              rounded={rounded}
-              shadow={shadow}
-            />
-            {caption2 && showCaption && (
-              <Figcaption caption={caption2} align="center" show={showCaption} />
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Shared caption (if no per-image captions) */}
-      {caption && !captions && (
-        <Figcaption
-          caption={caption}
-          credit={credit}
-          sourceUrl={sourceUrl}
-          align="center"
-          show={showCaption}
-        />
-      )}
     </motion.figure>
   );
 }
@@ -497,7 +399,6 @@ function CenterLayout({
   src,
   alt,
   widthPercent,
-  size = 'medium',
   aspectRatio = 'auto',
   objectPosition = 'center center',
   width,
@@ -511,7 +412,7 @@ function CenterLayout({
   priority,
   decorative,
 }: BlogMediaProps) {
-  const effectiveWidth = getEffectiveWidth(widthPercent, size);
+  const effectiveWidth = getEffectiveWidth(widthPercent);
 
   // Map width to max-width classes
   const maxWidthClass = {
@@ -586,9 +487,6 @@ export function BlogMedia(props: BlogMediaProps) {
     case 'right-float':
       return <FloatLayout {...safeProps} variant={variant} />;
 
-    case 'side-by-side':
-      return <SideBySideLayout {...safeProps} />;
-
     case 'breakout':
       return <BreakoutLayout {...safeProps} />;
 
@@ -601,70 +499,4 @@ export function BlogMedia(props: BlogMediaProps) {
   }
 }
 
-// =============================================================================
-// STRAPI MAPPING HELPER
-// =============================================================================
-
-import { StrapiImage, getStrapiImageUrl } from '../lib/strapi';
-
-export interface StrapiImageBlock {
-  __component: 'content.image-block';
-  id: number;
-  image: StrapiImage;
-  secondImage?: StrapiImage;
-  alt?: string;
-  caption?: string;
-  layout?: 'full-width' | 'left-float' | 'right-float' | 'center' | 'side-by-side' | 'breakout';
-  size?: 'small' | 'medium' | 'large';
-  width?: '30' | '40' | '50' | '60' | '100';
-  aspectRatio?: '3:2' | '16:9' | '4:3' | '1:1' | '2:3' | '9:16' | '3:4' | 'auto';
-  objectPosition?: string;
-  showCaption?: boolean;
-  rounded?: boolean;
-  shadow?: boolean;
-}
-
-/**
- * Maps a Strapi image block to BlogMedia props
- * Handles backward compatibility with old size enum
- */
-export function mapStrapiImageToProps(block: StrapiImageBlock): BlogMediaProps {
-  const {
-    image,
-    secondImage,
-    alt,
-    caption,
-    layout,
-    size,
-    width,
-    aspectRatio,
-    objectPosition,
-    showCaption,
-    rounded,
-    shadow,
-  } = block;
-
-  return {
-    variant: layout || 'full-width',
-    size: size || 'medium',
-    widthPercent: width,
-    aspectRatio: aspectRatio || 'auto',
-    objectPosition: objectPosition || 'center center',
-    src: getStrapiImageUrl(image),
-    alt: alt || image.alternativeText || image.caption || caption || '',
-    width: image.width,
-    height: image.height,
-    caption,
-    showCaption: showCaption ?? true,
-    rounded: rounded ?? true,
-    shadow: shadow ?? true,
-    // Second image for side-by-side
-    ...(secondImage && {
-      secondSrc: getStrapiImageUrl(secondImage),
-      secondAlt: secondImage.alternativeText || secondImage.caption || '',
-      secondWidth: secondImage.width,
-      secondHeight: secondImage.height,
-    }),
-  };
-}
 

@@ -1,8 +1,8 @@
 'use client';
 
-import { Facebook, Twitter, Linkedin, Link2, Mail } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Facebook, Linkedin, Mail, Link2, Check, Twitter } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner@2.0.3';
 
 interface SocialShareProps {
   title: string;
@@ -11,97 +11,143 @@ interface SocialShareProps {
 
 export function SocialShare({ title, url = '' }: SocialShareProps) {
   const [copied, setCopied] = useState(false);
-  
   const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
   const encodedTitle = encodeURIComponent(title);
   const encodedUrl = encodeURIComponent(currentUrl);
 
-  const shareLinks = {
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    twitter: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
-    linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
-    email: `mailto:?subject=${encodedTitle}&body=${encodedUrl}`,
-  };
+  const items = [
+    {
+      name: 'Facebook',
+      Icon: Facebook,
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    },
+    {
+      name: 'X',
+      Icon: Twitter,
+      href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+    },
+    {
+      name: 'LinkedIn',
+      Icon: Linkedin,
+      href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
+    },
+    {
+      name: 'E-mail',
+      Icon: Mail,
+      href: `mailto:?subject=${encodedTitle}&body=${encodedUrl}`,
+    },
+  ];
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(currentUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      setCopied(true);
+      toast.success('Odkaz skopírovaný');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Nepodarilo sa skopírovať odkaz');
+    }
   };
 
   return (
-    <div className="space-y-4">
-      <h3 
-        className="text-stone-800 dark:text-stone-200 uppercase tracking-wide text-sm"
-        style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '0.1em' }}
+    <div style={{ width: '100%', margin: '40px 0' }}>
+      {/* Horná zlatá linka */}
+      <div style={{ height: 1, background: 'rgba(196,165,116,0.6)', marginBottom: 16 }} />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}
       >
-        Zdieľať článok
-      </h3>
-      
-      <div className="flex flex-wrap gap-3">
-        <motion.a
-          href={shareLinks.facebook}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-3 bg-[#1877F2] hover:bg-[#166FE5] text-white rounded-lg transition-colors flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Zdieľať na Facebooku"
+        <span
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: '#a87437',
+          }}
         >
-          <Facebook className="w-5 h-5" />
-          <span className="text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>Facebook</span>
-        </motion.a>
-
-        <motion.a
-          href={shareLinks.twitter}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-3 bg-[#1DA1F2] hover:bg-[#1A94DA] text-white rounded-lg transition-colors flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Zdieľať na Twitteri"
-        >
-          <Twitter className="w-5 h-5" />
-          <span className="text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>Twitter</span>
-        </motion.a>
-
-        <motion.a
-          href={shareLinks.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-3 bg-[#0A66C2] hover:bg-[#095196] text-white rounded-lg transition-colors flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Zdieľať na LinkedIn"
-        >
-          <Linkedin className="w-5 h-5" />
-          <span className="text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>LinkedIn</span>
-        </motion.a>
-
-        <motion.a
-          href={shareLinks.email}
-          className="p-3 bg-amber-700 hover:bg-amber-800 dark:bg-amber-600 dark:hover:bg-amber-700 text-white rounded-lg transition-colors flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Zdieľať emailom"
-        >
-          <Mail className="w-5 h-5" />
-          <span className="text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>Email</span>
-        </motion.a>
-
-        <motion.button
-          onClick={copyToClipboard}
-          className="p-3 bg-stone-700 hover:bg-stone-800 dark:bg-stone-600 dark:hover:bg-stone-700 text-white rounded-lg transition-colors flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label="Kopírovať odkaz"
-        >
-          <Link2 className="w-5 h-5" />
-          <span className="text-sm" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-            {copied ? 'Skopírované!' : 'Kopírovať'}
-          </span>
-        </motion.button>
+          Zdieľať článok
+        </span>
+        <div style={{ display: 'flex', gap: 10 }}>
+          {items.map(({ name, Icon, href }) => (
+            <a
+              key={name}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Zdieľať na ${name}`}
+              title={name}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 9999,
+                border: '1px solid #a87437',
+                background: 'transparent',
+                color: '#3a2a1a',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background 0.2s, color 0.2s',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#a87437';
+                e.currentTarget.style.color = '#fffdf8';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#3a2a1a';
+              }}
+            >
+              <Icon style={{ width: 18, height: 18 }} />
+            </a>
+          ))}
+          <button
+            onClick={copy}
+            aria-label="Kopírovať odkaz"
+            title={copied ? 'Skopírované' : 'Kopírovať odkaz'}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 9999,
+              border: '1px solid #a87437',
+              background: copied ? '#a87437' : 'transparent',
+              color: copied ? '#fffdf8' : '#3a2a1a',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background 0.2s, color 0.2s',
+              cursor: 'pointer',
+            }}
+            onMouseEnter={(e) => {
+              if (!copied) {
+                e.currentTarget.style.background = '#a87437';
+                e.currentTarget.style.color = '#fffdf8';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!copied) {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#3a2a1a';
+              }
+            }}
+          >
+            {copied ? (
+              <Check style={{ width: 18, height: 18 }} />
+            ) : (
+              <Link2 style={{ width: 18, height: 18 }} />
+            )}
+          </button>
+        </div>
       </div>
+      {/* Spodná zlatá linka */}
+      <div style={{ height: 1, background: 'rgba(196,165,116,0.6)', marginTop: 16 }} />
     </div>
   );
 }

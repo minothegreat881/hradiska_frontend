@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Article } from '../data/mock-data';
 import { useState } from 'react';
@@ -24,129 +24,229 @@ export function ArticleCard({ article }: ArticleCardProps) {
       href={`/blog/${article.slug}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ 
-        y: -8,
-        transition: { duration: 0.3, type: 'spring', stiffness: 300 }
+      whileHover={{
+        y: -6,
+        transition: { duration: 0.3, type: 'spring', stiffness: 300 },
       }}
-      className="block group"
+      className="block h-full group"
+      style={{ textDecoration: 'none' }}
     >
-      <article className="h-full bg-amber-50/50 dark:bg-stone-800/50 border border-amber-900/20 dark:border-amber-700/10 hover:border-amber-900/40 transition-all duration-300 relative overflow-hidden shadow-md hover:shadow-2xl rounded-xl">
-        
-        {/* Shine effect on hover */}
-        {isHovered && (
+      <article
+        className="relative h-full flex flex-col overflow-hidden rounded-2xl"
+        style={{
+          minHeight: 360,
+          background: '#1f1a12',
+          boxShadow: isHovered
+            ? '0 10px 28px rgba(20,15,10,0.25), 0 20px 48px rgba(20,15,10,0.18)'
+            : '0 2px 6px rgba(20,15,10,0.12), 0 8px 24px rgba(20,15,10,0.10)',
+          border: '1px solid rgba(196,165,116,0.28)',
+          transition: 'box-shadow 200ms ease',
+        }}
+      >
+        {/* Cover image — fills entire card */}
+        <div className="absolute inset-0 overflow-hidden">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-200/20 to-transparent z-10 pointer-events-none"
-            initial={{ x: '-100%' }}
-            animate={{ x: '100%' }}
-            transition={{ duration: 0.8, ease: 'easeInOut' }}
-          />
-        )}
-
-        {/* Cover image */}
-        <div className="aspect-[2/1] relative overflow-hidden bg-stone-300 dark:bg-stone-700 rounded-t-xl">
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.5 }}
             className="w-full h-full"
+            animate={{ scale: isHovered ? 1.05 : 1 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
           >
             <ImageWithFallback
               src={article.coverImage}
               alt={article.title}
-              className="w-full h-full object-cover sepia-[0.15] group-hover:sepia-0 transition-all duration-500"
-              style={{ filter: 'contrast(1.05) brightness(0.95)' }}
+              className="w-full h-full object-cover"
+              style={{ filter: 'contrast(1.05) brightness(0.96)' }}
             />
           </motion.div>
-          
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-amber-950/60 via-transparent to-transparent pointer-events-none"></div>
 
-          {/* Parchment overlay */}
-          <div className="absolute inset-0 mix-blend-multiply bg-amber-100/10 pointer-events-none"></div>
-          
-          {article.featured && (
-            <div className="absolute top-3 right-3">
-              <span className="px-3 py-1.5 bg-amber-800 text-amber-50 text-xs rounded-full uppercase tracking-wider z-20 shadow-lg" style={{
-                fontFamily: 'Georgia, "Times New Roman", serif'
-              }}>
-                Odporúčané
-              </span>
-            </div>
+          {/* Gradient overlay — strong dark anchor at bottom, soft fade up */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(15,11,7,0.96) 0%, rgba(15,11,7,0.90) 22%, rgba(15,11,7,0.72) 45%, rgba(15,11,7,0.35) 65%, rgba(15,11,7,0.08) 82%, rgba(15,11,7,0) 100%)',
+            }}
+          />
+
+          {/* Top vignette — keeps top pill badges legible without dimming image */}
+          <div
+            className="absolute inset-x-0 top-0 pointer-events-none"
+            style={{
+              height: '38%',
+              background:
+                'linear-gradient(to bottom, rgba(15,11,7,0.45) 0%, rgba(15,11,7,0) 100%)',
+            }}
+          />
+
+          {/* Shine effect on hover */}
+          {isHovered && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  'linear-gradient(120deg, transparent 30%, rgba(232,197,110,0.18) 50%, transparent 70%)',
+              }}
+              initial={{ x: '-100%' }}
+              animate={{ x: '100%' }}
+              transition={{ duration: 0.9, ease: 'easeInOut' }}
+            />
           )}
-          <div className="absolute bottom-3 left-3">
-            <span className="px-3 py-1.5 bg-stone-100/95 dark:bg-stone-900/95 text-stone-800 dark:text-stone-200 text-xs rounded-full z-20 backdrop-blur-sm shadow-md" style={{
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              fontStyle: 'italic'
-            }}>
+        </div>
+
+        {/* Featured badge — top right */}
+        {article.featured && (
+          <div className="absolute top-3 right-3 z-10">
+            <span
+              className="px-3 py-1 text-xs uppercase tracking-wider rounded-full"
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                background: 'rgba(154,93,31,0.92)',
+                color: '#fef9f0',
+                border: '1px solid rgba(232,197,110,0.55)',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                letterSpacing: '0.06em',
+              }}
+            >
+              Odporúčané
+            </span>
+          </div>
+        )}
+
+        {/* Category pill — top left */}
+        {article.category && categoryLabels[article.category] && (
+          <div className="absolute top-3 left-3 z-10">
+            <span
+              className="px-3 py-1 text-xs rounded-full backdrop-blur-sm"
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontStyle: 'italic',
+                background: 'rgba(31,26,18,0.55)',
+                color: '#fef9f0',
+                border: '1px solid rgba(255,255,255,0.35)',
+              }}
+            >
               {categoryLabels[article.category]}
             </span>
           </div>
-        </div>
+        )}
 
-        {/* Content */}
-        <div className="p-5 space-y-3 relative">
-          {/* Title */}
-          <h3 className="text-amber-950 dark:text-amber-100 group-hover:text-amber-800 dark:group-hover:text-amber-200 transition-colors line-clamp-2" style={{
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            letterSpacing: '0.02em',
-            lineHeight: '1.4'
-          }}>
+        {/* Frosted blur panel under text — separate layer so mask works reliably */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 pointer-events-none"
+          style={{
+            height: '62%',
+            backdropFilter: 'blur(3px) saturate(1.1)',
+            WebkitBackdropFilter: 'blur(3px) saturate(1.1)',
+            maskImage:
+              'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
+          }}
+        />
+
+        {/* Content overlay — bottom of card */}
+        <div className="relative z-10 flex flex-col flex-1 justify-end p-5 pt-16">
+          {/* Title — clamped to 2 lines */}
+          <h3
+            className="mb-2"
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              color: '#fef9f0',
+              fontSize: 19,
+              lineHeight: 1.3,
+              letterSpacing: '0.01em',
+              fontWeight: 600,
+              textShadow:
+                '0 1px 2px rgba(0,0,0,0.85), 0 2px 6px rgba(0,0,0,0.65), 0 0 12px rgba(0,0,0,0.4)',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              margin: 0,
+              marginBottom: 8,
+            }}
+          >
             {article.title}
           </h3>
 
           {/* Decorative line */}
-          <div className="w-16 h-px bg-amber-900/30"></div>
+          <div
+            style={{
+              width: 36,
+              height: 1,
+              background: 'rgba(232,197,110,0.7)',
+              marginBottom: 10,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.5)',
+            }}
+          />
 
-          {/* Excerpt */}
-          <p className="text-sm line-clamp-3 leading-relaxed" style={{
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            textAlign: 'justify',
-            color: '#2d2418' /* WCAG AAA - 11.2:1 */
-          }}>
+          {/* Excerpt — left-aligned, 2 lines max */}
+          <p
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontSize: 13.5,
+              lineHeight: 1.55,
+              color: '#fdf0db',
+              textAlign: 'left',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              margin: 0,
+              marginBottom: 14,
+              textShadow:
+                '0 1px 2px rgba(0,0,0,0.85), 0 2px 5px rgba(0,0,0,0.6)',
+            }}
+          >
             {article.excerpt}
           </p>
 
-          {/* Meta */}
-          <div className="flex flex-wrap gap-3 text-xs pt-3" style={{
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            color: '#4a3f2f' /* WCAG AAA - 7.1:1 */
-          }}>
-            <span className="flex items-center gap-1.5">
-              <User className="w-3 h-3" />
-              {article.author.name}
-            </span>
-            <span className="text-stone-400 dark:text-stone-600">·</span>
-            <span className="flex items-center gap-1.5">
-              <Calendar className="w-3 h-3" />
-              {new Date(article.publishedAt).toLocaleDateString('sk-SK', { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
-              })}
-            </span>
-            <span className="text-stone-400 dark:text-stone-600">·</span>
-            <span className="flex items-center gap-1.5">
-              <Clock className="w-3 h-3" />
-              {article.readTime} min.
-            </span>
-          </div>
-
-          {/* Tags */}
-          {article.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              {article.tags.slice(0, 3).map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-2.5 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 text-xs rounded-full"
-                  style={{
-                    fontFamily: 'Georgia, "Times New Roman", serif',
-                    fontStyle: 'italic'
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
+          {/* Footer row — date + reading time + tag, anchored at bottom */}
+          <div
+            className="flex items-center justify-between gap-3"
+            style={{
+              marginTop: 'auto',
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontSize: 12,
+              color: '#fdf0db',
+              textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+            }}
+          >
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="w-3 h-3" style={{ opacity: 0.85 }} />
+                {new Date(article.publishedAt).toLocaleDateString('sk-SK', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="w-3 h-3" style={{ opacity: 0.85 }} />
+                {article.readTime} min
+              </span>
             </div>
-          )}
+
+            {/* First tag as pill — outline style */}
+            {article.tags && article.tags.length > 0 && (
+              <span
+                className="px-2.5 py-0.5 rounded-full whitespace-nowrap"
+                style={{
+                  fontSize: 11,
+                  fontStyle: 'italic',
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.38)',
+                  color: 'rgba(253,240,219,0.92)',
+                  maxWidth: 160,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {article.tags[0]}
+              </span>
+            )}
+          </div>
         </div>
       </article>
     </motion.a>

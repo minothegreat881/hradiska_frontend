@@ -87,93 +87,106 @@ export function HeroSearch() {
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
-      {/* Main search container */}
+    <div className="relative w-full max-w-[640px] mx-auto">
+      {/* Pill searchbar – flat krémové pozadie, 1 px gold border, mäkký teplý shadow */}
       <div
-        className={`relative rounded-2xl border-2 transition-all duration-300 ${
-          isFocused
-            ? 'border-amber-600 dark:border-amber-500 shadow-[0_8px_30px_rgb(217,119,6,0.25)] dark:shadow-[0_8px_30px_rgb(245,158,11,0.2)] bg-white dark:bg-stone-900'
-            : 'border-stone-300 dark:border-stone-700 shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_6px_25px_rgba(217,119,6,0.15)] hover:border-amber-400 dark:hover:border-amber-600 bg-gradient-to-b from-white to-stone-50/50 dark:from-stone-900 dark:to-stone-900/80'
-        }`}
+        className="relative flex items-center"
         style={{
-          backdropFilter: 'blur(8px)',
+          height: 56,
+          backgroundColor: '#fdfbf6',
+          border: `1px solid ${isFocused ? '#a87437' : '#c4a574'}`,
+          borderRadius: 9999,
+          boxShadow: isFocused
+            ? '0 0 0 4px rgba(196, 165, 116, 0.22), 0 6px 24px rgba(125, 79, 29, 0.15)'
+            : '0 6px 24px rgba(125, 79, 29, 0.12)',
+          paddingLeft: 22,
+          paddingRight: 4,
+          gap: 12,
+          transition: 'border-color 150ms ease, box-shadow 200ms ease',
         }}
       >
-        <div className="flex items-center gap-4 px-6 py-5">
-          {/* Search Icon */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400 }}
-          >
-            <Search
-              className={`w-6 h-6 flex-shrink-0 transition-all duration-300 ${
-                isFocused
-                  ? 'text-amber-600 dark:text-amber-500 drop-shadow-[0_2px_8px_rgba(217,119,6,0.4)]'
-                  : 'text-stone-500 dark:text-stone-400'
-              }`}
-              aria-hidden="true"
-            />
-          </motion.div>
-
-          {/* Input Field */}
-          <input
-            ref={inputRef}
-            type="text"
-            id="site-search"
-            name="search"
-            placeholder="Hľadaj články, témy, hradiská alebo kľúčové slová..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent outline-none text-stone-900 dark:text-stone-100 placeholder:text-stone-500 dark:placeholder:text-stone-400 text-base md:text-lg transition-all duration-200"
-            style={{
-              fontFamily: 'Georgia, "Times New Roman", serif',
-            }}
-            aria-label="Vyhľadávanie článkov, hradísk a kľúčových slov"
-            aria-autocomplete="list"
-            aria-controls="search-results"
-            aria-expanded={isFocused && (results.length > 0 || query.length >= 2)}
-            autoComplete="off"
-          />
-
-          {/* Clear Button */}
-          {query && (
-            <motion.button
-              type="button"
-              onClick={clearSearch}
-              className="flex-shrink-0 p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-all duration-200"
-              aria-label="Vymazať vyhľadávanie"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <X className="w-5 h-5 text-stone-500 dark:text-stone-400" />
-            </motion.button>
-          )}
-
-          {/* Search Button */}
-          <motion.button
-            type="submit"
-            className="flex-shrink-0 px-6 py-2.5 bg-gradient-to-br from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 dark:from-amber-600 dark:to-amber-700 dark:hover:from-amber-700 dark:hover:to-amber-800 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-amber-600/30 hover:shadow-xl hover:shadow-amber-600/40"
-            style={{
-              fontFamily: 'Georgia, "Times New Roman", serif',
-            }}
-            aria-label="Vyhľadať"
-            whileHover={{ scale: 1.02, y: -1 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Hľadať
-          </motion.button>
-        </div>
-
-        {/* Subtle decorative accent line */}
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: isFocused ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
+        {/* Lupa vľavo – tlmená hnedá */}
+        <Search
+          className="w-5 h-5 flex-shrink-0"
+          style={{ color: isFocused ? '#7d4f1d' : '#8b7355', transition: 'color 150ms ease' }}
+          aria-hidden="true"
         />
+
+        {/* Input */}
+        <input
+          ref={inputRef}
+          type="text"
+          id="site-search"
+          name="search"
+          placeholder="Hľadaj články, témy, hradiská alebo kľúčové slová…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+          onKeyDown={handleKeyDown}
+          className="flex-1 min-w-0 bg-transparent outline-none border-0 hero-search-input"
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 16,
+            color: '#2d1810',
+            padding: 0,
+            background: 'transparent',
+          }}
+          role="combobox"
+          aria-label="Vyhľadávanie článkov, hradísk a kľúčových slov"
+          aria-autocomplete="list"
+          aria-controls="search-results"
+          aria-expanded={isFocused && (results.length > 0 || query.length >= 2)}
+          autoComplete="off"
+        />
+
+        {/* Clear Button – zobrazí sa pri zadaní */}
+        {query && (
+          <motion.button
+            type="button"
+            onClick={clearSearch}
+            className="flex-shrink-0 flex items-center justify-center rounded-full"
+            style={{
+              width: 32, height: 32,
+              color: '#8b7355',
+              transition: 'background-color 150ms ease',
+            }}
+            aria-label="Vymazať vyhľadávanie"
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+          >
+            <X className="w-4 h-4" />
+          </motion.button>
+        )}
+
+        {/* Hľadať button – embedded vnútri pillu, plná zlato-hnedá */}
+        <motion.button
+          type="submit"
+          className="flex-shrink-0 items-center justify-center"
+          style={{
+            display: 'inline-flex',
+            gap: 8,
+            height: 44,
+            padding: '0 18px',
+            borderRadius: 9999,
+            background: 'linear-gradient(135deg, #7d4f1d 0%, #a87437 100%)',
+            color: '#faf7f1',
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontWeight: 500,
+            fontSize: 14,
+            letterSpacing: '0.02em',
+            boxShadow: '0 2px 8px rgba(125, 79, 29, 0.35)',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'filter 150ms ease',
+          }}
+          aria-label="Vyhľadať"
+          whileHover={{ filter: 'brightness(1.08)' }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <Search className="w-4 h-4 md:hidden" />
+          <span className="hidden md:inline">Hľadať</span>
+        </motion.button>
       </div>
 
       {/* Search Results Dropdown */}
@@ -186,7 +199,7 @@ export function HeroSearch() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-stone-900 rounded-2xl border-2 border-stone-200 dark:border-stone-700 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] max-h-[480px] overflow-y-auto z-50"
+            className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-stone-900 rounded-2xl border-2 border-stone-200 dark:border-stone-700 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] max-h-[480px] overflow-y-auto z-[60]"
             style={{
               backdropFilter: 'blur(12px)',
             }}
@@ -263,7 +276,7 @@ export function HeroSearch() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-stone-900 rounded-2xl border-2 border-stone-200 dark:border-stone-700 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] p-12 text-center z-50"
+            className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-stone-900 rounded-2xl border-2 border-stone-200 dark:border-stone-700 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] p-12 text-center z-[60]"
             style={{
               backdropFilter: 'blur(12px)',
             }}
