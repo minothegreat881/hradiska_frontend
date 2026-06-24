@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/strapi/:path*",
-      "destination": "https://quilt-stiffly-unraveled.ngrok-free.dev/:path*"
+      "destination": "/api/strapi-proxy"
     }
   ]
 }
