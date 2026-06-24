@@ -36,3 +36,5 @@ pnpm-lock.yaml
 # Generated CSS (Tailwind output)
 src/index.css
 nul
+
+.vercel

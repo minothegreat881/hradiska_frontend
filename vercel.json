@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/strapi/:path*",
-      "destination": "/api/strapi-proxy"
-    }
-  ]
-}
