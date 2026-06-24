@@ -333,7 +333,9 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       url.searchParams.set('sort[0]', 'originalDate:desc');
       url.searchParams.set('sort[1]', 'createdAt:desc');
       url.searchParams.set('pagination[pageSize]', '100');
-      const res = await fetch(url.toString());
+      const res = await fetch(url.toString(), {
+        headers: { 'ngrok-skip-browser-warning': 'true' },
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const list: StrapiComment[] = json.data || [];
@@ -387,7 +389,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       try {
         const res = await fetch(
           `${STRAPI_URL}/api/blog-comments/${commentDocId}/${action}`,
-          { method: 'POST' },
+          { method: 'POST', headers: { 'ngrok-skip-browser-warning': 'true' } },
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
@@ -427,7 +429,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
     try {
       const res = await fetch(`${STRAPI_URL}/api/blog-comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         body: JSON.stringify({
           data: {
             authorName: name.trim(),

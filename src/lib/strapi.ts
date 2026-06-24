@@ -117,6 +117,10 @@ async function fetchStrapi<T>(endpoint: string, options?: RequestInit): Promise<
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        // ngrok free-tier shows a browser warning page on first request from a
+        // typical browser User-Agent. This header bypasses it so fetch receives
+        // JSON instead of HTML. No-op for non-ngrok backends.
+        'ngrok-skip-browser-warning': 'true',
         ...options?.headers,
       },
     });
