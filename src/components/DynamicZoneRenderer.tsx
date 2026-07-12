@@ -68,10 +68,71 @@ interface SourcesBlock {
   items: SourceItem[];
 }
 
-type DynamicBlock = RichTextBlock | ImageBlock | QuoteBlockType | ImageGalleryBlock | SourcesBlock;
+interface EmbedBlock {
+  __component: 'content.embed';
+  id: number;
+  provider: 'youtube' | 'sketchfab' | 'vimeo' | 'blogger';
+  embedId?: string;
+  url: string;
+  caption?: string;
+}
+
+interface PoemBlock {
+  __component: 'content.poem';
+  id: number;
+  text: string;        // verše: '\n' = riadok, '\n\n' = predel strofy
+  title?: string;
+  author?: string;
+  source?: string;
+}
+
+type DynamicBlock = RichTextBlock | ImageBlock | QuoteBlockType | ImageGalleryBlock | SourcesBlock | EmbedBlock | PoemBlock;
 
 interface DynamicZoneRendererProps {
   blocks: DynamicBlock[];
+}
+
+// =============================================================================
+// RENDERER: content.embed — responzívny prehrávač (YouTube / Vimeo / Sketchfab / Blogger)
+// =============================================================================
+
+function EmbedRenderer({ block }: { block: EmbedBlock }) {
+  const { provider, embedId, url, caption } = block;
+  const src =
+    provider === 'youtube'   ? `https://www.youtube.com/embed/${embedId}` :
+    provider === 'vimeo'     ? `https://player.vimeo.com/video/${embedId}` :
+    provider === 'sketchfab' ? `https://sketchfab.com/models/${embedId}/embed` :
+    url;
+  return (
+    <figure className="my-8 clear-both not-prose">
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          paddingBottom: '56.25%',
+          borderRadius: 12,
+          overflow: 'hidden',
+          boxShadow: '0 4px 12px rgba(70,40,20,.12)',
+        }}
+      >
+        <iframe
+          src={src}
+          title={caption || 'Video'}
+          loading="lazy"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+      {caption && (
+        <figcaption
+          style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}
+        >
+          {caption}
+        </figcaption>
+      )}
+    </figure>
+  );
 }
 
 // =============================================================================
@@ -514,6 +575,48 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
 }
 
 // =============================================================================
+// RENDERER: content.poem — literárna báseň (centrovaná, kurzíva, verše po riadkoch)
+// =============================================================================
+
+function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClearBefore?: boolean }) {
+  const stanzas = (block.text || '').split(/\n\s*\n/).map(s => s.split('\n').filter(l => l.trim().length > 0)).filter(st => st.length > 0);
+  if (stanzas.length === 0) return null;
+  return (
+    <div
+      className="poem-block not-prose"
+      style={{
+        clear: needsClearBefore ? 'both' : undefined,
+        textAlign: 'center',
+        fontStyle: 'italic',
+        fontFamily: 'Georgia, "Times New Roman", serif',
+        color: '#5a4a2f',
+        margin: '2.5rem auto',
+        maxWidth: 640,
+        lineHeight: 1.75,
+      }}
+    >
+      {block.title && (
+        <div style={{ fontStyle: 'normal', fontWeight: 600, fontSize: '1.05em', marginBottom: '0.9rem', letterSpacing: '0.02em' }}>
+          {block.title}
+        </div>
+      )}
+      {stanzas.map((lines, i) => (
+        <div key={i} style={{ marginBottom: '1.1rem' }}>
+          {lines.map((line, j) => (
+            <div key={j}>{line.trim()}</div>
+          ))}
+        </div>
+      ))}
+      {block.author && (
+        <div style={{ marginTop: '0.8rem', fontStyle: 'normal', fontSize: '0.85em', opacity: 0.65 }}>
+          — {block.author}{block.source ? `, ${block.source}` : ''}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
 // MAIN RENDERER with pairing logic
 // =============================================================================
 
@@ -622,6 +725,25 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
           <SourcesRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as SourcesBlock}
+            needsClearBefore={isPrevFloat}
+          />
+        );
+        break;
+
+      case 'content.embed':
+        renderedElements.push(
+          <EmbedRenderer
+            key={`${block.__component}-${block.id || idx}`}
+            block={block as EmbedBlock}
+          />
+        );
+        break;
+
+      case 'content.poem':
+        renderedElements.push(
+          <PoemRenderer
+            key={`${block.__component}-${block.id || idx}`}
+            block={block as PoemBlock}
             needsClearBefore={isPrevFloat}
           />
         );
