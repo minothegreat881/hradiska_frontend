@@ -586,30 +586,69 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
       className="poem-block not-prose"
       style={{
         clear: needsClearBefore ? 'both' : undefined,
+        margin: '2.4rem auto',
+        maxWidth: 520,
+        background: 'rgba(196,165,116,0.07)',
+        border: '1px solid rgba(168,116,55,0.2)',
+        borderRadius: 10,
+        padding: '2.1rem 2.4rem 1.8rem',
         textAlign: 'center',
-        fontStyle: 'italic',
-        fontFamily: 'Georgia, "Times New Roman", serif',
-        color: '#5a4a2f',
-        margin: '2.5rem auto',
-        maxWidth: 640,
-        lineHeight: 1.75,
       }}
     >
+      {/* Ornament: line - diamond - line */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: '1.1rem' }}>
+        <span style={{ height: 1, width: 34, background: 'rgba(168,116,55,0.45)' }} />
+        <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#a87437', transform: 'rotate(45deg)' }} />
+        <span style={{ height: 1, width: 34, background: 'rgba(168,116,55,0.45)' }} />
+      </div>
       {block.title && (
-        <div style={{ fontStyle: 'normal', fontWeight: 600, fontSize: '1.05em', marginBottom: '0.9rem', letterSpacing: '0.02em' }}>
+        <div
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontStyle: 'normal',
+            fontWeight: 600,
+            fontSize: '1.05em',
+            color: '#3d3020',
+            marginBottom: '0.9rem',
+            letterSpacing: '0.02em',
+          }}
+        >
           {block.title}
         </div>
       )}
-      {stanzas.map((lines, i) => (
-        <div key={i} style={{ marginBottom: '1.1rem' }}>
-          {lines.map((line, j) => (
-            <div key={j}>{line.trim()}</div>
-          ))}
-        </div>
-      ))}
+      <div
+        style={{
+          fontFamily: 'Georgia, "Times New Roman", serif',
+          fontStyle: 'italic',
+          color: '#3d3020',
+          lineHeight: 1.85,
+          fontSize: '15.5px',
+        }}
+      >
+        {stanzas.map((lines, i) => (
+          <div key={i} style={{ marginBottom: i < stanzas.length - 1 ? '1rem' : 0 }}>
+            {lines.map((line, j) => (
+              <div key={j}>{line.trim()}</div>
+            ))}
+          </div>
+        ))}
+      </div>
       {block.author && (
-        <div style={{ marginTop: '0.8rem', fontStyle: 'normal', fontSize: '0.85em', opacity: 0.65 }}>
-          — {block.author}{block.source ? `, ${block.source}` : ''}
+        <div
+          style={{
+            marginTop: '1.2rem',
+            paddingTop: '0.9rem',
+            borderTop: '1px solid rgba(168,116,55,0.22)',
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontStyle: 'normal',
+            fontSize: '12.5px',
+            color: '#7d4f1d',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            fontWeight: 600,
+          }}
+        >
+          {block.author}{block.source ? ` — ${block.source}` : ''}
         </div>
       )}
     </div>
