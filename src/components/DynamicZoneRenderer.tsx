@@ -513,13 +513,14 @@ function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; nee
             const text = (it.text || '').trim();
             const url = (it.url || '').trim();
             return (
-              <li key={it.id || j} className="text-stone-700 leading-relaxed">
+              <li key={it.id || j} className="text-stone-700 leading-relaxed" style={{ overflowWrap: 'anywhere', minWidth: 0 }}>
                 {url ? (
                   <a
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-amber-700 hover:text-amber-900 hover:underline break-all"
+                    style={{ overflowWrap: 'anywhere' }}
                   >
                     {text || url}
                   </a>

@@ -778,6 +778,15 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   }
 }
 
+/* Grid items default to min-width:auto, ktorý necháva ich intrinzickú (max-content)
+   šírku vyhrať nad max-width obmedzeniami detí — dlhý nezalomiteľný text (napr. URL
+   v zozname zdrojov) tak pretlačí celý grid stĺpec cez vyhradený priestor, aj keď má
+   samotný odkaz break-all. min-width:0 donúti stĺpec rešpektovať šírku gridu. */
+.article-main-col,
+.article-sidebar-col {
+  min-width: 0;
+}
+
 /* Reset any motion-related blocking */
 [data-motion-pop-id],
 [data-framer-appear-id] {
