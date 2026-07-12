@@ -221,9 +221,10 @@ export function ArticleSidebar({
 
   // Show location card only if we have both coordinates AND a name
   const hasLocation = !!coordinates && !!locationName && locationName.trim().length > 0;
-  const capitalizedName = hasLocation
-    ? locationName!.charAt(0).toUpperCase() + locationName!.slice(1).toLowerCase()
-    : '';
+  // Strapi location.name je už správne zapísaný (vlastné mená, veľké písmená) — nemeniť.
+  // Predošlý "capitalize prvé písmeno + lowercase zvyšok" rozbíjal viacslovné názvy
+  // (napr. "Mys Arkona, Rujana" -> "Mys arkona, rujana").
+  const capitalizedName = hasLocation ? locationName!.trim() : '';
 
   return (
     <div>
