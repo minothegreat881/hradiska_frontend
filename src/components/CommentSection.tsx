@@ -163,6 +163,7 @@ function CommentItem({
               color: '#2d2418',
               margin: 0,
               whiteSpace: 'pre-wrap',
+              overflowWrap: 'anywhere',
             }}
           >
             {comment.content}
