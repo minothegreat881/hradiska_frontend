@@ -663,8 +663,19 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
 export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
   if (!blocks || blocks.length === 0) return null;
 
-  // Find the index of the first rich-text block (for drop cap)
-  const firstRichTextIndex = blocks.findIndex(b => b.__component === 'content.rich-text');
+  // Find the index of the first rich-text block that actually contains a real
+  // paragraph (for drop cap). A plain "first content.rich-text block" check is not
+  // enough — a block can be empty ({body:[]}), a heading-only block, or a stray short
+  // citation paragraph left over from migration. renderRichText only applies the
+  // drop-cap to `type:'paragraph'` nodes, so pointing isFirstRichTextBlock at a block
+  // with no real paragraph silently drops the initial letter for the whole article.
+  const hasRealParagraph = (b: any) =>
+    b.__component === 'content.rich-text' &&
+    (b.body || []).some((n: any) =>
+      n.type === 'paragraph' &&
+      (n.children || []).some((c: any) => ((c.text ?? c.children?.map((x: any) => x.text).join('')) || '').trim())
+    );
+  const firstRichTextIndex = blocks.findIndex(hasRealParagraph);
 
   const renderedElements: React.ReactNode[] = [];
   const skipIndices = new Set<number>();
