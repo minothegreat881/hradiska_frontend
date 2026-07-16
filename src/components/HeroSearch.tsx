@@ -1,80 +1,276 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Search, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { mockSites, mockArticles } from '../data/mock-data';
 
-interface SearchResult {
-  type: 'site' | 'article';
+// Design tokens – "Vyhľadávací dropdown, varianta 2B (S náhľadmi)"
+const T = {
+  panelBg: '#f6efdd',
+  panelBorder: '#c8a15a',
+  chipBorder: '#d9c69a',
+  dividerStrong: '#e3d4ad',
+  dividerSoft: '#ece0c2',
+  hairline: '#e6d7b0',
+  amber: '#9a5d1f',
+  amberLight: '#c8862f',
+  textMain: '#2e2213',
+  textSecondary: '#8a795e',
+  countChipText: '#8a6a35',
+  chipBg: '#efe2c0',
+  footerBg: '#efe6cf',
+  clearBg: '#ece0c2',
+  clearText: '#7a6a52',
+  markBg: '#f4dca0',
+  markText: '#7a3d0a',
+  chevron: '#c8a15a',
+  focusGlow: 'rgba(200,134,47,.22)',
+} as const;
+
+// Diakritiky-necitlivé, case-insensitive porovnanie, zachováva dĺžku reťazca po znakoch
+// (aby indexy zvýraznenia sedeli s pôvodným textom).
+function normalize(value: string): string {
+  return [...value]
+    .map((ch) => (ch.normalize('NFD').replace(/\p{Diacritic}/gu, '')[0] ?? ch).toLowerCase())
+    .join('');
+}
+
+interface Highlight {
+  pre: string;
+  mid: string;
+  post: string;
+  matched: boolean;
+}
+
+function highlight(text: string, query: string): Highlight {
+  if (!query) return { pre: text, mid: '', post: '', matched: false };
+  const haystack = normalize(text);
+  const needle = normalize(query);
+  const index = haystack.indexOf(needle);
+  if (index < 0) return { pre: text, mid: '', post: '', matched: false };
+  return {
+    pre: text.slice(0, index),
+    mid: text.slice(index, index + query.length),
+    post: text.slice(index + query.length),
+    matched: true,
+  };
+}
+
+interface RowResult {
   id: string;
-  title: string;
-  subtitle: string;
   href: string;
+  pre: string;
+  mid: string;
+  post: string;
+  sub: string;
+  thumbnail?: string;
+  typeLabel?: string;
+}
+
+function GroupHeader({ label, count, withTopBorder }: { label: string; count: number; withTopBorder: boolean }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 11,
+        padding: withTopBorder ? '14px 20px 8px' : '12px 20px 8px',
+        marginTop: withTopBorder ? 6 : 0,
+        borderTop: withTopBorder ? `1px solid ${T.dividerSoft}` : 'none',
+      }}
+    >
+      <span
+        style={{
+          fontFamily: 'var(--font-heading)',
+          fontSize: 10,
+          letterSpacing: '.16em',
+          textTransform: 'uppercase',
+          color: T.amber,
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontFamily: 'var(--font-heading)',
+          fontSize: 9,
+          fontWeight: 700,
+          color: T.countChipText,
+          background: T.chipBg,
+          border: `1px solid ${T.chipBorder}`,
+          borderRadius: 999,
+          padding: '1px 7px',
+        }}
+      >
+        {count}
+      </span>
+      <span style={{ flex: 1, height: 1, background: T.hairline }} />
+    </div>
+  );
+}
+
+function ResultRow({
+  result,
+  kind,
+  selected,
+  onMouseEnter,
+}: {
+  result: RowResult;
+  kind: 'location' | 'article';
+  selected: boolean;
+  onMouseEnter: () => void;
+}) {
+  const fallbackBg =
+    kind === 'location'
+      ? 'repeating-linear-gradient(135deg,#e3d3a8 0 6px,#efe2c0 6px 12px)'
+      : 'repeating-linear-gradient(135deg,#d8c7e0 0 6px,#e9e0f0 6px 12px)';
+
+  return (
+    <a
+      href={result.href}
+      role="option"
+      aria-selected={selected}
+      data-selected={selected ? 'true' : undefined}
+      onMouseEnter={onMouseEnter}
+      className="search-result-row"
+    >
+      <span
+        style={{
+          display: 'block',
+          flexShrink: 0,
+          width: 52,
+          height: 40,
+          borderRadius: 8,
+          border: `1px solid ${T.chipBorder}`,
+          backgroundImage: result.thumbnail ? `url(${result.thumbnail})` : fallbackBg,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span
+          style={{
+            display: 'block',
+            fontSize: 19,
+            fontWeight: 600,
+            color: T.textMain,
+            lineHeight: kind === 'location' ? 1.15 : 1.2,
+            fontFamily: 'var(--font-serif)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {result.pre}
+          <mark style={{ background: T.markBg, color: T.markText, borderRadius: 3, padding: '0 1px' }}>
+            {result.mid}
+          </mark>
+          {result.post}
+        </span>
+        <span
+          style={{
+            display: 'block',
+            fontSize: 14,
+            color: T.textSecondary,
+            fontFamily: 'var(--font-serif)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {result.sub}
+        </span>
+      </span>
+      {result.typeLabel && (
+        <span
+          style={{
+            flexShrink: 0,
+            fontFamily: 'var(--font-heading)',
+            fontSize: 9,
+            letterSpacing: '.08em',
+            textTransform: 'uppercase',
+            color: T.amber,
+            background: T.chipBg,
+            border: `1px solid ${T.chipBorder}`,
+            borderRadius: 999,
+            padding: '3px 10px',
+          }}
+        >
+          {result.typeLabel}
+        </span>
+      )}
+      <span style={{ flexShrink: 0, color: T.chevron, fontSize: 17, lineHeight: 1 }}>›</span>
+    </a>
+  );
 }
 
 export function HeroSearch() {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [pulseKey, setPulseKey] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Search logic
+  const trimmed = query.trim();
+
+  const locationResults = useMemo<RowResult[]>(() => {
+    if (!trimmed) return [];
+    return mockSites
+      .map((site) => ({ site, h: highlight(site.name, trimmed) }))
+      .filter((x) => x.h.matched)
+      .slice(0, 6)
+      .map(({ site, h }) => ({
+        id: `site-${site.id}`,
+        href: `/sites/${site.slug}`,
+        pre: h.pre,
+        mid: h.mid,
+        post: h.post,
+        sub: site.district,
+        thumbnail: site.images[0],
+        typeLabel: site.type === 'hradisko' ? 'hradisko' : 'lokalita',
+      }));
+  }, [trimmed]);
+
+  const articleResults = useMemo<RowResult[]>(() => {
+    if (!trimmed) return [];
+    return mockArticles
+      .map((article) => ({ article, h: highlight(article.title, trimmed) }))
+      .filter((x) => x.h.matched)
+      .slice(0, 6)
+      .map(({ article, h }) => ({
+        id: `article-${article.id}`,
+        href: `/blog/${article.slug}`,
+        pre: h.pre,
+        mid: h.mid,
+        post: h.post,
+        sub: `Blog · ${article.category ?? 'článok'}`,
+        thumbnail: article.coverImage,
+      }));
+  }, [trimmed]);
+
+  const allResults = useMemo(() => [...locationResults, ...articleResults], [locationResults, articleResults]);
+  const showPanel = isFocused && trimmed.length > 0;
+  const hasResults = allResults.length > 0;
+
   useEffect(() => {
-    if (query.length < 2) {
-      setResults([]);
+    setSelectedIndex(0);
+  }, [trimmed]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showPanel || !hasResults) {
+      if (e.key === 'Escape') inputRef.current?.blur();
       return;
     }
-
-    const searchLower = query.toLowerCase();
-
-    const siteResults: SearchResult[] = mockSites
-      .filter(
-        (site) =>
-          site.name.toLowerCase().includes(searchLower) ||
-          site.district.toLowerCase().includes(searchLower) ||
-          site.description.toLowerCase().includes(searchLower)
-      )
-      .slice(0, 4)
-      .map((site) => ({
-        type: 'site',
-        id: site.id,
-        title: site.name,
-        subtitle: `${site.district} • ${site.type}`,
-        href: `/sites/${site.slug}`,
-      }));
-
-    const articleResults: SearchResult[] = mockArticles
-      .filter(
-        (article) =>
-          article.title.toLowerCase().includes(searchLower) ||
-          article.excerpt.toLowerCase().includes(searchLower)
-      )
-      .slice(0, 3)
-      .map((article) => ({
-        type: 'article',
-        id: article.id,
-        title: article.title,
-        subtitle: `Blog • ${article.category}`,
-        href: `/blog/${article.slug}`,
-      }));
-
-    setResults([...siteResults, ...articleResults]);
-    setSelectedIndex(0);
-  }, [query]);
-
-  // Keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((prev) => Math.min(prev + 1, results.length - 1));
+      setSelectedIndex((prev) => Math.min(prev + 1, allResults.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedIndex((prev) => Math.max(prev - 1, 0));
-    } else if (e.key === 'Enter' && results.length > 0) {
+    } else if (e.key === 'Enter') {
       e.preventDefault();
-      window.location.href = results[selectedIndex].href;
+      window.location.href = allResults[selectedIndex].href;
     } else if (e.key === 'Escape') {
       inputRef.current?.blur();
       setIsFocused(false);
@@ -88,217 +284,183 @@ export function HeroSearch() {
 
   return (
     <div className="relative w-full max-w-[640px] mx-auto">
-      {/* Pill searchbar – flat krémové pozadie, 1 px gold border, mäkký teplý shadow */}
       <div
-        className="relative flex items-center"
         style={{
-          height: 56,
-          backgroundColor: '#fdfbf6',
-          border: `1px solid ${isFocused ? '#a87437' : '#c4a574'}`,
-          borderRadius: 9999,
-          boxShadow: isFocused
-            ? '0 0 0 4px rgba(196, 165, 116, 0.22), 0 6px 24px rgba(125, 79, 29, 0.15)'
-            : '0 6px 24px rgba(125, 79, 29, 0.12)',
-          paddingLeft: 22,
-          paddingRight: 4,
-          gap: 12,
-          transition: 'border-color 150ms ease, box-shadow 200ms ease',
+          position: 'relative',
+          background: T.panelBg,
+          border: `1px solid ${T.panelBorder}`,
+          borderRadius: 16,
+          boxShadow: '0 6px 20px rgba(125,79,29,.14)',
+          overflow: 'hidden',
         }}
       >
-        {/* Lupa vľavo – tlmená hnedá */}
-        <Search
-          className="w-5 h-5 flex-shrink-0"
-          style={{ color: isFocused ? '#7d4f1d' : '#8b7355', transition: 'color 150ms ease' }}
-          aria-hidden="true"
-        />
-
-        {/* Input */}
-        <input
-          ref={inputRef}
-          type="text"
-          id="site-search"
-          name="search"
-          placeholder="Hľadaj články, témy, hradiská alebo kľúčové slová…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-          onKeyDown={handleKeyDown}
-          className="flex-1 min-w-0 bg-transparent outline-none border-0 hero-search-input"
-          style={{
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            fontSize: 16,
-            color: '#2d1810',
-            padding: 0,
-            background: 'transparent',
-          }}
-          role="combobox"
-          aria-label="Vyhľadávanie článkov, hradísk a kľúčových slov"
-          aria-autocomplete="list"
-          aria-controls="search-results"
-          aria-expanded={isFocused && (results.length > 0 || query.length >= 2)}
-          autoComplete="off"
-        />
-
-        {/* Clear Button – zobrazí sa pri zadaní */}
-        {query && (
-          <motion.button
-            type="button"
-            onClick={clearSearch}
-            className="flex-shrink-0 flex items-center justify-center rounded-full"
+        {/* Input riadok */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' }}>
+          <motion.span
+            key={pulseKey}
             style={{
-              width: 32, height: 32,
-              color: '#8b7355',
-              transition: 'background-color 150ms ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 30,
+              height: 30,
+              borderRadius: 8,
+              flexShrink: 0,
+              transition: 'background 250ms ease, color 250ms ease, border-color 250ms ease, box-shadow 250ms ease',
+              ...(isFocused
+                ? {
+                    color: T.panelBg,
+                    background: `linear-gradient(135deg, ${T.amberLight}, ${T.amber})`,
+                    border: `1px solid ${T.amber}`,
+                    boxShadow: `0 0 0 4px ${T.focusGlow}`,
+                    animation: 'lupaPulse .5s ease',
+                  }
+                : {
+                    color: T.amber,
+                    background: T.chipBg,
+                    border: `1px solid ${T.chipBorder}`,
+                  }),
             }}
-            aria-label="Vymazať vyhľadávanie"
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.92 }}
           >
-            <X className="w-4 h-4" />
-          </motion.button>
-        )}
+            <Search size={17} strokeWidth={2.3} />
+          </motion.span>
 
-        {/* Hľadať button – embedded vnútri pillu, plná zlato-hnedá */}
-        <motion.button
-          type="submit"
-          className="flex-shrink-0 items-center justify-center"
-          style={{
-            display: 'inline-flex',
-            gap: 8,
-            height: 44,
-            padding: '0 18px',
-            borderRadius: 9999,
-            background: 'linear-gradient(135deg, #7d4f1d 0%, #a87437 100%)',
-            color: '#faf7f1',
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            fontWeight: 500,
-            fontSize: 14,
-            letterSpacing: '0.02em',
-            boxShadow: '0 2px 8px rgba(125, 79, 29, 0.35)',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'filter 150ms ease',
-          }}
-          aria-label="Vyhľadať"
-          whileHover={{ filter: 'brightness(1.08)' }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <Search className="w-4 h-4 md:hidden" />
-          <span className="hidden md:inline">Hľadať</span>
-        </motion.button>
+          <input
+            ref={inputRef}
+            type="text"
+            id="site-search"
+            name="search"
+            placeholder="Hľadaj hradiská, články, kľúčové slová…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => {
+              setIsFocused(true);
+              setPulseKey((k) => k + 1);
+            }}
+            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+            onKeyDown={handleKeyDown}
+            className="flex-1 min-w-0 bg-transparent outline-none border-0 hero-search-input"
+            style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: T.textMain, padding: 0, background: 'transparent' }}
+            role="combobox"
+            aria-label="Vyhľadávanie lokalít a článkov"
+            aria-autocomplete="list"
+            aria-controls="search-dropdown-results"
+            aria-expanded={showPanel}
+            autoComplete="off"
+          />
+
+          {query && (
+            <motion.button
+              type="button"
+              onClick={clearSearch}
+              aria-label="Vymazať vyhľadávanie"
+              style={{
+                flexShrink: 0,
+                border: 'none',
+                background: T.clearBg,
+                color: T.clearText,
+                width: 26,
+                height: 26,
+                borderRadius: 999,
+                fontSize: 13,
+                cursor: 'pointer',
+              }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+            >
+              ✕
+            </motion.button>
+          )}
+        </div>
       </div>
 
-      {/* Search Results Dropdown */}
+      {/* Roletka výsledkov – plávajúci panel nad obsahom (viď z-index poznámka v HomePage.tsx) */}
       <AnimatePresence>
-        {isFocused && results.length > 0 && (
-          <motion.div
-            id="search-results"
-            role="listbox"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-stone-900 rounded-2xl border-2 border-stone-200 dark:border-stone-700 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] max-h-[480px] overflow-y-auto z-[60]"
-            style={{
-              backdropFilter: 'blur(12px)',
-            }}
-          >
-            <div className="p-3">
-              {results.map((result, idx) => (
-                <motion.a
-                  key={result.id}
-                  id={`result-${idx}`}
-                  href={result.href}
-                  role="option"
-                  aria-selected={idx === selectedIndex}
-                  className={`flex items-start gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 ${
-                    idx === selectedIndex
-                      ? 'bg-gradient-to-r from-amber-50 to-amber-50/50 dark:from-amber-950/30 dark:to-amber-950/20 border border-amber-300 dark:border-amber-800/50 shadow-sm'
-                      : 'hover:bg-stone-50/80 dark:hover:bg-stone-800/50 border border-transparent'
-                  }`}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  whileHover={{ x: 4 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                >
-                  {/* Icon */}
-                  <div className="flex-shrink-0 mt-0.5">
-                    {result.type === 'site' ? (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div
-                      className="font-medium text-stone-900 dark:text-stone-100 truncate"
-                      style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-                    >
-                      {result.title}
-                    </div>
-                    <div className="text-sm text-stone-600 dark:text-stone-400 truncate mt-0.5">
-                      {result.subtitle}
-                    </div>
-                  </div>
-                </motion.a>
-              ))}
-            </div>
-
-            {/* Footer */}
-            <div className="px-5 py-3 border-t border-stone-200 dark:border-stone-700 bg-gradient-to-b from-stone-50 to-stone-100/50 dark:from-stone-800/50 dark:to-stone-800/80 flex items-center justify-between text-xs text-stone-600 dark:text-stone-400 rounded-b-2xl">
-              <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1.5">
-                  <kbd className="px-2 py-1 bg-white dark:bg-stone-900 rounded-md border border-stone-300 dark:border-stone-600 font-mono shadow-sm">↑↓</kbd>
-                  <span style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>navigácia</span>
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <kbd className="px-2 py-1 bg-white dark:bg-stone-900 rounded-md border border-stone-300 dark:border-stone-600 font-mono shadow-sm">Enter</kbd>
-                  <span style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>otvoriť</span>
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Empty State */}
-      <AnimatePresence>
-        {isFocused && query.length >= 2 && results.length === 0 && (
+        {showPanel && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-stone-900 rounded-2xl border-2 border-stone-200 dark:border-stone-700 shadow-[0_12px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] p-12 text-center z-[60]"
             style={{
-              backdropFilter: 'blur(12px)',
+              position: 'absolute',
+              top: 'calc(100% + 10px)',
+              left: 0,
+              right: 0,
+              background: T.panelBg,
+              border: `1px solid ${T.panelBorder}`,
+              borderRadius: 16,
+              boxShadow: '0 26px 64px -24px rgba(60,40,15,.55)',
+              overflow: 'hidden',
+              zIndex: 60,
             }}
           >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.3 }}
+            <div
+              id="search-dropdown-results"
+              role="listbox"
+              className="search-dropdown-scroll"
+              style={{ maxHeight: 460, overflowY: 'auto', padding: '6px 0' }}
             >
-              <svg className="w-16 h-16 mx-auto text-stone-400 dark:text-stone-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <p
-                className="text-stone-700 dark:text-stone-400 mb-2 text-lg"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-              >
-                Nenašli sa žiadne výsledky pre <strong className="text-stone-900 dark:text-stone-100">"{query}"</strong>
-              </p>
-              <p className="text-sm text-stone-500 dark:text-stone-500">
-                Skúste použiť iné kľúčové slová alebo všeobecnejší výraz
-              </p>
-            </motion.div>
+              {hasResults ? (
+                <>
+                  {locationResults.length > 0 && (
+                    <div>
+                      <GroupHeader label="Lokality" count={locationResults.length} withTopBorder={false} />
+                      {locationResults.map((r) => (
+                        <ResultRow
+                          key={r.id}
+                          result={r}
+                          kind="location"
+                          selected={allResults[selectedIndex]?.id === r.id}
+                          onMouseEnter={() => setSelectedIndex(allResults.findIndex((x) => x.id === r.id))}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {articleResults.length > 0 && (
+                    <div>
+                      <GroupHeader label="Články" count={articleResults.length} withTopBorder={locationResults.length > 0} />
+                      {articleResults.map((r) => (
+                        <ResultRow
+                          key={r.id}
+                          result={r}
+                          kind="article"
+                          selected={allResults[selectedIndex]?.id === r.id}
+                          onMouseEnter={() => setSelectedIndex(allResults.findIndex((x) => x.id === r.id))}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div
+                  style={{
+                    padding: '36px 18px',
+                    textAlign: 'center',
+                    color: T.textSecondary,
+                    fontSize: 18,
+                    fontFamily: 'var(--font-serif)',
+                  }}
+                >
+                  Pre „<strong style={{ color: T.amber }}>{query}</strong>" sme nič nenašli.
+                </div>
+              )}
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '9px 18px',
+                borderTop: `1px solid ${T.dividerStrong}`,
+                background: T.footerBg,
+                fontFamily: 'var(--font-serif)',
+                fontSize: 14,
+                color: T.textSecondary,
+              }}
+            >
+              <span style={{ marginLeft: 'auto' }}>{allResults.length} výsledkov</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

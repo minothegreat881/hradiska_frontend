@@ -1029,6 +1029,43 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+/* Search dropdown 2B "S nahladmi" – pergamenova roletka vysledkov */
+@keyframes lupaPulse {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.14); }
+}
+
+.search-result-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px;
+  margin: 1px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: transparent;
+  transition: background 150ms ease;
+}
+.search-result-row:hover,
+.search-result-row[data-selected="true"] {
+  background: #ece0c2;
+}
+
+.search-dropdown-scroll {
+  scrollbar-color: #c8a15a transparent;
+  scrollbar-width: thin;
+}
+.search-dropdown-scroll::-webkit-scrollbar {
+  width: 9px;
+}
+.search-dropdown-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.search-dropdown-scroll::-webkit-scrollbar-thumb {
+  background: #c8a15a;
+  border-radius: 9px;
+}
+
 /* Hide scrollbar utility */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
