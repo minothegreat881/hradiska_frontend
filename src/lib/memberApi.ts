@@ -87,3 +87,8 @@ export async function resetPassword(code: string, password: string): Promise<{ j
 export async function resendConfirmation(email: string): Promise<void> {
   await call('/api/auth/send-email-confirmation', { method: 'POST', body: { email } });
 }
+
+/** GDPR: člen si zmaže vlastný účet. Komentáre sa anonymizujú, nezmažú. */
+export async function deleteMyAccount(token: string): Promise<void> {
+  await call('/api/account/me', { method: 'DELETE', token });
+}

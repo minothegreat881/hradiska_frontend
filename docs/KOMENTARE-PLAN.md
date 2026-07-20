@@ -42,7 +42,35 @@ maže komentáre, blokuje účty, vidí prehľad po článkoch.
     sanitizácia pri užívateľskej role odmieta reláciu ako holý documentId
   - **overené:** člen nevie vytvoriť článok (403) ani zmazať cudzí komentár (403);
     vlastný komentár vytvorí/zmaže; lajk sa deduplikuje
-- ⏳ Kroky 5–10 (frontend, admin moderácia, anti-spam) — otvorené.
+- ✅ **Krok 5 — účty pre verejnosť** (frontend): registrácia, prihlásenie,
+  reset hesla, profil (`AccountPage`, `MemberAuth`, `memberApi`). E-mail cez
+  Gmail SMTP overený reálnym mailom.
+- ✅ **Krok 6 — komentáre na účty**: `CommentSection` prestavaná, komentuje
+  a lajkuje len prihlásený, zobrazí sa hneď, lajky cez `reaction` (dedup),
+  odkaz na účet v navigácii.
+- ✅ **Krok 7 — fotky**: `PhotoDiscussion` v lightboxe — komentáre a lajky
+  k fotke cez `fileId`. Lajk komentára synchronizuje counter `likes`.
+- ✅ **Krok 8 — admin moderácia**: `CommentsScreen` — filtre podľa statusu,
+  zobraziť/skryť/spam/zmazať, hľadanie, stránkovanie.
+- ✅ **Krok 9 — admin používatelia**: `UsersScreen` — zoznam členov,
+  blokovanie s dôvodom (zablokovaný sa neprihlási), odblokovanie.
+- ✅ **Krok 10 — anti-spam + GDPR**:
+  - rate limit: max 5 komentárov/min na účet (429), aj foto-komentáre
+  - GDPR súhlas pri registrácii (povinný checkbox + odkaz na ochranu údajov)
+  - zmazanie vlastného účtu (`DELETE /api/account/me`) — komentáre sa
+    anonymizujú na „Zmazaný účet", nezmažú sa
+
+## HOTOVO — celá vrstva komentárov a účtov dokončená (2026-07-20)
+
+Testovací člen: `milanhrabkovsky+test@gmail.com` / `TestHeslo123`.
+
+### DB-závislé nastavenia (pri obnove čistej DB nastaviť znova)
+- rola Member + jej povolenia (komentáre, reakcie, `account.deleteMe`)
+- registrácia: default_role=member, email_confirmation=true
+- Public: odobraté blog-comment.create; má photo-comment/reaction find
+- Authenticated (admin): pridané user find/findOne/update, photo-comment/
+  reaction CRUD, aktualita CRUD
+- e-mailové šablóny v SK (reset → frontend, overenie → Strapi redirect)
 
 ---
 

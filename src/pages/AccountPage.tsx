@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useMember } from '../auth/MemberAuth';
 import {
-  register, forgotPassword, resetPassword, resendConfirmation, AuthError,
+  register, forgotPassword, resetPassword, resendConfirmation, deleteMyAccount, AuthError,
 } from '../lib/memberApi';
 
 export type AccountMode = 'login' | 'register' | 'forgot' | 'reset' | 'profile';
@@ -62,12 +62,14 @@ function Notice({ tone, children }: { tone: 'ok' | 'err'; children: React.ReactN
 const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
 export function AccountPage({ mode }: { mode: AccountMode }) {
-  const { signIn, member, isLoggedIn, signOut, ready } = useMember();
+  const { signIn, member, token, isLoggedIn, signOut, ready } = useMember();
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [identifier, setIdentifier] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [ok, setOk] = useState('');
@@ -93,6 +95,7 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
         go('/');
       } else if (mode === 'register') {
         if (password.length < 6) throw new AuthError(400, 'Heslo musí mať aspoň 6 znakov.');
+        if (!consent) throw new AuthError(400, 'Pre registráciu je potrebný súhlas so spracovaním údajov.');
         await register(username.trim(), email.trim(), password);
         setOk('Účet vytvorený. Poslali sme vám overovací e-mail — kliknite na odkaz v ňom a potom sa prihláste.');
       } else if (mode === 'forgot') {
@@ -128,6 +131,36 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
                   onClick={() => { signOut(); go('/'); }}>
             Odhlásiť sa
           </button>
+
+          {/* GDPR — zmazanie účtu */}
+          <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px dashed rgba(196,165,116,0.5)' }}>
+            {!confirmDelete ? (
+              <button style={{ ...linkBtn, color: '#a04338' }} onClick={() => setConfirmDelete(true)}>
+                Zmazať účet
+              </button>
+            ) : (
+              <div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13.5, color: '#5d4a32', lineHeight: 1.5, margin: '0 0 12px' }}>
+                  Účet sa zmaže natrvalo. Vaše komentáre zostanú, ale ako <strong>Zmazaný účet</strong>.
+                  Túto akciu nie je možné vrátiť.
+                </p>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button style={{ ...linkBtn }} onClick={() => setConfirmDelete(false)}>Zrušiť</button>
+                  <button
+                    style={{ background: '#a04338', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13.5 }}
+                    onClick={async () => {
+                      if (!token) return;
+                      try { await deleteMyAccount(token); signOut(); go('/'); }
+                      catch (e: any) { setErr(e?.message || 'Zmazanie zlyhalo.'); }
+                    }}
+                  >
+                    Zmazať natrvalo
+                  </button>
+                </div>
+                {err && <p style={{ color: '#a04338', fontSize: 13, marginTop: 8, fontFamily: 'Georgia, serif' }}>{err}</p>}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -181,6 +214,19 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
                    placeholder="••••••••" disabled={busy}
                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
           </>
+        )}
+
+        {mode === 'register' && (
+          <label style={{ display: 'flex', gap: 9, alignItems: 'flex-start', marginBottom: 16, cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, color: '#5d4a32', lineHeight: 1.5 }}>
+            <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3 }} />
+            <span>
+              Súhlasím so spracovaním e-mailu na účely účtu a diskusie. Údaje neposkytujeme
+              tretím stranám. Viac v{' '}
+              <button type="button" style={{ ...linkBtn, fontSize: 13 }} onClick={() => go('/ochrana-osobnych-udajov')}>
+                ochrane osobných údajov
+              </button>.
+            </span>
+          </label>
         )}
 
         <button type="submit" style={{ ...primaryBtn, opacity: busy ? 0.7 : 1 }} disabled={busy}>
