@@ -138,17 +138,22 @@ export function TwoTierNav({ items, darkMode, onToggleDark }: TwoTierNavProps) {
               textDecoration: 'none',
             }}
           >
-            <img
-              className="nav-logo"
-              src="/logo_slovanske_hradiska.jpg"
-              alt="Slovanské hradiská"
-              style={{
-                width: 'auto',
-                borderRadius: 8,
-                mixBlendMode: 'multiply',
-                filter: 'contrast(1.05)',
-              }}
-            />
+            {/* PERF: viď NavBar.tsx — 256 px variant namiesto 5,63 MB originálu.
+                .nav-logo je 46 px, pri hoveri scale(1.55) → max ~71 px. */}
+            <picture style={{ display: 'contents' }}>
+              <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+              <img
+                className="nav-logo"
+                src="/logo_slovanske_hradiska_256.jpg"
+                alt="Slovanské hradiská"
+                style={{
+                  width: 'auto',
+                  borderRadius: 8,
+                  mixBlendMode: 'multiply',
+                  filter: 'contrast(1.05)',
+                }}
+              />
+            </picture>
           </a>
 
           {/* Pravý stĺpec: dva riadky kategórií (logo sa cez ne centruje) */}

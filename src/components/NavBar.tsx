@@ -302,16 +302,22 @@ export function NavBar() {
                 textDecoration: 'none',
               }}
             >
-              <img
-                src="/logo_slovanske_hradiska.jpg"
-                alt="Slovanské hradiská"
-                style={{
-                  height: 44,
-                  width: 'auto',
-                  mixBlendMode: 'multiply',
-                  filter: 'contrast(1.05)',
-                }}
-              />
+              {/* PERF: originál logo_slovanske_hradiska.jpg má 2080x2048 px / 5,63 MB
+                  a vykresľuje sa na 44 px — sťahovalo sa na KAŽDEJ stránke (12 s).
+                  256 px variant stačí aj pre 3x retina a má 15,7 KB (368x menej). */}
+              <picture style={{ display: 'contents' }}>
+                <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+                <img
+                  src="/logo_slovanske_hradiska_256.jpg"
+                  alt="Slovanské hradiská"
+                  style={{
+                    height: 44,
+                    width: 'auto',
+                    mixBlendMode: 'multiply',
+                    filter: 'contrast(1.05)',
+                  }}
+                />
+              </picture>
               <span
                 className="hidden md:inline"
                 style={{

@@ -46,6 +46,12 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
         ...convertStrapiPostToArticle(strapiPost),
         content: strapiPost.content, // Keep original blocks content
         author: { name: strapiPost.authorName || 'Hradiská.sk', avatar: '/avatar.jpg' },
+        // 80 z 305 článkov nemá coverImage. getStrapiImageUrl vracia v takom
+        // prípade '/placeholder-image.jpg', ktorý v public/ neexistuje — Vite
+        // naň vráti SPA fallback (HTML), <img> to nevie dekódovať a vykreslí
+        // ikonu rozbitého obrázka. Preto si zapamätáme, či cover naozaj je,
+        // a namiesto rozbitého obrázka vykreslíme značkovú hlavičku.
+        hasCover: !!strapiPost.coverImage,
         images: strapiPost.gallery?.map(img => ({
           url: getStrapiImageUrl(img),
           caption: img.caption || img.alternativeText || ''
@@ -89,11 +95,11 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
             Článok nenájdený
           </h1>
           <a
-            href="/blog"
+            href="/"
             className="text-amber-700 dark:text-amber-400 hover:underline"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
-            Späť na blog →
+            Späť na domovskú stránku →
           </a>
         </div>
       </div>
@@ -414,7 +420,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
       {/* Back link — decentný textový odkaz, zarovnaný s container okrajom hero karty */}
       <div className="container pt-8 pb-5 relative z-10">
         <a
-          href="/blog"
+          href="/"
           className="back-to-blog"
           style={{
             display: 'inline-flex',
@@ -460,11 +466,52 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
 
             {/* Hero Image - Full Width (12 columns) - SMALLER */}
             <div style={{ gridColumn: 'span 12' }} className="relative h-48 md:h-64">
-              <ImageWithFallback
-                src={article.coverImage}
-                alt={article.title}
-                className="w-full h-full object-cover"
-              />
+              {(article as any).hasCover !== false ? (
+                <ImageWithFallback
+                  src={article.coverImage}
+                  alt={article.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                /* Značková hlavička pre články bez vlastného obrázka.
+                   Logo cez object-contain (nie cover) — emblém je takmer štvorec,
+                   cover by ho orezal na úzky pruh. Pergamen ladí so zvyškom webu. */
+                <div
+                  className="w-full h-full"
+                  style={{
+                    // POZOR: zarovnanie je inline, NIE cez Tailwind triedu.
+                    // `justify-end` sa v tomto projekte do CSS negeneruje (v builde
+                    // chýba), takže trieda by nespravila nič a flex by spadol na
+                    // flex-start — logo by skončilo vľavo.
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    paddingRight: '5%',
+                    background:
+                      'radial-gradient(ellipse at 76% 40%, #f5ecd8 0%, #ece0c4 55%, #ddcba4 100%)',
+                  }}
+                  aria-hidden="true"
+                >
+                  <span
+                    className="hidden sm:block"
+                    style={{ height: 1, width: 64, background: 'linear-gradient(90deg, transparent, #c4a574)' }}
+                  />
+                  <picture style={{ display: 'contents' }}>
+                    <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+                    <img
+                      src="/logo_slovanske_hradiska_256.jpg"
+                      alt=""
+                      style={{
+                        height: '62%',
+                        width: 'auto',
+                        marginLeft: 18,
+                        mixBlendMode: 'multiply',
+                        opacity: 0.92,
+                      }}
+                    />
+                  </picture>
+                </div>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
                 <div className="text-sm text-white/80 mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>

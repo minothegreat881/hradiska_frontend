@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import {
   getAktuality, getStrapiImageUrl,
-  StrapiAktualita, AktualitaTyp, StrapiImage,
+  getKronika, getKronikaIntro, KRONIKA_INTRO_SLUG,
+  StrapiAktualita, AktualitaTyp, StrapiImage, KronikaItem,
 } from '../lib/strapi';
 import { hradiskaData } from '../data/hradiska';
 import { slovakiaBorderDetailed } from '../data/slovakia-border';
@@ -499,6 +500,166 @@ function TypeChip({ typ }: { typ: AktualitaTyp }) {
 }
 
 // ============================================================================
+// KRONIKA – karty nad blog-postami z kategórie `aktuality`
+// ============================================================================
+
+/** Pripnutý úvod — široká karta hore. Statická, nezávisí od radenia. */
+function KronikaIntro({ item }: { item: KronikaItem }) {
+  return (
+    <article
+      className="aktualita-featured-grid"
+      style={{
+        background: '#fbf6ea', border: '1px solid #e3d4ad', borderRadius: 16, overflow: 'hidden',
+        boxShadow: '0 16px 42px -24px rgba(60,40,15,.55)', marginBottom: 26,
+      }}
+    >
+      <div className="relative" style={{ minHeight: 260 }}>
+        {item.coverUrl ? (
+          <SafeImg
+            src={item.coverUrl}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'radial-gradient(ellipse at 50% 40%, #f5ecd8 0%, #ece0c4 55%, #ddcba4 100%)',
+            }}
+          >
+            <picture style={{ display: 'contents' }}>
+              <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+              <img
+                src="/logo_slovanske_hradiska_256.jpg"
+                alt=""
+                style={{ height: '58%', width: 'auto', mixBlendMode: 'multiply', opacity: 0.92 }}
+              />
+            </picture>
+          </div>
+        )}
+        <span
+          className="absolute pointer-events-none"
+          style={{
+            top: 14, left: 14, display: 'flex', alignItems: 'center', gap: 7,
+            background: 'rgba(28,21,16,.72)', color: '#e9c877', fontFamily: 'var(--font-heading)',
+            fontSize: 10, letterSpacing: '.1em', padding: '6px 11px', borderRadius: 999,
+          }}
+        >
+          <span style={{ color: '#c8862f' }}>◆</span>PRIPNUTÉ
+        </span>
+      </div>
+
+      <div style={{ padding: '22px 24px' }}>
+        <div className="flex items-center gap-3 mb-3">
+          <div
+            className="flex-shrink-0 flex items-center justify-center rounded-full"
+            style={{ width: 38, height: 38, background: '#f0e6d1', border: '1px solid rgba(125,79,29,0.25)' }}
+            aria-hidden="true"
+          >
+            <Shield className="w-4.5 h-4.5" style={{ color: GOLD }} />
+          </div>
+          <div className="min-w-0">
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#2e2213' }}>
+              Slovanské hradiská
+            </div>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e' }}>
+              {formatSkDate(item.datum)} · {item.author} · {item.readingTime} min čítania
+            </div>
+          </div>
+        </div>
+
+        <h3 style={{ margin: '0 0 10px', fontFamily: 'var(--font-serif)', fontSize: 27, fontWeight: 700, color: '#2e2213', lineHeight: 1.12 }}>
+          {item.title}
+        </h3>
+        {item.excerpt && (
+          <p style={{ margin: '0 0 18px', fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.5, color: '#4a3f2e' }}>
+            {item.excerpt}
+          </p>
+        )}
+
+        <a
+          href={`/blog/${item.slug}`}
+          style={{
+            display: 'inline-block',
+            fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.05em', color: '#fbf6ea',
+            background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', borderRadius: 999,
+            padding: '9px 16px', textDecoration: 'none',
+          }}
+        >
+          Čítať celé →
+        </a>
+      </div>
+    </article>
+  );
+}
+
+/** Karta v 2-stĺpcovej nástenke. „Zobraziť viac" vedie na článok. */
+function KronikaCard({ item }: { item: KronikaItem }) {
+  return (
+    <article
+      className="aktualita-masonry-card"
+      style={{
+        display: 'inline-block', width: '100%', background: '#fbf6ea', border: '1px solid #e3d4ad',
+        borderRadius: 14, boxShadow: '0 12px 32px -22px rgba(60,40,15,.5)', overflow: 'hidden',
+        marginBottom: 22, breakInside: 'avoid', transition: 'transform .18s, box-shadow .18s',
+      }}
+    >
+      {item.coverUrl && (
+        <a href={`/blog/${item.slug}`} className="block relative overflow-hidden" style={{ height: 210 }}>
+          <SafeImg src={item.coverUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(18,13,8,.55) 0%, rgba(18,13,8,.18) 38%, transparent 62%)', pointerEvents: 'none' }} />
+        </a>
+      )}
+
+      <div style={{ padding: '15px 17px 6px' }}>
+        <div
+          className="flex items-center gap-1.5 flex-wrap"
+          style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e', marginBottom: 7 }}
+        >
+          <Calendar className="w-3 h-3" />
+          <span>{formatSkDate(item.datum)}</span>
+          <span aria-hidden="true">·</span>
+          <span>{item.author}</span>
+          <span aria-hidden="true">·</span>
+          <span>{item.readingTime} min čítania</span>
+        </div>
+
+        <h3 style={{ margin: '0 0 7px', fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 700, color: '#2e2213', lineHeight: 1.15 }}>
+          <a href={`/blog/${item.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+            {item.title}
+          </a>
+        </h3>
+
+        {item.excerpt && (
+          <p
+            style={{
+              margin: 0, fontFamily: 'var(--font-serif)', fontSize: 16, lineHeight: 1.5, color: '#4a3f2e',
+              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+            }}
+          >
+            {item.excerpt}
+          </p>
+        )}
+      </div>
+
+      <div
+        className="flex items-center"
+        style={{ padding: '10px 17px', borderTop: '1px solid #ece0c2', background: '#f7efdb' }}
+      >
+        <div className="flex-1" />
+        <a
+          href={`/blog/${item.slug}`}
+          style={{ fontFamily: 'var(--font-serif)', fontSize: 16, color: '#9a5d1f', textDecoration: 'none' }}
+        >
+          Zobraziť viac →
+        </a>
+      </div>
+    </article>
+  );
+}
+
+// ============================================================================
 // FeaturedPost – široká pripnutá karta hore (varianta 3B)
 // ============================================================================
 function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLightbox: (start: number) => void }) {
@@ -965,18 +1126,31 @@ export interface AktualityFeedProps {
 }
 
 export default function AktualityFeed({ initialPageSize = 20, showHeader = true }: AktualityFeedProps) {
-  const [items, setItems] = useState<StrapiAktualita[]>([]);
+  const [items, setItems] = useState<KronikaItem[]>([]);
+  const [intro, setIntro] = useState<KronikaItem | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'empty' | 'error'>('loading');
-  const [activeFilter, setActiveFilter] = useState<AktualitaTyp | 'all'>('all');
+  // Smer časovej osi. Typové filtre (Brigády/Tabule/…) sú preč — blog-posty
+  // pole `typAktivity` nemajú, takže by dva z chipov boli natrvalo prázdne.
+  const [sort, setSort] = useState<'desc' | 'asc'>('desc');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [lightbox, setLightbox] = useState<{ open: boolean; images: StrapiImage[]; start: number }>({ open: false, images: [], start: 0 });
+
+  // Úvod sa ťahá zvlášť — je najstarší (2010), pri radení „najnovšie" by
+  // na prvú stránku nepadol.
+  useEffect(() => {
+    let cancelled = false;
+    getKronikaIntro()
+      .then(i => { if (!cancelled) setIntro(i); })
+      .catch(() => { /* úvod je ozdoba, bez neho nástenka funguje ďalej */ });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     setState('loading');
-    getAktuality({ page: 1, pageSize: initialPageSize })
+    setPage(1);
+    getKronika({ page: 1, pageSize: initialPageSize, sort })
       .then(({ items, pagination }) => {
         if (cancelled) return;
         setItems(items);
@@ -985,18 +1159,18 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
       })
       .catch((err) => {
         if (cancelled) return;
-        console.warn('Aktuality API nedostupné, sekciu skrývam.', err);
+        console.warn('Kronika API nedostupná, sekciu skrývam.', err);
         setState('error');
       });
     return () => { cancelled = true; };
-  }, [initialPageSize]);
+  }, [initialPageSize, sort]);
 
   const loadMore = async () => {
     if (loadingMore) return;
     setLoadingMore(true);
     try {
       const nextPage = page + 1;
-      const { items: more, pagination } = await getAktuality({ page: nextPage, pageSize: initialPageSize });
+      const { items: more, pagination } = await getKronika({ page: nextPage, pageSize: initialPageSize, sort });
       setItems(prev => [...prev, ...more]);
       setPage(nextPage);
       setHasMore(pagination ? pagination.page < pagination.pageCount : false);
@@ -1007,12 +1181,11 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
     }
   };
 
-  // Featured (pripnutý) príspevok sa filtrom neriadi a nikdy sa neopakuje v nástenke.
-  const featuredItem = useMemo(() => items.find(it => it.zvyraznene) ?? null, [items]);
-  const masonryItems = useMemo(() => {
-    const base = activeFilter === 'all' ? items : items.filter(it => it.typAktivity === activeFilter);
-    return base.filter(it => it.documentId !== featuredItem?.documentId);
-  }, [items, activeFilter, featuredItem]);
+  // Úvod sa v nástenke neopakuje.
+  const masonryItems = useMemo(
+    () => items.filter(it => it.slug !== KRONIKA_INTRO_SLUG),
+    [items]
+  );
 
   if (state === 'error') return null;
 
@@ -1059,20 +1232,19 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
 
         {state === 'ok' && (
           <>
-            {featuredItem && (
-              <FeaturedPost
-                item={featuredItem}
-                onOpenLightbox={(start) => setLightbox({ open: true, images: featuredItem.fotky ?? [], start })}
-              />
-            )}
+            {intro && <KronikaIntro item={intro} />}
 
+            {/* Radenie časovej osi namiesto typových filtrov. */}
             <div className="flex flex-wrap items-center justify-center gap-2" style={{ marginBottom: 22 }}>
-              {FILTERS.map((f) => {
-                const active = activeFilter === f.id;
+              {([
+                { id: 'desc' as const, label: 'Najnovšie' },
+                { id: 'asc' as const, label: 'Od najstaršieho' },
+              ]).map((f) => {
+                const active = sort === f.id;
                 return (
                   <button
                     key={f.id}
-                    onClick={() => setActiveFilter(f.id)}
+                    onClick={() => setSort(f.id)}
                     style={{
                       fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.04em',
                       padding: '8px 16px', borderRadius: 999, cursor: 'pointer', transition: 'all .15s',
@@ -1095,14 +1267,10 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
               <div className="aktualita-masonry-scroll" style={{ height: 560, overflowY: 'auto', paddingRight: 10 }}>
                 <div className="aktualita-masonry-cols">
                   {masonryItems.map((item) => (
-                    <MasonryPost
-                      key={item.documentId}
-                      item={item}
-                      onOpenLightbox={(images, start) => setLightbox({ open: true, images, start })}
-                    />
+                    <KronikaCard key={item.documentId} item={item} />
                   ))}
                 </div>
-                {hasMore && activeFilter === 'all' && (
+                {hasMore && (
                   <div className="text-center" style={{ paddingTop: 4, paddingBottom: 14 }}>
                     <button
                       onClick={loadMore}
@@ -1125,14 +1293,8 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
           </>
         )}
       </div>
-
-      <AnimatePresence>
-        {lightbox.open && lightbox.images.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
-            <Lightbox images={lightbox.images} startIndex={lightbox.start} onClose={() => setLightbox((s) => ({ ...s, open: false }))} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox tu už nie je — karty kroniky vedú na článok, galéria je na ňom.
+          Komponent `Lightbox` ostáva v súbore, používa ho AktualitaCard na /aktuality. */}
     </section>
   );
 }

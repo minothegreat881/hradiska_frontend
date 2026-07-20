@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, Send, CheckCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2 } from 'lucide-react';
 
 type FieldErrors = Partial<Record<'name' | 'email' | 'message', string>>;
+
+/** Kontaktný e-mail združenia — používa sa v CTA aj ako cieľ formulára. */
+const CONTACT_EMAIL = 'orgon333@gmail.com';
 
 // TODO (backend): zatiaľ atrapa – formulár sa neodosiela nikam.
 // Pre produkciu: napojiť na Strapi collection "kontakt" alebo /api/mail endpoint
@@ -15,11 +18,7 @@ async function submitForm(_data: { name: string; email: string; message: string 
 }
 
 export function JoinUs() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -63,40 +62,27 @@ export function JoinUs() {
     }
   };
 
-  // Field props helper
-  const fieldClass = (err?: string) => ({
-    height: 44,
-    width: '100%',
-    padding: '0 14px',
-    background: '#fff',
-    color: '#2d1810',
-    border: `1px solid ${err ? '#c44561' : 'rgba(125,79,29,0.35)'}`,
-    borderRadius: 8,
-    fontFamily: 'Georgia, serif',
-    fontSize: 14,
-    outline: 'none',
-    transition: 'border-color 150ms ease, box-shadow 150ms ease',
-  } as React.CSSProperties);
-
-  const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.currentTarget.style.borderColor = '#a87437';
-    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(196,165,116,0.25)';
-  };
-  const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>, fieldName: keyof FieldErrors) => {
-    e.currentTarget.style.boxShadow = 'none';
-    e.currentTarget.style.borderColor = errors[fieldName] ? '#c44561' : 'rgba(125,79,29,0.35)';
+  const clearErr = (k: keyof FieldErrors) => {
+    if (errors[k]) setErrors({ ...errors, [k]: undefined });
   };
 
   return (
     <section
-      className="relative py-16 md:py-24 border-t-2 border-amber-900/20"
-      style={{ backgroundColor: '#f7f1e3', overflowX: 'clip' }}
+      className="joinus relative"
+      style={{
+        background: 'var(--ju-page)',
+        padding: '70px 20px 96px',
+        overflowX: 'clip',
+        borderTop: '2px solid rgba(125,79,29,0.2)',
+      }}
     >
-      {/* Slovanské zlaté medailóny po stranách formulára – viewport >= 1200 px.
+      {/* Slovanské zlaté medailóny po stranách – viewport >= 1200 px. NEMENIŤ.
           mix-blend-mode: multiply skrýva biele pozadie PNG na krémovej stránke,
           zlatá ostane plne viditeľná.
           PERF: <picture> načíta WebP (~100 KB, 1400px) namiesto pôvodného PNG (5.8 MB, 2506px).
-          PNG ostáva ako fallback + záloha pri obnove. */}
+          PNG ostáva ako fallback + záloha pri obnove.
+          Odsadenie: stĺpec obsahu má max-width 780 px (polovica 390), medailón sa
+          centruje medzi jeho okraj a okraj viewportu. */}
       {showMedailony && (
         <>
           <picture>
@@ -109,8 +95,7 @@ export function JoinUs() {
               decoding="async"
               style={{
                 position: 'absolute',
-                // Vycentrované medzi okrajom viewportu a kartou (max-w 640 → 320 polovica)
-                left: 'calc((50% - 320px - 470px) / 2)',
+                left: 'calc((50% - 390px - 470px) / 2)',
                 top: '50%',
                 transform: 'translateY(-50%) rotate(-4deg)',
                 width: 'clamp(380px, 30vw, 560px)',
@@ -131,7 +116,7 @@ export function JoinUs() {
               decoding="async"
               style={{
                 position: 'absolute',
-                right: 'calc((50% - 320px - 470px) / 2)',
+                right: 'calc((50% - 390px - 470px) / 2)',
                 top: '50%',
                 transform: 'translateY(-50%) rotate(4deg)',
                 width: 'clamp(380px, 30vw, 560px)',
@@ -140,90 +125,293 @@ export function JoinUs() {
                 pointerEvents: 'none',
                 zIndex: 1,
               }}
-            /></picture>
+            />
+          </picture>
         </>
       )}
 
-      <div className="container relative" style={{ zIndex: 2 }}>
-        <div className="max-w-3xl mx-auto">
-          {/* HLAVIČKA SEKCIE */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-10"
-          >
-            {/* Pill badge */}
-            <span
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-medium uppercase mb-5"
-              style={{
-                background: 'rgba(196,165,116,0.18)',
-                border: '1px solid rgba(125,79,29,0.3)',
-                color: '#7d4f1d',
-                fontFamily: 'Georgia, serif',
-                letterSpacing: '0.12em',
-              }}
-            >
-              <Users className="w-3.5 h-3.5" />
-              Pridajte sa k nám
-            </span>
+      <div style={{ maxWidth: 780, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+        {/* Hlavička sekcie odstránená na želanie — badge „◆ Pridajte sa k nám",
+            nadpis „Staňte sa súčasťou našej komunity" aj kurzívny podnadpis.
+            Sekciu otvára rovno tmavý banner. */}
 
-            {/* Nadpis – tmavohnedý, garantovane viditeľný */}
-            <h2
-              style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontSize: 'clamp(24px, 3.5vw, 34px)',
-                fontWeight: 600,
-                color: '#2d1810',
-                letterSpacing: '0.02em',
-                lineHeight: 1.2,
-                margin: 0,
-              }}
-            >
-              Staňte sa súčasťou našej komunity
-            </h2>
-
-            {/* Zlatá ozdobná linka */}
-            <div
-              className="mx-auto mt-3"
-              style={{
-                width: 56,
-                height: 2,
-                background: 'linear-gradient(90deg, transparent, #a87437, transparent)',
-              }}
-            />
-
-            {/* Podtitul */}
-            <p
-              className="mx-auto mt-4"
-              style={{
-                color: '#7a6b56',
-                fontFamily: 'Georgia, serif',
-                fontStyle: 'italic',
-                fontSize: 15,
-                lineHeight: 1.55,
-                maxWidth: 480,
-              }}
-            >
-              Pomôžte nám uchovať a zdieľať našu históriu — fotografie z hradísk, archeologické nálezy aj odborné poznatky sú vítané.
-            </p>
-          </motion.div>
-
-          {/* KARTA FORMULÁRA */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+        {/* ---------- „HRDOSŤ" BANNER ---------- */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.05 }}
+          className="relative text-center"
+          style={{
+            background: 'linear-gradient(180deg, var(--ju-banner-top), var(--ju-banner-bottom))',
+            border: '1px solid var(--ju-border-banner)',
+            borderRadius: 16,
+            padding: 30,
+            overflow: 'hidden',
+            marginBottom: 34,
+          }}
+        >
+          {/* Jemná diagonálna textúra */}
+          <div
+            aria-hidden="true"
             style={{
-              background: '#fffdf8',
-              borderRadius: 12,
-              border: '1px solid rgba(196,165,116,0.4)',
-              boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 14px rgba(70,40,20,0.06)',
-              padding: '28px',
-              maxWidth: 640,
-              margin: '0 auto',
+              position: 'absolute',
+              inset: 0,
+              background:
+                'repeating-linear-gradient(58deg, rgba(200,161,90,.05) 0 2px, transparent 2px 10px)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div className="relative">
+            <div
+              aria-hidden="true"
+              className="flex items-center justify-center gap-3"
+              style={{ color: 'var(--ju-banner-orn)', fontSize: 15, marginBottom: 12 }}
+            >
+              <span style={{ height: 1, width: 54, background: 'currentColor', opacity: 0.55 }} />
+              <span>✦</span>
+              <span style={{ height: 1, width: 54, background: 'currentColor', opacity: 0.55 }} />
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: 'clamp(21px, 3vw, 27px)',
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                color: 'var(--ju-banner-title)',
+                lineHeight: 1.2,
+              }}
+            >
+              Buďme hrdí na naše dejiny!
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                fontSize: 19,
+                color: 'var(--ju-banner-sub)',
+                marginTop: 6,
+              }}
+            >
+              Máme na to mnoho dôvodov.
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ---------- 3) KARTA S VÝZVOU ---------- */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          style={{
+            background: 'var(--ju-card)',
+            border: '1px solid var(--ju-border)',
+            borderRadius: 18,
+            boxShadow: '0 20px 50px -30px rgba(60,40,15,.45)',
+            padding: '36px 40px 34px',
+            marginBottom: 30,
+          }}
+        >
+          <h3
+            className="text-center"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 25,
+              fontWeight: 600,
+              color: 'var(--ju-text)',
+              margin: '0 0 20px',
+              lineHeight: 1.2,
+            }}
+          >
+            Staňte sa našimi spolupracovníkmi
+          </h3>
+
+          <p
+            className="dropcap"
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 19,
+              lineHeight: 1.62,
+              color: 'var(--ju-body)',
+              margin: '0 0 24px',
+            }}
+          >
+            Aj vy sa môžete podieľať na zveľaďovaní našej stránky. Ak máte doma
+            zaujímavé fotografie z hradísk alebo obrázky a fotky nálezov, stačí sa
+            s nami o ne podeliť — každý záber pomáha dopĺňať náš spoločný obraz
+            o dávnej minulosti.
+          </p>
+
+          {/* E-mail CTA */}
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="ju-cta"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              textDecoration: 'none',
+              background: 'linear-gradient(180deg,#fbf1da,#f5e8c9)',
+              border: '1px solid var(--ju-border-soft)',
+              borderRadius: 14,
+              padding: '16px 20px',
+              margin: '0 0 26px',
+              transition: 'border-color 150ms ease, box-shadow 150ms ease',
+            }}
+          >
+            <span
+              aria-hidden="true"
+              className="flex-shrink-0 flex items-center justify-center"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: 'linear-gradient(180deg, var(--ju-amber-mid), var(--ju-amber-deep))',
+                color: '#fbf3e2',
+                fontSize: 22,
+              }}
+            >
+              ✉
+            </span>
+            <span className="flex-1 min-w-0">
+              <span
+                style={{
+                  display: 'block',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 11,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: 'var(--ju-amber)',
+                }}
+              >
+                Pošlite fotky na
+              </span>
+              <span
+                style={{
+                  display: 'block',
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 23,
+                  fontWeight: 700,
+                  color: 'var(--ju-text)',
+                  lineHeight: 1.25,
+                  wordBreak: 'break-word',
+                }}
+              >
+                {CONTACT_EMAIL}
+              </span>
+            </span>
+            <span
+              aria-hidden="true"
+              style={{ color: 'var(--ju-amber-bright)', fontSize: 20, flexShrink: 0 }}
+            >
+              →
+            </span>
+          </a>
+
+          <p
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 19,
+              lineHeight: 1.62,
+              color: 'var(--ju-body)',
+              margin: '0 0 18px',
+            }}
+          >
+            Najhodnotnejšie sú pre mňa zábery na valy, pozostatky opevnení, budov
+            a podobne — najmä pri hradiskách, na ktorých som ešte nebol a ku ktorým
+            preto nemám žiadne fotky. Veľmi zaujímavé sú aj fotky slovanských nálezov
+            v zahraničí, predovšetkým v Maďarsku a Rakúsku.
+          </p>
+          <p
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 19,
+              lineHeight: 1.62,
+              color: 'var(--ju-body)',
+              margin: 0,
+            }}
+          >
+            Ak ste boli v múzeách napríklad vo Visegráde, Novohrade, Ostrihome či
+            Zalavári a podarilo sa vám nafotiť slovanské šperky, zbrane, črepy
+            a podobne, budem vám veľmi vďačný, ak sa o tie fotky s nami podelíte.
+          </p>
+        </motion.div>
+
+        {/* ---------- 4) CALLOUT „MÁTE DOMA NÁLEZ?" ---------- */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.12 }}
+          style={{
+            background: 'var(--ju-callout)',
+            border: '1px solid var(--ju-border-callout)',
+            borderLeft: '5px solid var(--ju-amber-mid)',
+            borderRadius: 14,
+            padding: '26px 30px',
+            marginBottom: 34,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 13,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: 'var(--ju-amber-deep)',
+              marginBottom: 12,
+            }}
+          >
+            ◆ Máte doma nález?
+          </div>
+          <p
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 18,
+              lineHeight: 1.6,
+              color: 'var(--ju-body)',
+              margin: '0 0 14px',
+            }}
+          >
+            Platí to aj pre náhodných nálezcov, ktorí majú v pivnici či na povale
+            zaujímavé nálezy, na ktoré len sadá prach a s ktorými sa boja oficiálne
+            pochváliť. Urobiť fotku, napísať, kde sa nález našiel, a poslať to na
+            mail sa predsa dá.
+          </p>
+          <p
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 22,
+              fontStyle: 'italic',
+              fontWeight: 600,
+              color: 'var(--ju-amber-deep)',
+              margin: 0,
+            }}
+          >
+            „Možno sami neviete, aké poklady vlastníte."
+          </p>
+        </motion.div>
+
+        {/* ---------- 5) KONTAKTNÝ FORMULÁR ---------- */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          style={{
+            background: 'var(--ju-card)',
+            border: '1px solid var(--ju-border)',
+            borderRadius: 18,
+            boxShadow: '0 28px 66px -30px rgba(60,40,15,.5)',
+            padding: 6,
+          }}
+        >
+          <div
+            style={{
+              border: '1px solid var(--ju-frame)',
+              borderRadius: 14,
+              padding: '34px 34px 30px',
             }}
           >
             <AnimatePresence mode="wait">
@@ -236,81 +424,111 @@ export function JoinUs() {
                   exit={{ opacity: 0 }}
                   noValidate
                 >
-                  {/* Meno + E-mail v 2 stĺpcoch desktop */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <h3
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 21,
+                      fontWeight: 600,
+                      color: 'var(--ju-text)',
+                      margin: 0,
+                    }}
+                  >
+                    Alebo nám napíšte rovno tu
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontStyle: 'italic',
+                      fontSize: 17,
+                      color: 'var(--ju-muted-2)',
+                      margin: '6px 0 24px',
+                    }}
+                  >
+                    Ozveme sa vám späť na uvedený e-mail.
+                  </p>
+
+                  <div className="ju-grid">
                     <div>
-                      <Label htmlFor="join-name">Vaše meno</Label>
+                      <label className="lbl" htmlFor="join-name">
+                        Vaše meno <span className="req" aria-hidden="true">✦</span>
+                      </label>
                       <input
                         id="join-name"
                         name="name"
                         type="text"
+                        className="fld"
                         autoComplete="name"
+                        required
+                        aria-required="true"
                         value={formData.name}
-                        onChange={(e) => { setFormData({ ...formData, name: e.target.value }); if (errors.name) setErrors({ ...errors, name: undefined }); }}
-                        onFocus={onFocus}
-                        onBlur={(e) => onBlur(e, 'name')}
+                        onChange={(e) => { setFormData({ ...formData, name: e.target.value }); clearErr('name'); }}
                         placeholder="Jana Nováková"
-                        style={fieldClass(errors.name)}
                         aria-invalid={!!errors.name}
                         aria-describedby={errors.name ? 'join-name-err' : undefined}
                       />
                       {errors.name && <ErrorMsg id="join-name-err">{errors.name}</ErrorMsg>}
                     </div>
+
                     <div>
-                      <Label htmlFor="join-email">E-mail</Label>
+                      <label className="lbl" htmlFor="join-email">
+                        E-mail <span className="req" aria-hidden="true">✦</span>
+                      </label>
                       <input
                         id="join-email"
                         name="email"
                         type="email"
+                        className="fld"
                         autoComplete="email"
+                        required
+                        aria-required="true"
                         value={formData.email}
-                        onChange={(e) => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors({ ...errors, email: undefined }); }}
-                        onFocus={onFocus}
-                        onBlur={(e) => onBlur(e, 'email')}
+                        onChange={(e) => { setFormData({ ...formData, email: e.target.value }); clearErr('email'); }}
                         placeholder="meno@domena.sk"
-                        style={fieldClass(errors.email)}
                         aria-invalid={!!errors.email}
                         aria-describedby={errors.email ? 'join-email-err' : undefined}
                       />
                       {errors.email && <ErrorMsg id="join-email-err">{errors.email}</ErrorMsg>}
                     </div>
+
+                    <div className="ju-full">
+                      <label className="lbl" htmlFor="join-message">
+                        Vaša správa <span className="req" aria-hidden="true">✦</span>
+                      </label>
+                      <textarea
+                        id="join-message"
+                        name="message"
+                        className="fld"
+                        required
+                        aria-required="true"
+                        style={{ minHeight: 150, resize: 'vertical' }}
+                        value={formData.message}
+                        onChange={(e) => { setFormData({ ...formData, message: e.target.value }); clearErr('message'); }}
+                        placeholder="Popíšte, čím by ste chceli prispieť…"
+                        aria-invalid={!!errors.message}
+                        aria-describedby={errors.message ? 'join-msg-err' : undefined}
+                      />
+                      {errors.message && <ErrorMsg id="join-msg-err">{errors.message}</ErrorMsg>}
+                    </div>
                   </div>
 
-                  {/* Správa */}
-                  <div className="mb-5">
-                    <Label htmlFor="join-message">Vaša správa</Label>
-                    <textarea
-                      id="join-message"
-                      name="message"
-                      rows={5}
-                      value={formData.message}
-                      onChange={(e) => { setFormData({ ...formData, message: e.target.value }); if (errors.message) setErrors({ ...errors, message: undefined }); }}
-                      onFocus={onFocus}
-                      onBlur={(e) => onBlur(e, 'message')}
-                      placeholder="Popíšte, čím by ste chceli prispieť…"
-                      style={{ ...fieldClass(errors.message), height: 'auto', padding: '10px 14px', resize: 'vertical' }}
-                      aria-invalid={!!errors.message}
-                      aria-describedby={errors.message ? 'join-msg-err' : undefined}
-                    />
-                    {errors.message && <ErrorMsg id="join-msg-err">{errors.message}</ErrorMsg>}
-                  </div>
-
-                  {/* Submit */}
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl font-medium hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="ju-submit w-full inline-flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                     style={{
-                      height: 48,
-                      background: 'linear-gradient(135deg, #7d4f1d 0%, #a87437 100%)',
-                      color: '#faf7f1',
-                      fontFamily: 'Georgia, serif',
-                      fontSize: 15,
-                      letterSpacing: '0.02em',
-                      boxShadow: '0 4px 12px rgba(125,79,29,0.3)',
-                      border: 'none',
+                      marginTop: 24,
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 16,
+                      fontWeight: 600,
+                      letterSpacing: '0.06em',
+                      color: '#fbf3e2',
+                      background: 'linear-gradient(180deg, var(--ju-amber-mid), var(--ju-amber-deep))',
+                      border: '1px solid #7c4a13',
+                      borderRadius: 999,
+                      padding: 16,
+                      boxShadow: '0 12px 26px -12px rgba(120,74,19,.7)',
                       cursor: submitting ? 'wait' : 'pointer',
-                      transition: 'filter 150ms ease',
+                      transition: 'filter 150ms ease, transform 100ms ease',
                     }}
                   >
                     {submitting ? (
@@ -319,25 +537,23 @@ export function JoinUs() {
                         Odosielam…
                       </>
                     ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        Odoslať správu
-                      </>
+                      <>✎ Odoslať správu</>
                     )}
                   </button>
 
-                  {/* Poznámka o použití údajov */}
                   <p
-                    className="text-center mt-3"
+                    className="text-center"
                     style={{
-                      color: '#7a6b56',
-                      fontFamily: 'Georgia, serif',
-                      fontSize: 12,
+                      fontFamily: 'var(--font-serif)',
                       fontStyle: 'italic',
+                      fontSize: 15,
+                      color: '#9a8a6c',
                       lineHeight: 1.5,
+                      margin: '14px 0 0',
                     }}
                   >
-                    Vaše údaje použijeme len na odpoveď na túto správu. Neposkytujeme ich tretím stranám.
+                    🛡 Vaše údaje použijeme len na odpoveď na túto správu.
+                    Neposkytujeme ich tretím stranám.
                   </p>
                 </motion.form>
               ) : (
@@ -346,16 +562,18 @@ export function JoinUs() {
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  className="text-center py-6"
+                  className="text-center"
+                  style={{ padding: '18px 0' }}
+                  role="status"
                 >
                   <CheckCircle className="w-14 h-14 mx-auto mb-4" style={{ color: '#2D7F4F' }} />
                   <h3
-                    className="mb-2"
                     style={{
-                      fontFamily: 'Georgia, serif',
-                      fontSize: 22,
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 24,
                       fontWeight: 600,
-                      color: '#2d1810',
+                      color: 'var(--ju-text)',
+                      margin: '0 0 8px',
                     }}
                   >
                     Ďakujeme, ozveme sa vám
@@ -363,15 +581,17 @@ export function JoinUs() {
                   <p
                     className="mx-auto"
                     style={{
-                      color: '#7a6b56',
-                      fontFamily: 'Georgia, serif',
+                      fontFamily: 'var(--font-serif)',
                       fontStyle: 'italic',
-                      fontSize: 14.5,
-                      maxWidth: 380,
+                      fontSize: 18,
+                      color: 'var(--ju-muted-2)',
+                      maxWidth: 420,
                       lineHeight: 1.55,
+                      margin: 0,
                     }}
                   >
-                    Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími informáciami o spolupráci.
+                    Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími
+                    informáciami o spolupráci.
                   </p>
                   <button
                     type="button"
@@ -379,12 +599,17 @@ export function JoinUs() {
                       setSubmitted(false);
                       setFormData({ name: '', email: '', message: '' });
                     }}
-                    className="mt-5 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px]"
                     style={{
+                      marginTop: 22,
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 12,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
                       background: 'transparent',
-                      color: '#7d4f1d',
-                      border: '1px solid rgba(125,79,29,0.35)',
-                      fontFamily: 'Georgia, serif',
+                      color: 'var(--ju-amber-deep)',
+                      border: '1px solid var(--ju-border-soft)',
+                      borderRadius: 999,
+                      padding: '10px 20px',
                       cursor: 'pointer',
                     }}
                   >
@@ -393,44 +618,24 @@ export function JoinUs() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
 // ----- helpers -----
-function Label({ htmlFor, children, as = 'label' }: { htmlFor?: string; children: React.ReactNode; as?: 'label' | 'div' }) {
-  const Tag: any = as;
-  return (
-    <Tag
-      htmlFor={htmlFor}
-      style={{
-        display: 'block',
-        marginBottom: 6,
-        fontFamily: 'Georgia, serif',
-        fontSize: 13,
-        fontWeight: 500,
-        color: '#3d3528',
-        letterSpacing: '0.02em',
-      }}
-    >
-      {children}
-    </Tag>
-  );
-}
-
 function ErrorMsg({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
     <div
       id={id}
       role="alert"
       style={{
-        marginTop: 5,
+        marginTop: 6,
         color: '#c44561',
-        fontFamily: 'Georgia, serif',
-        fontSize: 12,
+        fontFamily: 'var(--font-serif)',
+        fontSize: 15,
         fontStyle: 'italic',
       }}
     >

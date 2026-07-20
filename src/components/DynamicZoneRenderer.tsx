@@ -212,9 +212,26 @@ function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
       '3:4': '133.33%',
     };
 
+    // ── STROP VÝŠKY PRE OBRÁZKY NA VÝŠKU ────────────────────────────────────
+    // Predtým: pri `auto` sa paddingBottom rovnal presnému pomeru obrázka BEZ
+    // stropu. Obrázok 161x786 tak dostal padding-bottom 488 % → v 700 px stĺpci
+    // 3417 px vysoký blok, teda ~4 obrazovky scrollovania na jeden obrázok.
+    // Týkalo sa to 472 z 2138 obrázkov v telách (22 % vyšších než 800 px).
+    //
+    // Teraz: pomer sa zastropuje na MAX_AUTO_RATIO. Obrázok sa NEOREZÁVA —
+    // vyššie než strop prepneme na object-contain, takže sa zobrazí celý,
+    // len úzky a vycentrovaný. Zároveň sa prestane upscalovať do šírky stĺpca.
+    const MAX_AUTO_RATIO = 1.25; // 5:4 na výšku; zvýš = povolíš vyššie obrázky
+    const naturalRatio =
+      block.image?.width && block.image?.height
+        ? block.image.height / block.image.width
+        : null;
+    const isTallCapped =
+      aspectRatio === 'auto' && naturalRatio !== null && naturalRatio > MAX_AUTO_RATIO;
+
     const paddingBottom = aspectRatio === 'auto'
-      ? (block.image?.width && block.image?.height
-          ? `${((block.image.height / block.image.width) * 100).toFixed(2)}%`
+      ? (naturalRatio
+          ? `${(Math.min(naturalRatio, MAX_AUTO_RATIO) * 100).toFixed(2)}%`
           : '66.67%')
       : ASPECT_RATIO_PADDING[aspectRatio] || '66.67%';
 
@@ -224,13 +241,18 @@ function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
         <button
           onClick={() => openGalleryWithImage(imageUrl)}
           className={`relative overflow-hidden ${rounded ? 'rounded-lg' : ''} ${shadow ? 'shadow-lg' : ''} w-full cursor-pointer group`}
-          style={{ paddingBottom }}
+          style={{
+            paddingBottom,
+            // Pri zastropovanom vysokom obrázku ostane po stranách voľné miesto
+            // (object-contain) — podfarbíme ho pergamenom, nech to pôsobí zámerne.
+            ...(isTallCapped ? { background: '#f0e9dc' } : {}),
+          }}
           title="Kliknutím zobraziť v galérii"
         >
           <ImageWithFallback
             src={getStrapiImageUrl(block.image)}
             alt={altText}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={`absolute inset-0 w-full h-full ${isTallCapped ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
             style={{ objectPosition }}
           />
           {/* Hover overlay with zoom icon */}

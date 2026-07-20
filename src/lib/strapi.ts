@@ -93,6 +93,10 @@ export interface StrapiBlogPost {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  /** Pôvodný dátum z Blogger migrácie. `publishedAt` je dátum migrácie (u všetkých
+   *  aktualít 2026-07-19), takže na chronológiu treba toto. Schéma to tak aj mieni:
+   *  „frontend zobrazuje originalPublishedDate || publishedAt". */
+  originalPublishedDate?: string;
 }
 
 export interface StrapiResponse<T> {
@@ -246,6 +250,77 @@ export function getStrapiImageUrl(image: StrapiImage | undefined, size?: 'thumbn
 }
 
 // ============================================================================
+// KRONIKA – aktuality ako blog-posty v kategórii `aktuality`
+// ----------------------------------------------------------------------------
+// Reálny obsah združenia (68 príspevkov, 2010–2026) žije ako blog-post
+// v kategórii `aktuality`, nie v kolekcii `aktualita` (tam je len 8 seed
+// záznamov). Nástenka na homepage berie dáta odtiaľto.
+// ============================================================================
+
+/** Sploštený tvar pre kartu na nástenke. */
+export interface KronikaItem {
+  documentId: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  /** ISO dátum — originalPublishedDate, s fallbackom na publishedAt. */
+  datum: string;
+  author: string;
+  readingTime: number;
+  coverUrl: string | null;
+}
+
+/** Slug článku, ktorý je na nástenke pripnutý ako statický úvod. */
+export const KRONIKA_INTRO_SLUG = 'preco-to-vlastne-robim';
+
+function toKronikaItem(p: StrapiBlogPost): KronikaItem {
+  return {
+    documentId: p.documentId,
+    slug: p.slug,
+    title: p.title,
+    excerpt: p.excerpt || '',
+    datum: p.originalPublishedDate || p.publishedAt,
+    author: p.authorName || 'Hradiská',
+    readingTime: p.readingTime || 1,
+    coverUrl: p.coverImage ? getStrapiImageUrl(p.coverImage, 'medium') : null,
+  };
+}
+
+/**
+ * Načítaj kroniku. `sort` riadi smer časovej osi (najnovšie / najstaršie).
+ */
+export async function getKronika(options?: {
+  page?: number;
+  pageSize?: number;
+  sort?: 'desc' | 'asc';
+}): Promise<{ items: KronikaItem[]; pagination: any }> {
+  const queryParts: string[] = [
+    'filters[category][slug][$eq]=aktuality',
+    `sort=originalPublishedDate:${options?.sort === 'asc' ? 'asc' : 'desc'}`,
+    'populate[0]=coverImage',
+  ];
+  if (options?.page) queryParts.push(`pagination[page]=${options.page}`);
+  if (options?.pageSize) queryParts.push(`pagination[pageSize]=${options.pageSize}`);
+
+  const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
+    `/blog-posts?${queryParts.join('&')}`
+  );
+  return {
+    items: response.data.map(toKronikaItem),
+    pagination: response.meta?.pagination,
+  };
+}
+
+/** Úvodný (pripnutý) príspevok. Ťahá sa zvlášť — pri radení podľa dátumu by
+ *  inak nemusel padnúť na prvú stránku. */
+export async function getKronikaIntro(): Promise<KronikaItem | null> {
+  const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
+    `/blog-posts?filters[slug][$eq]=${KRONIKA_INTRO_SLUG}&populate[0]=coverImage`
+  );
+  return response.data[0] ? toKronikaItem(response.data[0]) : null;
+}
+
+// ============================================================================
 // AKTUALITY – krátke príspevky o činnosti združenia
 // ============================================================================
 
@@ -306,7 +381,11 @@ export function convertStrapiPostToArticle(post: StrapiBlogPost) {
     title: post.title,
     excerpt: post.excerpt || '',
     content: post.content,
-    coverImage: getStrapiImageUrl(post.coverImage), // Use original size for best quality
+    // Karty v zozname sa vykresľujú v malom — `medium` (~40 KB) namiesto originálu
+    // (~351 KB). Variant je v Strapi už vygenerovaný, nič sa negeneruje navyše.
+    // Ak `formats.medium` chýba, getStrapiImageUrl spadne späť na originál.
+    // Detail článku má vlastnú cestu (getBlogPostBySlug) a originál si berie ďalej.
+    coverImage: getStrapiImageUrl(post.coverImage, 'medium'),
     author: post.authorName || 'Hradiská',
     publishedAt: post.publishedAt,
     readTime: post.readingTime || 5,

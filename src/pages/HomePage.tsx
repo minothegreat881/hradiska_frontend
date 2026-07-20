@@ -6,7 +6,7 @@ import { HeroSearch } from '../components/HeroSearch';
 import AktualityFeed from '../components/AktualityFeed';
 import { JoinUs } from '../components/JoinUs';
 import { CategoryCard } from '../components/CategoryCard';
-import { categories } from '../data/mock-data';
+import { hradiskaCategories } from '../data/categories';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { InkEffect } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
@@ -146,7 +146,8 @@ export function HomePage() {
                   fontSize: 15,
                 }}
               >
-                Preskúmajte archeologické lokality podľa ich historickej funkcie a významu
+                Hradiská triedime podľa toho, čomu slúžili — od kniežacích sídel cez strážne
+                body až po písomné pramene, z ktorých o nich vieme
               </motion.p>
             </div>
           </ScrollReveal>
@@ -156,8 +157,20 @@ export function HomePage() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto"
             style={{ gap: '36px 28px' }}
           >
-            {categories.map((category, idx) => (
-              <CategoryCard key={category.value} category={category} index={idx} />
+            {hradiskaCategories.map((category, idx) => (
+              <CategoryCard
+                key={category.slug}
+                category={{
+                  // CategoryCard očakáva `value` (→ /category/<value>) a plnú URL obrázka.
+                  value: category.slug,
+                  label: category.label,
+                  description: category.description,
+                  detailedDescription: category.description,
+                  icon: category.icon,
+                  image: `${import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337'}${category.image}`,
+                }}
+                index={idx}
+              />
             ))}
           </div>
         </div>

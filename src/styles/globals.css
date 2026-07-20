@@ -1415,3 +1415,324 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .article-card:focus-visible [data-arrow] {
   transform: translateX(3px);
 }
+
+/* ============================================================================
+   Sekcia „Pridajte sa k nám" (JoinUs) — pergamenový historický ráz.
+   Tokeny podľa design handoffu; komponent ich číta cez var(), nie inline hodnoty.
+   ========================================================================== */
+.joinus {
+  --ju-page: #f2ead7;
+  --ju-card: #fdfaf1;
+  --ju-frame: #eadcbb;
+  --ju-callout: #f4e7cd;
+
+  --ju-border: #ddcba0;
+  --ju-border-field: #d8c8a4;
+  --ju-border-soft: #dcc593;
+  --ju-border-callout: #e0cb95;
+  --ju-border-banner: #6b4f2a;
+
+  --ju-amber: #9a5d1f;
+  --ju-amber-deep: #8a5316;
+  --ju-amber-mid: #b0813a;
+  --ju-amber-bright: #c8862f;
+
+  --ju-banner-top: #2c2114;
+  --ju-banner-bottom: #1c1510;
+  --ju-banner-title: #f0d493;
+  --ju-banner-sub: #c9b48c;
+  --ju-banner-orn: #c8a15a;
+
+  --ju-text: #2e2213;
+  --ju-body: #4a3f2e;
+  --ju-muted: #7f6f55;
+  --ju-muted-2: #8a795e;
+  --ju-field-bg: #fbf7ec;
+  --ju-placeholder: #a89a7d;
+}
+
+/* Polia formulára */
+.joinus .fld {
+  width: 100%;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  color: var(--ju-text);
+  background: var(--ju-field-bg);
+  border: 1px solid var(--ju-border-field);
+  border-radius: 11px;
+  padding: 13px 15px;
+  outline: none;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+.joinus .fld::placeholder { color: var(--ju-placeholder); }
+.joinus .fld:focus {
+  border-color: var(--ju-amber);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(200, 134, 47, 0.16);
+}
+.joinus .fld[aria-invalid='true'] { border-color: #c44561; }
+
+/* Labely */
+.joinus .lbl {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7a5a2e;
+}
+.joinus .lbl .req { color: var(--ju-amber-mid); }
+
+/* Drop-cap iniciála v intro odseku */
+.joinus .dropcap::first-letter {
+  float: left;
+  font-family: var(--font-heading);
+  font-size: 56px;
+  line-height: 0.82;
+  font-weight: 700;
+  color: var(--ju-amber);
+  margin: 6px 12px 0 0;
+}
+
+/* E-mail CTA hover */
+.joinus .ju-cta:hover {
+  border-color: var(--ju-amber-bright);
+  box-shadow: 0 12px 28px -18px rgba(120, 74, 19, 0.5);
+}
+
+/* Submit tlačidlo */
+.joinus .ju-submit:hover:not(:disabled) { filter: brightness(1.07); }
+.joinus .ju-submit:active:not(:disabled) { transform: translateY(1px); }
+
+/* Mriežka formulára */
+.joinus .ju-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 22px;
+}
+.joinus .ju-grid .ju-full { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .joinus .ju-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================================
+   Hlavička kategórie (CategoryPage hero) — varianta 5A „Vľavo, vertikálny scrim".
+   ========================================================================== */
+.cat-hero {
+  --ch-border: #6b4f2a;
+  --ch-frame: rgba(200, 161, 90, 0.35);
+  --ch-fallback: #20180e;
+  --ch-chip-bg: rgba(122, 31, 36, 0.55);
+  --ch-chip-border: rgba(200, 161, 90, 0.55);
+  --ch-chip-text: #f0d493;
+  --ch-gold: #c8862f;
+  --ch-pill-bg: #e6c98a;
+  --ch-pill-text: #1c1510;
+  --ch-title: #fbf3e2;
+  --ch-sub: #e4d5b8;
+  --ch-meta: #d8c6a2;
+
+  position: relative;
+  height: 440px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--ch-border);
+  box-shadow: 0 30px 66px -28px rgba(40, 26, 10, 0.55);
+}
+
+/* Vertikálny scrim zľava — text vľavo čitateľný, fotka vpravo dýcha. */
+.cat-hero .ch-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(16, 11, 6, 0.9) 0%,
+    rgba(16, 11, 6, 0.72) 34%,
+    rgba(16, 11, 6, 0.28) 60%,
+    rgba(16, 11, 6, 0) 82%
+  );
+  pointer-events: none;
+}
+
+.cat-hero .ch-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 120px 24px rgba(16, 11, 6, 0.5);
+  pointer-events: none;
+}
+
+.cat-hero .ch-frame {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid var(--ch-frame);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.cat-hero .ch-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 56px;
+}
+
+/* Scroll cue */
+@keyframes scrollNudge {
+  0%, 100% { transform: translateY(0); opacity: 0.9; }
+  50%      { transform: translateY(6px); opacity: 0.5; }
+}
+.cat-hero .ch-cue-arrow { animation: scrollNudge 1.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-hero .ch-cue-arrow { animation: none; }
+}
+
+/* Mobil: scrim zdola, obsah cez celú šírku a zarovnaný dole. */
+@media (max-width: 760px) {
+  .cat-hero { height: 380px; }
+  .cat-hero .ch-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(16, 11, 6, 0.25) 0%,
+      rgba(16, 11, 6, 0.55) 45%,
+      rgba(16, 11, 6, 0.92) 100%
+    );
+  }
+  .cat-hero .ch-content {
+    width: 100%;
+    justify-content: flex-end;
+    padding: 0 26px 34px;
+  }
+}
+@media (max-width: 600px) {
+  .cat-hero .ch-cue { display: none; }
+}
+
+/* ============================================================================
+   Pätička — varianta 7A „Vlnovková hrana".
+   ========================================================================== */
+.site-footer {
+  --ft-bg-top: #332619;
+  --ft-bg-bottom: #241a10;
+  --ft-wave-base: #9a5d1f;
+  --ft-wave-line: #c8a15a;
+  --ft-head: #e6c98a;
+  --ft-accent: #c8862f;
+  --ft-link: #c9b48c;
+  --ft-link-hover: #f0d493;
+  --ft-brand: #f4ead4;
+  --ft-tagline: #a8946c;
+  --ft-desc: #b7a380;
+  --ft-edge: #5a462c;
+  --ft-fleur: #8a6a3a;
+  --ft-bottom-text: #8a7856;
+
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ft-bg-top) 0%, var(--ft-bg-bottom) 100%);
+  font-family: var(--font-serif);
+}
+
+/* Nadpis stĺpca */
+.site-footer .fhead {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ft-head);
+  margin: 0;
+}
+.site-footer .fhead-rule {
+  width: 34px;
+  height: 2px;
+  background: var(--ft-accent);
+  margin: 10px 0 12px;
+}
+
+/* Odkaz v stĺpci — hover posunie text a odhalí › marker */
+.site-footer .flink {
+  position: relative;
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  color: var(--ft-link);
+  text-decoration: none;
+  padding: 7px 0;
+  transition: color 0.16s ease, padding-left 0.16s ease;
+}
+.site-footer .flink::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--ft-accent);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+.site-footer .flink:hover,
+.site-footer .flink:focus-visible {
+  color: var(--ft-link-hover);
+  padding-left: 14px;
+}
+.site-footer .flink:hover::before,
+.site-footer .flink:focus-visible::before { opacity: 1; }
+
+/* Sociálne ikony */
+.site-footer .soc {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  border: 1px solid var(--ft-edge);
+  background: rgba(255, 247, 231, 0.03);
+  color: var(--ft-link);
+  transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+}
+.site-footer .soc:hover,
+.site-footer .soc:focus-visible {
+  border-color: var(--ft-accent);
+  color: #1c1510;
+  background: linear-gradient(180deg, var(--ft-head), var(--ft-accent));
+  transform: translateY(-2px);
+}
+
+/* Tlačidlo „Späť hore" */
+.site-footer .to-top {
+  font-family: var(--font-heading);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ft-head);
+  border: 1px solid var(--ft-edge);
+  border-radius: 999px;
+  padding: 8px 15px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.site-footer .to-top:hover {
+  border-color: var(--ft-accent);
+  background: rgba(200, 134, 47, 0.12);
+}
+
+/* Mriežka stĺpcov */
+.site-footer .ft-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+@media (max-width: 900px) {
+  .site-footer .ft-grid { grid-template-columns: 1fr 1fr; }
+  .site-footer .ft-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .site-footer .ft-grid { grid-template-columns: 1fr; }
+  .site-footer .ft-bottom { justify-content: center; text-align: center; }
+}

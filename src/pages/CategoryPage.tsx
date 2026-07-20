@@ -2,19 +2,20 @@
 
 import { motion } from 'motion/react';
 import { ArticleCard } from '../components/ArticleCard';
-import { categories, Category } from '../data/mock-data';
+import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
-import { BookOpen, ArrowLeft, Crown, Scroll, Loader2 } from 'lucide-react';
+import { ArrowLeft, Crown, Scroll, Loader2 } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 
 interface CategoryPageProps {
   categorySlug: string;
 }
 
 export function CategoryPage({ categorySlug }: CategoryPageProps) {
-  // Get category info from local data (for UI like image, icon)
-  const localCategory = categories.find(c => c.value === categorySlug);
+  // Kurátorské dáta ku kategórii (obrázok, popis). Predtým sa brali z `mock-data`,
+  // ktoré má neaktuálne slugy — pre `strazna-funkcia`, `3d-modely`, `odborne-texty`
+  // a ďalšie sa nenašla zhoda a hlavička padala na generickú Unsplash fotku.
+  const localCategory = hradiskaCategories.find(c => c.slug === categorySlug);
 
   // Fetch category from Strapi
   const { category: strapiCategory, loading: categoryLoading } = useCategory(categorySlug);
@@ -29,8 +30,11 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
 
   // Use Strapi category name if available, fallback to local
   const categoryName = strapiCategory?.name || localCategory?.label || categorySlug;
-  const categoryDescription = strapiCategory?.description || localCategory?.description || '';
-  const categoryImage = localCategory?.image || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200';
+  // Kurátorský popis má prednosť — je písaný podľa toho, čo v kategórii reálne je.
+  const categoryDescription = localCategory?.description || strapiCategory?.description || '';
+  // Obrázok je z článku v tej istej kategórii, servírovaný zo Strapi médií.
+  const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+  const categoryImage = localCategory ? `${STRAPI_URL}${localCategory.image}` : null;
   const categoryIcon = localCategory?.icon || '📜';
 
   // Loading state
@@ -67,210 +71,173 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
 
   return (
     <div className="min-h-screen parchment">
-      {/* Hero Section with Image */}
+      {/* Hero — varianta 5A „Vľavo, vertikálny scrim" */}
       <section className="relative overflow-hidden">
-        <div className="container relative py-8 md:py-12">
+        <div className="container relative" style={{ paddingTop: 22, paddingBottom: 40 }}>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            {/* Back button */}
-            <motion.a
+            {/* Späť */}
+            <a
               href="/"
-              className="inline-flex items-center gap-2 mb-8 group"
+              className="ch-back inline-flex items-center gap-2"
               style={{
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                color: 'var(--color-sepia-link, #8b4513)',
-                fontSize: 14,
-                fontWeight: 500,
+                fontFamily: 'var(--font-heading)',
+                fontSize: 13,
+                letterSpacing: '0.04em',
+                color: '#9a5d1f',
                 textDecoration: 'none',
+                marginBottom: 16,
+                transition: 'color 150ms ease',
               }}
-              whileHover={{ x: -4 }}
-              transition={{ type: "spring", stiffness: 300 }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#c8862f'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = '#9a5d1f'; }}
             >
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span className="border-b border-transparent group-hover:border-current transition-colors">
-                Späť na domovskú stránku
-              </span>
-            </motion.a>
+              <ArrowLeft className="w-4 h-4" />
+              Späť na domovskú stránku
+            </a>
 
-            {/* Main header with image */}
-            <div
-              className="relative rounded-2xl overflow-hidden"
-              style={{
-                background: '#1f1a12',
-                boxShadow: '0 10px 28px rgba(20,15,10,0.25), 0 20px 48px rgba(20,15,10,0.18)',
-                border: '1px solid rgba(196,165,116,0.28)',
-              }}
-            >
-              {/* Background Image */}
-              <motion.div
-                className="absolute inset-0"
-                initial={{ scale: 1.2 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-              >
-                <ImageWithFallback
-                  src={categoryImage}
-                  alt={categoryName}
-                  className="w-full h-full object-cover"
-                />
-                {/* Gradient overlay — darker on left where text sits, image visible on right */}
-                <div
-                  className="absolute inset-0"
+            {/* Hero karta */}
+            <div className="cat-hero">
+              {/* 1. Fotka */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: categoryImage
+                    ? `url("${categoryImage}") center 42% / cover no-repeat`
+                    : 'var(--ch-fallback)',
+                  backgroundColor: 'var(--ch-fallback)',
+                }}
+                role="img"
+                aria-label={categoryName}
+              />
+              {/* 2. Vertikálny scrim, 3. vignette, 4. zlatý rám */}
+              <div className="ch-scrim" aria-hidden="true" />
+              <div className="ch-vignette" aria-hidden="true" />
+              <div className="ch-frame" aria-hidden="true" />
+
+              {/* Obsah vľavo */}
+              <div className="ch-content">
+                <span
                   style={{
-                    background:
-                      'linear-gradient(to right, rgba(20,15,10,0.92) 0%, rgba(20,15,10,0.78) 35%, rgba(20,15,10,0.45) 65%, rgba(20,15,10,0.20) 100%)',
+                    alignSelf: 'flex-start',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: 'var(--ch-chip-text)',
+                    background: 'var(--ch-chip-bg)',
+                    border: '1px solid var(--ch-chip-border)',
+                    backdropFilter: 'blur(3px)',
+                    WebkitBackdropFilter: 'blur(3px)',
+                    padding: '6px 15px',
+                    borderRadius: 999,
                   }}
-                />
-                {/* Subtle bottom darkening */}
+                >
+                  Kategória
+                </span>
+
                 <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      'linear-gradient(to top, rgba(20,15,10,0.55) 0%, rgba(20,15,10,0) 50%)',
-                  }}
+                  aria-hidden="true"
+                  style={{ width: 64, height: 2, background: 'var(--ch-gold)', margin: '22px 0 20px' }}
                 />
-              </motion.div>
 
-              {/* Animated particles overlay */}
-              <div className="absolute inset-0 opacity-30">
-                {[...Array(20)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 bg-amber-400 rounded-full"
+                <h1
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'clamp(34px, 4vw, 52px)',
+                    fontWeight: 700,
+                    letterSpacing: '0.01em',
+                    color: 'var(--ch-title)',
+                    lineHeight: 1.04,
+                    textShadow: '0 2px 18px rgba(0,0,0,.5)',
+                    margin: 0,
+                  }}
+                >
+                  {categoryName}
+                </h1>
+
+                {categoryDescription && (
+                  <p
                     style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                    }}
-                    animate={{
-                      y: [0, -30, 0],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 3 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: Math.random() * 2,
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Content */}
-              <div className="relative py-16 md:py-24 px-8 md:px-12 lg:px-16">
-                <div className="max-w-4xl">
-                  {/* Category badge */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="mb-6"
-                  >
-                    <span
-                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs backdrop-blur-sm"
-                      style={{
-                        fontFamily: 'Georgia, "Times New Roman", serif',
-                        fontStyle: 'italic',
-                        background: 'rgba(31,26,18,0.55)',
-                        color: '#fef9f0',
-                        border: '1px solid rgba(255,255,255,0.35)',
-                      }}
-                    >
-                      <Scroll className="w-3 h-3" />
-                      Kategória
-                    </span>
-                  </motion.div>
-
-                  {/* Title with decorative element */}
-                  <div className="mb-6">
-                    <motion.div
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.8, delay: 0.3 }}
-                      className="h-1 w-20 bg-gradient-to-r from-amber-500 to-amber-700 rounded-full mb-6"
-                    />
-                    <motion.h1
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.4 }}
-                      className="text-amber-50 mb-2 tracking-tight"
-                      style={{
-                        textShadow: '2px 4px 8px rgba(0,0,0,0.5)',
-                      }}
-                    >
-                      {categoryName}
-                    </motion.h1>
-                    <motion.div
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.8, delay: 0.5 }}
-                      className="h-0.5 w-32 bg-gradient-to-r from-amber-600 to-transparent rounded-full"
-                    />
-                  </div>
-
-                  {/* Description */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                    className="text-amber-100/90 text-lg md:text-xl max-w-2xl leading-relaxed mb-8"
-                    style={{
-                      textShadow: '1px 2px 4px rgba(0,0,0,0.5)',
+                      fontFamily: 'var(--font-serif)',
+                      fontStyle: 'italic',
+                      fontSize: 22,
+                      color: 'var(--ch-sub)',
+                      maxWidth: 440,
+                      lineHeight: 1.4,
+                      margin: '14px 0 0',
                     }}
                   >
                     {categoryDescription}
-                  </motion.p>
+                  </p>
+                )}
 
-                  {/* Stats bar */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.7 }}
-                    className="flex flex-wrap items-center gap-4"
+                <div
+                  className="flex items-center flex-wrap"
+                  style={{ marginTop: 26, gap: 14 }}
+                >
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 13,
+                      color: 'var(--ch-pill-text)',
+                      background: 'var(--ch-pill-bg)',
+                      padding: '8px 16px',
+                      borderRadius: 999,
+                    }}
                   >
-                    <div
-                      className="flex items-center gap-2 px-4 py-1.5 rounded-full backdrop-blur-sm"
-                      style={{
-                        fontFamily: 'Georgia, "Times New Roman", serif',
-                        background: 'rgba(31,26,18,0.55)',
-                        border: '1px solid rgba(255,255,255,0.35)',
-                        color: '#fef9f0',
-                      }}
-                    >
-                      <BookOpen className="w-4 h-4" style={{ color: '#f4c87a' }} />
-                      <span style={{ fontSize: 13 }}>
-                        <strong>{categoryArticles.length}</strong>{' '}
-                        {categoryArticles.length === 1
-                          ? 'článok'
-                          : categoryArticles.length < 5
-                          ? 'články'
-                          : 'článkov'}
-                      </span>
-                    </div>
-
-                    {/* Decorative scroll indicator */}
-                    <motion.div
-                      animate={{ y: [0, 8, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="hidden md:flex items-center gap-2 px-4 py-3 text-amber-300/80"
-                    >
-                      <Scroll className="w-4 h-4" />
-                      <span className="text-sm">Posúvajte nadol</span>
-                    </motion.div>
-                  </motion.div>
+                    {categoryArticles.length}{' '}
+                    {categoryArticles.length === 1
+                      ? 'článok'
+                      : categoryArticles.length < 5
+                      ? 'články'
+                      : 'článkov'}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    style={{ width: 5, height: 5, borderRadius: 999, background: 'rgba(230,201,138,.6)' }}
+                  />
+                  <span
+                    style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: 'var(--ch-meta)' }}
+                  >
+                    Preskúmajte všetky lokality nižšie
+                  </span>
                 </div>
               </div>
 
-              {/* Bottom decorative wave */}
-              <motion.div
-                className="absolute bottom-0 left-0 right-0 h-1"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 1, delay: 0.8 }}
+              {/* Scroll cue */}
+              <div
+                className="ch-cue"
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  bottom: 16,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 4,
+                  color: '#e6c98a',
+                }}
               >
-                <div className="h-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600" />
-              </motion.div>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 10,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Posúvajte nadol
+                </span>
+                <span className="ch-cue-arrow" style={{ fontSize: 16, lineHeight: 1 }}>⌄</span>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -370,10 +337,13 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
               style={{ gap: 26 }}
             >
-              {categoryArticles.map((article, idx) => (
-                <ScrollReveal key={article.id} delay={idx * 0.1}>
-                  <ArticleCard article={article} />
-                </ScrollReveal>
+              {/* Bez ScrollReveal zámerne: karty boli obalené v `<ScrollReveal delay={idx * 0.1}>`,
+                  takže sa odkrývali postupne pri scrollovaní a každá ďalšia mala o 100 ms väčšie
+                  oneskorenie — 20. dlaždica čakala 2 s, 40. štyri sekundy. Pri kategórii so 45
+                  článkami to pôsobilo, že sa stránka donekonečna načítava. Zoznam sa má dať
+                  prezerať naraz, nie sa odhaľovať. */}
+              {categoryArticles.map((article) => (
+                <ArticleCard key={article.id} article={article} />
               ))}
             </div>
           </div>
