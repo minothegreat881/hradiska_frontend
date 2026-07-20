@@ -4,8 +4,11 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ThumbsUp, Reply, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useMember } from '../auth/MemberAuth';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+
+const goTo = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
 interface Comment {
   id: string;
@@ -34,28 +37,8 @@ interface StrapiComment {
   createdAt: string;
 }
 
-const LIKED_STORAGE_KEY = 'hradiska:liked-comments';
-
-function getLikedSet(): Set<string> {
-  if (typeof window === 'undefined') return new Set();
-  try {
-    const raw = window.localStorage.getItem(LIKED_STORAGE_KEY);
-    if (!raw) return new Set();
-    const arr = JSON.parse(raw);
-    return new Set(Array.isArray(arr) ? arr : []);
-  } catch {
-    return new Set();
-  }
-}
-
-function saveLikedSet(set: Set<string>) {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(LIKED_STORAGE_KEY, JSON.stringify([...set]));
-  } catch {
-    // ignore quota / privacy errors
-  }
-}
+// Lajky sa už nedržia v localStorage — po prechode na účty ide každý lajk
+// cez kolekciu `reaction` (jeden na účet). Viď handleLike.
 
 const FALLBACK_COMMENTS: Comment[] = [];
 
@@ -64,7 +47,8 @@ interface CommentItemProps {
   depth?: number;
   onLike: (documentId: string) => void;
   onReply: (documentId: string, authorName: string) => void;
-  likedSet: Set<string>;
+  // Set aj Map majú .has() — prijmeme oboje (member likes sú Map).
+  likedSet: { has(k: string): boolean };
   replyingToDocId: string | null;
 }
 
@@ -312,13 +296,15 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ postDocumentId }: CommentSectionProps) {
+  const { member, token, isLoggedIn } = useMember();
+
   const [comments, setComments] = useState<Comment[]>(FALLBACK_COMMENTS);
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [likedSet, setLikedSet] = useState<Set<string>>(() => getLikedSet());
+  // documentId komentára → documentId reakcie (lajku prihláseného člena).
+  // Prítomnosť v mape = člen dal lajk. Nahrádza localStorage prístup.
+  const [myLikes, setMyLikes] = useState<Map<string, string>>(new Map());
   const [replyingTo, setReplyingTo] = useState<{ docId: string; author: string } | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
 
@@ -355,6 +341,26 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
     fetchComments();
   }, [fetchComments]);
 
+  // Načítaj, ktoré komentáre už prihlásený člen lajkol (z kolekcie reaction).
+  useEffect(() => {
+    if (!isLoggedIn || !member || !token) { setMyLikes(new Map()); return; }
+    let cancelled = false;
+    const url = new URL(`${STRAPI_URL}/api/reactions`);
+    url.searchParams.set('filters[user][id][$eq]', String(member.id));
+    url.searchParams.set('filters[targetType][$eq]', 'comment');
+    url.searchParams.set('pagination[pageSize]', '200');
+    fetch(url.toString(), { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(j => {
+        if (cancelled) return;
+        const m = new Map<string, string>();
+        (j.data || []).forEach((r: any) => m.set(r.targetId, r.documentId));
+        setMyLikes(m);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [isLoggedIn, member, token, postDocumentId]);
+
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '10px 14px',
@@ -369,49 +375,58 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
     boxSizing: 'border-box',
   };
 
-  const canSubmit = !!postDocumentId && !!name.trim() && !!newComment.trim() && !submitting;
+  const canSubmit = !!postDocumentId && isLoggedIn && !!newComment.trim() && !submitting;
 
+  // Lajky idú cez kolekciu `reaction` (jeden na účet). Len pre prihlásených.
   const handleLike = useCallback(
     async (commentDocId: string) => {
-      const wasLiked = likedSet.has(commentDocId);
-      const action = wasLiked ? 'unlike' : 'like';
+      if (!isLoggedIn || !token) {
+        toast.error('Lajkovať môžu len prihlásení. Prihláste sa.');
+        return;
+      }
+      const existingReaction = myLikes.get(commentDocId);
+      const wasLiked = !!existingReaction;
       const delta = wasLiked ? -1 : +1;
 
-      // Optimistic update — UI hneď reaguje, server response zafixuje finálnu hodnotu.
-      setLikedSet((prev) => {
-        const next = new Set(prev);
+      // Optimistický update — UI reaguje hneď.
+      setMyLikes(prev => {
+        const next = new Map(prev);
         if (wasLiked) next.delete(commentDocId);
-        else next.add(commentDocId);
-        saveLikedSet(next);
+        else next.set(commentDocId, 'pending');
         return next;
       });
-      setComments((prev) => bumpLikesInTree(prev, commentDocId, delta));
+      setComments(prev => bumpLikesInTree(prev, commentDocId, delta));
 
       try {
-        const res = await fetch(
-          `${STRAPI_URL}/api/blog-comments/${commentDocId}/${action}`,
-          { method: 'POST', headers: { 'ngrok-skip-browser-warning': 'true' } },
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        const serverLikes = json?.data?.likes;
-        if (typeof serverLikes === 'number') {
-          setComments((prev) => setLikesInTree(prev, commentDocId, serverLikes));
+        if (wasLiked) {
+          const res = await fetch(`${STRAPI_URL}/api/reactions/${existingReaction}`, {
+            method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        } else {
+          const res = await fetch(`${STRAPI_URL}/api/reactions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ data: { targetType: 'comment', targetId: commentDocId } }),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const json = await res.json();
+          const rid = json?.data?.documentId;
+          if (rid) setMyLikes(prev => new Map(prev).set(commentDocId, rid));
         }
-      } catch (e) {
-        // Rollback optimistic update
-        setLikedSet((prev) => {
-          const next = new Set(prev);
-          if (wasLiked) next.add(commentDocId);
+      } catch {
+        // Rollback
+        setMyLikes(prev => {
+          const next = new Map(prev);
+          if (wasLiked) next.set(commentDocId, existingReaction!);
           else next.delete(commentDocId);
-          saveLikedSet(next);
           return next;
         });
-        setComments((prev) => bumpLikesInTree(prev, commentDocId, -delta));
-        toast.error(wasLiked ? 'Nepodarilo sa zrušiť reakciu.' : 'Nepodarilo sa zaznamenať reakciu.');
+        setComments(prev => bumpLikesInTree(prev, commentDocId, -delta));
+        toast.error(wasLiked ? 'Nepodarilo sa zrušiť lajk.' : 'Nepodarilo sa zaznamenať lajk.');
       }
     },
-    [likedSet],
+    [isLoggedIn, token, myLikes],
   );
 
   const handleReply = useCallback((commentDocId: string, authorName: string) => {
@@ -425,19 +440,18 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   const handleCancelReply = useCallback(() => setReplyingTo(null), []);
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || !token) return;
     setSubmitting(true);
     try {
       const res = await fetch(`${STRAPI_URL}/api/blog-comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           data: {
-            authorName: name.trim(),
-            authorEmail: email.trim() || undefined,
             content: newComment.trim(),
             post: postDocumentId,
             inReplyTo: replyingTo?.docId,
+            // authorName/user nastaví server z prihláseného účtu.
           },
         }),
       });
@@ -445,19 +459,16 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
         const t = await res.text();
         throw new Error(`HTTP ${res.status}: ${t.slice(0, 200)}`);
       }
-      setName('');
-      setEmail('');
       setNewComment('');
       setReplyingTo(null);
-      toast.success(
-        'Komentár bol odoslaný. Po schválení administrátorom sa zobrazí v diskusii.',
-      );
-      // Komentár nepridávame do zoznamu — je v admin moderation queue, fetch vráti
-      // len schválené. Užívateľ vidí toast a formulár sa vyčistí.
+      toast.success('Komentár pridaný.');
+      // Komentár sa zobrazí HNEĎ (status=visible) — načítame zoznam nanovo,
+      // aby sa zaradil na správne miesto (aj ako odpoveď).
+      fetchComments();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error('[CommentSection] submit failed:', e);
-      toast.error(`Nepodarilo sa odoslať komentár: ${msg.slice(0, 120)}`);
+      toast.error(`Nepodarilo sa pridať komentár: ${msg.slice(0, 120)}`);
     } finally {
       setSubmitting(false);
     }
@@ -550,7 +561,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               comment={c}
               onLike={handleLike}
               onReply={handleReply}
-              likedSet={likedSet}
+              likedSet={myLikes}
               replyingToDocId={replyingTo?.docId || null}
             />
           ))
@@ -635,80 +646,73 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             Komentovanie tohto článku nie je momentálne dostupné.
           </p>
         )}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-            marginTop: 16,
-            opacity: postDocumentId ? 1 : 0.55,
-            pointerEvents: postDocumentId ? 'auto' : 'none',
-          }}
-        >
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Vaše meno *"
-            maxLength={100}
-            style={inputStyle}
-            disabled={submitting}
-          />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="E-mail (nezobrazí sa, slúži len adminovi)"
-            maxLength={150}
-            style={inputStyle}
-            disabled={submitting}
-          />
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Napíšte svoj komentár…"
-            rows={4}
-            maxLength={5000}
-            style={{ ...inputStyle, resize: 'vertical', fontFamily: 'Georgia, serif' }}
-            disabled={submitting}
-          />
-          <button
-            type="button"
-            disabled={!canSubmit}
-            onClick={handleSubmit}
+        {isLoggedIn ? (
+          <div
             style={{
-              alignSelf: 'flex-start',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 24px',
-              background: canSubmit ? '#a87437' : 'rgba(168,116,55,0.3)',
-              color: '#fffdf8',
-              border: 0,
-              borderRadius: 8,
-              fontFamily: 'Georgia, serif',
-              fontSize: 14,
-              fontWeight: 600,
-              letterSpacing: '0.05em',
-              cursor: canSubmit ? 'pointer' : 'not-allowed',
-              transition: 'background 0.2s',
+              display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16,
+              opacity: postDocumentId ? 1 : 0.55,
+              pointerEvents: postDocumentId ? 'auto' : 'none',
             }}
           >
-            {submitting && <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />}
-            {submitting ? 'Odosielam…' : 'Odoslať'}
-          </button>
-          <p
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
+              Píšete ako <strong style={{ color: '#5d3a14' }}>{member?.displayName || member?.username}</strong>
+            </div>
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Napíšte svoj komentár…"
+              rows={4}
+              maxLength={5000}
+              style={{ ...inputStyle, resize: 'vertical', fontFamily: 'Georgia, serif' }}
+              disabled={submitting}
+            />
+            <button
+              type="button"
+              disabled={!canSubmit}
+              onClick={handleSubmit}
+              style={{
+                alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '10px 24px', background: canSubmit ? '#a87437' : 'rgba(168,116,55,0.3)',
+                color: '#fffdf8', border: 0, borderRadius: 8, fontFamily: 'Georgia, serif',
+                fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
+                cursor: canSubmit ? 'pointer' : 'not-allowed', transition: 'background 0.2s',
+              }}
+            >
+              {submitting && <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />}
+              {submitting ? 'Pridávam…' : replyingTo ? 'Odpovedať' : 'Pridať komentár'}
+            </button>
+          </div>
+        ) : (
+          <div
             style={{
-              fontFamily: 'Georgia, serif',
-              fontSize: 12,
-              color: '#7a6b56',
-              fontStyle: 'italic',
-              margin: 0,
+              marginTop: 16, padding: '18px 20px', borderRadius: 10,
+              background: 'rgba(196,165,116,0.10)', border: '1px dashed rgba(196,165,116,0.5)',
+              textAlign: 'center', fontFamily: 'Georgia, serif',
             }}
           >
-            Komentár sa po odoslaní zobrazí až po schválení administrátorom.
-          </p>
-        </div>
+            <p style={{ margin: '0 0 12px', fontSize: 14.5, color: '#5d4a32' }}>
+              Do diskusie sa môžu zapojiť prihlásení členovia.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => goTo('/prihlasenie')}
+                style={{ padding: '9px 20px', borderRadius: 999, border: '1px solid #7c4a13',
+                  background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
+                  fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+              >
+                Prihlásiť sa
+              </button>
+              <button
+                onClick={() => goTo('/registracia')}
+                style={{ padding: '9px 20px', borderRadius: 999, border: '1px solid #d9c69a',
+                  background: 'transparent', color: '#9a5d1f', fontFamily: 'Georgia, serif',
+                  fontSize: 14, cursor: 'pointer' }}
+              >
+                Zaregistrovať sa
+              </button>
+            </div>
+          </div>
+        )}
       </motion.div>
     </section>
   );

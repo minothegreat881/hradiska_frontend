@@ -1,8 +1,32 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapPin, Moon, Sun } from 'lucide-react';
+import { MapPin, Moon, Sun, User, LogIn } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
+import { useMember } from '../auth/MemberAuth';
+
+/** Odkaz na účet v navigácii — prihlásenie alebo profil podľa stavu. */
+function AccountNavLink() {
+  const { isLoggedIn, member } = useMember();
+  const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
+  return (
+    <button
+      onClick={() => go(isLoggedIn ? '/profil' : '/prihlasenie')}
+      title={isLoggedIn ? 'Môj profil' : 'Prihlásiť sa'}
+      style={{
+        flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 7,
+        padding: '7px 14px', borderRadius: 999, cursor: 'pointer',
+        background: 'rgba(255,247,231,0.08)', border: '1px solid rgba(200,161,90,0.4)',
+        color: '#e8dcc8', fontFamily: 'Georgia, serif', fontSize: 13, whiteSpace: 'nowrap',
+      }}
+    >
+      {isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
+      <span className="hidden sm:inline">
+        {isLoggedIn ? (member?.displayName || member?.username || 'Účet') : 'Prihlásiť sa'}
+      </span>
+    </button>
+  );
+}
 
 /**
  * Dvojriadková horná lišta — varianta 2A „Dvojriadková lišta".
@@ -166,6 +190,9 @@ export function TwoTierNav({ items, darkMode, onToggleDark }: TwoTierNavProps) {
               <CategoryRow cats={secondary} openId={open} setOpen={setOpen} />
             </div>
           </div>
+
+          {/* Účet — prihlásenie alebo odkaz na profil */}
+          <AccountNavLink />
         </div>
 
         {/* ── Pull-tab „▾" ─────────────────────────────────────────────────── */}
