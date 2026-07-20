@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
-  BarChart3, LogOut, Search, ExternalLink,
+  BarChart3, LogOut, Search, ExternalLink, Users,
 } from 'lucide-react';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LoginScreen } from './screens/LoginScreen';
@@ -12,11 +12,12 @@ import { EditorScreen } from './screens/EditorScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { MediaScreen } from './screens/MediaScreen';
 import { CommentsScreen } from './screens/CommentsScreen';
+import { UsersScreen } from './screens/UsersScreen';
 import { StubScreen } from './screens/StubScreen';
 import { TOTALS } from './data';
 
 export type AdminRoute =
-  | 'articles' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'analytics';
+  | 'articles' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'users' | 'analytics';
 
 const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any; badge?: number }[] }[] = [
   {
@@ -33,6 +34,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
       { id: 'categories', label: 'Kategórie', icon: FolderTree, badge: 13 },
       { id: 'tags', label: 'Štítky', icon: Tag },
       { id: 'comments', label: 'Komentáre', icon: MessageSquare },
+      { id: 'users', label: 'Používatelia', icon: Users },
     ],
   },
   {
@@ -43,7 +45,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
 
 const ROUTE_LABELS: Record<AdminRoute, string> = {
   articles: 'Články', editor: 'Editor článku', media: 'Médiá',
-  categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', analytics: 'Analytika',
+  categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', users: 'Používatelia', analytics: 'Analytika',
 };
 
 export default function AdminApp() {
@@ -208,6 +210,7 @@ function AdminShell() {
           )}
           {route === 'tags' && <StubScreen title="Štítky" note="Polia: name*, slug*. Zobraziť počet použití." />}
           {route === 'comments' && <CommentsScreen />}
+          {route === 'users' && <UsersScreen />}
         </main>
       </div>
 
