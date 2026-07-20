@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { NavBar } from './components/NavBar';
 import { HomePage } from './pages/HomePage';
 import { SiteDetailPage } from './pages/SiteDetailPage';
@@ -14,7 +14,10 @@ import { Footer } from './components/Footer';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
 
-type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy';
+// Admin je lazy — návštevník webu ho nikdy nestiahne, nezväčšuje hlavný bundle.
+const AdminApp = lazy(() => import('./admin/AdminApp'));
+
+type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'admin';
 
 
 
@@ -37,6 +40,8 @@ function App() {
 
       if (path === '/' || path === '') {
         setRoute('home');
+      } else if (path === '/admin' || path.startsWith('/admin/')) {
+        setRoute('admin');
       } else if (path === '/mapa') {
         setRoute('mapa');
       } else if (path === '/aktuality' || path.startsWith('/aktuality/')) {
@@ -118,6 +123,21 @@ function App() {
       document.removeEventListener('click', handleClick);
     };
   }, []);
+
+  // Admin má vlastný shell — bez NavBaru, pätičky a Toasteru webu.
+  if (route === 'admin') {
+    return (
+      <Suspense
+        fallback={
+          <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f4efe3', color: '#8a795e', fontSize: 14 }}>
+            Načítavam administráciu…
+          </div>
+        }
+      >
+        <AdminApp />
+      </Suspense>
+    );
+  }
 
   return (
     <div className="min-h-screen">

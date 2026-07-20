@@ -1736,3 +1736,205 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   .site-footer .ft-grid { grid-template-columns: 1fr; }
   .site-footer .ft-bottom { justify-content: center; text-align: center; }
 }
+
+/* ============================================================================
+   ADMIN — svetlý pergamenový administračný systém.
+   Scopované pod `.admin`, aby sa nemiešalo s vizuálom webu.
+   ========================================================================== */
+.admin {
+  --ad-app: #f4efe3;
+  --ad-card: #fdfbf4;
+  --ad-surface: #faf5e8;
+  --ad-border: #e2d7bc;
+  --ad-line: #efe6d0;
+  --ad-field-border: #ddd0b2;
+
+  --ad-side-top: #332619;
+  --ad-side-bottom: #241a10;
+  --ad-side-line: #453520;
+  --ad-side-text: #b7a380;
+  --ad-side-active: #f0d493;
+  --ad-side-label: #7a6647;
+
+  --ad-amber: #9a5d1f;
+  --ad-amber-deep: #8a5316;
+  --ad-amber-mid: #b0813a;
+  --ad-amber-bright: #c8862f;
+
+  --ad-pub-fg: #3d5c40;
+  --ad-pub-bg: #e4ecdc;
+  --ad-pub-br: #c5d4b8;
+  --ad-draft-fg: #8a5316;
+  --ad-draft-bg: #f6ead0;
+  --ad-draft-br: #e0cb95;
+  --ad-danger: #a04338;
+
+  --ad-text: #2e2213;
+  --ad-panel-head: #5a4a32;
+  --ad-secondary: #7a6f5a;
+  --ad-secondary-2: #8a795e;
+  --ad-muted: #a89a7d;
+
+  --ad-blk-rich: #c8862f;
+  --ad-blk-image: #5c7a52;
+  --ad-blk-quote: #7c1f24;
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ad-text);
+  background: var(--ad-app);
+}
+
+.admin h1, .admin .ad-brand { font-family: var(--font-heading); }
+
+/* Polia */
+.admin .afld {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--ad-field-border);
+  border-radius: 9px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ad-text);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.admin .afld:focus {
+  border-color: var(--ad-amber);
+  box-shadow: 0 0 0 3px rgba(200,134,47,.15);
+}
+.admin .afld[aria-invalid='true'] { border-color: var(--ad-danger); }
+.admin .afld::placeholder { color: var(--ad-muted); }
+
+/* Tlačidlá */
+.admin .abtn {
+  display: inline-flex; align-items: center; gap: 7px;
+  border-radius: 9px; padding: 9px 15px;
+  font: inherit; font-size: 14px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--ad-field-border);
+  background: var(--ad-card); color: var(--ad-text);
+  transition: border-color .15s ease, filter .15s ease, background .15s ease;
+}
+.admin .abtn:hover:not(:disabled) { border-color: var(--ad-amber-mid); }
+.admin .abtn:disabled { opacity: .55; cursor: not-allowed; }
+.admin .abtn-primary {
+  background: linear-gradient(180deg, var(--ad-amber-mid), var(--ad-amber-deep));
+  color: #fff; border-color: var(--ad-amber-deep);
+}
+.admin .abtn-primary:hover:not(:disabled) { filter: brightness(1.07); }
+.admin .abtn-icon {
+  width: 30px; height: 30px; padding: 0;
+  justify-content: center; border-radius: 7px;
+}
+.admin .abtn-danger:hover { border-color: var(--ad-danger); color: var(--ad-danger); }
+
+/* Karty a chipy */
+.admin .acard {
+  background: var(--ad-card);
+  border: 1px solid var(--ad-border);
+  border-radius: 12px;
+}
+.admin .achip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 999px; padding: 3px 10px;
+  font-size: 12px; font-weight: 500;
+}
+.admin .achip-pub { color: var(--ad-pub-fg); background: var(--ad-pub-bg); border: 1px solid var(--ad-pub-br); }
+.admin .achip-draft { color: var(--ad-draft-fg); background: var(--ad-draft-bg); border: 1px solid var(--ad-draft-br); }
+.admin .achip-cat { background: #f1e8d2; color: var(--ad-panel-head); border: 1px solid var(--ad-line); }
+
+/* Sidebar */
+.admin .ad-nav {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; margin: 1px 8px;
+  border-radius: 8px; color: var(--ad-side-text);
+  font-size: 14px; text-decoration: none; cursor: pointer;
+  border: none; background: transparent; width: calc(100% - 16px);
+  text-align: left; transition: background .15s ease, color .15s ease;
+}
+.admin .ad-nav:hover { background: rgba(200,134,47,.10); color: var(--ad-side-active); }
+.admin .ad-nav[aria-current='page'] {
+  background: linear-gradient(90deg, rgba(200,134,47,.24), rgba(200,134,47,.08));
+  box-shadow: inset 3px 0 0 var(--ad-amber-bright);
+  color: var(--ad-side-active);
+}
+.admin .ad-nav-label {
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ad-side-label); padding: 16px 22px 6px;
+}
+.admin .ad-badge {
+  margin-left: auto; background: var(--ad-amber-bright); color: #1c1510;
+  border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600;
+}
+
+/* Tabuľka */
+.admin .atable { width: 100%; min-width: 980px; border-collapse: collapse; }
+.admin .atable th {
+  text-align: left; font-size: 12px; font-weight: 600; color: var(--ad-secondary);
+  padding: 12px 14px; border-bottom: 1px solid var(--ad-border); white-space: nowrap;
+}
+.admin .atable td {
+  padding: 11px 14px; border-bottom: 1px solid var(--ad-line); font-size: 14px;
+}
+.admin .atable tbody tr:hover { background: var(--ad-surface); }
+.admin .atable tbody tr:last-child td { border-bottom: none; }
+
+/* Panely v editore */
+.admin .apanel { border-bottom: 1px solid var(--ad-line); }
+.admin .apanel-head {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 13px 16px; background: transparent; border: none; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--ad-panel-head);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.admin .apanel-arrow { margin-left: auto; transition: transform .18s ease; }
+.admin .apanel-head[aria-expanded='true'] .apanel-arrow { transform: rotate(180deg); }
+.admin .apanel-body { padding: 0 16px 16px; }
+
+/* Bloky v editore */
+.admin .ablock {
+  background: var(--ad-card); border: 1px solid var(--ad-border);
+  border-left: 3px solid var(--ad-blk-rich);
+  border-radius: 12px; margin-bottom: 14px;
+}
+.admin .ablock-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-bottom: 1px solid var(--ad-line);
+}
+.admin .ablock-type {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ad-secondary);
+}
+.admin .ablock-grip { cursor: grab; color: var(--ad-muted); }
+
+/* Scrollbar */
+.admin ::-webkit-scrollbar { width: 10px; height: 10px; }
+.admin ::-webkit-scrollbar-thumb { background: #c8a15a; border-radius: 10px; border: 3px solid var(--ad-app); }
+.admin ::-webkit-scrollbar-track { background: transparent; }
+
+/* Editor rich-textu v admine (TipTap) */
+.admin .ad-rte .tiptap {
+  min-height: 170px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--ad-field-border);
+  border-radius: 9px;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ad-text);
+  outline: none;
+}
+.admin .ad-rte .tiptap:focus {
+  border-color: var(--ad-amber);
+  box-shadow: 0 0 0 3px rgba(200, 134, 47, .15);
+}
+.admin .ad-rte .tiptap p { margin: 0 0 0.8em; }
+.admin .ad-rte .tiptap p:last-child { margin-bottom: 0; }
+.admin .ad-rte .tiptap h2 { font-family: var(--font-heading); font-size: 22px; font-weight: 700; margin: 1em 0 .5em; }
+.admin .ad-rte .tiptap h3 { font-family: var(--font-heading); font-size: 19px; font-weight: 700; margin: 1em 0 .45em; }
+.admin .ad-rte .tiptap h4 { font-family: var(--font-heading); font-size: 17px; font-weight: 700; margin: 1em 0 .4em; }
+.admin .ad-rte .tiptap ul,
+.admin .ad-rte .tiptap ol { padding-left: 1.4em; margin: 0 0 .8em; }
+.admin .ad-rte .tiptap li { margin: .2em 0; }
+.admin .ad-rte .tiptap a { color: var(--ad-amber-deep); text-decoration: underline; }
