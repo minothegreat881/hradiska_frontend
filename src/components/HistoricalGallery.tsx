@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { PhotoDiscussion } from './PhotoDiscussion';
 
 export interface GalleryImage {
   url: string;
@@ -25,6 +26,8 @@ export interface GalleryImage {
   alt?: string;
   author?: string;
   source?: string;
+  /** id súboru v Strapi Media Library — na to sa viažu komentáre a lajky k fotke. */
+  fileId?: number;
 }
 
 interface HistoricalGalleryProps {
@@ -426,6 +429,13 @@ function Lightbox({
                 </div>
               )}
             </div>
+
+            {/* Lajky + komentáre k fotke (len ak má fileId zo Strapi) */}
+            {current.fileId != null && (
+              <div style={{ paddingTop: 14, borderTop: '1px solid rgba(196,165,116,0.3)' }}>
+                <PhotoDiscussion fileId={current.fileId} />
+              </div>
+            )}
           </div>
         </div>
       )}

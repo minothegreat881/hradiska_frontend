@@ -60,6 +60,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
           url: getStrapiImageUrl(img),
           caption: img.caption || img.alternativeText || '',
           alt: img.alternativeText || img.caption || '',
+          fileId: img.id, // pre komentáre a lajky k fotke
         })),
         quotes: strapiPost.quotes || [],
         blocks: strapiPost.blocks || [], // Dynamic zone blocks
