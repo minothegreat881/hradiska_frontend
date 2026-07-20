@@ -733,6 +733,15 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   -webkit-hyphens: none !important;
 }
 
+/* Zoznamy (napr. výpočty toponým) — justify + auto-hyphens by lámali krátke
+   vlastné mená ("Karpin" -> "Kar-pin"), navyše by vyzeralo divne s odrážkami. */
+.article-content ul,
+.article-content ul li {
+  text-align: left !important;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+}
+
 .article-content h2 {
   font-family: Georgia, serif !important;
   font-size: 26px !important;
@@ -1012,6 +1021,63 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   scrollbar-width: thin;
 }
 
+/* Aktuality nastenka (varianta 3B) – responsive card padding, featured grid,
+   masonry stlpce a vlastny scrollbar nastenky */
+.aktualita-card-outer {
+  padding: 24px 16px 28px;
+}
+@media (min-width: 640px) {
+  .aktualita-card-outer {
+    padding: 36px 34px 44px;
+  }
+}
+
+.aktualita-featured-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 46%) minmax(0, 1fr);
+}
+@media (max-width: 760px) {
+  .aktualita-featured-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aktualita-masonry-cols {
+  column-count: 2;
+  column-gap: 22px;
+}
+@media (max-width: 760px) {
+  .aktualita-masonry-cols {
+    column-count: 1;
+  }
+}
+
+.aktualita-masonry-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 44px -22px rgba(60, 40, 15, .55);
+}
+
+.aktualita-masonry-scroll {
+  scrollbar-color: #c8a15a #e6d7b0;
+  scrollbar-width: thin;
+}
+.aktualita-masonry-scroll::-webkit-scrollbar {
+  width: 11px;
+}
+.aktualita-masonry-scroll::-webkit-scrollbar-thumb {
+  background: #c8a15a;
+  border-radius: 11px;
+  border: 3px solid #f3ead6;
+}
+.aktualita-masonry-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9a5d1f;
+}
+.aktualita-masonry-scroll::-webkit-scrollbar-track {
+  background: #e6d7b0;
+  border-radius: 11px;
+  margin: 4px 0;
+}
+
 
 
 
@@ -1029,7 +1095,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Search dropdown 2B "S nahladmi" – pergamenova roletka vysledkov */
+/* Search dropdown 2B "S náhľadmi" – pergamenová roletka výsledkov */
 @keyframes lupaPulse {
   0%, 100% { transform: scale(1); }
   45% { transform: scale(1.14); }
@@ -1064,6 +1130,30 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .search-dropdown-scroll::-webkit-scrollbar-thumb {
   background: #c8a15a;
   border-radius: 9px;
+}
+
+/* Nav mega menu / mobile accordion dropdown scrollbar — vždy tmavohnedé pozadie
+   (dropdown má svoj vlastný tmavý motív nezávislý od .dark), zlatý thumb */
+.nav-dropdown-scroll {
+  scrollbar-color: #a87437 #2e2317;
+  scrollbar-width: thin;
+}
+.nav-dropdown-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.nav-dropdown-scroll::-webkit-scrollbar-track {
+  background: #2e2317;
+  border-radius: 8px;
+}
+.nav-dropdown-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #c4a574, #a87437);
+  border-radius: 8px;
+  border: 1px solid #2e2317;
+  background-clip: padding-box;
+}
+.nav-dropdown-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #e8c56e, #c4a574);
+  background-clip: padding-box;
 }
 
 /* Hide scrollbar utility */
@@ -1132,4 +1222,196 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
     flex-direction: column !important;
     gap: 1rem !important;
   }
+}
+
+/* =============================================================================
+ * TWO-TIER NAV (varianta 2A „Dvojriadková lišta")
+ * Druhý riadok kategórií je vždy v DOM; odhalí sa čistým CSS na :hover lišty.
+ * `data-expanded="true"` (JS) drží riadok otvorený aj bez hoveru — keď je
+ * otvorená roletka niektorej sekundárnej kategórie, alebo po tape na pull-tab
+ * (dotykové zariadenia, kde :hover neexistuje).
+ * ============================================================================= */
+
+/* Responzívne prepínanie desktop/mobil lišty.
+ * `lg:block` sa v tomto builde negeneruje (Tailwind ho v týchto súboroch
+ * nezachytí), preto zobrazenie riešime explicitným media query na marker
+ * triedach `.two-tier-nav` (desktop 2A lišta) a `.mobile-nav` (mobilná lišta). */
+.two-tier-nav { display: none; }
+.mobile-nav { display: block; }
+@media (min-width: 1024px) {
+  .two-tier-nav { display: block; }
+  .mobile-nav { display: none; }
+}
+
+/* Logo v lište: normálne malé, po rozbalení lišty (hover / pripnutý 2. riadok)
+ * sa zväčší spolu s celou lištou. Výška riadi flex výšku riadka, takže rastie
+ * aj lišta. */
+.nav-logo {
+  height: 46px;
+  /* Rast cez transform (nie height) → nereflowuje kategórie do strany.
+   * origin left center: rastie doprava do medzery (nezasahuje do kategórií). */
+  transform-origin: left center;
+  transition: transform 0.24s ease-out;
+}
+[data-tier]:hover .nav-logo,
+[data-tier][data-expanded="true"] .nav-logo {
+  transform: scale(1.55);
+}
+
+[data-sec] {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 1px solid transparent;
+  transform: translateY(-6px);
+  /* Jednoduchý „vysype sa nadol" efekt (ako roletka): fade + jemný sklz.
+   * Realistická max-height (nie 320) → rovnomerný, plynulý priebeh; opacity
+   * nesie vizuál, takže max-height nie je cítiť. */
+  transition: max-height 0.24s ease-out, opacity 0.2s ease-out,
+    transform 0.24s ease-out, margin-top 0.24s ease-out,
+    padding-top 0.24s ease-out;
+}
+[data-tier]:hover [data-sec],
+[data-tier][data-expanded="true"] [data-sec] {
+  max-height: 180px;
+  opacity: 1;
+  overflow: visible;
+  pointer-events: auto;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(200, 161, 90, 0.22);
+  transform: translateY(0);
+}
+
+/* Pull-tab „▾" — indikátor rozbaliteľnosti pod prvým riadkom */
+[data-tab] {
+  transition: transform 0.28s ease, opacity 0.2s ease;
+}
+[data-tier]:hover [data-tab],
+[data-tier][data-expanded="true"] [data-tab] {
+  transform: rotate(180deg);
+  opacity: 0.35;
+}
+[data-tier]:hover [data-tabwrap],
+[data-tier][data-expanded="true"] [data-tabwrap] {
+  opacity: 0.55;
+}
+
+/* Roletka (pergamenový dropdown so zoznamom lokalít) — vstupná animácia */
+@keyframes roletka {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Interný scroll roletky pri dlhých zoznamoch (pergamenová verzia) */
+.roletka-scroll {
+  scrollbar-color: #c8a15a #f6efdd;
+  scrollbar-width: thin;
+}
+.roletka-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.roletka-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.roletka-scroll::-webkit-scrollbar-thumb {
+  background: #d9c391;
+  border-radius: 8px;
+  border: 2px solid #f6efdd;
+  background-clip: padding-box;
+}
+.roletka-scroll::-webkit-scrollbar-thumb:hover {
+  background: #c8a15a;
+  background-clip: padding-box;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * KARTY „ČLÁNKY A ŠTÚDIE" — dizajnové tokeny + interakcie
+ * Zdroj: design_handoff_clanky. High-fidelity dlaždice článkov (ArticleCard)
+ * a hlavička sekcie na /category/:slug. Farby bez existujúceho tokenu sú tu
+ * ako CSS premenné (nie inline v komponente); zlatá #9a5d1f = --color-amber-600.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --clanky-title: #2e2213;              /* nadpis sekcie */
+  --clanky-subtitle: #8a795e;           /* podnadpis sekcie */
+  --gold-accent: var(--color-amber-600); /* #9a5d1f — predel/šípka/focus */
+  --gold-accent-light: #e6c98a;         /* svetlejší zlatý akcent */
+
+  --card-h: 420px;
+  --card-radius: 15px;
+  --card-border: #cdb98c;
+  --card-img-fallback: #3a2a1e;
+  --card-scrim: linear-gradient(
+    180deg,
+    rgba(20, 14, 8, 0) 34%,
+    rgba(20, 14, 8, 0.5) 58%,
+    rgba(14, 9, 5, 0.86) 82%,
+    rgba(12, 8, 4, 0.95) 100%
+  );
+  --card-chip-bg: rgba(122, 31, 36, 0.82);
+  --card-chip-border: rgba(200, 161, 90, 0.6);
+  --card-chip-text: #f4ead4;
+  --card-title: #fbf3e2;
+  --card-title-hover: #f0d493;
+  --card-excerpt: #d9cbb2;
+  --card-meta: #c3b28f;
+  --card-meta-line: rgba(230, 210, 170, 0.18);
+  --card-arrow: var(--gold-accent-light); /* #e6c98a */
+  --card-dot: #8a7550;
+}
+
+/* Karta = jeden odkaz; hover aj klávesový focus zdieľajú rovnaké správanie. */
+.article-card {
+  position: relative;
+  display: block;
+  height: var(--card-h);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  text-decoration: none;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 16px 40px -24px rgba(40, 26, 10, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.article-card:hover,
+.article-card:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px -26px rgba(40, 26, 10, 0.6);
+}
+.article-card:focus-visible {
+  outline: 2px solid var(--gold-accent);
+  outline-offset: 2px;
+}
+
+/* Fotka — vlastný element kvôli zoomu nezávisle od scrimu/textu. */
+.article-card [data-img] {
+  transition: transform 0.45s ease;
+}
+.article-card:hover [data-img],
+.article-card:focus-visible [data-img] {
+  transform: scale(1.06);
+}
+
+/* Nadpis zozlatne, šípka sa posunie. */
+.article-card [data-title] {
+  transition: color 0.2s ease;
+}
+.article-card:hover [data-title],
+.article-card:focus-visible [data-title] {
+  color: var(--card-title-hover);
+}
+.article-card [data-arrow] {
+  transition: transform 0.2s ease;
+}
+.article-card:hover [data-arrow],
+.article-card:focus-visible [data-arrow] {
+  transform: translateX(3px);
 }

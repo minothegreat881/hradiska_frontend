@@ -320,62 +320,56 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
 
           <div className="container relative">
             <ScrollReveal>
-              <div className="mb-10">
-                {/* Section title with ornaments */}
-                <div className="flex items-center gap-4 mb-2">
-                  <motion.div
-                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-600 to-orange-700 flex items-center justify-center shadow-lg relative overflow-hidden"
-                    whileHover={{ scale: 1.05, rotate: -5 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    {/* Shine effect */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                      animate={{ x: ['-100%', '100%'] }}
-                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, delay: 1 }}
-                    />
-                    <BookOpen className="w-6 h-6 text-amber-50 relative z-10" />
-                  </motion.div>
+              <div>
+                {/* Nadpis sekcie — bez ikony, Cinzel */}
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: 'var(--clanky-title)',
+                    fontSize: 38,
+                    fontWeight: 700,
+                    letterSpacing: '0.03em',
+                    margin: 0,
+                  }}
+                >
+                  Články a štúdie
+                </h2>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontStyle: 'italic',
+                    color: 'var(--clanky-subtitle)',
+                    fontSize: 19,
+                    margin: '6px 0 0',
+                  }}
+                >
+                  Odborné publikácie a výskum
+                </p>
 
-                  <div>
-                    <h2
-                      style={{
-                        fontFamily: 'Georgia, "Times New Roman", serif',
-                        color: 'var(--color-sepia-text, #2d2418)',
-                        fontSize: 26,
-                        fontWeight: 600,
-                        letterSpacing: '0.01em',
-                        margin: 0,
-                      }}
-                    >
-                      Články a štúdie
-                    </h2>
-                    <p
-                      style={{
-                        fontFamily: 'Georgia, "Times New Roman", serif',
-                        color: 'var(--color-sepia-secondary, #4a3f2f)',
-                        fontSize: 14,
-                        margin: 0,
-                        marginTop: 4,
-                      }}
-                    >
-                      Odborné publikácie a výskum
-                    </p>
-                  </div>
+                {/* Zlatý predel — plný segment + doznievajúca linka */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    margin: '20px 0 34px',
+                  }}
+                >
+                  <span style={{ width: 52, height: 2, background: 'var(--gold-accent)', flexShrink: 0 }} />
+                  <span
+                    style={{
+                      flex: 1,
+                      height: 1,
+                      background: 'linear-gradient(90deg, #d8c49a, transparent)',
+                    }}
+                  />
                 </div>
-
-                {/* Decorative underline */}
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className="h-0.5 bg-gradient-to-r from-amber-700 via-orange-500 to-transparent origin-left mt-4"
-                />
               </div>
             </ScrollReveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              style={{ gap: 26 }}
+            >
               {categoryArticles.map((article, idx) => (
                 <ScrollReveal key={article.id} delay={idx * 0.1}>
                   <ArticleCard article={article} />

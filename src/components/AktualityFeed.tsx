@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useId, useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner@2.0.3';
 import {
@@ -23,13 +23,13 @@ const GOLD_SOFT = '#a87437';
 // ============================================================================
 // Typy aktivity – TLMENÉ pastelové chipy (svetlý podklad + tmavý text rovnakého odtieňa)
 // ============================================================================
-const TYP_META: Record<AktualitaTyp, { label: string; bg: string; fg: string }> = {
-  brigada:        { label: 'Brigáda',          bg: '#E5EFE8', fg: '#2E5C42' },
-  nova_tabula:    { label: 'Tabuľa',           bg: '#F4E5E8', fg: '#8A3548' },
-  socha_pamatnik: { label: 'Pamätník',         bg: '#ECE6F4', fg: '#5A3B86' },
-  podujatie:      { label: 'Podujatie',        bg: '#FAEFD9', fg: '#8C5810' },
-  vyskum:         { label: 'Výskum',           bg: '#E2EEF2', fg: '#2C6680' },
-  ine:            { label: 'Iné',              bg: '#EFEAE0', fg: '#5D4E37' },
+const TYP_META: Record<AktualitaTyp, { label: string; bg: string; fg: string; border: string }> = {
+  brigada:        { label: 'Brigáda',          bg: '#E5EFE8', fg: '#2E5C42', border: '#C8DBCB' },
+  nova_tabula:    { label: 'Tabuľa',           bg: '#F4E5E8', fg: '#8A3548', border: '#E3C4CB' },
+  socha_pamatnik: { label: 'Pamätník',         bg: '#ECE6F4', fg: '#5A3B86', border: '#D6C9E8' },
+  podujatie:      { label: 'Podujatie',        bg: '#FAEFD9', fg: '#8C5810', border: '#E8D2A0' },
+  vyskum:         { label: 'Výskum',           bg: '#E2EEF2', fg: '#2C6680', border: '#C3D8E0' },
+  ine:            { label: 'Iné',              bg: '#EFEAE0', fg: '#5D4E37', border: '#DCD2BF' },
 };
 
 const FILTERS: { id: AktualitaTyp | 'all'; label: string }[] = [
@@ -45,12 +45,6 @@ function formatSkDate(iso: string): string {
   const d = new Date(iso);
   const months = ['januára', 'februára', 'marca', 'apríla', 'mája', 'júna', 'júla', 'augusta', 'septembra', 'októbra', 'novembra', 'decembra'];
   return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-// Mesačný oddeľovač – mesiac v nominatíve, prvé veľké
-const MONTHS_NOM = ['Január', 'Február', 'Marec', 'Apríl', 'Máj', 'Jún', 'Júl', 'August', 'September', 'Október', 'November', 'December'];
-function formatMonthLabel(d: Date): string {
-  return `${MONTHS_NOM[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 // Relatívny dátum – iba ak je príspevok do 14 dní späť
@@ -436,6 +430,280 @@ function focusHradisko(name: string) {
 }
 
 // ============================================================================
+// CeramicDivider – slovanská keramická vlnovka (SVG pattern), zdieľateľná
+// ============================================================================
+export function CeramicDivider({ color = '#b39a72', maxWidth = 540 }: { color?: string; maxWidth?: number }) {
+  const uid = useId();
+  const patternId = `ceramic-wave-${uid}`;
+  return (
+    <div style={{ margin: '12px auto 22px', width: '100%', maxWidth, opacity: 0.9 }} aria-hidden="true">
+      <svg width="100%" height="30" preserveAspectRatio="none" style={{ display: 'block' }}>
+        <defs>
+          <pattern id={patternId} width="46" height="30" patternUnits="userSpaceOnUse">
+            <path d="M0 8 Q11.5 1 23 8 T46 8" fill="none" stroke={color} strokeWidth="1.5" />
+            <path d="M0 15 Q11.5 8 23 15 T46 15" fill="none" stroke={color} strokeWidth="1.5" />
+            <circle cx="7.5" cy="24" r="1.5" fill={color} />
+            <circle cx="19" cy="24" r="1.5" fill={color} />
+            <circle cx="30.5" cy="24" r="1.5" fill={color} />
+            <circle cx="42" cy="24" r="1.5" fill={color} />
+          </pattern>
+        </defs>
+        <rect width="100%" height="30" fill={`url(#${patternId})`} />
+      </svg>
+    </div>
+  );
+}
+
+// ============================================================================
+// Vignette – tmavý spodný prechod + voliteľný geotag, nad reálnym <img> (nie
+// CSS box-shadow ako v mocku – ten by sa vykreslil pod img elementom).
+// ============================================================================
+function vignetteOverlay(place: string | undefined, strength: 'strong' | 'soft') {
+  const gradient = strength === 'strong'
+    ? 'linear-gradient(to top, rgba(18,13,8,.62) 0%, rgba(18,13,8,.25) 40%, transparent 65%)'
+    : 'linear-gradient(to top, rgba(18,13,8,.55) 0%, rgba(18,13,8,.18) 38%, transparent 62%)';
+  return (
+    <>
+      <div className="absolute inset-0" style={{ background: gradient, pointerEvents: 'none' }} />
+      {place && (
+        <span
+          className="absolute left-3 bottom-3"
+          style={{
+            fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#f4ead4',
+            background: 'rgba(28,21,16,.55)', borderRadius: 6, padding: '4px 9px',
+            pointerEvents: 'none',
+          }}
+        >
+          ◍ {place}
+        </span>
+      )}
+    </>
+  );
+}
+
+// Typový chip (Cinzel, farebný bod) – zdieľané medzi featured a masonry kartou
+function TypeChip({ typ }: { typ: AktualitaTyp }) {
+  const t = TYP_META[typ] ?? TYP_META.ine;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 whitespace-nowrap"
+      style={{
+        fontFamily: 'var(--font-heading)', fontSize: 10, letterSpacing: '.09em', textTransform: 'uppercase',
+        color: t.fg, background: t.bg, border: `1px solid ${t.border}`, borderRadius: 999, padding: '4px 10px',
+      }}
+    >
+      <span style={{ width: 6, height: 6, borderRadius: 999, background: t.fg, flexShrink: 0 }} />
+      {t.label}
+    </span>
+  );
+}
+
+// ============================================================================
+// FeaturedPost – široká pripnutá karta hore (varianta 3B)
+// ============================================================================
+function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLightbox: (start: number) => void }) {
+  const fotky = item.fotky ?? [];
+  const hradisko = item.hradiskoSlug ? hradiskaData.find(h => h.name === item.hradiskoSlug) : null;
+  const [expanded, setExpanded] = useState(false);
+  const TEXT_LIMIT = 320;
+  const text = item.obsah || '';
+  const isLong = text.length > TEXT_LIMIT;
+  const visibleText = expanded || !isLong ? text : text.slice(0, TEXT_LIMIT).trimEnd() + '…';
+
+  return (
+    <article
+      className="aktualita-featured-grid"
+      style={{
+        background: '#fbf6ea', border: '1px solid #e3d4ad', borderRadius: 16, overflow: 'hidden',
+        boxShadow: '0 16px 42px -24px rgba(60,40,15,.55)', marginBottom: 26,
+      }}
+    >
+      <div className="relative" style={{ minHeight: 260 }}>
+        {fotky.length > 0 ? (
+          <PhotoTile img={fotky[0]} idx={0} style={{ width: '100%', height: '100%', minHeight: 260 }} onOpen={onOpenLightbox} />
+        ) : (
+          <PhotoPlaceholder className="absolute inset-0" />
+        )}
+        <span
+          className="absolute pointer-events-none"
+          style={{
+            top: 14, left: 14, display: 'flex', alignItems: 'center', gap: 7,
+            background: 'rgba(28,21,16,.72)', color: '#e9c877', fontFamily: 'var(--font-heading)',
+            fontSize: 10, letterSpacing: '.1em', padding: '6px 11px', borderRadius: 999,
+          }}
+        >
+          <span style={{ color: '#c8862f' }}>◆</span>PRIPNUTÉ
+        </span>
+        {fotky.length > 0 && (
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(18,13,8,.68) 0%, rgba(18,13,8,.2) 46%, transparent 70%)' }} />
+        )}
+        {hradisko && (
+          <span
+            className="absolute pointer-events-none"
+            style={{
+              left: 14, bottom: 14, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#f4ead4',
+              background: 'rgba(28,21,16,.55)', borderRadius: 6, padding: '4px 9px',
+            }}
+          >
+            ◍ {hradisko.name}
+          </span>
+        )}
+      </div>
+
+      <div style={{ padding: '22px 24px' }}>
+        <div className="flex items-center gap-3 mb-3">
+          <div
+            className="flex-shrink-0 flex items-center justify-center rounded-full"
+            style={{ width: 38, height: 38, background: '#f0e6d1', border: '1px solid rgba(125,79,29,0.25)' }}
+            aria-hidden="true"
+          >
+            <Shield className="w-4.5 h-4.5" style={{ color: GOLD }} />
+          </div>
+          <div className="min-w-0">
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#2e2213' }}>Slovanské hradiská</div>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e' }}>
+              {formatSkDate(item.datum)}{hradisko ? ` · ${hradisko.name}` : ''}
+            </div>
+          </div>
+          <div className="flex-1" />
+          <TypeChip typ={item.typAktivity} />
+        </div>
+
+        <h3 style={{ margin: '0 0 10px', fontFamily: 'var(--font-serif)', fontSize: 27, fontWeight: 700, color: '#2e2213', lineHeight: 1.12 }}>
+          {item.nazov}
+        </h3>
+        {text && (
+          <p style={{ margin: '0 0 18px', fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.5, color: '#4a3f2e', whiteSpace: 'pre-line' }}>
+            {visibleText}
+          </p>
+        )}
+
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {isLong && (
+            <button
+              onClick={() => setExpanded(e => !e)}
+              style={{
+                fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.05em', color: '#fbf6ea',
+                background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', border: 'none', borderRadius: 999,
+                padding: '9px 16px', cursor: 'pointer',
+              }}
+            >
+              {expanded ? 'Zobraziť menej' : 'Čítať celé →'}
+            </button>
+          )}
+          {hradisko && (
+            <button
+              onClick={() => focusHradisko(hradisko.name)}
+              style={{
+                fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.04em', color: '#9a5d1f',
+                background: 'transparent', border: '1px solid #d9c69a', borderRadius: 999, padding: '9px 14px', cursor: 'pointer',
+              }}
+            >
+              Na mape
+            </button>
+          )}
+          <div className="flex-1" />
+          {fotky.length > 0 && (
+            <button
+              onClick={() => onOpenLightbox(0)}
+              style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: '#8a795e', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Galéria ({fotky.length})
+            </button>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+
+// ============================================================================
+// MasonryPost – kompaktná karta v 2-stĺpcovej nástenke (varianta 3B)
+// ============================================================================
+function MasonryPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLightbox: (fotky: StrapiImage[], start: number) => void }) {
+  const fotky = item.fotky ?? [];
+  const hradisko = item.hradiskoSlug ? hradiskaData.find(h => h.name === item.hradiskoSlug) : null;
+  const [expanded, setExpanded] = useState(false);
+  const [hoverMap, setHoverMap] = useState(false);
+  const open = (start: number) => onOpenLightbox(fotky, start);
+
+  return (
+    <article
+      className="aktualita-masonry-card"
+      style={{
+        display: 'inline-block', width: '100%', background: '#fbf6ea', border: '1px solid #e3d4ad',
+        borderRadius: 14, boxShadow: '0 12px 32px -22px rgba(60,40,15,.5)', overflow: 'hidden',
+        marginBottom: 22, breakInside: 'avoid', transition: 'transform .18s, box-shadow .18s',
+      }}
+    >
+      {fotky.length === 1 && (
+        <PhotoTile img={fotky[0]} idx={0} style={{ width: '100%', height: 210 }} onOpen={open} overlay={vignetteOverlay(hradisko?.name, 'strong')} />
+      )}
+      {fotky.length === 2 && (
+        <div className="grid grid-cols-2" style={{ gap: 4 }}>
+          {fotky.map((f, i) => (
+            <PhotoTile key={f.id} img={f} idx={i} style={{ width: '100%', height: 170 }} onOpen={open} overlay={vignetteOverlay(undefined, 'soft')} />
+          ))}
+        </div>
+      )}
+      {fotky.length >= 3 && (
+        <PhotoGrid fotky={fotky} onOpenLightbox={(start) => open(start)} />
+      )}
+
+      <div style={{ padding: '15px 17px 3px' }}>
+        <div className="flex items-center gap-2 mb-2">
+          <TypeChip typ={item.typAktivity} />
+          <div className="flex-1" />
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e' }}>{formatSkDate(item.datum)}</span>
+        </div>
+        <h3 style={{ margin: '0 0 7px', fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 700, color: '#2e2213', lineHeight: 1.15 }}>
+          {item.nazov}
+        </h3>
+        {item.obsah && (
+          <p
+            style={{
+              margin: 0, fontFamily: 'var(--font-serif)', fontSize: 16, lineHeight: 1.5, color: '#4a3f2e', whiteSpace: 'pre-line',
+              ...(expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }),
+            }}
+          >
+            {item.obsah}
+          </p>
+        )}
+        <button
+          onClick={() => setExpanded(e => !e)}
+          style={{ background: 'none', border: 'none', padding: '4px 0 12px', color: '#9a5d1f', fontFamily: 'var(--font-serif)', fontSize: 16, cursor: 'pointer' }}
+        >
+          {expanded ? 'Zobraziť menej' : 'Zobraziť viac'}
+        </button>
+      </div>
+
+      <div
+        className="flex items-center gap-2"
+        style={{ padding: '10px 17px', borderTop: '1px solid #ece0c2', background: '#f7efdb' }}
+      >
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 600, color: '#2e2213' }}>
+          {hradisko?.name ?? item.hradiskoSlug ?? '—'}
+        </span>
+        <div className="flex-1" />
+        {hradisko && (
+          <button
+            onClick={() => focusHradisko(hradisko.name)}
+            onMouseEnter={() => setHoverMap(true)}
+            onMouseLeave={() => setHoverMap(false)}
+            style={{
+              fontFamily: 'var(--font-heading)', fontSize: 10, letterSpacing: '.04em',
+              color: hoverMap ? '#c8862f' : '#9a5d1f', background: 'none', border: 'none', cursor: 'pointer',
+            }}
+          >
+            Na mape →
+          </button>
+        )}
+      </div>
+    </article>
+  );
+}
+
+// ============================================================================
 // AktualitaCard – FB-style single column post
 // ============================================================================
 export function AktualitaCard({ item }: { item: StrapiAktualita }) {
@@ -688,66 +956,22 @@ function AktualitaSkeleton() {
 }
 
 // ============================================================================
-// AktualityFeed – jeden vertikálny stĺpec, max-w 600 px, krémové pozadie
+// AktualityFeed – nástenka (masonry), varianta 3B: featured hore, chipy,
+// 2-stĺpcová nástenka s vlastným scrollom
 // ============================================================================
-// MonthDivider – kronikový mesačný oddeľovač medzi kartami
-function MonthDivider({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 py-2" aria-hidden="true">
-      <div className="flex-1 h-px" style={{ background: 'rgba(196,165,116,0.4)' }} />
-      <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: '#a87437', fontWeight: 500, letterSpacing: '0.02em' }}>
-        {label}
-      </span>
-      <div className="flex-1 h-px" style={{ background: 'rgba(196,165,116,0.4)' }} />
-    </div>
-  );
-}
-
-// Rendering pripnutých (bez mesačnej skupiny) + zvyšok s mesačnými oddeľovačmi
-function renderTimeline(items: StrapiAktualita[]): React.ReactNode {
-  const nodes: React.ReactNode[] = [];
-  const pinned = items.filter(it => it.zvyraznene);
-  const regular = items.filter(it => !it.zvyraznene);
-
-  pinned.forEach(it => nodes.push(<AktualitaCard key={it.documentId} item={it} />));
-
-  let lastMonth: string | null = null;
-  regular.forEach(it => {
-    const d = new Date(it.datum);
-    const monthKey = `${d.getFullYear()}-${d.getMonth()}`;
-    if (monthKey !== lastMonth) {
-      nodes.push(<MonthDivider key={`month-${monthKey}`} label={formatMonthLabel(d)} />);
-      lastMonth = monthKey;
-    }
-    nodes.push(<AktualitaCard key={it.documentId} item={it} />);
-  });
-
-  return nodes;
-}
-
 export interface AktualityFeedProps {
   initialPageSize?: number;
   showHeader?: boolean;
 }
 
-export default function AktualityFeed({ initialPageSize = 4, showHeader = true }: AktualityFeedProps) {
+export default function AktualityFeed({ initialPageSize = 20, showHeader = true }: AktualityFeedProps) {
   const [items, setItems] = useState<StrapiAktualita[]>([]);
   const [state, setState] = useState<'loading' | 'ok' | 'empty' | 'error'>('loading');
   const [activeFilter, setActiveFilter] = useState<AktualitaTyp | 'all'>('all');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-
-  // JS-driven viewport check (Tailwind responsive triedy zlyhávajú za istých okolností)
-  const [viewportWidth, setViewportWidth] = useState<number>(0);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const update = () => setViewportWidth(window.innerWidth);
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-  const showOrnaments = viewportWidth >= 1280;
+  const [lightbox, setLightbox] = useState<{ open: boolean; images: StrapiImage[]; start: number }>({ open: false, images: [], start: 0 });
 
   useEffect(() => {
     let cancelled = false;
@@ -783,155 +1007,132 @@ export default function AktualityFeed({ initialPageSize = 4, showHeader = true }
     }
   };
 
-  const filtered = useMemo(() => {
-    if (activeFilter === 'all') return items;
-    return items.filter(it => it.typAktivity === activeFilter);
-  }, [items, activeFilter]);
+  // Featured (pripnutý) príspevok sa filtrom neriadi a nikdy sa neopakuje v nástenke.
+  const featuredItem = useMemo(() => items.find(it => it.zvyraznene) ?? null, [items]);
+  const masonryItems = useMemo(() => {
+    const base = activeFilter === 'all' ? items : items.filter(it => it.typAktivity === activeFilter);
+    return base.filter(it => it.documentId !== featuredItem?.documentId);
+  }, [items, activeFilter, featuredItem]);
 
   if (state === 'error') return null;
 
   return (
-    <section
-      className="relative"
-      style={{
-        backgroundColor: '#f7f1e3', // krémový pergament – konzistentne s palettou stránky
-        paddingTop: 56,
-        paddingBottom: 64,
-        zIndex: 20,
-        overflowX: 'clip', // zabraňuje horizontálnemu scrollu ale nepoškodzuje sticky/absolute children
-      }}
-    >
-      {/* DEKORATÍVNE ORNAMENTY – JS-driven render, viewport>=1024 px.
-          PERF: <picture> načíta WebP (~70 KB, 1400px) namiesto pôvodného PNG (5.6 MB, 2304px).
-          PNG ostáva ako fallback pre prehliadače bez WebP podpory + ako záloha pri obnove. */}
-      {showOrnaments && (
-        <>
-          {/* Ľavý ornament – clip-path orezáva dekoratívny rámik z PNG */}
-          <picture>
-            <source srcSet="/ornament-keramika.webp" type="image/webp" />
-            <img
-              src="/ornament-keramika.png"
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-              decoding="async"
-              style={{
-                position: 'absolute',
-                left: 'calc((50% - 300px - 420px) / 2)',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 420,
-                height: 'auto',
-                opacity: 0.5,
-                zIndex: 1,
-                pointerEvents: 'none',
-                // Orezanie rámika: vrchný 8%, pravý 6%, spodný 12%, ľavý 6%
-                clipPath: 'inset(8% 6% 12% 6%)',
-              }}
-            />
-          </picture>
-          <picture>
-            <source srcSet="/ornament-keramika.webp" type="image/webp" />
-            <img
-              src="/ornament-keramika.png"
-              alt=""
-              aria-hidden="true"
-              loading="lazy"
-              decoding="async"
-              style={{
-                position: 'absolute',
-                right: 'calc((50% - 300px - 420px) / 2)',
-                top: '50%',
-                transform: 'translateY(-50%) scaleX(-1)',
-                width: 420,
-                height: 'auto',
-                opacity: 0.5,
-                zIndex: 1,
-                pointerEvents: 'none',
-                clipPath: 'inset(8% 6% 12% 6%)',
-              }}
-            />
-          </picture>
-        </>
-      )}
-
-      {/* JEDEN vertikálny stĺpec max 600px, vycentrovaný */}
-      <div className="relative mx-auto px-4" style={{ maxWidth: 600 }}>
+    <section className="relative" style={{ padding: '48px 16px 64px' }}>
+      <div
+        className="relative mx-auto aktualita-card-outer"
+        style={{
+          maxWidth: 1200,
+          background: '#f3ead6',
+          border: '1px solid #ddcba0',
+          borderRadius: 18,
+          boxShadow: '0 26px 64px -30px rgba(60,40,15,.5)',
+        }}
+      >
         {showHeader && (
-          <header className="mb-6 text-center">
+          <header className="text-center">
             <div className="flex items-center justify-center gap-2 mb-3 opacity-60" aria-hidden="true">
               <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, transparent, #c4a574)' }} />
               <span style={{ color: '#c4a574', fontSize: 12, lineHeight: 1 }}>⚜</span>
               <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, #c4a574, transparent)' }} />
             </div>
-            <h2
-              className="font-semibold tracking-wide"
-              style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(22px, 3vw, 28px)', color: '#2d1810', letterSpacing: '0.03em' }}
-            >
+            <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 38px)', fontWeight: 700, color: '#2e2213' }}>
               Aktuality zo života združenia
             </h2>
-            <p className="mt-2 text-sm" style={{ color: '#7a6b56', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+            <p style={{ margin: '6px 0 0', fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 19, color: '#8a795e' }}>
               Kronika brigád, podujatí a obnov pamiatok
             </p>
+            <CeramicDivider />
           </header>
         )}
 
-        {/* OBSAH FEEDU – vertikálny stĺpec, karty pod sebou s 16px medzerou */}
         {state === 'loading' && (
-          <div className="flex flex-col gap-4">
-            {Array.from({ length: 3 }).map((_, i) => <AktualitaSkeleton key={i} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 22 }}>
+            {Array.from({ length: 4 }).map((_, i) => <AktualitaSkeleton key={i} />)}
           </div>
         )}
 
         {state === 'empty' && (
-          <p className="text-center py-10" style={{ color: '#7a6b56', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+          <p className="text-center py-10" style={{ color: '#8a795e', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
             Zatiaľ tu nie sú žiadne príspevky. Hneď ako vyrazíme do terénu, dáme vedieť ✦
           </p>
         )}
 
-        {state === 'ok' && filtered.length === 0 && (
-          <p className="text-center py-10" style={{ color: '#7a6b56', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-            V tejto kategórii zatiaľ nie sú žiadne príspevky.
-          </p>
-        )}
+        {state === 'ok' && (
+          <>
+            {featuredItem && (
+              <FeaturedPost
+                item={featuredItem}
+                onOpenLightbox={(start) => setLightbox({ open: true, images: featuredItem.fotky ?? [], start })}
+              />
+            )}
 
-        {state === 'ok' && filtered.length > 0 && (
-          <div
-            className="aktuality-list space-y-4"
-            style={{
-              display: 'block',
-              height: 'min(820px, 78vh)',
-              overflowY: 'scroll',
-              paddingTop: 4,
-              paddingRight: 8,
-              paddingBottom: 4,
-              scrollbarGutter: 'stable',
-            }}
-          >
-            {renderTimeline(filtered)}
-          </div>
-        )}
+            <div className="flex flex-wrap items-center justify-center gap-2" style={{ marginBottom: 22 }}>
+              {FILTERS.map((f) => {
+                const active = activeFilter === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setActiveFilter(f.id)}
+                    style={{
+                      fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.04em',
+                      padding: '8px 16px', borderRadius: 999, cursor: 'pointer', transition: 'all .15s',
+                      ...(active
+                        ? { background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', color: '#fbf6ea', border: '1px solid #9a5d1f' }
+                        : { background: '#f6efdd', color: '#5a4a32', border: '1px solid #d9c69a' }),
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* STARŠIE AKTUALITY */}
-        {state === 'ok' && hasMore && activeFilter === 'all' && (
-          <div className="text-center mt-6">
-            <button
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium hover:brightness-110 disabled:opacity-60"
-              style={{
-                background: '#fffdf8',
-                color: '#5d4e37',
-                border: '1px solid rgba(125,79,29,0.3)',
-                fontFamily: 'Georgia, serif',
-                transition: 'background 150ms ease',
-              }}
-            >
-              {loadingMore ? 'Načítavam…' : 'Staršie aktuality'}
-            </button>
-          </div>
+            {masonryItems.length === 0 ? (
+              <p className="text-center py-10" style={{ color: '#8a795e', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+                V tejto kategórii zatiaľ nie sú žiadne príspevky.
+              </p>
+            ) : (
+              <div className="aktualita-masonry-scroll" style={{ height: 560, overflowY: 'auto', paddingRight: 10 }}>
+                <div className="aktualita-masonry-cols">
+                  {masonryItems.map((item) => (
+                    <MasonryPost
+                      key={item.documentId}
+                      item={item}
+                      onOpenLightbox={(images, start) => setLightbox({ open: true, images, start })}
+                    />
+                  ))}
+                </div>
+                {hasMore && activeFilter === 'all' && (
+                  <div className="text-center" style={{ paddingTop: 4, paddingBottom: 14 }}>
+                    <button
+                      onClick={loadMore}
+                      disabled={loadingMore}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium hover:brightness-110 disabled:opacity-60"
+                      style={{
+                        background: '#fbf6ea',
+                        color: '#5d4e37',
+                        border: '1px solid #d9c69a',
+                        fontFamily: 'var(--font-serif)',
+                        transition: 'background 150ms ease',
+                      }}
+                    >
+                      {loadingMore ? 'Načítavam…' : 'Načítať staršie'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
+
+      <AnimatePresence>
+        {lightbox.open && lightbox.images.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <Lightbox images={lightbox.images} startIndex={lightbox.start} onClose={() => setLightbox((s) => ({ ...s, open: false }))} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

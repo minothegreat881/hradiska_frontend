@@ -1,15 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import {
   ChevronLeft,
   ChevronRight,
   X,
-  Heart,
-  MessageCircle,
   Share2,
-  Send,
   Maximize2,
   Minimize2,
   Facebook,
@@ -35,42 +32,6 @@ interface HistoricalGalleryProps {
   title?: string;
 }
 
-interface MockComment {
-  id: string;
-  author: string;
-  text: string;
-  timestamp: string;
-  likes: number;
-}
-
-const SEED_COMMENTS: Record<number, MockComment[]> = {
-  0: [
-    {
-      id: 'c1',
-      author: 'Martin Kováč',
-      text: 'Krásny záber! Tieto valy sú impozantné aj po tisícke rokov.',
-      timestamp: 'pred 2 hodinami',
-      likes: 4,
-    },
-    {
-      id: 'c2',
-      author: 'Jana Nováková',
-      text: 'Vďaka za zdieľanie, plánujem návštevu na jar.',
-      timestamp: 'pred 5 hodinami',
-      likes: 1,
-    },
-  ],
-  1: [
-    {
-      id: 'c3',
-      author: 'Peter Horváth',
-      text: 'Vidieť stratigrafiu je vždy zážitok.',
-      timestamp: 'pred 1 dňom',
-      likes: 2,
-    },
-  ],
-};
-
 // =============================================================================
 // LIGHTBOX — Facebook-style: image stage + info panel s likes/komentármi/share
 // =============================================================================
@@ -90,11 +51,6 @@ function Lightbox({
 }) {
   const [fullscreen, setFullscreen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [likedSet, setLikedSet] = useState<Set<number>>(new Set());
-  const [likesCount, setLikesCount] = useState<Record<number, number>>({});
-  const [commentsByIndex, setCommentsByIndex] = useState<Record<number, MockComment[]>>(SEED_COMMENTS);
-  const [commentDraft, setCommentDraft] = useState('');
-  const commentInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Keyboard navigation + scroll-lock bez reflowu gridu
   useEffect(() => {
@@ -142,52 +98,13 @@ function Lightbox({
     preload(index - 1);
   }, [index, images]);
 
-  // Pri zmene fotky zatvor share popup a vyčisti draft input
+  // Pri zmene fotky zatvor share popup
   useEffect(() => {
     setShareOpen(false);
-    setCommentDraft('');
   }, [index]);
 
   const current = images[index];
   if (!current) return null;
-
-  const isLiked = likedSet.has(index);
-  const baseLikes = likesCount[index] ?? 12;
-  const comments = commentsByIndex[index] ?? [];
-
-  const toggleLike = () => {
-    setLikedSet((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
-    setLikesCount((prev) => ({
-      ...prev,
-      [index]: (prev[index] ?? 12) + (isLiked ? -1 : 1),
-    }));
-  };
-
-  const submitComment = () => {
-    const text = commentDraft.trim();
-    if (!text) return;
-    const newComment: MockComment = {
-      id: `c-${Date.now()}`,
-      author: 'Vy',
-      text,
-      timestamp: 'práve teraz',
-      likes: 0,
-    };
-    setCommentsByIndex((prev) => ({
-      ...prev,
-      [index]: [...(prev[index] ?? []), newComment],
-    }));
-    setCommentDraft('');
-  };
-
-  const focusComment = () => {
-    commentInputRef.current?.focus();
-  };
 
   const copyLink = async () => {
     try {
@@ -446,47 +363,15 @@ function Lightbox({
               </div>
             )}
 
-            {/* Reaction count */}
+            {/* Action bar — Zdieľať */}
             <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontFamily: 'Georgia, serif',
-                fontSize: 12,
-                color: '#7a6b56',
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                <span style={miniHeartStyle}>
-                  <Heart style={{ width: 10, height: 10, fill: '#fffdf8', color: '#fffdf8' }} />
-                </span>
-                {baseLikes} {baseLikes === 1 ? 'reakcia' : baseLikes < 5 ? 'reakcie' : 'reakcií'}
-              </span>
-              <span>
-                {comments.length} {comments.length === 1 ? 'komentár' : comments.length < 5 ? 'komentáre' : 'komentárov'}
-              </span>
-            </div>
-
-            {/* Action bar — Like / Komentár / Zdieľať */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 4,
                 paddingTop: 8,
                 borderTop: '1px solid rgba(196,165,116,0.3)',
                 position: 'relative',
               }}
             >
-              <ActionButton
-                Icon={Heart}
-                label="Páči sa"
-                active={isLiked}
-                onClick={toggleLike}
-                iconStyle={isLiked ? { fill: '#a87437', color: '#a87437' } : undefined}
-              />
-              <ActionButton Icon={MessageCircle} label="Komentár" onClick={focusComment} />
               <ActionButton
                 Icon={Share2}
                 label="Zdieľať"
@@ -500,7 +385,7 @@ function Lightbox({
                   style={{
                     position: 'absolute',
                     top: '100%',
-                    right: 0,
+                    left: 0,
                     marginTop: 6,
                     background: '#fffdf8',
                     border: '1px solid rgba(196,165,116,0.5)',
@@ -540,152 +425,6 @@ function Lightbox({
                   </button>
                 </div>
               )}
-            </div>
-
-            {/* Comments list */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {comments.length === 0 ? (
-                <p
-                  style={{
-                    fontFamily: 'Georgia, serif',
-                    fontSize: 13,
-                    color: '#9b8e75',
-                    fontStyle: 'italic',
-                    margin: 0,
-                  }}
-                >
-                  Zatiaľ žiadne komentáre. Buďte prvý/á!
-                </p>
-              ) : (
-                comments.map((c) => (
-                  <div key={c.id} style={{ display: 'flex', gap: 10 }}>
-                    <div style={avatarStyle(c.author.charAt(0), 32)}>{c.author.charAt(0)}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          background: '#f5efe3',
-                          borderRadius: 12,
-                          padding: '8px 12px',
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontFamily: 'Georgia, serif',
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: '#2d1810',
-                            margin: 0,
-                          }}
-                        >
-                          {c.author}
-                        </p>
-                        <p
-                          style={{
-                            fontFamily: 'Georgia, serif',
-                            fontSize: 13.5,
-                            lineHeight: 1.5,
-                            color: '#2d2418',
-                            margin: '2px 0 0',
-                          }}
-                        >
-                          {c.text}
-                        </p>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 12,
-                          marginTop: 4,
-                          paddingLeft: 12,
-                          fontFamily: 'Georgia, serif',
-                          fontSize: 11.5,
-                          color: '#7a6b56',
-                        }}
-                      >
-                        <button
-                          type="button"
-                          style={miniLinkButton}
-                        >
-                          Páči sa mi
-                        </button>
-                        <button type="button" style={miniLinkButton}>
-                          Odpovedať
-                        </button>
-                        <span>{c.timestamp}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Comment input */}
-          <div
-            style={{
-              padding: '12px 16px',
-              borderTop: '1px solid rgba(196,165,116,0.3)',
-              background: '#fffdf8',
-              display: 'flex',
-              alignItems: 'flex-end',
-              gap: 10,
-              flexShrink: 0,
-            }}
-          >
-            <div style={avatarStyle('V', 32)}>V</div>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <textarea
-                ref={commentInputRef}
-                rows={1}
-                value={commentDraft}
-                onChange={(e) => setCommentDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    submitComment();
-                  }
-                }}
-                placeholder="Napíšte komentár..."
-                style={{
-                  width: '100%',
-                  resize: 'none',
-                  padding: '8px 36px 8px 12px',
-                  background: '#f5efe3',
-                  border: '1px solid rgba(196,165,116,0.4)',
-                  borderRadius: 18,
-                  outline: 'none',
-                  fontFamily: 'Georgia, serif',
-                  fontSize: 13.5,
-                  color: '#2d2418',
-                  lineHeight: 1.5,
-                  maxHeight: 120,
-                }}
-              />
-              <button
-                type="button"
-                onClick={submitComment}
-                disabled={!commentDraft.trim()}
-                aria-label="Odoslať komentár"
-                style={{
-                  position: 'absolute',
-                  right: 6,
-                  bottom: 6,
-                  width: 28,
-                  height: 28,
-                  borderRadius: 9999,
-                  border: 0,
-                  background: commentDraft.trim() ? '#a87437' : 'rgba(168,116,55,0.3)',
-                  color: '#fffdf8',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: commentDraft.trim() ? 'pointer' : 'not-allowed',
-                  transition: 'background 0.2s',
-                }}
-              >
-                <Send style={{ width: 14, height: 14 }} />
-              </button>
             </div>
           </div>
         </div>
@@ -752,16 +491,6 @@ const metaStyle: React.CSSProperties = {
   margin: 0,
 };
 
-const miniHeartStyle: React.CSSProperties = {
-  width: 16,
-  height: 16,
-  borderRadius: 9999,
-  background: '#a87437',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-
 const sharePillStyle: React.CSSProperties = {
   width: 32,
   height: 32,
@@ -774,17 +503,6 @@ const sharePillStyle: React.CSSProperties = {
   justifyContent: 'center',
   transition: 'background 0.2s, color 0.2s',
   textDecoration: 'none',
-};
-
-const miniLinkButton: React.CSSProperties = {
-  background: 'transparent',
-  border: 0,
-  padding: 0,
-  cursor: 'pointer',
-  fontFamily: 'Georgia, serif',
-  fontSize: 11.5,
-  color: '#7a6b56',
-  fontWeight: 600,
 };
 
 function avatarStyle(letter: string, size = 36): React.CSSProperties {

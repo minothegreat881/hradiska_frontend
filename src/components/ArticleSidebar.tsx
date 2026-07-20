@@ -64,13 +64,30 @@ function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; ln
             ],
             tileSize: 256,
             attribution: 'Esri, Maxar, Earthstar Geographics'
+          },
+          // Transparent overlay: obce, rieky, cesty a ďalšie popisky nad satelitnou
+          // snímkou — bez toho je mapa len "suchý" terén bez orientačných bodov.
+          'labels': {
+            type: 'raster' as const,
+            tiles: [
+              'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+            ],
+            tileSize: 256,
+            attribution: 'Esri'
           }
         },
-        layers: [{
-          id: 'satellite',
-          type: 'raster' as const,
-          source: 'satellite'
-        }],
+        layers: [
+          {
+            id: 'satellite',
+            type: 'raster' as const,
+            source: 'satellite'
+          },
+          {
+            id: 'labels',
+            type: 'raster' as const,
+            source: 'labels'
+          }
+        ],
         glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf'
       },
       center: [coordinates.lng, coordinates.lat],

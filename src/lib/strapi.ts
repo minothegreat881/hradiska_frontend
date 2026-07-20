@@ -26,6 +26,7 @@ export interface StrapiCategory {
   name: string;
   slug: string;
   description?: string;
+  order?: number;
 }
 
 export interface StrapiTag {
@@ -141,7 +142,7 @@ async function fetchStrapi<T>(endpoint: string, options?: RequestInit): Promise<
  */
 export async function getCategories(): Promise<StrapiCategory[]> {
   const response = await fetchStrapi<StrapiResponse<StrapiCategory[]>>(
-    '/blog-categories?sort=name:asc'
+    '/blog-categories?sort=order:asc'
   );
   return response.data;
 }
@@ -167,8 +168,15 @@ export async function getBlogPosts(options?: {
   pageSize?: number;
 }): Promise<{ posts: StrapiBlogPost[]; pagination: any }> {
   // Build query string manually to avoid encoding issues
+  // PERF: `populate=*` ťahalo pre KAŽDÝ článok v zozname aj gallery, blocks, quotes,
+  // location, keyFacts a timeline — 25 článkov = ~2,6 s a 0,66 MB. Zoznamy potrebujú
+  // len to, čo číta convertStrapiPostToArticle: coverImage, category, tags.
+  // Po zúžení: ~135 ms a 0,04 MB. Detail článku si plné dáta doťahuje sám
+  // (getBlogPostBySlug má vlastný deep populate), takže tu nič nechýba.
   const queryParts: string[] = [
-    'populate=*',
+    'populate[0]=coverImage',
+    'populate[1]=category',
+    'populate[2]=tags',
     'sort=publishedAt:desc',
   ];
 
@@ -304,6 +312,7 @@ export function convertStrapiPostToArticle(post: StrapiBlogPost) {
     readTime: post.readingTime || 5,
     tags: post.tags?.map(t => t.name) || [],
     category: post.category?.slug || 'ostatne',
+    categoryName: post.category?.name || '',
     hradiskaCategory: post.category ? [post.category.slug] : [],
     featured: post.featured || false,
   };

@@ -21,15 +21,27 @@ interface ArticlePageProps {
 }
 
 export function ArticlePage({ articleSlug }: ArticlePageProps) {
-  // Try to fetch from Strapi first
+  // Strapi is the source of truth — a real migrated article must never be
+  // shadowed by leftover prototype/mock content sharing the same slug
+  // (this is exactly what happened to Bojná: mockArticles had a fabricated
+  // entry at 'bojna-vyznamne-velkomoravske-centrum' that silently won).
   const { post: strapiPost, loading, error } = useBlogPost(articleSlug);
 
-  // Always check mock data first for full template experience
-  const mockArticle = mockArticles.find((a) => a.slug === articleSlug);
+  // Real "related articles" from the same Strapi category — replaces the
+  // previous behaviour of always pulling from fabricated mockArticles
+  // (that's where the fake "Slovania: Mýtus a realita" cards came from).
+  const { posts: relatedStrapiPosts } = useBlogPosts({
+    categorySlug: strapiPost?.category?.slug,
+    pageSize: 4,
+  });
 
-  // Use mock article if available (for full template with images, quotes, etc.)
-  // Only use Strapi if no mock exists for this slug
-  const article = mockArticle || (strapiPost
+  // Mock article is only used as a fallback for slugs that don't exist in
+  // Strapi at all (demo/prototype content), never to override a real post.
+  // Gated on `!loading` too so a colliding mock slug can't flash on screen
+  // before the real Strapi fetch has had a chance to resolve.
+  const mockArticle = !loading && !strapiPost ? mockArticles.find((a) => a.slug === articleSlug) : undefined;
+
+  const article = strapiPost
     ? {
         ...convertStrapiPostToArticle(strapiPost),
         content: strapiPost.content, // Keep original blocks content
@@ -47,7 +59,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
         blocks: strapiPost.blocks || [], // Dynamic zone blocks
         bibliography: [],
       }
-    : null);
+    : mockArticle || null;
 
   // Get Strapi quotes separately for rendering
   const strapiQuotes: StrapiQuote[] = strapiPost?.quotes || [];
@@ -88,9 +100,11 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
     );
   }
 
-  const relatedArticles = mockArticles
-    .filter((a) => a.id !== article.id && a.category === article.category)
-    .slice(0, 3);
+  const relatedArticles = strapiPost
+    ? relatedStrapiPosts.filter((a) => a.slug !== article.slug).slice(0, 3)
+    : mockArticles
+        .filter((a) => a.id !== article.id && a.category === article.category)
+        .slice(0, 3);
 
   const categoryLabels: Record<string, string> = {
     vyskum: 'Výskum',
@@ -727,7 +741,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                     color: '#4a3f2f' /* WCAG AAA - 7.1:1 */
                   }}
                 >
-                  Ďalšie články z kategórie {categoryLabels[article.category!]}
+                  Ďalšie články z kategórie {strapiPost ? strapiPost.category?.name : categoryLabels[article.category!]}
                 </p>
               </div>
             </ScrollReveal>

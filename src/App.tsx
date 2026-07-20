@@ -12,6 +12,7 @@ import { AktualityPage } from './pages/AktualityPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { Shield, Facebook, Instagram, Youtube, Mail, ArrowUp } from 'lucide-react';
 import { Toaster } from './components/ui/sonner';
+import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
 
 type Route = 'home' | 'site' | 'blog' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy';
@@ -51,11 +52,18 @@ const footerLinkStyle: React.CSSProperties = {
 function App() {
   const [route, setRoute] = useState<Route>('home');
   const [params, setParams] = useState<Record<string, string>>({});
+  const [pathname, setPathname] = useState(window.location.pathname);
+  // true on initial load and browser back/forward (restore old scroll position),
+  // false right after a link click (that already scrolls to top itself).
+  const [restoreScroll, setRestoreScroll] = useState(true);
+
+  useScrollRestoration(pathname, restoreScroll);
 
   useEffect(() => {
     // Simple client-side routing
     const handleNavigation = () => {
       const path = window.location.pathname;
+      setPathname(path);
       const searchParams = new URLSearchParams(window.location.search);
 
       if (path === '/' || path === '') {
@@ -103,8 +111,13 @@ function App() {
 
     handleNavigation();
 
-    // Listen to popstate for browser back/forward
-    window.addEventListener('popstate', handleNavigation);
+    // Listen to popstate for browser back/forward — restore that page's
+    // scroll position (this is where users expect to land back where they were).
+    const handlePopState = () => {
+      setRestoreScroll(true);
+      handleNavigation();
+    };
+    window.addEventListener('popstate', handlePopState);
 
     // Intercept link clicks
     const handleClick = (e: MouseEvent) => {
@@ -121,6 +134,7 @@ function App() {
       // Skip external links and non-origin links
       if (link.href.startsWith(window.location.origin) && !link.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
         e.preventDefault();
+        setRestoreScroll(false); // forward navigation — go to top, don't restore
         window.history.pushState({}, '', link.href);
         handleNavigation();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -130,7 +144,7 @@ function App() {
     document.addEventListener('click', handleClick);
 
     return () => {
-      window.removeEventListener('popstate', handleNavigation);
+      window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('click', handleClick);
     };
   }, []);

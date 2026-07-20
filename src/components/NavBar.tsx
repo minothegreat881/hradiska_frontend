@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Menu, X, Moon, Sun, ChevronDown, MapPin } from 'lucide-react';
-import { mainNavigation, NavigationItem } from '../data/navigation-structure';
+import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
-import { MegaMenu } from './MegaMenu';
+import { TwoTierNav } from './TwoTierNav';
+import { useNavigationData } from '../hooks/useNavigationData';
 
 const NAV_BG = '#1f1611';
 const NAV_BG_DARKER = '#1f1611';
@@ -227,6 +228,9 @@ export function NavBar() {
   const [scrolled, setScrolled] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
+  // Živá navigácia zo Strapi (kategórie + blogy pre dropdown roletky).
+  const { items: mainNavigation } = useNavigationData();
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -263,8 +267,16 @@ export function NavBar() {
 
   return (
     <>
+      {/* ── Desktop (lg+): dvojriadková lišta 2A ─────────────────────────────── */}
+      <TwoTierNav
+        items={mainNavigation}
+        darkMode={darkMode}
+        onToggleDark={toggleDarkMode}
+      />
+
+      {/* ── Mobil (<lg): kompaktná lišta + hamburger ─────────────────────────── */}
       <nav
-        className="sticky top-0 z-50"
+        className="mobile-nav lg:hidden sticky top-0 z-50"
         style={{
           background: NAV_BG,
           borderBottom: `1px solid ${BORDER_GOLD}`,
@@ -313,21 +325,6 @@ export function NavBar() {
                 Slovanské hradiská
               </span>
             </a>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center" style={{ gap: 2 }}>
-              {mainNavigation.map((item) => (
-                <MegaMenu
-                  key={item.label}
-                  item={item}
-                  isOpen={openMenu === item.label}
-                  onToggle={() =>
-                    setOpenMenu((cur) => (cur === item.label ? null : item.label))
-                  }
-                  onClose={() => setOpenMenu(null)}
-                />
-              ))}
-            </div>
 
             {/* Akčné tlačidlá */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
