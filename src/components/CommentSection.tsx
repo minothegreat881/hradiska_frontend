@@ -47,6 +47,9 @@ interface CommentItemProps {
   depth?: number;
   onLike: (documentId: string) => void;
   onReply: (documentId: string, authorName: string) => void;
+  onCancelReply: () => void;
+  onSubmitReply: (parentDocId: string, text: string) => Promise<void>;
+  isLoggedIn: boolean;
   // Set aj Map majú .has() — prijmeme oboje (member likes sú Map).
   likedSet: { has(k: string): boolean };
   replyingToDocId: string | null;
@@ -57,11 +60,16 @@ function CommentItem({
   depth = 0,
   onLike,
   onReply,
+  onCancelReply,
+  onSubmitReply,
+  isLoggedIn,
   likedSet,
   replyingToDocId,
 }: CommentItemProps) {
   const liked = likedSet.has(comment.documentId);
   const isBeingRepliedTo = replyingToDocId === comment.documentId;
+  const [replyText, setReplyText] = useState('');
+  const [sending, setSending] = useState(false);
   return (
     <div style={{ marginLeft: depth > 0 ? 32 : 0, marginTop: 16 }}>
       <div
@@ -211,6 +219,58 @@ function CommentItem({
               Odpovedať
             </button>
           </div>
+
+          {/* Inline pole na odpoveď — otvorí sa priamo pod komentárom */}
+          {isBeingRepliedTo && (
+            isLoggedIn ? (
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <textarea
+                  autoFocus
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder={`Odpoveď pre ${comment.author}…`}
+                  rows={2}
+                  maxLength={5000}
+                  style={{
+                    width: '100%', padding: '9px 12px', background: '#fdfbf6',
+                    border: '1px solid #a87437', borderRadius: 8, outline: 'none',
+                    fontFamily: 'Georgia, serif', fontSize: 14, color: '#2d2418', resize: 'vertical',
+                  }}
+                />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    type="button"
+                    disabled={!replyText.trim() || sending}
+                    onClick={async () => {
+                      setSending(true);
+                      try { await onSubmitReply(comment.documentId, replyText.trim()); setReplyText(''); }
+                      finally { setSending(false); }
+                    }}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px',
+                      background: replyText.trim() ? '#a87437' : 'rgba(168,116,55,0.3)', color: '#fffdf8',
+                      border: 0, borderRadius: 8, fontFamily: 'Georgia, serif', fontSize: 13, fontWeight: 600,
+                      cursor: replyText.trim() ? 'pointer' : 'not-allowed',
+                    }}
+                  >
+                    {sending && <Loader2 style={{ width: 13, height: 13 }} className="animate-spin" />}
+                    Odoslať odpoveď
+                  </button>
+                  <button type="button" onClick={onCancelReply}
+                          style={{ background: 'transparent', border: 0, color: '#7a6b56', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, textDecoration: 'underline' }}>
+                    Zrušiť
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ marginTop: 10, fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
+                <button type="button" onClick={() => goTo('/prihlasenie')}
+                        style={{ color: '#a87437', background: 'none', border: 0, cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'Georgia, serif', fontSize: 13 }}>
+                  Prihláste sa
+                </button>{' '}a zapojte sa do diskusie.
+              </div>
+            )
+          )}
         </div>
       </div>
       {comment.replies?.map((r) => (
@@ -220,6 +280,9 @@ function CommentItem({
           depth={depth + 1}
           onLike={onLike}
           onReply={onReply}
+          onCancelReply={onCancelReply}
+          onSubmitReply={onSubmitReply}
+          isLoggedIn={isLoggedIn}
           likedSet={likedSet}
           replyingToDocId={replyingToDocId}
         />
@@ -429,15 +492,30 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
     [isLoggedIn, token, myLikes],
   );
 
+  // Otvorí inline pole odpovede priamo pod komentárom (netreba scrollovať dole).
   const handleReply = useCallback((commentDocId: string, authorName: string) => {
     setReplyingTo({ docId: commentDocId, author: authorName });
-    // Scroll k formuláru
-    setTimeout(() => {
-      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 50);
   }, []);
 
   const handleCancelReply = useCallback(() => setReplyingTo(null), []);
+
+  // Odoslanie inline odpovede — komentár s inReplyTo na rodiča.
+  const submitReply = useCallback(async (parentDocId: string, text: string) => {
+    if (!token || !postDocumentId) return;
+    try {
+      const res = await fetch(`${STRAPI_URL}/api/blog-comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ data: { content: text, post: postDocumentId, inReplyTo: parentDocId } }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setReplyingTo(null);
+      toast.success('Odpoveď pridaná.');
+      fetchComments();
+    } catch (e) {
+      toast.error('Nepodarilo sa pridať odpoveď.');
+    }
+  }, [token, postDocumentId, fetchComments]);
 
   const handleSubmit = async () => {
     if (!canSubmit || !token) return;
@@ -450,7 +528,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
           data: {
             content: newComment.trim(),
             post: postDocumentId,
-            inReplyTo: replyingTo?.docId,
+            // spodný formulár = top-level komentár, bez inReplyTo
             // authorName/user nastaví server z prihláseného účtu.
           },
         }),
@@ -561,6 +639,9 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               comment={c}
               onLike={handleLike}
               onReply={handleReply}
+              onCancelReply={handleCancelReply}
+              onSubmitReply={submitReply}
+              isLoggedIn={isLoggedIn}
               likedSet={myLikes}
               replyingToDocId={replyingTo?.docId || null}
             />
@@ -577,12 +658,13 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
         style={{
           marginTop: 32,
           background: '#fffdf8',
-          border: replyingTo ? '1px solid #a87437' : '1px solid rgba(196,165,116,0.4)',
+          border: '1px solid rgba(196,165,116,0.4)',
           borderRadius: 12,
           padding: 20,
-          transition: 'border-color 0.2s',
         }}
       >
+        {/* Spodný formulár je len na NOVÝ komentár. Odpovede sa píšu inline
+            priamo pod komentárom (tlačidlo „Odpovedať"). */}
         <h3
           style={{
             fontFamily: 'Georgia, serif',
@@ -594,45 +676,8 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             margin: 0,
           }}
         >
-          {replyingTo ? `Odpovedať na ${replyingTo.author}` : 'Pridať komentár'}
+          Pridať komentár
         </h3>
-        {replyingTo && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              marginTop: 10,
-              padding: '8px 12px',
-              background: 'rgba(196,165,116,0.12)',
-              borderRadius: 8,
-              fontFamily: 'Georgia, serif',
-              fontSize: 13,
-              color: '#5d3a14',
-            }}
-          >
-            <span>
-              Odpovedáte na komentár od <strong>{replyingTo.author}</strong>.
-            </span>
-            <button
-              type="button"
-              onClick={handleCancelReply}
-              style={{
-                marginLeft: 'auto',
-                background: 'transparent',
-                border: 0,
-                padding: 0,
-                cursor: 'pointer',
-                fontFamily: 'Georgia, serif',
-                fontSize: 12,
-                color: '#7a6b56',
-                textDecoration: 'underline',
-              }}
-            >
-              Zrušiť
-            </button>
-          </div>
-        )}
         {!postDocumentId && (
           <p
             style={{
@@ -679,7 +724,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               }}
             >
               {submitting && <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />}
-              {submitting ? 'Pridávam…' : replyingTo ? 'Odpovedať' : 'Pridať komentár'}
+              {submitting ? "Pridávam…" : "Pridať komentár"}
             </button>
           </div>
         ) : (
