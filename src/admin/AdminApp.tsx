@@ -11,6 +11,7 @@ import { ArticlesScreen } from './screens/ArticlesScreen';
 import { EditorScreen } from './screens/EditorScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { MediaScreen } from './screens/MediaScreen';
+import { CommentsScreen } from './screens/CommentsScreen';
 import { StubScreen } from './screens/StubScreen';
 import { TOTALS } from './data';
 
@@ -31,7 +32,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
     items: [
       { id: 'categories', label: 'Kategórie', icon: FolderTree, badge: 13 },
       { id: 'tags', label: 'Štítky', icon: Tag },
-      { id: 'comments', label: 'Komentáre', icon: MessageSquare, badge: 3 },
+      { id: 'comments', label: 'Komentáre', icon: MessageSquare },
     ],
   },
   {
@@ -206,9 +207,7 @@ function AdminShell() {
             <StubScreen title="Kategórie" note="13 kategórií, poradie ťahaním cez pole `order`. Polia: name*, slug*, description, order." />
           )}
           {route === 'tags' && <StubScreen title="Štítky" note="Polia: name*, slug*. Zobraziť počet použití." />}
-          {route === 'comments' && (
-            <StubScreen title="Komentáre" note="Moderácia cez pole `approved`. Vlastné endpointy /like a /unlike už v Strapi existujú." />
-          )}
+          {route === 'comments' && <CommentsScreen />}
         </main>
       </div>
 
