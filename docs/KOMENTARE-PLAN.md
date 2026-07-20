@@ -4,6 +4,46 @@ Stav k 2026-07-20. Cieľ: návštevník sa zaregistruje, overí e-mailom, môže
 komentovať články **aj fotografie** a dávať lajky. Admin má nad tým kontrolu —
 maže komentáre, blokuje účty, vidí prehľad po článkoch.
 
+## Rozhodnutia používateľa (2026-07-20)
+
+- **E-mail:** Gmail SMTP cez `milanhrabkovsky@gmail.com` (dočasný technický účet,
+  App Password). Pri prechode na doménu → SMTP hradiska.sk.
+- **Komentáre sa zobrazujú HNEĎ**, bez schvaľovania. Admin ich môže dodatočne
+  skryť/označiť ako spam/zmazať.
+- **Fotokomentáre** len v galérii v článku (lightbox po kliknutí na fotku).
+
+## Priebeh
+
+- ✅ **Krok 1 — e-mail.** `@strapi/provider-email-nodemailer`, Gmail SMTP v
+  `config/plugins.ts`, údaje v `.env`. Odoslanie overené reálnym mailom.
+- ✅ **Krok 3 — schéma** (2026-07-20). Aplikované cez dočasný `develop`, dáta
+  nedotknuté (305 článkov, 732 komentárov, 5424 súborov):
+  - `blog-comment` + `status` [visible|hidden|spam], `editedAt`, `user` relácia
+  - nová kolekcia `photo-comment` (fileId, content, status, user, inReplyTo)
+  - nová kolekcia `reaction` (targetType, targetId, user) — lajky per účet
+  - používateľ + `displayName`, `blockedReason`, `blockedAt` (cez extensions)
+  - 732 komentárov zmigrovaných: `approved=true → status=visible`
+  - povolenia: Public číta photo-comments/reactions, Authenticated (admin) CRUD
+- ✅ **Krok 2 — rola Member + overenie e-mailu** (2026-07-20):
+  - nová rola `Member` (type=member) — smie len komentovať a lajkovať
+  - `default_role` registrácie prepnutý `authenticated → member`
+    (KRITICKÉ: predtým by registrovaný dostal právo mazať články!)
+  - `email_confirmation` zapnuté; redirect na `/prihlasenie?overeny=1`
+  - Public rola už mala register/login/forgot/reset zapnuté
+  - ⚠️ tieto zmeny sú v DB (up_roles, up_permissions, core_store), nie v gite —
+    pri obnove čistej DB ich treba nastaviť znova
+- ✅ **Krok 4 — bezpečnostné policy „len vlastné"** (2026-07-20):
+  - `reaction` controller: lajk len prihlásený, `user` nastaví server,
+    dedup (user+targetType+targetId), unlike len vlastný
+  - `photo-comment` + `blog-comment`: create len prihlásený (`user` zo servera),
+    `status='visible'` (zobrazí sa hneď), update/delete len VLASTNÝ komentár —
+    výnimka staff (rola authenticated = admin) moderuje čokoľvek
+  - create ide cez `strapi.documents().create()`, nie `super.create` — content-API
+    sanitizácia pri užívateľskej role odmieta reláciu ako holý documentId
+  - **overené:** člen nevie vytvoriť článok (403) ani zmazať cudzí komentár (403);
+    vlastný komentár vytvorí/zmaže; lajk sa deduplikuje
+- ⏳ Kroky 5–10 (frontend, admin moderácia, anti-spam) — otvorené.
+
 ---
 
 ## 0. Východiskový stav (overené)

@@ -9,6 +9,8 @@ import { MapPage } from './pages/MapPage';
 import { GalleryPage } from './pages/GalleryPage';
 import { AktualityPage } from './pages/AktualityPage';
 import { PrivacyPage } from './pages/PrivacyPage';
+import { AccountPage, type AccountMode } from './pages/AccountPage';
+import { MemberAuthProvider } from './auth/MemberAuth';
 import { Toaster } from './components/ui/sonner';
 import { Footer } from './components/Footer';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
@@ -17,12 +19,22 @@ import './styles/globals.css';
 // Admin je lazy — návštevník webu ho nikdy nestiahne, nezväčšuje hlavný bundle.
 const AdminApp = lazy(() => import('./admin/AdminApp'));
 
-type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'admin';
+type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'admin' | 'account';
+
+// Cesty účtov → režim AccountPage
+const ACCOUNT_ROUTES: Record<string, AccountMode> = {
+  '/prihlasenie': 'login',
+  '/registracia': 'register',
+  '/zabudnute-heslo': 'forgot',
+  '/reset-hesla': 'reset',
+  '/profil': 'profile',
+};
 
 
 
 function App() {
   const [route, setRoute] = useState<Route>('home');
+  const [accountMode, setAccountMode] = useState<AccountMode>('login');
   const [params, setParams] = useState<Record<string, string>>({});
   const [pathname, setPathname] = useState(window.location.pathname);
   // true on initial load and browser back/forward (restore old scroll position),
@@ -42,6 +54,9 @@ function App() {
         setRoute('home');
       } else if (path === '/admin' || path.startsWith('/admin/')) {
         setRoute('admin');
+      } else if (ACCOUNT_ROUTES[path]) {
+        setRoute('account');
+        setAccountMode(ACCOUNT_ROUTES[path]);
       } else if (path === '/mapa') {
         setRoute('mapa');
       } else if (path === '/aktuality' || path.startsWith('/aktuality/')) {
@@ -152,6 +167,7 @@ function App() {
       {route === 'category' && <CategoryPage categorySlug={params.slug} />}
       {route === 'article' && <ArticlePage articleSlug={params.slug} />}
       {route === 'about' && <AboutPage />}
+      {route === 'account' && <AccountPage mode={accountMode} />}
 
       <Toaster position="top-center" />
 
@@ -160,4 +176,12 @@ function App() {
   );
 }
 
-export default App;
+// MemberAuthProvider obaľuje celú appku — prihlásenie člena je dostupné všade
+// (komentáre, profil), nielen na stránkach účtu.
+export default function AppWithAuth() {
+  return (
+    <MemberAuthProvider>
+      <App />
+    </MemberAuthProvider>
+  );
+}
