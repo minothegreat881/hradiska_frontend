@@ -4,14 +4,15 @@
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Hradiská.sk — encyklopédia slovanských hradísk na Slovensku</title>
-
-      <!-- Default SEO (fallback pre celý web; jednotlivé stránky si ich prepíšu
-           po zavedení render vrstvy — viď docs/SEO-AUDIT.md). -->
-      <meta name="description" content="Encyklopédia slovanských a pravekých hradísk na Slovensku — dejiny, archeológia, lokality a pramene. Vyše 300 článkov o hradiskách, ich obyvateľoch a nálezoch." />
       <meta name="theme-color" content="#8a5316" />
 
-      <!-- Open Graph (Facebook, Messenger, LinkedIn, WhatsApp…) -->
+      <!-- ═══ SEO blok ═══ Tagy medzi značkami seo:start/seo:end pri builde
+           prepíše prerender (scripts/prerender.mjs) per-stránkovými hodnotami.
+           Toto default znenie ostáva pre homepage a ako fallback. -->
+      <!--seo:start-->
+      <title>Hradiská.sk — encyklopédia slovanských hradísk na Slovensku</title>
+      <meta name="description" content="Encyklopédia slovanských a pravekých hradísk na Slovensku — dejiny, archeológia, lokality a pramene. Vyše 300 článkov o hradiskách, ich obyvateľoch a nálezoch." />
+      <link rel="canonical" href="https://hradiska.sk/" />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="Hradiská.sk" />
       <meta property="og:locale" content="sk_SK" />
@@ -19,12 +20,11 @@
       <meta property="og:description" content="Dejiny, archeológia a lokality slovanských a pravekých hradísk na Slovensku. Vyše 300 článkov o hradiskách, ich obyvateľoch a nálezoch." />
       <meta property="og:url" content="https://hradiska.sk/" />
       <meta property="og:image" content="https://hradiska.sk/img_header_hradiska_02.png" />
-
-      <!-- Twitter / X -->
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Hradiská.sk — encyklopédia slovanských hradísk na Slovensku" />
       <meta name="twitter:description" content="Dejiny, archeológia a lokality slovanských a pravekých hradísk na Slovensku." />
       <meta name="twitter:image" content="https://hradiska.sk/img_header_hradiska_02.png" />
+      <!--seo:end-->
 
       <!-- Historické fonty z Google Fonts -->
       <link rel="preconnect" href="https://fonts.googleapis.com">

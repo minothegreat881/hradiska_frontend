@@ -69,6 +69,7 @@
       "scripts": {
             "dev": "vite",
             "sitemap": "node scripts/gen-sitemap.mjs",
-            "build": "node scripts/gen-sitemap.mjs && vite build"
+            "prerender": "node scripts/prerender.mjs",
+            "build": "node scripts/gen-sitemap.mjs && vite build && node scripts/prerender.mjs"
       }
 }

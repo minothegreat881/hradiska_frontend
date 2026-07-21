@@ -58,11 +58,15 @@ Označenie: `[ ]` čaká · `[~]` rozpracované · `[x]` hotové.
 - [x] **T0.3** `index.html`: oprava „Encyclopédia"→„encyklopédia", default meta
       description + Open Graph + Twitter cards + theme-color (fallback pre celý web)
 
-### FÁZA 1 — Render vrstva (P0, GATE — treba rozhodnutie, viď §3)
-- [ ] **T1.1** rozhodnúť smer: SSG (vite-react-ssg / Vike) vs. Astro vs. prerender
-- [ ] **T1.2** zaviesť build-time prerender všetkých ciest (článok, kategória,
-      domov, o nás, mapa…) s hydratáciou
-- [ ] **T1.3** `<Head>`/helmet komponent — per-route `<title>`, meta, canonical
+### FÁZA 1 — Render vrstva (P0) — zvolený prerender HLAVIČKY ✅ 2026-07-21
+- [x] **T1.1** rozhodnutie: **prerender iba hlavičky** (nie plné SSG) — bez
+      server-renderu React komponentov, takže žiadne riziko pádov Cesia/máp/motion.
+      Plné SSG (obsah v HTML) ostáva ako neskorší, samostatný krok.
+- [x] **T1.2** `scripts/prerender.mjs` — beží po `vite build`, pre každú URL
+      (305 článkov + 10 statických) vyrobí dist/<path>/index.html s prepísaným
+      `<head>` medzi značkami `seo:start/seo:end` v `index.html`. Telo naďalej JS.
+- [ ] **T1.3** (voliteľné) klientsky head-sync pri SPA navigácii (document.title
+      + meta) — pre scrapery netreba (majú prerendrované HTML), pre UX bonus.
 
 ### FÁZA 2 — Per-article SEO dáta („SEO agent")
 - [ ] **T2.1** agent prejde telo každého článku a vygeneruje:
@@ -72,14 +76,31 @@ Označenie: `[ ]` čaká · `[~]` rozpracované · `[x]` hotové.
 - [ ] **T2.3** pilot na 3–5 článkoch, schválenie formátu, až potom mass-run
 - [ ] **T2.4** (voliteľné) pole `ogImage` / potvrdenie coverImage ako OG obrázka
 
-### FÁZA 3 — Render SEO dát
-- [ ] **T3.1** `<title>` = metaTitle || title; meta description = metaDescription || excerpt
-- [ ] **T3.2** Open Graph + Twitter cards (title, description, image=cover, type=article,
-      url, locale sk_SK)
-- [ ] **T3.3** canonical URL na každej stránke
-- [ ] **T3.4** JSON-LD: `Article` (+ author, datePublished, image), `BreadcrumbList`,
-      `Organization`/`WebSite` (sitewide), `Place`+`GeoCoordinates` pri hradiskách
-      (z komponentu `location`)
+### FÁZA 3 — Render SEO dát ✅ 2026-07-21 (cez prerender hlavičky)
+- [x] **T3.1** `<title>` = metaTitle || title; description = metaDescription || excerpt
+- [x] **T3.2** Open Graph + Twitter cards (title, description, image=cover, type=article,
+      url, locale sk_SK, article:published_time)
+- [x] **T3.3** canonical URL na každej stránke
+- [x] **T3.4** JSON-LD: `Article` (author, datePublished, image, publisher),
+      `BreadcrumbList`, `WebSite`/`Organization`, `LandmarksOrHistoricalBuildings`
+      + `GeoCoordinates` pri hradiskách s lokalitou
+- search-index rozšírený o metaTitle/metaDescription/author/date/lat/lng (podklad
+  pre prerender)
+
+> **Nasadenie:** (1) hosting musí servovať dist/<path>/index.html na danej URL
+> (napr. nginx `try_files $uri $uri/ /index.html`) — fyzický súbor vyhráva pred
+> SPA fallbackom. (2) `MEDIA_URL` (env pri builde) musí ukazovať tam, kde sa
+> servujú `/uploads` obrázky, aby OG obrázky boli absolútne a dostupné.
+
+### FÁZA 5 — Migrácia URL a redirecty (robiť POSLEDNÉ)
+- [ ] **T5.1** vygenerovať mapu starých→nových URL. Staré Blogger permalinky
+      (`http://www.hradiska.sk/RRRR/MM/slug.html`) sú v Blogger feed exportoch
+      v `hradiska-strapi/scripts/blog-migrate/data/`. Nové = `/blog/<slug>`.
+- [ ] **T5.2** ⚠️ párovať **podľa obsahu textu, nie len názvu** — viac článkov má
+      rovnaký názov lokality (Zvolen-Môťová, Zlatý kôň, Bíňa: kresba/3D/panoráma),
+      podľa názvu by sa pomýlili. Nespárované → 301 na kategóriu/domov, nie 404.
+- [ ] **T5.3** 301 (trvalé) redirecty na úrovni hostingu/proxy (nginx/Caddy/CF),
+      nie v appke. Doména ostáva `hradiska.sk` (potvrdiť).
 
 ### FÁZA 4 — Doladenie a odolnosť
 - [ ] **T4.1** pravý 404 (neznáma cesta → 404 komponent, noindex)
