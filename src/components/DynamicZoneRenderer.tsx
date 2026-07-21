@@ -252,6 +252,8 @@ function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
           <ImageWithFallback
             src={getStrapiImageUrl(block.image)}
             alt={altText}
+            loading="lazy"
+            decoding="async"
             className={`absolute inset-0 w-full h-full ${isTallCapped ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
             style={{ objectPosition }}
           />
@@ -588,6 +590,8 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
             <ImageWithFallback
               src={getStrapiImageUrl(image)}
               alt={image.alternativeText || image.caption || ''}
+              loading="lazy"
+              decoding="async"
               className="w-full h-48 object-cover"
             />
           </motion.div>
