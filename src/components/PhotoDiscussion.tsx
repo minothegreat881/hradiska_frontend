@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ThumbsUp, Send, Trash2, Loader2 } from 'lucide-react';
+import { ThumbsUp, Send, Trash2, Reply, Loader2 } from 'lucide-react';
 import { useMember } from '../auth/MemberAuth';
 import {
   listPhotoComments, addPhotoComment, deletePhotoComment,
@@ -10,6 +10,23 @@ import {
 
 const go = (p: string) => { window.history.pushState({}, '', p); window.dispatchEvent(new PopStateEvent('popstate')); };
 
+/** Komentár s vnorenými odpoveďami (strom podľa inReplyTo). */
+interface PhotoCommentNode extends PhotoComment {
+  replies: PhotoCommentNode[];
+}
+
+/** Z plochého zoznamu zostav strom podľa inReplyTo (rovnako ako pri článkoch). */
+function buildTree(flat: PhotoComment[]): PhotoCommentNode[] {
+  const byId = new Map<string, PhotoCommentNode>();
+  for (const c of flat) byId.set(c.documentId, { ...c, replies: [] });
+  const roots: PhotoCommentNode[] = [];
+  for (const c of byId.values()) {
+    if (c.inReplyTo && byId.has(c.inReplyTo)) byId.get(c.inReplyTo)!.replies.push(c);
+    else roots.push(c);
+  }
+  return roots;
+}
+
 /**
  * Panel lajkov a komentárov k fotke v lightboxe.
  * Zobrazuje sa v info paneli vedľa obrázka. Aktivita len pre prihlásených.
@@ -17,20 +34,24 @@ const go = (p: string) => { window.history.pushState({}, '', p); window.dispatch
 export function PhotoDiscussion({ fileId }: { fileId: number }) {
   const { member, token, isLoggedIn } = useMember();
 
-  const [comments, setComments] = useState<PhotoComment[]>([]);
+  const [comments, setComments] = useState<PhotoCommentNode[]>([]);
   const [likeCount, setLikeCount] = useState(0);
   const [myReaction, setMyReaction] = useState<string | null>(null);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+  // documentId komentára, na ktorý práve píšem odpoveď (alebo null)
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [replyBusy, setReplyBusy] = useState(false);
 
   const load = () => {
     setLoading(true);
     Promise.all([
-      listPhotoComments(fileId),
+      listPhotoComments(fileId, token ?? undefined),
       getPhotoLikes(fileId, token ?? undefined, member?.id),
     ])
-      .then(([c, l]) => { setComments(c); setLikeCount(l.count); setMyReaction(l.myReactionId); })
+      .then(([c, l]) => { setComments(buildTree(c)); setLikeCount(l.count); setMyReaction(l.myReactionId); })
       .catch(() => {})
       .finally(() => setLoading(false));
   };
@@ -62,10 +83,80 @@ export function PhotoDiscussion({ fileId }: { fileId: number }) {
     } catch { /* ignore */ } finally { setBusy(false); }
   };
 
+  const submitReply = async (parentDocId: string) => {
+    if (!token || !replyText.trim()) return;
+    setReplyBusy(true);
+    try {
+      await addPhotoComment(token, fileId, replyText.trim(), parentDocId);
+      setReplyText('');
+      setReplyTo(null);
+      load();
+    } catch { /* ignore */ } finally { setReplyBusy(false); }
+  };
+
   const remove = async (id: string) => {
     if (!token) return;
-    try { await deletePhotoComment(token, id); setComments(cs => cs.filter(c => c.documentId !== id)); } catch {}
+    if (!window.confirm('Zmazať tento komentár?')) return;
+    try { await deletePhotoComment(token, id); load(); } catch {}
   };
+
+  // Rekurzívne vykreslenie komentára aj s odpoveďami (odsadené cez depth).
+  const renderComment = (c: PhotoCommentNode, depth = 0) => (
+    <div key={c.documentId} style={{ marginLeft: depth > 0 ? 20 : 0, marginTop: depth > 0 ? 8 : 0 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+        <div style={{ flex: 1 }}>
+          <span style={{ color: '#a87437', fontSize: 13, fontWeight: 600 }}>{c.authorName}</span>
+          <span style={{ color: '#2d2418', fontSize: 13.5, marginLeft: 8, whiteSpace: 'pre-wrap' }}>{c.content}</span>
+          <div style={{ display: 'flex', gap: 12, marginTop: 3 }}>
+            {isLoggedIn && (
+              <button
+                onClick={() => { setReplyTo(replyTo === c.documentId ? null : c.documentId); setReplyText(''); }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none',
+                  color: '#7a6b56', cursor: 'pointer', padding: 0, fontFamily: 'Georgia, serif', fontSize: 12 }}
+              >
+                <Reply className="w-3 h-3" /> Odpovedať
+              </button>
+            )}
+            {c.mine && (
+              <button onClick={() => remove(c.documentId)} title="Zmazať môj komentár"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none',
+                        color: '#a04338', cursor: 'pointer', padding: 0, fontFamily: 'Georgia, serif', fontSize: 12 }}>
+                <Trash2 className="w-3 h-3" /> Zmazať
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Inline pole odpovede pod komentárom */}
+      {replyTo === c.documentId && isLoggedIn && (
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', marginTop: 6, marginLeft: 4 }}>
+          <textarea
+            autoFocus
+            value={replyText}
+            onChange={e => setReplyText(e.target.value)}
+            placeholder={`Odpoveď pre ${c.authorName}…`}
+            rows={2}
+            maxLength={2000}
+            style={{ flex: 1, resize: 'vertical', padding: '7px 10px', borderRadius: 8,
+              background: '#fdfbf6', border: '1px solid #a87437', color: '#2d2418',
+              fontFamily: 'Georgia, serif', fontSize: 13, outline: 'none' }}
+          />
+          <button
+            onClick={() => submitReply(c.documentId)} disabled={replyBusy || !replyText.trim()}
+            style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, cursor: 'pointer', border: 'none',
+              background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              opacity: replyBusy || !replyText.trim() ? 0.5 : 1 }}
+          >
+            {replyBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+      )}
+
+      {c.replies.map(r => renderComment(r, depth + 1))}
+    </div>
+  );
 
   const S = {
     text: { fontFamily: 'Georgia, serif' } as React.CSSProperties,
@@ -98,20 +189,7 @@ export function PhotoDiscussion({ fileId }: { fileId: number }) {
           <span style={{ color: '#7a6b56', fontSize: 13, fontStyle: 'italic' }}>
             Zatiaľ bez komentárov k tejto fotke.
           </span>
-        ) : comments.map(c => (
-          <div key={c.documentId} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-            <div style={{ flex: 1 }}>
-              <span style={{ color: '#a87437', fontSize: 13, fontWeight: 600 }}>{c.authorName}</span>
-              <span style={{ color: '#2d2418', fontSize: 13.5, marginLeft: 8, whiteSpace: 'pre-wrap' }}>{c.content}</span>
-            </div>
-            {member?.id && c.userId === member.id && (
-              <button onClick={() => remove(c.documentId)} title="Zmazať"
-                      style={{ background: 'none', border: 'none', color: '#a87437', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-        ))}
+        ) : comments.map(c => renderComment(c))}
       </div>
 
       {/* Vstup */}

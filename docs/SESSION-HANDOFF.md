@@ -160,7 +160,9 @@ vôbec nebeží** — `@vercel/analytics` nie je nainštalovaný.
 - `dist/build/uploads` v backende (4 GB mŕtva kópia z buildu) — dá sa zmazať
 
 ### Fotokomentáre
-Nemajú vnorené odpovede (schéma `inReplyTo` má, UI nie). Blog komentáre áno.
+Majú vnorené odpovede aj mazanie vlastného (rovnako ako blog komentáre) —
+doplnené 2026-07-21. Meno autora aj príznak „môj" dopočítava controller
+(`populate[user]` cez verejné API Strapi zahadzuje).
 
 ---
 

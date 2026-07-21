@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
-import { ThumbsUp, Reply, Loader2 } from 'lucide-react';
+import { ThumbsUp, Reply, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMember } from '../auth/MemberAuth';
 
@@ -19,6 +19,7 @@ interface Comment {
   date: string;
   likes: number;
   sourceBlogger?: boolean;
+  mine?: boolean;   // patrí prihlásenému? (príznak zo servera)
   replies?: Comment[];
 }
 
@@ -35,6 +36,7 @@ interface StrapiComment {
   likes?: number;
   originalDate?: string;
   createdAt: string;
+  mine?: boolean;
 }
 
 // Lajky sa už nedržia v localStorage — po prechode na účty ide každý lajk
@@ -49,6 +51,7 @@ interface CommentItemProps {
   onReply: (documentId: string, authorName: string) => void;
   onCancelReply: () => void;
   onSubmitReply: (parentDocId: string, text: string) => Promise<void>;
+  onDelete: (documentId: string) => void;
   isLoggedIn: boolean;
   // Set aj Map majú .has() — prijmeme oboje (member likes sú Map).
   likedSet: { has(k: string): boolean };
@@ -62,6 +65,7 @@ function CommentItem({
   onReply,
   onCancelReply,
   onSubmitReply,
+  onDelete,
   isLoggedIn,
   likedSet,
   replyingToDocId,
@@ -218,6 +222,22 @@ function CommentItem({
               <Reply style={{ width: 14, height: 14 }} />
               Odpovedať
             </button>
+            {/* Mazať vidí len autor vlastného komentára */}
+            {comment.mine && (
+              <button
+                type="button"
+                onClick={() => onDelete(comment.documentId)}
+                title="Zmazať môj komentár"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent',
+                  border: 0, padding: 0, cursor: 'pointer', fontFamily: 'Georgia, serif',
+                  fontSize: 12, color: '#a04338',
+                }}
+              >
+                <Trash2 style={{ width: 13, height: 13 }} />
+                Zmazať
+              </button>
+            )}
           </div>
 
           {/* Inline pole na odpoveď — otvorí sa priamo pod komentárom */}
@@ -282,6 +302,7 @@ function CommentItem({
           onReply={onReply}
           onCancelReply={onCancelReply}
           onSubmitReply={onSubmitReply}
+          onDelete={onDelete}
           isLoggedIn={isLoggedIn}
           likedSet={likedSet}
           replyingToDocId={replyingToDocId}
@@ -314,6 +335,7 @@ function mapStrapiComment(c: StrapiComment): Comment {
     date: formatDate(c.originalDate || c.createdAt),
     likes: c.likes ?? 0,
     sourceBlogger: c.sourceBlogger,
+    mine: c.mine,
   };
 }
 
@@ -383,22 +405,47 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       url.searchParams.set('sort[0]', 'originalDate:desc');
       url.searchParams.set('sort[1]', 'createdAt:desc');
       url.searchParams.set('pagination[pageSize]', '100');
+      // GET je verejný a ide BEZ tokenu — pri Member role Strapi sanitizácia
+      // odmieta filter cez reláciu `post` („Invalid key post"). Príznak „môj
+      // komentár" doťahujeme zvlášť cez /blog-comments/mine (nižšie).
       const res = await fetch(url.toString(), {
         headers: { 'ngrok-skip-browser-warning': 'true' },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const list: StrapiComment[] = json.data || [];
+
+      // documentId vlastných komentárov (len ak je člen prihlásený) — server
+      // vráti iba pole ID, žiadne údaje účtu.
+      let mineSet = new Set<string>();
+      if (token) {
+        try {
+          const mineUrl = new URL(`${STRAPI_URL}/api/blog-comments/mine`);
+          mineUrl.searchParams.set('post', postDocumentId);
+          const mineRes = await fetch(mineUrl.toString(), {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (mineRes.ok) {
+            const mineJson = await mineRes.json();
+            mineSet = new Set<string>(mineJson.data || []);
+          }
+        } catch { /* nevadí — bez príznaku sa len nezobrazí tlačidlo Zmazať */ }
+      }
+
       // Build nested tree: replies sa zobrazia vnorené pod parent komentárom
       // (oddelené visually cez `depth` v CommentItem).
-      setComments(buildCommentTree(list.map(mapStrapiComment)));
+      setComments(buildCommentTree(list.map((c) => {
+        const m = mapStrapiComment(c);
+        m.mine = mineSet.has(m.documentId);
+        return m;
+      })));
     } catch (e) {
       console.warn('[CommentSection] fetch failed:', e);
       setComments([]);
     } finally {
       setLoading(false);
     }
-  }, [postDocumentId]);
+  }, [postDocumentId, token]);
 
   useEffect(() => {
     fetchComments();
@@ -498,6 +545,22 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   }, []);
 
   const handleCancelReply = useCallback(() => setReplyingTo(null), []);
+
+  // Mazanie vlastného komentára (backend povolí len vlastný / staff).
+  const handleDelete = useCallback(async (commentDocId: string) => {
+    if (!token) return;
+    if (!window.confirm('Zmazať tento komentár?')) return;
+    try {
+      const res = await fetch(`${STRAPI_URL}/api/blog-comments/${commentDocId}`, {
+        method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      toast.success('Komentár zmazaný.');
+      fetchComments();
+    } catch {
+      toast.error('Nepodarilo sa zmazať komentár.');
+    }
+  }, [token, fetchComments]);
 
   // Odoslanie inline odpovede — komentár s inReplyTo na rodiča.
   const submitReply = useCallback(async (parentDocId: string, text: string) => {
@@ -641,6 +704,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               onReply={handleReply}
               onCancelReply={handleCancelReply}
               onSubmitReply={submitReply}
+              onDelete={handleDelete}
               isLoggedIn={isLoggedIn}
               likedSet={myLikes}
               replyingToDocId={replyingTo?.docId || null}

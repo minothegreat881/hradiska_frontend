@@ -12,36 +12,42 @@ export interface PhotoComment {
   content: string;
   authorName: string;
   createdAt: string;
-  userId?: number;
+  inReplyTo?: string | null;
+  mine?: boolean;
 }
 
 function authHeaders(token?: string): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-export async function listPhotoComments(fileId: number): Promise<PhotoComment[]> {
+export async function listPhotoComments(fileId: number, token?: string): Promise<PhotoComment[]> {
   const url = new URL(`${STRAPI_URL}/api/photo-comments`);
   url.searchParams.set('filters[fileId][$eq]', String(fileId));
-  url.searchParams.set('populate[user]', 'true');
   url.searchParams.set('sort', 'createdAt:asc');
   url.searchParams.set('pagination[pageSize]', '100');
-  const r = await fetch(url.toString());
+  // Token pošleme, ak je člen prihlásený: controller podľa neho doplní `mine`
+  // (vlastník komentára → tlačidlo Zmazať). `authorName` doplní server vždy,
+  // aj neprihlásenému (populate[user] cez verejné API Strapi zahadzuje).
+  const r = await fetch(url.toString(), { headers: authHeaders(token) });
   if (!r.ok) return [];
   const j = await r.json();
   return (j.data || []).map((c: any) => ({
     documentId: c.documentId,
     content: c.content,
-    authorName: c.user?.displayName || c.user?.username || 'Člen',
+    authorName: c.authorName || 'Člen',
     createdAt: c.createdAt,
-    userId: c.user?.id,
+    inReplyTo: c.inReplyTo ?? null,
+    mine: !!c.mine,
   }));
 }
 
-export async function addPhotoComment(token: string, fileId: number, content: string): Promise<void> {
+export async function addPhotoComment(
+  token: string, fileId: number, content: string, inReplyTo?: string | null,
+): Promise<void> {
   const r = await fetch(`${STRAPI_URL}/api/photo-comments`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-    body: JSON.stringify({ data: { fileId, content } }),
+    body: JSON.stringify({ data: { fileId, content, inReplyTo: inReplyTo ?? null } }),
   });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
 }

@@ -177,11 +177,16 @@ counter nemajú — počet sa ráta priamo z reakcií.
 ### Member (id 3)
 ```
 api::account.account.deleteMe
-api::blog-comment.blog-comment.{create,update,delete}
-api::photo-comment.photo-comment.{create,update,delete}
+api::blog-comment.blog-comment.{create,update,delete,mine}
+api::photo-comment.photo-comment.{create,update,delete,find}
 api::reaction.reaction.{find,create,delete}
 plugin::users-permissions.user.me
 ```
+`blog-comment.mine` = vlastný custom endpoint `GET /blog-comments/mine?post=<docId>`
+(vráti documentId vlastných komentárov k článku). `photo-comment.find` treba,
+lebo foto komentáre sa načítavajú s tokenom (aby controller doplnil `mine`);
+pri blog komentároch to nejde (token na verejnom GET padá na sanitizácii filtra
+relácie `post`), preto tam samostatný `/mine` endpoint.
 
 ### Authenticated / admin (id 1) — navyše k obsahu
 ```
