@@ -5,8 +5,6 @@ import { SiteDetailPage } from './pages/SiteDetailPage';
 import { ArticlePage } from './pages/ArticlePage';
 import { AboutPage } from './pages/AboutPage';
 import { CategoryPage } from './pages/CategoryPage';
-import { MapPage } from './pages/MapPage';
-import { GalleryPage } from './pages/GalleryPage';
 import { AktualityPage } from './pages/AktualityPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { AccountPage, type AccountMode } from './pages/AccountPage';
@@ -20,6 +18,11 @@ import './styles/globals.css';
 
 // Admin je lazy — návštevník webu ho nikdy nestiahne, nezväčšuje hlavný bundle.
 const AdminApp = lazy(() => import('./admin/AdminApp'));
+
+// Mapa (Cesium/maplibre) a galéria (lightgallery) sú najťažšie závislosti.
+// Lazy → nesťahuje ich bežný návštevník článku, len kto otvorí /mapa alebo /galeria.
+const MapPage = lazy(() => import('./pages/MapPage').then((m) => ({ default: m.MapPage })));
+const GalleryPage = lazy(() => import('./pages/GalleryPage').then((m) => ({ default: m.GalleryPage })));
 
 type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'admin' | 'account' | 'hladat' | 'notfound';
 
@@ -163,19 +166,25 @@ function App() {
   return (
     <div className="min-h-screen">
       <NavBar />
-      
-      {route === 'home' && <HomePage />}
-      {route === 'mapa' && <MapPage />}
-      {route === 'galeria' && <GalleryPage />}
-      {route === 'aktuality' && <AktualityPage />}
-      {route === 'privacy' && <PrivacyPage />}
-      {route === 'site' && <SiteDetailPage siteSlug={params.slug} />}
-      {route === 'category' && <CategoryPage categorySlug={params.slug} />}
-      {route === 'article' && <ArticlePage articleSlug={params.slug} />}
-      {route === 'about' && <AboutPage />}
-      {route === 'account' && <AccountPage mode={accountMode} />}
-      {route === 'hladat' && <SearchResultsPage query={params.q} />}
-      {route === 'notfound' && <NotFoundPage />}
+
+      <Suspense fallback={
+        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8a795e', fontFamily: 'Georgia, serif', fontSize: 15 }}>
+          Načítavam…
+        </div>
+      }>
+        {route === 'home' && <HomePage />}
+        {route === 'mapa' && <MapPage />}
+        {route === 'galeria' && <GalleryPage />}
+        {route === 'aktuality' && <AktualityPage />}
+        {route === 'privacy' && <PrivacyPage />}
+        {route === 'site' && <SiteDetailPage siteSlug={params.slug} />}
+        {route === 'category' && <CategoryPage categorySlug={params.slug} />}
+        {route === 'article' && <ArticlePage articleSlug={params.slug} />}
+        {route === 'about' && <AboutPage />}
+        {route === 'account' && <AccountPage mode={accountMode} />}
+        {route === 'hladat' && <SearchResultsPage query={params.q} />}
+        {route === 'notfound' && <NotFoundPage />}
+      </Suspense>
 
       <Toaster position="top-center" />
 

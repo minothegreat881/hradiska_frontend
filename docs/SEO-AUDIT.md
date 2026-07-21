@@ -103,12 +103,15 @@ Označenie: `[ ]` čaká · `[~]` rozpracované · `[x]` hotové.
       nie v appke. Doména ostáva `hradiska.sk` (potvrdiť).
 
 ### FÁZA 4 — Doladenie a odolnosť
-- [ ] **T4.1** pravý 404 (neznáma cesta → 404 komponent, noindex)
-- [ ] **T4.2** breadcrumbs (vizuálne + BreadcrumbList JSON-LD)
-- [ ] **T4.3** „súvisiace články" (interné prelinkovanie podľa kategórie/štítkov)
-- [ ] **T4.4** `width`/`height` na obrázky (CLS), `loading="lazy"`, moderné formáty
-- [ ] **T4.5** zmenšiť hlavný JS bundle (3,4 MB) — code-splitting mapy/Cesium
-- [ ] **T4.6** Google Search Console + reálne meranie (nadväzuje na analytiku)
+- [x] **T4.1** pravý 404 (`NotFoundPage`, neznáma cesta → notfound + noindex)
+- [~] **T4.2** BreadcrumbList JSON-LD hotové (prerender); vizuálne breadcrumbs zatiaľ nie
+- [x] **T4.3** „súvisiace články" — už existuje (ArticleCard = `<a href="/blog/slug">`,
+      ArticlePage sekcia „Ďalšie články z kategórie")
+- [x] **T4.4** `loading="lazy"`+`decoding="async"` na obrázky tela a galérie;
+      CLS už rieši aspect-ratio box z `block.image.width/height`; obálka eager (LCP)
+- [x] **T4.5** hlavný bundle 3,4 MB → **1,69 MB** (gzip 960→483 KB): MapPage a
+      GalleryPage sú lazy (mapy sa sťahujú len na /mapa)
+- [ ] **T4.6** Google Search Console + reálne meranie (vec používateľa — jeho účet)
 
 ---
 
