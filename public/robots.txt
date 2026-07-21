@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /prihlasenie
+Disallow: /registracia
+Disallow: /zabudnute-heslo
+Disallow: /reset-hesla
+Disallow: /profil
+Disallow: /hladat
+
+Sitemap: https://hradiska.sk/sitemap.xml
