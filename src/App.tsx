@@ -10,6 +10,7 @@ import { GalleryPage } from './pages/GalleryPage';
 import { AktualityPage } from './pages/AktualityPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { AccountPage, type AccountMode } from './pages/AccountPage';
+import { SearchResultsPage } from './pages/SearchResultsPage';
 import { MemberAuthProvider } from './auth/MemberAuth';
 import { Toaster } from './components/ui/sonner';
 import { Footer } from './components/Footer';
@@ -19,7 +20,7 @@ import './styles/globals.css';
 // Admin je lazy — návštevník webu ho nikdy nestiahne, nezväčšuje hlavný bundle.
 const AdminApp = lazy(() => import('./admin/AdminApp'));
 
-type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'admin' | 'account';
+type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'admin' | 'account' | 'hladat';
 
 // Cesty účtov → režim AccountPage
 const ACCOUNT_ROUTES: Record<string, AccountMode> = {
@@ -57,6 +58,9 @@ function App() {
       } else if (ACCOUNT_ROUTES[path]) {
         setRoute('account');
         setAccountMode(ACCOUNT_ROUTES[path]);
+      } else if (path === '/hladat' || path === '/vyhladavanie') {
+        setRoute('hladat');
+        setParams({ q: searchParams.get('q') || '' });
       } else if (path === '/mapa') {
         setRoute('mapa');
       } else if (path === '/aktuality' || path.startsWith('/aktuality/')) {
@@ -168,6 +172,7 @@ function App() {
       {route === 'article' && <ArticlePage articleSlug={params.slug} />}
       {route === 'about' && <AboutPage />}
       {route === 'account' && <AccountPage mode={accountMode} />}
+      {route === 'hladat' && <SearchResultsPage query={params.q} />}
 
       <Toaster position="top-center" />
 

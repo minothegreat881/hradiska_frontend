@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { mockSites, mockArticles } from '../data/mock-data';
+import { searchArticles, makeSnippet, coverToUrl, getSearchIndex, type SearchHit } from '../lib/searchIndex';
+
+const goTo = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
 // Design tokens – "Vyhľadávací dropdown, varianta 2B (S náhľadmi)"
 const T = {
@@ -64,6 +66,8 @@ interface RowResult {
   mid: string;
   post: string;
   sub: string;
+  /** Zvýraznený úryvok z tela (ak sa zhoda našla v texte). */
+  snip?: { pre: string; mid: string; post: string; matched: boolean };
   thumbnail?: string;
   typeLabel?: string;
 }
@@ -179,7 +183,17 @@ function ResultRow({
             whiteSpace: 'nowrap',
           }}
         >
-          {result.sub}
+          {result.snip && result.snip.matched ? (
+            <>
+              {result.snip.pre}
+              <mark style={{ background: 'transparent', color: T.amber, fontWeight: 600, padding: 0 }}>
+                {result.snip.mid}
+              </mark>
+              {result.snip.post}
+            </>
+          ) : (
+            result.sub
+          )}
         </span>
       </span>
       {result.typeLabel && (
@@ -213,41 +227,49 @@ export function HeroSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const trimmed = query.trim();
+  const [hits, setHits] = useState<SearchHit[]>([]);
+  const [searching, setSearching] = useState(false);
 
-  const locationResults = useMemo<RowResult[]>(() => {
-    if (!trimmed) return [];
-    return mockSites
-      .map((site) => ({ site, h: highlight(site.name, trimmed) }))
-      .filter((x) => x.h.matched)
-      .slice(0, 6)
-      .map(({ site, h }) => ({
-        id: `site-${site.id}`,
-        href: `/sites/${site.slug}`,
-        pre: h.pre,
-        mid: h.mid,
-        post: h.post,
-        sub: site.district,
-        thumbnail: site.images[0],
-        typeLabel: site.type === 'hradisko' ? 'hradisko' : 'lokalita',
-      }));
+  // Hľadanie je async (index sa lenivo stiahne z backendu). Debounce 140 ms,
+  // aby sme nespúšťali na každý úder klávesy.
+  useEffect(() => {
+    if (!trimmed) { setHits([]); setSearching(false); return; }
+    let cancelled = false;
+    setSearching(true);
+    const t = setTimeout(() => {
+      searchArticles(trimmed, 40)
+        .then((res) => { if (!cancelled) setHits(res); })
+        .catch(() => { if (!cancelled) setHits([]); })
+        .finally(() => { if (!cancelled) setSearching(false); });
+    }, 140);
+    return () => { cancelled = true; clearTimeout(t); };
   }, [trimmed]);
 
-  const articleResults = useMemo<RowResult[]>(() => {
-    if (!trimmed) return [];
-    return mockArticles
-      .map((article) => ({ article, h: highlight(article.title, trimmed) }))
-      .filter((x) => x.h.matched)
-      .slice(0, 6)
-      .map(({ article, h }) => ({
-        id: `article-${article.id}`,
-        href: `/blog/${article.slug}`,
-        pre: h.pre,
-        mid: h.mid,
-        post: h.post,
-        sub: `Blog · ${article.category ?? 'článok'}`,
-        thumbnail: article.coverImage,
-      }));
-  }, [trimmed]);
+  const hitToRow = (hit: SearchHit): RowResult => {
+    const h = highlight(hit.title, trimmed);
+    const snip = makeSnippet(hit.text, trimmed);
+    return {
+      id: `article-${hit.slug}`,
+      href: `/blog/${hit.slug}`,
+      pre: h.pre,
+      mid: h.mid,
+      post: h.post,
+      sub: hit.categoryName || 'Článok',
+      snip,
+      thumbnail: coverToUrl(hit.cover),
+      typeLabel: hit.hasLocation ? 'lokalita' : undefined,
+    };
+  };
+
+  // Rozdelenie podľa polohy: články s lokalitou = Lokality/hradiská, ostatné = Články.
+  const locationResults = useMemo<RowResult[]>(
+    () => hits.filter((h) => h.hasLocation).slice(0, 6).map(hitToRow),
+    [hits, trimmed],
+  );
+  const articleResults = useMemo<RowResult[]>(
+    () => hits.filter((h) => !h.hasLocation).slice(0, 8).map(hitToRow),
+    [hits, trimmed],
+  );
 
   const allResults = useMemo(() => [...locationResults, ...articleResults], [locationResults, articleResults]);
   const showPanel = isFocused && trimmed.length > 0;
@@ -257,11 +279,20 @@ export function HeroSearch() {
     setSelectedIndex(0);
   }, [trimmed]);
 
+  const openResultsPage = () => {
+    if (!trimmed) return;
+    setIsFocused(false);
+    inputRef.current?.blur();
+    goTo(`/hladat?q=${encodeURIComponent(trimmed)}`);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showPanel || !hasResults) {
-      if (e.key === 'Escape') inputRef.current?.blur();
+    if (e.key === 'Escape') {
+      inputRef.current?.blur();
+      setIsFocused(false);
       return;
     }
+    if (!showPanel) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedIndex((prev) => Math.min(prev + 1, allResults.length - 1));
@@ -270,10 +301,10 @@ export function HeroSearch() {
       setSelectedIndex((prev) => Math.max(prev - 1, 0));
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      window.location.href = allResults[selectedIndex].href;
-    } else if (e.key === 'Escape') {
-      inputRef.current?.blur();
-      setIsFocused(false);
+      // Enter na vybranom výsledku → článok; inak (žiadne zvýraznené) → stránka výsledkov.
+      const target = hasResults ? allResults[selectedIndex] : undefined;
+      if (target) goTo(target.href);
+      else openResultsPage();
     }
   };
 
@@ -336,6 +367,8 @@ export function HeroSearch() {
             onFocus={() => {
               setIsFocused(true);
               setPulseKey((k) => k + 1);
+              // Zahrej index hneď pri fokuse, nech je prvé hľadanie okamžité.
+              getSearchIndex().catch(() => {});
             }}
             onBlur={() => setTimeout(() => setIsFocused(false), 200)}
             onKeyDown={handleKeyDown}
@@ -442,7 +475,9 @@ export function HeroSearch() {
                     fontFamily: 'var(--font-serif)',
                   }}
                 >
-                  Pre „<strong style={{ color: T.amber }}>{query}</strong>" sme nič nenašli.
+                  {searching
+                    ? 'Hľadám…'
+                    : <>Pre „<strong style={{ color: T.amber }}>{query}</strong>" sme nič nenašli.</>}
                 </div>
               )}
             </div>
@@ -451,6 +486,7 @@ export function HeroSearch() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                gap: 12,
                 padding: '9px 18px',
                 borderTop: `1px solid ${T.dividerStrong}`,
                 background: T.footerBg,
@@ -459,7 +495,21 @@ export function HeroSearch() {
                 color: T.textSecondary,
               }}
             >
-              <span style={{ marginLeft: 'auto' }}>{allResults.length} výsledkov</span>
+              {hasResults && (
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={openResultsPage}
+                  style={{
+                    border: 'none', background: 'transparent', cursor: 'pointer',
+                    color: T.amber, fontWeight: 600, fontFamily: 'var(--font-serif)',
+                    fontSize: 14, padding: 0, textDecoration: 'underline',
+                  }}
+                >
+                  Zobraziť všetky výsledky
+                </button>
+              )}
+              <span style={{ marginLeft: 'auto' }}>{hits.length} výsledkov</span>
             </div>
           </motion.div>
         )}
