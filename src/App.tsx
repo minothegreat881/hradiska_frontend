@@ -15,6 +15,7 @@ import { MemberAuthProvider } from './auth/MemberAuth';
 import { Toaster } from './components/ui/sonner';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
+import { InstallPrompt } from './components/InstallPrompt';
 import { initConsent } from './lib/consent';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
@@ -201,6 +202,9 @@ function App() {
 
       {/* GDPR cookie-consent — fixed dole, neblokuje scroll; späť sa otvorí z pätičky */}
       <CookieBanner />
+
+      {/* PWA — ponuka „Nainštalovať appku" (až po zapojení a cookie lište) */}
+      <InstallPrompt />
     </div>
   );
 }

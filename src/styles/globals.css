@@ -2115,3 +2115,33 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   .ck-shield .ck-emoji { animation: none; }
   .ck-btn, .ck-toggle, .ck-toggle-knob, .ck-settings-link { transition: none; }
 }
+
+/* ═══ PWA ponuka „Nainštalovať appku" — zdieľa vzhľad kompaktnej cookie karty ═══ */
+.pwa-dock {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 9998;
+  display: flex; justify-content: flex-end; padding: 0 20px 20px; pointer-events: none;
+}
+.pwa-card {
+  pointer-events: auto; width: 380px; max-width: calc(100vw - 32px);
+  background: linear-gradient(180deg, var(--ck-card-top) 0%, var(--ck-card-bottom) 100%);
+  border: 1px solid var(--ck-card-border); border-radius: 16px;
+  box-shadow: 0 34px 80px -24px rgba(10, 6, 2, .75), inset 0 1px 0 rgba(255, 251, 240, .8);
+  animation: ckBannerIn .4s ease-out both; overflow: hidden;
+}
+.pwa-body { display: flex; align-items: flex-start; gap: 14px; padding: 16px 16px 16px; }
+.pwa-icon { flex-shrink: 0; width: 56px; height: 56px; }
+.pwa-icon img {
+  width: 56px; height: 56px; object-fit: cover; border-radius: 14px;
+  border: 1px solid var(--ck-shield-border);
+  box-shadow: 0 8px 18px -8px rgba(40, 20, 5, .5), inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+.pwa-share {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; vertical-align: -4px; color: var(--ck-accent);
+  border: 1px solid var(--ck-pill-border); border-radius: 5px; background: var(--ck-pill-bg);
+}
+@media (max-width: 640px) {
+  .pwa-dock { justify-content: center; padding: 0 10px 12px; }
+  .pwa-card { width: 100%; max-width: calc(100vw - 20px); }
+}
+@media (prefers-reduced-motion: reduce) { .pwa-card { animation: none; } }

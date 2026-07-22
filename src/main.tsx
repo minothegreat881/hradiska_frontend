@@ -18,5 +18,9 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { initPwa } from "./lib/pwa";
+
+// PWA: service worker + odchyt inštalačnej ponuky + počítadlo návštev.
+initPwa();
 
 createRoot(document.getElementById("root")!).render(<App />);

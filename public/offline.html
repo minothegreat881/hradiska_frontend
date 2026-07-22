@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offline — Hradiská.sk</title>
+  <style>
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #f8f1de, #efe3c6);
+      color: #4a3f2e; font-family: Georgia, "Times New Roman", serif;
+      text-align: center; padding: 24px;
+    }
+    .card { max-width: 420px; }
+    .shield {
+      width: 88px; height: 100px; margin: 0 auto 22px;
+      background: linear-gradient(180deg, #7c1f24, #5e1418);
+      border: 2px solid #c8a15a;
+      border-radius: 44px 44px 50% 50% / 34px 34px 62% 62%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 12px 26px -10px rgba(40, 10, 5, .6);
+      font-size: 40px;
+    }
+    h1 { font-family: "Cinzel", Georgia, serif; font-size: 26px; color: #2e2213; margin: 0 0 10px; letter-spacing: .02em; }
+    p { font-size: 17px; line-height: 1.55; margin: 0 0 22px; }
+    button {
+      font-family: "Cinzel", Georgia, serif; font-size: 14px; font-weight: 600; letter-spacing: .04em;
+      color: #fbf3e2; background: linear-gradient(180deg, #b0813a, #8a5316);
+      border: 1px solid #7c4a13; border-radius: 999px; padding: 12px 26px; cursor: pointer;
+      box-shadow: 0 10px 22px -10px rgba(120, 74, 19, .75);
+    }
+    button:hover { filter: brightness(1.08); }
+    .fleur { margin-top: 26px; color: #c3a86f; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="shield" aria-hidden="true">🛡️</div>
+    <h1>Stráže hlásia: si offline</h1>
+    <p>Zdá sa, že brány k internetu sú práve zatvorené. Skontroluj pripojenie a skús to znova — už navštívené stránky nájdeš aj bez signálu.</p>
+    <button onclick="location.reload()">Skúsiť znova</button>
+    <div class="fleur">⚜</div>
+  </div>
+</body>
+</html>

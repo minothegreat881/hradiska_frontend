@@ -2,6 +2,7 @@
 
 import { useId } from 'react';
 import { openCookieSettings } from '../lib/consent';
+import { openInstall, isStandalone } from '../lib/pwa';
 
 /**
  * Pätička webu — varianta 7A „Vlnovková hrana".
@@ -284,6 +285,26 @@ export function Footer() {
           >
             Zvyky hradiska (cookies)
           </button>
+          {typeof window !== 'undefined' && !isStandalone() && (
+            <button
+              type="button"
+              onClick={openInstall}
+              style={{
+                fontSize: 16,
+                color: 'var(--ft-tagline)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                fontFamily: 'inherit',
+                transition: 'color 0.16s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--ft-link-hover)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--ft-tagline)'; }}
+            >
+              Nainštalovať appku
+            </button>
+          )}
           <button type="button" onClick={scrollTop} className="to-top">
             Späť hore ↑
           </button>
