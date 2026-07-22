@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Feather, Quote, ZoomIn, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { mockArticles } from '../data/mock-data';
@@ -11,8 +12,9 @@ import { SocialShare } from '../components/SocialShare';
 import { CommentSection } from '../components/CommentSection';
 import { HistoricalGallery } from '../components/HistoricalGallery';
 import { ArticleSidebar } from '../components/ArticleSidebar';
-import { useBlogPost, useBlogPosts } from '../hooks/useStrapi';
+import { useBlogPost } from '../hooks/useStrapi';
 import { getStrapiImageUrl, convertStrapiPostToArticle, StrapiQuote } from '../lib/strapi';
+import { getRelated, type RelatedCard } from '../lib/related';
 import { QuoteBlock } from '../components/QuoteBlock';
 import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 
@@ -27,13 +29,16 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
   // entry at 'bojna-vyznamne-velkomoravske-centrum' that silently won).
   const { post: strapiPost, loading, error } = useBlogPost(articleSlug);
 
-  // Real "related articles" from the same Strapi category — replaces the
-  // previous behaviour of always pulling from fabricated mockArticles
-  // (that's where the fake "Slovania: Mýtus a realita" cards came from).
-  const { posts: relatedStrapiPosts } = useBlogPosts({
-    categorySlug: strapiPost?.category?.slug,
-    pageSize: 4,
-  });
+  // Odporúčané „súvisiace" články — adresný systém podľa obsahu (lib/related.ts):
+  // MiniSearch dopyt kľúčovými slovami článku + boost za kategóriu/lokalitu/tagy.
+  // Nahrádza pôvodné „prvé 3 z rovnakej kategórie" (opakujúce sa, nerelevantné).
+  const [related, setRelated] = useState<RelatedCard[]>([]);
+  useEffect(() => {
+    let alive = true;
+    setRelated([]);
+    if (articleSlug) getRelated(articleSlug, 6).then((r) => { if (alive) setRelated(r); }).catch(() => {});
+    return () => { alive = false; };
+  }, [articleSlug]);
 
   // Mock article is only used as a fallback for slugs that don't exist in
   // Strapi at all (demo/prototype content), never to override a real post.
@@ -107,11 +112,8 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
     );
   }
 
-  const relatedArticles = strapiPost
-    ? relatedStrapiPosts.filter((a) => a.slug !== article.slug).slice(0, 3)
-    : mockArticles
-        .filter((a) => a.id !== article.id && a.category === article.category)
-        .slice(0, 3);
+  // Súvisiace = odporúčané (načítané async vyššie). Pri mock článkoch ostáva prázdne.
+  const relatedArticles = related;
 
   const categoryLabels: Record<string, string> = {
     vyskum: 'Výskum',
@@ -780,7 +782,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                     color: '#4a3f2f' /* WCAG AAA - 7.1:1 */
                   }}
                 >
-                  Ďalšie články z kategórie {strapiPost ? strapiPost.category?.name : categoryLabels[article.category!]}
+                  Vybrali sme články príbuzné tejto téme
                 </p>
               </div>
             </ScrollReveal>

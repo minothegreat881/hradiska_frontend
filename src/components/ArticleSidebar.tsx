@@ -458,7 +458,7 @@ export function ArticleSidebar({
         <div style={cardStyle}>
           <h3 style={cardTitleStyle}>Súvisiace články</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {relatedArticles.slice(0, 3).map((related) => (
+            {relatedArticles.slice(0, 5).map((related) => (
               <a
                 key={related.id}
                 href={`/blog/${related.slug}`}
