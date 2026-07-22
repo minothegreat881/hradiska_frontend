@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { ArticleCard } from '../components/ArticleCard';
 import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
-import { ArrowLeft, Crown, Scroll, Loader2 } from 'lucide-react';
+import { Crown, Scroll, Loader2 } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 
 interface CategoryPageProps {
@@ -79,25 +79,23 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Späť */}
-            <a
-              href="/"
-              className="ch-back inline-flex items-center gap-2"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: 13,
-                letterSpacing: '0.04em',
-                color: '#9a5d1f',
-                textDecoration: 'none',
-                marginBottom: 16,
-                transition: 'color 150ms ease',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#c8862f'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = '#9a5d1f'; }}
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Späť na domovskú stránku
-            </a>
+            {/* Omrvinky (breadcrumbs): Domov › Kategória */}
+            <nav aria-label="Omrvinky" style={{ marginBottom: 16 }}>
+              <ol style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '0.03em', color: '#7a6b56' }}>
+                <li>
+                  <a
+                    href="/"
+                    style={{ color: '#9a5d1f', textDecoration: 'none', transition: 'color 150ms ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = '#c8862f'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = '#9a5d1f'; }}
+                  >
+                    Domov
+                  </a>
+                </li>
+                <li aria-hidden="true" style={{ color: '#c4a574' }}>›</li>
+                <li aria-current="page" style={{ color: '#5e4a2e' }}>{categoryName}</li>
+              </ol>
+            </nav>
 
             {/* Hero karta */}
             <div className="cat-hero">

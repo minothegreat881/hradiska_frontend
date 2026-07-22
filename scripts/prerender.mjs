@@ -131,13 +131,13 @@ async function main() {
     };
     if (a.date) article.datePublished = a.date;
 
-    const breadcrumb = {
-      '@context': 'https://schema.org', '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Domov', item: SITE + '/' },
-        { '@type': 'ListItem', position: 2, name: a.title, item: canonical },
-      ],
-    };
+    // Breadcrumb zosúladený s vizuálnymi omrvinkami na stránke: Domov › Kategória › Článok.
+    const crumbs = [{ '@type': 'ListItem', position: 1, name: 'Domov', item: SITE + '/' }];
+    if (a.categorySlug && a.categoryName) {
+      crumbs.push({ '@type': 'ListItem', position: crumbs.length + 1, name: a.categoryName, item: `${SITE}/category/${a.categorySlug}` });
+    }
+    crumbs.push({ '@type': 'ListItem', position: crumbs.length + 1, name: a.title, item: canonical });
+    const breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: crumbs };
 
     const ld = [article, breadcrumb];
     if (a.hasLocation && a.lat != null && a.lng != null) {

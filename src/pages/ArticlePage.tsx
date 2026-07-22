@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Feather, Quote, ZoomIn, Loader2 } from 'lucide-react';
+import { Feather, Quote, ZoomIn, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { mockArticles } from '../data/mock-data';
 import { ArticleCard } from '../components/ArticleCard';
@@ -418,41 +418,32 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
         opacity: 0.3
       }}></div>
 
-      {/* Back link — decentný textový odkaz, zarovnaný s container okrajom hero karty */}
-      <div className="container pt-8 pb-5 relative z-10">
-        <a
-          href="/"
-          className="back-to-blog"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            fontSize: 14,
-            color: '#7d4f1d',
-            textDecoration: 'none',
-            transition: 'color 0.15s',
-            background: 'transparent',
-            padding: 0,
-            margin: 0,
-          }}
-        >
-          <ArrowLeft className="back-to-blog-arrow" style={{ width: 16, height: 16, transition: 'transform 0.15s' }} />
-          <span>Späť na blog</span>
-        </a>
-        <style>{`
-          .back-to-blog:hover {
-            color: #5d3a14 !important;
-          }
-          .back-to-blog:hover .back-to-blog-arrow {
-            transform: translateX(-2px);
-          }
-          .back-to-blog:hover span {
-            text-decoration: underline;
-            text-underline-offset: 3px;
-          }
-        `}</style>
-      </div>
+      {/* Omrvinky (breadcrumbs) — navigácia + SEO, zarovnané s container okrajom hero karty.
+          Domov › [Kategória] › [Článok]. Kategória sa berie zo Strapi, s fallbackom na mock. */}
+      {(() => {
+        const catSlug = strapiPost?.category?.slug || article.category || null;
+        const catLabel = strapiPost?.category?.name || (article.category ? (categoryLabels[article.category] || article.category) : null);
+        const title = strapiPost?.title || article.title;
+        return (
+          <nav aria-label="Omrvinky" className="container pt-8 pb-5 relative z-10">
+            <ol style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 14, color: '#7a6b56' }}>
+              <li><a href="/" className="bc-link">Domov</a></li>
+              {catSlug && catLabel && (
+                <>
+                  <li aria-hidden="true" style={{ color: '#c4a574' }}>›</li>
+                  <li><a href={`/category/${catSlug}`} className="bc-link">{catLabel}</a></li>
+                </>
+              )}
+              <li aria-hidden="true" style={{ color: '#c4a574' }}>›</li>
+              <li aria-current="page" style={{ color: '#4a3f2f', maxWidth: '55ch', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</li>
+            </ol>
+            <style>{`
+              .bc-link { color: #7d4f1d; text-decoration: none; transition: color .15s; }
+              .bc-link:hover { color: #5d3a14; text-decoration: underline; text-underline-offset: 3px; }
+            `}</style>
+          </nav>
+        );
+      })()}
 
       {/* SCEAR Layout Pattern - Everything inside one article container */}
       <section className="py-8 md:py-12 container mx-auto px-4 relative z-10">
