@@ -213,14 +213,29 @@ html, body, #root, main, article, section, div:not(.pointer-events-none):not([cl
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Žiadne horizontálne pretečenie — jeden široký prvok inak posunie celú stránku
+     a na mobile to vyzerá „neviditeľne odsunuté / necentrované". `clip` (nie `hidden`)
+     zachováva position:sticky (napr. bočný panel článku). */
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
+  max-width: 100%;
+  overflow-x: clip;
   font-family: Georgia, "Times New Roman", serif;
   background-color: #f7f4ed;  /* Optimalizované pozadie */
   color: #2d2418;             /* Vysoký kontrast text - 11.2:1 */
   transition: background-color 0.2s, color 0.2s;
+}
+
+/* Poistka proti pretečeniu médií a širokého obsahu na úzkych displejoch. */
+img, video, iframe, table, pre { max-width: 100%; }
+
+/* Mobil: univerzálna poistka proti horizontálnemu scrollu (sticky sa tu nepoužíva,
+   preto je `hidden` bezpečné aj pre staršie prehliadače bez podpory `clip`). */
+@media (max-width: 1023px) {
+  html, body { overflow-x: hidden; }
 }
 
 .dark body {
