@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./fonts.css";
 
 /* ULTIMATE FIX: Force all text to be selectable and clickable */
 * {
