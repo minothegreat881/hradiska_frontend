@@ -6,12 +6,15 @@ import { CheckCircle, Loader2 } from 'lucide-react';
 
 type FieldErrors = Partial<Record<'name' | 'email' | 'message', string>>;
 
-/** Kontaktný e-mail združenia — používa sa v CTA aj ako cieľ formulára. */
-const CONTACT_EMAIL = 'orgon333@gmail.com';
+/** Kontaktný e-mail združenia — používa sa v CTA aj ako cieľ formulára.
+ *  Zjednotené na doménovú adresu (rovnaká vo Footeri aj v Zásadách ochrany údajov). */
+const CONTACT_EMAIL = 'info@hradiska.sk';
 
-// TODO (backend): zatiaľ atrapa – formulár sa neodosiela nikam.
-// Pre produkciu: napojiť na Strapi collection "kontakt" alebo /api/mail endpoint
-// alebo služby ako Resend / EmailJS / Formspree.
+// ⚠️ PRODUKCIA — TODO: formulár je zatiaľ ATRAPA, správu NIKAM neodosiela
+// (len simuluje úspech). Rozhodnutie: doriešiť až v produkcii so skutočnou
+// e-mailovou schránkou. Vtedy napojiť na Strapi (collection „kontakt" alebo
+// /api/mail cez existujúci nodemailer), prípadne Resend/EmailJS/Formspree,
+// a doplniť GDPR súhlas (checkbox + odkaz na Zásady ochrany osobných údajov).
 async function submitForm(_data: { name: string; email: string; message: string }) {
   await new Promise(r => setTimeout(r, 900));
   return { ok: true };

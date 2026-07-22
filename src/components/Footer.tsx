@@ -1,6 +1,7 @@
 'use client';
 
 import { useId } from 'react';
+import { openCookieSettings } from '../lib/consent';
 
 /**
  * Pätička webu — varianta 7A „Vlnovková hrana".
@@ -252,6 +253,24 @@ export function Footer() {
           >
             Ochrana osobných údajov
           </a>
+          <button
+            type="button"
+            onClick={openCookieSettings}
+            style={{
+              fontSize: 16,
+              color: 'var(--ft-tagline)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              fontFamily: 'inherit',
+              transition: 'color 0.16s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--ft-link-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--ft-tagline)'; }}
+          >
+            Zvyky hradiska (cookies)
+          </button>
           <button type="button" onClick={scrollTop} className="to-top">
             Späť hore ↑
           </button>

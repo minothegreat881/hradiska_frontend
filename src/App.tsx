@@ -13,6 +13,8 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { MemberAuthProvider } from './auth/MemberAuth';
 import { Toaster } from './components/ui/sonner';
 import { Footer } from './components/Footer';
+import { CookieBanner } from './components/CookieBanner';
+import { initConsent } from './lib/consent';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
 
@@ -47,6 +49,9 @@ function App() {
   const [restoreScroll, setRestoreScroll] = useState(true);
 
   useScrollRestoration(pathname, restoreScroll);
+
+  // Ak už je uložený súhlas s cookies, aplikuj ho pri štarte (napr. spustí analytiku).
+  useEffect(() => { initConsent(); }, []);
 
   useEffect(() => {
     // Simple client-side routing
@@ -189,6 +194,9 @@ function App() {
       <Toaster position="top-center" />
 
       <Footer />
+
+      {/* GDPR cookie-consent — fixed dole, neblokuje scroll; späť sa otvorí z pätičky */}
+      <CookieBanner />
     </div>
   );
 }

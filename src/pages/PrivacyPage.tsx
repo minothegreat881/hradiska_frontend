@@ -1,5 +1,11 @@
 'use client';
 
+import { openCookieSettings } from '../lib/consent';
+
+const H2: React.CSSProperties = { fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 };
+const UL: React.CSSProperties = { paddingLeft: 20, marginTop: 8 };
+const LINK: React.CSSProperties = { color: '#7d4f1d', textDecoration: 'underline' };
+
 export function PrivacyPage() {
   return (
     <div className="min-h-screen parchment relative">
@@ -19,17 +25,12 @@ export function PrivacyPage() {
           </div>
           <h1
             className="font-semibold tracking-wide"
-            style={{
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              fontSize: 'clamp(28px, 4vw, 40px)',
-              color: '#2d1810',
-              letterSpacing: '0.04em',
-            }}
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 'clamp(28px, 4vw, 40px)', color: '#2d1810', letterSpacing: '0.04em' }}
           >
             Ochrana osobných údajov
           </h1>
           <p className="mt-3 text-sm" style={{ color: '#7a6b56', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-            Posledná aktualizácia: 11. júna 2026
+            Posledná aktualizácia: 22. júla 2026
           </p>
         </div>
 
@@ -48,74 +49,95 @@ export function PrivacyPage() {
           }}
         >
           <section>
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 }}>1. Prevádzkovateľ</h2>
+            <h2 style={H2}>1. Prevádzkovateľ</h2>
             <p>
-              Občianske združenie <strong>Hradiska.sk</strong> spracúva osobné údaje v súlade s nariadením
-              GDPR (EÚ 2016/679) a zákonom č. 18/2018 Z. z. o ochrane osobných údajov.
+              Prevádzkovateľom je občianske združenie <strong>Hradiska.sk</strong>, ktoré spracúva osobné
+              údaje v súlade s nariadením <strong>GDPR (EÚ) 2016/679</strong> a zákonom č. 18/2018 Z. z.
+              o ochrane osobných údajov. Kontakt:{' '}
+              <a href="mailto:info@hradiska.sk" style={LINK}>info@hradiska.sk</a>.
+            </p>
+            <p style={{ marginTop: 8, fontSize: 13, fontStyle: 'italic', color: '#7a6b56' }}>
+              (Identifikačné a registračné údaje združenia — IČO, sídlo a registračné číslo — sa dopĺňajú.)
             </p>
           </section>
 
           <section>
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 }}>2. Aké údaje zbierame</h2>
-            <p>Prostredníctvom kontaktného formulára „Pridajte sa k nám" zbierame:</p>
-            <ul style={{ paddingLeft: 20, marginTop: 8 }}>
-              <li>meno a priezvisko,</li>
-              <li>e-mailovú adresu,</li>
-              <li>obsah vašej správy.</li>
+            <h2 style={H2}>2. Aké údaje spracúvame</h2>
+            <p><strong>a) Používateľské konto</strong> (pri registrácii): e-mailová adresa, meno alebo prezývka a heslo (uložené výhradne v zašifrovanej podobe). Konto slúži na prihlásenie a komentovanie.</p>
+            <p style={{ marginTop: 8 }}><strong>b) Komentáre</strong>: meno alebo prezývka, obsah komentára a dátum. Komentovať môžu iba prihlásení používatelia; e-mail sa preberá z konta a verejne sa nezobrazuje.</p>
+            <p style={{ marginTop: 8 }}><strong>c) Kontaktný formulár</strong> („Pridajte sa k nám"): meno, e-mailová adresa a obsah správy.</p>
+            <p style={{ marginTop: 8 }}><strong>d) Technické údaje</strong>: IP adresa a záznamy servera (logy), ktoré vznikajú automaticky pri návšteve a slúžia na prevádzku a bezpečnosť webu.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>3. Cookies a lokálne úložisko</h2>
+            <p>
+              Na prihlásenie a zapamätanie vášho rozhodnutia o cookies používame <strong>nevyhnutné</strong>{' '}
+              lokálne úložisko prehliadača (napr. prihlasovací token) — tie sú potrebné na chod webu.
+              <strong> Analytické</strong> cookies (anonymná návštevnosť) používame <strong>iba s vaším súhlasom</strong>;
+              pred jeho udelením sa nenačíta žiadny analytický skript ani cookies tretích strán.
+            </p>
+            <p style={{ marginTop: 10 }}>
+              Svoje rozhodnutie môžete kedykoľvek zmeniť:{' '}
+              <button type="button" onClick={openCookieSettings} style={{ ...LINK, background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}>
+                otvoriť nastavenia cookies („Zvyky hradiska")
+              </button>.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>4. Právne základy a účel</h2>
+            <ul style={UL}>
+              <li><strong>Poskytnutie služby</strong> (čl. 6 ods. 1 písm. b) — vedenie konta a zobrazovanie komentárov.</li>
+              <li><strong>Súhlas</strong> (čl. 6 ods. 1 písm. a) — analytické cookies; vybavenie správy z kontaktného formulára.</li>
+              <li><strong>Oprávnený záujem</strong> (čl. 6 ods. 1 písm. f) — bezpečnosť, prevádzka a ochrana webu pred zneužitím.</li>
+            </ul>
+            <p style={{ marginTop: 8 }}>Údaje nepoužívame na profilovanie ani automatizované rozhodovanie a neposkytujeme ich na marketingové účely.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>5. Príjemcovia a sprostredkovatelia</h2>
+            <p>Údaje spracúvame my; technicky nám pomáhajú:</p>
+            <ul style={UL}>
+              <li>poskytovateľ <strong>hostingu</strong>, na ktorom beží web a databáza;</li>
+              <li><strong>e-mailová služba</strong> (SMTP) pri overovaní registrácie a resete hesla;</li>
+              <li><strong>Google Fonts</strong> pri načítaní historických fontov (spracúva sa IP adresa) — v prípade prechodu na lokálne fonty odpadá.</li>
+            </ul>
+            <p style={{ marginTop: 8 }}>Údaje neposkytujeme tretím stranám na ich vlastné účely.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>6. Doba uchovávania</h2>
+            <ul style={UL}>
+              <li><strong>Konto a komentáre</strong> — po dobu existencie konta; po zrušení konta ich vymažeme (komentáre možno anonymizovať).</li>
+              <li><strong>Kontaktná správa</strong> — najviac 3 roky od posledného kontaktu.</li>
+              <li><strong>Serverové logy</strong> — krátkodobo, v rozsahu nevyhnutnom na bezpečnosť a prevádzku.</li>
             </ul>
           </section>
 
           <section>
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 }}>3. Účel spracovania</h2>
-            <p>
-              Údaje použijeme výhradne na odpoveď na vašu konkrétnu správu a ďalšiu komunikáciu
-              o navrhnutej spolupráci. Neposkytujeme ich tretím stranám ani na marketingové účely.
-            </p>
-          </section>
-
-          <section>
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 }}>4. Doba uchovávania</h2>
-            <p>
-              Údaje uchovávame po dobu nevyhnutnú na vybavenie vašej žiadosti, maximálne však 3 roky
-              od posledného kontaktu.
-            </p>
-          </section>
-
-          <section>
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 }}>5. Vaše práva</h2>
+            <h2 style={H2}>7. Vaše práva</h2>
             <p>Máte právo na:</p>
-            <ul style={{ paddingLeft: 20, marginTop: 8 }}>
+            <ul style={UL}>
               <li>prístup k svojim osobným údajom,</li>
               <li>opravu nepresných údajov,</li>
               <li>vymazanie údajov („právo byť zabudnutý"),</li>
               <li>obmedzenie spracovania,</li>
               <li>prenosnosť údajov,</li>
-              <li>namietať proti spracovaniu.</li>
+              <li>namietať proti spracovaniu a kedykoľvek odvolať súhlas.</li>
             </ul>
-          </section>
-
-          <section>
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 }}>6. Kontakt</h2>
-            <p>
-              S otázkami sa obráťte na e-mail{' '}
-              <a href="mailto:info@hradiska.sk" style={{ color: '#7d4f1d', textDecoration: 'underline' }}>
-                info@hradiska.sk
-              </a>.
+            <p style={{ marginTop: 8 }}>
+              Máte tiež právo podať sťažnosť dozornému orgánu — <strong>Úrad na ochranu osobných údajov SR</strong>{' '}
+              (<a href="https://dataprotection.gov.sk" target="_blank" rel="noopener noreferrer" style={LINK}>dataprotection.gov.sk</a>).
             </p>
           </section>
 
-          <section
-            style={{
-              marginTop: 16,
-              padding: 16,
-              background: 'rgba(232,197,110,0.18)',
-              border: '1px solid rgba(168,116,55,0.35)',
-              borderRadius: 8,
-              fontStyle: 'italic',
-              fontSize: 14,
-            }}
-          >
-            Toto je predbežná verzia dokumentu. Pre úplné znenie kontaktujte správcu webu.
+          <section>
+            <h2 style={H2}>8. Kontakt</h2>
+            <p>
+              S otázkami o spracovaní údajov a uplatnením práv sa obráťte na{' '}
+              <a href="mailto:info@hradiska.sk" style={LINK}>info@hradiska.sk</a>.
+            </p>
           </section>
         </div>
       </div>

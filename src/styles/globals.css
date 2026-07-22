@@ -1938,3 +1938,168 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .admin .ad-rte .tiptap ol { padding-left: 1.4em; margin: 0 0 .8em; }
 .admin .ad-rte .tiptap li { margin: .2em 0; }
 .admin .ad-rte .tiptap a { color: var(--ad-amber-deep); text-decoration: underline; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * COOKIE CONSENT BANNER — „Stoj! Kto tam?" (hradiskový pergamenový štýl)
+ * Farby ako lokálne premenné (nie inline). Fonty z --font-heading/--font-serif.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+.ck-root {
+  --ck-card-top: #f8f1de;
+  --ck-card-bottom: #efe3c6;
+  --ck-card-border: #b99760;
+  --ck-rim: #9a5d1f;
+  --ck-wave: #e6c98a;
+  --ck-shield-top: #7c1f24;
+  --ck-shield-bottom: #5e1418;
+  --ck-shield-border: #c8a15a;
+  --ck-pill-text: #8a5316;
+  --ck-pill-bg: #f6ead0;
+  --ck-pill-border: #dcc593;
+  --ck-title: #2e2213;
+  --ck-body: #4a3f2e;
+  --ck-accent: #8a5316;
+  --ck-muted: #6b5535;
+  --ck-link: #8a795e;
+  --ck-btn-top: #b0813a;
+  --ck-btn-bottom: #8a5316;
+  --ck-btn-border: #7c4a13;
+  --ck-btn-text: #fbf3e2;
+  --ck-btn2-border: #c3a86f;
+  --ck-btn2-text: #6b5535;
+  --ck-edge: #d8c49a;
+}
+
+/* Fixed dock zdola, centrovaná karta */
+.ck-dock {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  padding: 0 32px 34px;
+  pointer-events: none; /* len karta je klikateľná */
+}
+.ck-card {
+  pointer-events: auto;
+  width: 820px;
+  max-width: calc(100vw - 64px);
+  background: linear-gradient(180deg, var(--ck-card-top) 0%, var(--ck-card-bottom) 100%);
+  border: 1px solid var(--ck-card-border);
+  border-radius: 16px;
+  box-shadow: 0 34px 80px -24px rgba(10, 6, 2, .75), inset 0 1px 0 rgba(255, 251, 240, .8);
+  animation: ckBannerIn .4s ease-out both;
+  overflow: hidden;
+}
+@keyframes ckBannerIn {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Zlatý horný lem s vlnovkou */
+.ck-rim-bar { height: 12px; background: var(--ck-rim); border-radius: 15px 15px 0 0; overflow: hidden; }
+.ck-rim-bar svg { display: block; }
+
+/* Telo */
+.ck-body { display: flex; gap: 22px; padding: 24px 28px 26px; }
+
+/* Štít stráže (dekoratívny) */
+.ck-shield-wrap { flex-shrink: 0; width: 76px; height: 96px; align-self: flex-start; display: flex; flex-direction: column; align-items: center; }
+.ck-shield {
+  width: 76px; height: 88px;
+  background: linear-gradient(180deg, var(--ck-shield-top), var(--ck-shield-bottom));
+  border: 2px solid var(--ck-shield-border);
+  border-radius: 38px 38px 50% 50% / 30px 30px 62% 62%;
+  box-shadow: 0 10px 22px -8px rgba(40, 10, 5, .6);
+  display: flex; align-items: center; justify-content: center;
+}
+.ck-shield .ck-emoji { font-size: 34px; line-height: 1; animation: ckTorch 2.6s ease-in-out infinite; }
+@keyframes ckTorch { 0%, 100% { opacity: 1; } 50% { opacity: .75; } }
+.ck-pill {
+  margin-top: -8px;
+  font-family: var(--font-heading);
+  font-size: 9px; letter-spacing: .14em; font-weight: 600;
+  color: var(--ck-pill-text); background: var(--ck-pill-bg);
+  border: 1px solid var(--ck-pill-border); border-radius: 999px;
+  padding: 2px 8px; position: relative; z-index: 1;
+}
+
+/* Text */
+.ck-text { flex: 1; min-width: 0; }
+.ck-title { font-family: var(--font-heading); font-size: 22px; font-weight: 700; color: var(--ck-title); margin: 0 0 8px; }
+.ck-p { font-family: var(--font-serif); font-size: 17px; line-height: 1.52; color: var(--ck-body); margin: 0 0 8px; }
+.ck-p:last-of-type { margin-bottom: 0; }
+.ck-accent { color: var(--ck-accent); font-weight: 700; }
+.ck-accent-i { color: var(--ck-accent); font-style: italic; }
+.ck-strong { color: var(--ck-muted); font-weight: 700; }
+
+/* Tlačidlá */
+.ck-actions { display: flex; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.ck-btn {
+  font-family: var(--font-heading); font-size: 14px; font-weight: 600; letter-spacing: .05em;
+  border-radius: 999px; padding: 12px 24px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: filter .16s ease, background .16s ease, border-color .16s ease, color .16s ease, transform .06s ease;
+}
+.ck-btn:active { transform: translateY(1px); }
+.ck-btn:focus-visible { outline: 2px solid var(--ck-rim); outline-offset: 2px; }
+.ck-note { font-family: var(--font-serif); font-style: italic; font-size: 12px; }
+.ck-nowrap { white-space: nowrap; }
+
+.ck-btn-primary { color: var(--ck-btn-text); background: linear-gradient(180deg, var(--ck-btn-top), var(--ck-btn-bottom)); border: 1px solid var(--ck-btn-border); box-shadow: 0 10px 22px -10px rgba(120, 74, 19, .75); }
+.ck-btn-primary:hover { filter: brightness(1.08); }
+.ck-btn-secondary { color: var(--ck-btn2-text); background: transparent; border: 1px solid var(--ck-btn2-border); }
+.ck-btn-secondary:hover { color: var(--ck-accent); border-color: var(--ck-accent); background: rgba(200, 161, 90, .1); }
+
+.ck-settings-link {
+  margin-left: auto;
+  font-family: var(--font-serif); font-style: italic; font-size: 14px;
+  color: var(--ck-link); background: none; border: none; cursor: pointer;
+  border-bottom: 1px solid var(--ck-pill-border); padding: 0 0 1px;
+  transition: color .16s ease, border-color .16s ease;
+}
+.ck-settings-link:hover { color: var(--ck-accent); border-color: var(--ck-accent); }
+.ck-settings-link:focus-visible { outline: 2px solid var(--ck-rim); outline-offset: 3px; }
+
+/* Pätka s fleur-de-lis */
+.ck-foot { display: flex; align-items: center; gap: 14px; padding: 0 28px 14px; }
+.ck-foot .ck-rule { flex: 1; height: 1px; }
+.ck-foot .ck-rule-l { background: linear-gradient(90deg, transparent, var(--ck-edge)); }
+.ck-foot .ck-rule-r { background: linear-gradient(90deg, var(--ck-edge), transparent); }
+.ck-foot .ck-fleur { color: var(--ck-btn2-border); font-size: 11px; }
+
+/* Panel nastavení (kategórie) */
+.ck-settings { padding: 4px 28px 22px; }
+.ck-cat { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: rgba(255, 253, 248, .6); border: 1px solid var(--ck-pill-border); border-radius: 12px; margin-bottom: 12px; }
+.ck-cat h3 { font-family: var(--font-heading); font-size: 15px; font-weight: 700; color: var(--ck-title); margin: 0 0 4px; }
+.ck-cat p { font-family: var(--font-serif); font-size: 15px; line-height: 1.45; color: var(--ck-body); margin: 0; }
+.ck-cat-ctl { flex-shrink: 0; margin-left: auto; }
+.ck-fixed-tag { font-family: var(--font-heading); font-size: 10px; letter-spacing: .1em; color: var(--ck-pill-text); background: var(--ck-pill-bg); border: 1px solid var(--ck-pill-border); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+
+/* Prepínač (toggle) */
+.ck-toggle { position: relative; width: 46px; height: 26px; border-radius: 999px; border: 1px solid var(--ck-btn2-border); background: #e7dcc4; cursor: pointer; transition: background .18s ease, border-color .18s ease; padding: 0; }
+.ck-toggle[aria-checked="true"] { background: linear-gradient(180deg, var(--ck-btn-top), var(--ck-btn-bottom)); border-color: var(--ck-btn-border); }
+.ck-toggle:focus-visible { outline: 2px solid var(--ck-rim); outline-offset: 2px; }
+.ck-toggle-knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fffdf8; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); transition: transform .18s ease; }
+.ck-toggle[aria-checked="true"] .ck-toggle-knob { transform: translateX(20px); }
+
+/* Mobil */
+@media (max-width: 640px) {
+  .ck-dock { padding: 0 10px 14px; }
+  .ck-card { max-width: calc(100vw - 20px); }
+  .ck-body { padding: 20px 18px 20px; gap: 16px; }
+  .ck-title { font-size: 20px; }
+  .ck-p { font-size: 16px; }
+  .ck-actions { gap: 10px; }
+  .ck-btn { width: 100%; justify-content: center; }
+  .ck-settings-link { margin-left: 0; width: 100%; text-align: center; padding-top: 6px; }
+}
+@media (max-width: 520px) {
+  .ck-shield-wrap { display: none; } /* na malých mobiloch štít skry */
+}
+
+/* Rešpektuj prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .ck-card { animation: none; }
+  .ck-shield .ck-emoji { animation: none; }
+  .ck-btn, .ck-toggle, .ck-toggle-knob, .ck-settings-link { transition: none; }
+}
