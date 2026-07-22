@@ -306,6 +306,35 @@ function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
 }
 
 // =============================================================================
+// INLINE CHILDREN (text/link s bold/italic/underline) — spoločné pre paragraph aj list
+// =============================================================================
+
+function renderInlineChildren(children: any[] = []): React.ReactNode[] {
+  return children.map((child: any, ci: number) => {
+    if (child.type === 'link') {
+      const linkText = child.children?.map((c: any) => c.text).join('') || child.url;
+      return (
+        <a
+          key={ci}
+          href={child.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-amber-700 dark:text-amber-400 underline hover:text-amber-900 dark:hover:text-amber-300 break-words"
+        >
+          {linkText}
+        </a>
+      );
+    }
+    // type === 'text' (môže mať bold/italic/underline)
+    let node: React.ReactNode = child.text || '';
+    if (child.bold) node = <strong key={ci}>{node}</strong>;
+    if (child.italic) node = <em key={ci}>{node}</em>;
+    if (child.underline) node = <u key={ci}>{node}</u>;
+    return <React.Fragment key={ci}>{node}</React.Fragment>;
+  });
+}
+
+// =============================================================================
 // RICH TEXT RENDERER with clear-before-heading pattern
 // =============================================================================
 
@@ -325,29 +354,7 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
       // Inline children môžu byť `text` ALEBO `link` (so vnoreným text child-om).
       // Predtým mapovanie len `child.text` stratilo paragraphy s len `link` — napríklad
       // celú sekciu "Zdroje a literatúra" v ktorej sú URL ako <link> elementy.
-      const renderInline = (children: any[] = []): React.ReactNode[] =>
-        children.map((child: any, ci: number) => {
-          if (child.type === 'link') {
-            const linkText = child.children?.map((c: any) => c.text).join('') || child.url;
-            return (
-              <a
-                key={ci}
-                href={child.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-700 dark:text-amber-400 underline hover:text-amber-900 dark:hover:text-amber-300 break-all"
-              >
-                {linkText}
-              </a>
-            );
-          }
-          // type === 'text' (môže mať bold/italic/underline)
-          let node: React.ReactNode = child.text || '';
-          if (child.bold) node = <strong key={ci}>{node}</strong>;
-          if (child.italic) node = <em key={ci}>{node}</em>;
-          if (child.underline) node = <u key={ci}>{node}</u>;
-          return <React.Fragment key={ci}>{node}</React.Fragment>;
-        });
+      const renderInline = renderInlineChildren;
 
       const plainText = (block.children || [])
         .map((c: any) =>
@@ -457,7 +464,7 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
                   background: '#a87437',
                 }}
               />
-              {item.children?.map((child: any) => child.text).join('')}
+              {renderInlineChildren(item.children)}
             </li>
           ))}
         </ul>
