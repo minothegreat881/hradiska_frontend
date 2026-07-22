@@ -32,15 +32,34 @@ const catOf = (h: Hradisko): CatSlug => ((h as any).cat as CatSlug) || TYPE_TO_C
 
 const PIN_PATH = 'M18 47 C 13 41, 4 31, 4 18 A 14 14 0 1 1 32 18 C 32 31, 23 41, 18 47 Z';
 
-// Elegantná „bodka" — farebný kruh podľa kategórie s krémovým okrajom, leskom
-// a jemným pulzujúcim halo (mdot-halo v globals.css). Farba rozlišuje kategóriu.
-function makeCatPin(cat: CatSlug, size = 24): string {
+// Marker rozlíšený TVAROM aj farbou — ľahšia orientácia než len farebné bodky.
+// Každá kategória má vlastný tvar (krémový okraj) + jemné farebné halo.
+function catShapeInner(cat: CatSlug, c: string): string {
+  const s = `fill="${c}" stroke="${PIN_CREAM}" stroke-linejoin="round"`;
+  switch (cat) {
+    case 'refugia':                     // kruh
+      return `<circle cx="12" cy="12" r="6.6" ${s} stroke-width="2"/>`;
+    case 'staroveke-sidla':             // štvorec
+      return `<rect x="5.6" y="5.6" width="12.8" height="12.8" rx="2" ${s} stroke-width="2"/>`;
+    case 'mocenske-centra':             // kosoštvorec
+      return `<path d="M12 4.2 L19.8 12 L12 19.8 L4.2 12 Z" ${s} stroke-width="2"/>`;
+    case 'strazna-funkcia':             // trojuholník (strážna veža)
+      return `<path d="M12 4.4 L19.8 18.6 L4.2 18.6 Z" ${s} stroke-width="2"/>`;
+    case 'kniezacie-sidla':             // hviezda (sídlo kniežaťa)
+      return `<path d="M12 3.4 L14.7 9.2 L21 9.9 L16.2 14.3 L17.6 20.5 L12 17.2 L6.4 20.5 L7.8 14.3 L3 9.9 L9.3 9.2 Z" ${s} stroke-width="1.5"/>`;
+    case 'svatyne-a-sakralne-objekty':  // kríž (sakrálne)
+      return `<path d="M9.6 5 h4.8 v4.6 h4.6 v4.8 h-4.6 v4.6 h-4.8 v-4.6 h-4.6 v-4.8 h4.6 Z" ${s} stroke-width="2"/>`;
+    default:
+      return `<circle cx="12" cy="12" r="6.6" ${s} stroke-width="2"/>`;
+  }
+}
+function makeCatPin(cat: CatSlug, size = 24, pulse = false): string {
   const c = CAT_COLOR[cat];
+  const halo = `<circle cx="12" cy="12" r="10.6" fill="${c}" opacity="${pulse ? 0.22 : 0.16}"${pulse ? ' class="mdot-halo"' : ''}/>`;
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" style="overflow:visible; display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));">
-      <circle cx="12" cy="12" r="10.5" fill="${c}" opacity="0.22" class="mdot-halo"/>
-      <circle cx="12" cy="12" r="6.2" fill="${c}" stroke="${PIN_CREAM}" stroke-width="2"/>
-      <circle cx="9.7" cy="9.7" r="1.7" fill="#ffffff" opacity="0.45"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" style="overflow:visible; display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));">
+      ${halo}
+      ${catShapeInner(cat, c)}
     </svg>
   `;
 }
@@ -1379,7 +1398,7 @@ export default function Slovakia3DReliefMap() {
                   rgb(${Math.round(HYPSOMETRIC_COLORS[6].color.r*255)},${Math.round(HYPSOMETRIC_COLORS[6].color.g*255)},${Math.round(HYPSOMETRIC_COLORS[6].color.b*255)}))`;
                 return (
                   <div
-                    className="absolute bottom-4 left-4 z-10 rounded-xl shadow-2xl"
+                    className="absolute bottom-4 right-4 z-10 rounded-xl shadow-2xl"
                     style={{
                       background: 'rgba(28, 23, 16, 0.94)',
                       border: '1px solid rgba(196, 165, 116, 0.35)',
@@ -1404,8 +1423,8 @@ export default function Slovakia3DReliefMap() {
                             aria-pressed={isOn}
                             title={isOn ? `Skryť ${c.label}` : `Zobraziť ${c.label}`}
                           >
-                            <span style={{ width: 16, height: 16, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-                              dangerouslySetInnerHTML={{ __html: makeCatPin(c.slug, 16) }} />
+                            <span style={{ width: 18, height: 18, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                              dangerouslySetInnerHTML={{ __html: makeCatPin(c.slug, 18, true) }} />
                             <span style={{ fontFamily: 'Georgia, serif', fontSize: 12.5, color: isOn ? '#ece0c8' : '#8a7f6b', textDecoration: isOn ? 'none' : 'line-through' }}>
                               {legendLabel[c.slug]}
                             </span>

@@ -33,21 +33,33 @@ const CAT_LABEL = Object.fromEntries(CATS.map((c) => [c.slug, c.label])) as Reco
 // zatiaľ nevykresľujú — POINTS je prázdne).
 const TYPE_TO_CAT: Record<string, CatSlug> = { hrad: 'mocenske-centra', hradisko: 'strazna-funkcia', zamok: 'kniezacie-sidla' };
 
-// Elegantná „bodka" — farebný kruh podľa kategórie s krémovým okrajom, leskom
-// a jemným pulzujúcim halo (mdot-halo v globals.css). Farba rozlišuje kategóriu.
-function catDot(cat: CatSlug, px: number): string {
+// Marker rozlíšený TVAROM aj farbou (ľahšia orientácia). Každá kategória má
+// vlastný tvar (krémový okraj) + jemné farebné halo.
+function catShapeInner(cat: CatSlug, c: string): string {
+  const s = `fill="${c}" stroke="${PIN_CREAM}" stroke-linejoin="round"`;
+  switch (cat) {
+    case 'refugia':                     return `<circle cx="12" cy="12" r="6.6" ${s} stroke-width="2"/>`;
+    case 'staroveke-sidla':             return `<rect x="5.6" y="5.6" width="12.8" height="12.8" rx="2" ${s} stroke-width="2"/>`;
+    case 'mocenske-centra':             return `<path d="M12 4.2 L19.8 12 L12 19.8 L4.2 12 Z" ${s} stroke-width="2"/>`;
+    case 'strazna-funkcia':             return `<path d="M12 4.4 L19.8 18.6 L4.2 18.6 Z" ${s} stroke-width="2"/>`;
+    case 'kniezacie-sidla':             return `<path d="M12 3.4 L14.7 9.2 L21 9.9 L16.2 14.3 L17.6 20.5 L12 17.2 L6.4 20.5 L7.8 14.3 L3 9.9 L9.3 9.2 Z" ${s} stroke-width="1.5"/>`;
+    case 'svatyne-a-sakralne-objekty':  return `<path d="M9.6 5 h4.8 v4.6 h4.6 v4.8 h-4.6 v4.6 h-4.8 v-4.6 h-4.6 v-4.8 h4.6 Z" ${s} stroke-width="2"/>`;
+    default:                            return `<circle cx="12" cy="12" r="6.6" ${s} stroke-width="2"/>`;
+  }
+}
+function catShape(cat: CatSlug, px: number, pulse = false): string {
   const c = CAT_COLOR[cat];
+  const halo = `<circle cx="12" cy="12" r="10.6" fill="${c}" opacity="${pulse ? 0.22 : 0.16}"${pulse ? ' class="mdot-halo"' : ''}/>`;
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 24 24" style="overflow:visible; display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));">
-      <circle cx="12" cy="12" r="10.5" fill="${c}" opacity="0.22" class="mdot-halo"/>
-      <circle cx="12" cy="12" r="6.2" fill="${c}" stroke="${PIN_CREAM}" stroke-width="2"/>
-      <circle cx="9.7" cy="9.7" r="1.7" fill="#ffffff" opacity="0.45"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 24 24" style="overflow:visible; display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));">
+      ${halo}
+      ${catShapeInner(cat, c)}
     </svg>
   `;
 }
 
-function makePinSvg(cat: CatSlug): string { return catDot(cat, 30); }
-function makeMiniPinSvg(cat: CatSlug): string { return catDot(cat, 20); }
+function makePinSvg(cat: CatSlug): string { return catShape(cat, 30); }
+function makeMiniPinSvg(cat: CatSlug): string { return catShape(cat, 20, true); }
 
 const MapboxMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
