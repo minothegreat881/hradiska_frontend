@@ -1970,20 +1970,20 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   --ck-edge: #d8c49a;
 }
 
-/* Fixed dock zdola, centrovaná karta */
+/* Fixed dock — kompaktná karta v pravom dolnom rohu */
 .ck-dock {
   position: fixed;
   left: 0; right: 0; bottom: 0;
   z-index: 9999;
   display: flex;
-  justify-content: center;
-  padding: 0 32px 34px;
+  justify-content: flex-end;
+  padding: 0 20px 20px;
   pointer-events: none; /* len karta je klikateľná */
 }
 .ck-card {
   pointer-events: auto;
-  width: 820px;
-  max-width: calc(100vw - 64px);
+  width: 380px;
+  max-width: calc(100vw - 32px);
   background: linear-gradient(180deg, var(--ck-card-top) 0%, var(--ck-card-bottom) 100%);
   border: 1px solid var(--ck-card-border);
   border-radius: 16px;
@@ -2001,49 +2001,50 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .ck-rim-bar svg { display: block; }
 
 /* Telo */
-.ck-body { display: flex; gap: 22px; padding: 24px 28px 26px; }
+.ck-body { display: flex; gap: 14px; padding: 16px 16px 16px; }
 
 /* Štít stráže (dekoratívny) */
-.ck-shield-wrap { flex-shrink: 0; width: 76px; height: 96px; align-self: flex-start; display: flex; flex-direction: column; align-items: center; }
+.ck-shield-wrap { flex-shrink: 0; width: 52px; height: 68px; align-self: flex-start; display: flex; flex-direction: column; align-items: center; }
 .ck-shield {
-  width: 76px; height: 88px;
+  width: 52px; height: 60px;
   background: linear-gradient(180deg, var(--ck-shield-top), var(--ck-shield-bottom));
   border: 2px solid var(--ck-shield-border);
-  border-radius: 38px 38px 50% 50% / 30px 30px 62% 62%;
-  box-shadow: 0 10px 22px -8px rgba(40, 10, 5, .6);
+  border-radius: 26px 26px 50% 50% / 20px 20px 62% 62%;
+  box-shadow: 0 8px 16px -8px rgba(40, 10, 5, .6);
   display: flex; align-items: center; justify-content: center;
 }
-.ck-shield .ck-emoji { font-size: 34px; line-height: 1; animation: ckTorch 2.6s ease-in-out infinite; }
+.ck-shield .ck-emoji { font-size: 24px; line-height: 1; animation: ckTorch 2.6s ease-in-out infinite; }
 @keyframes ckTorch { 0%, 100% { opacity: 1; } 50% { opacity: .75; } }
 .ck-pill {
-  margin-top: -8px;
+  margin-top: -6px;
   font-family: var(--font-heading);
-  font-size: 9px; letter-spacing: .14em; font-weight: 600;
+  font-size: 8px; letter-spacing: .12em; font-weight: 600;
   color: var(--ck-pill-text); background: var(--ck-pill-bg);
   border: 1px solid var(--ck-pill-border); border-radius: 999px;
-  padding: 2px 8px; position: relative; z-index: 1;
+  padding: 2px 6px; position: relative; z-index: 1;
 }
 
 /* Text */
 .ck-text { flex: 1; min-width: 0; }
-.ck-title { font-family: var(--font-heading); font-size: 22px; font-weight: 700; color: var(--ck-title); margin: 0 0 8px; }
-.ck-p { font-family: var(--font-serif); font-size: 17px; line-height: 1.52; color: var(--ck-body); margin: 0 0 8px; }
+.ck-title { font-family: var(--font-heading); font-size: 16px; font-weight: 700; color: var(--ck-title); margin: 0 0 5px; }
+.ck-p { font-family: var(--font-serif); font-size: 13.5px; line-height: 1.42; color: var(--ck-body); margin: 0 0 6px; }
 .ck-p:last-of-type { margin-bottom: 0; }
 .ck-accent { color: var(--ck-accent); font-weight: 700; }
 .ck-accent-i { color: var(--ck-accent); font-style: italic; }
 .ck-strong { color: var(--ck-muted); font-weight: 700; }
 
-/* Tlačidlá */
-.ck-actions { display: flex; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+/* Tlačidlá — kompaktné, v úzkej karte sa vyskladajú pod seba */
+.ck-actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .ck-btn {
-  font-family: var(--font-heading); font-size: 14px; font-weight: 600; letter-spacing: .05em;
-  border-radius: 999px; padding: 12px 24px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-heading); font-size: 12.5px; font-weight: 600; letter-spacing: .04em;
+  border-radius: 999px; padding: 9px 14px; cursor: pointer;
+  flex: 1 1 auto; justify-content: center;
+  display: inline-flex; align-items: center; gap: 6px;
   transition: filter .16s ease, background .16s ease, border-color .16s ease, color .16s ease, transform .06s ease;
 }
 .ck-btn:active { transform: translateY(1px); }
 .ck-btn:focus-visible { outline: 2px solid var(--ck-rim); outline-offset: 2px; }
-.ck-note { font-family: var(--font-serif); font-style: italic; font-size: 12px; }
+.ck-note { font-family: var(--font-serif); font-style: italic; font-size: 11px; }
 .ck-nowrap { white-space: nowrap; }
 
 .ck-btn-primary { color: var(--ck-btn-text); background: linear-gradient(180deg, var(--ck-btn-top), var(--ck-btn-bottom)); border: 1px solid var(--ck-btn-border); box-shadow: 0 10px 22px -10px rgba(120, 74, 19, .75); }
@@ -2052,27 +2053,27 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .ck-btn-secondary:hover { color: var(--ck-accent); border-color: var(--ck-accent); background: rgba(200, 161, 90, .1); }
 
 .ck-settings-link {
-  margin-left: auto;
-  font-family: var(--font-serif); font-style: italic; font-size: 14px;
+  flex-basis: 100%; text-align: center; margin: 4px auto 0;
+  font-family: var(--font-serif); font-style: italic; font-size: 12.5px;
   color: var(--ck-link); background: none; border: none; cursor: pointer;
-  border-bottom: 1px solid var(--ck-pill-border); padding: 0 0 1px;
+  padding: 2px 0;
   transition: color .16s ease, border-color .16s ease;
 }
 .ck-settings-link:hover { color: var(--ck-accent); border-color: var(--ck-accent); }
 .ck-settings-link:focus-visible { outline: 2px solid var(--ck-rim); outline-offset: 3px; }
 
 /* Pätka s fleur-de-lis */
-.ck-foot { display: flex; align-items: center; gap: 14px; padding: 0 28px 14px; }
+.ck-foot { display: flex; align-items: center; gap: 12px; padding: 0 16px 10px; }
 .ck-foot .ck-rule { flex: 1; height: 1px; }
 .ck-foot .ck-rule-l { background: linear-gradient(90deg, transparent, var(--ck-edge)); }
 .ck-foot .ck-rule-r { background: linear-gradient(90deg, var(--ck-edge), transparent); }
 .ck-foot .ck-fleur { color: var(--ck-btn2-border); font-size: 11px; }
 
 /* Panel nastavení (kategórie) */
-.ck-settings { padding: 4px 28px 22px; }
-.ck-cat { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: rgba(255, 253, 248, .6); border: 1px solid var(--ck-pill-border); border-radius: 12px; margin-bottom: 12px; }
-.ck-cat h3 { font-family: var(--font-heading); font-size: 15px; font-weight: 700; color: var(--ck-title); margin: 0 0 4px; }
-.ck-cat p { font-family: var(--font-serif); font-size: 15px; line-height: 1.45; color: var(--ck-body); margin: 0; }
+.ck-settings { padding: 4px 16px 16px; }
+.ck-cat { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: rgba(255, 253, 248, .6); border: 1px solid var(--ck-pill-border); border-radius: 10px; margin-bottom: 10px; }
+.ck-cat h3 { font-family: var(--font-heading); font-size: 13.5px; font-weight: 700; color: var(--ck-title); margin: 0 0 3px; }
+.ck-cat p { font-family: var(--font-serif); font-size: 12.5px; line-height: 1.4; color: var(--ck-body); margin: 0; }
 .ck-cat-ctl { flex-shrink: 0; margin-left: auto; }
 .ck-fixed-tag { font-family: var(--font-heading); font-size: 10px; letter-spacing: .1em; color: var(--ck-pill-text); background: var(--ck-pill-bg); border: 1px solid var(--ck-pill-border); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
 
@@ -2083,19 +2084,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .ck-toggle-knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fffdf8; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); transition: transform .18s ease; }
 .ck-toggle[aria-checked="true"] .ck-toggle-knob { transform: translateX(20px); }
 
-/* Mobil */
+/* Mobil — karta na plnú šírku dole, tlačidlá pod sebou */
 @media (max-width: 640px) {
-  .ck-dock { padding: 0 10px 14px; }
-  .ck-card { max-width: calc(100vw - 20px); }
-  .ck-body { padding: 20px 18px 20px; gap: 16px; }
-  .ck-title { font-size: 20px; }
-  .ck-p { font-size: 16px; }
-  .ck-actions { gap: 10px; }
-  .ck-btn { width: 100%; justify-content: center; }
-  .ck-settings-link { margin-left: 0; width: 100%; text-align: center; padding-top: 6px; }
+  .ck-dock { justify-content: center; padding: 0 10px 12px; }
+  .ck-card { width: 100%; max-width: calc(100vw - 20px); }
+  .ck-btn { flex-basis: 100%; }
 }
-@media (max-width: 520px) {
-  .ck-shield-wrap { display: none; } /* na malých mobiloch štít skry */
+@media (max-width: 400px) {
+  .ck-shield-wrap { display: none; } /* na najmenších mobiloch štít skry */
 }
 
 /* Rešpektuj prefers-reduced-motion */
