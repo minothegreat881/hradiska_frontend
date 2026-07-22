@@ -19,12 +19,12 @@ type CatSlug =
   | 'refugia' | 'staroveke-sidla' | 'svatyne-a-sakralne-objekty';
 
 const CATS: { slug: CatSlug; label: string; color: string }[] = [
-  { slug: 'kniezacie-sidla',            label: 'Kniežacie sídla',                color: '#C0912E' }, // zlatá
-  { slug: 'mocenske-centra',            label: 'Mocenské centrá',                color: '#A23A2E' }, // bordová
-  { slug: 'strazna-funkcia',            label: 'Strážna a hospodárska funkcia',  color: '#3E7480' }, // oceľová modrozelená
-  { slug: 'refugia',                    label: 'Refúgiá',                        color: '#5E7A39' }, // lesná zelená
-  { slug: 'staroveke-sidla',            label: 'Staroveké sídla',                color: '#96652F' }, // okrová hnedá
-  { slug: 'svatyne-a-sakralne-objekty', label: 'Svätyne a sakrálne objekty',     color: '#6C5192' }, // fialová
+  { slug: 'kniezacie-sidla',            label: 'Kniežacie sídla',                color: '#E01E28' }, // výrazná červená
+  { slug: 'mocenske-centra',            label: 'Mocenské centrá',                color: '#1A1A1A' }, // čierna
+  { slug: 'strazna-funkcia',            label: 'Strážna a hospodárska funkcia',  color: '#1E9B48' }, // zelená
+  { slug: 'refugia',                    label: 'Refúgiá',                        color: '#2563EB' }, // modrá
+  { slug: 'staroveke-sidla',            label: 'Staroveké sídla',                color: '#E8760C' }, // oranžová
+  { slug: 'svatyne-a-sakralne-objekty', label: 'Svätyne a sakrálne objekty',     color: '#7E3FF2' }, // fialová
 ];
 const CAT_COLOR = Object.fromEntries(CATS.map((c) => [c.slug, c.color])) as Record<CatSlug, string>;
 const CAT_LABEL = Object.fromEntries(CATS.map((c) => [c.slug, c.label])) as Record<CatSlug, string>;
@@ -33,27 +33,16 @@ const CAT_LABEL = Object.fromEntries(CATS.map((c) => [c.slug, c.label])) as Reco
 // zatiaľ nevykresľujú — POINTS je prázdne).
 const TYPE_TO_CAT: Record<string, CatSlug> = { hrad: 'mocenske-centra', hradisko: 'strazna-funkcia', zamok: 'kniezacie-sidla' };
 
-// Marker rozlíšený TVAROM aj farbou (ľahšia orientácia). Každá kategória má
-// vlastný tvar (krémový okraj) + jemné farebné halo.
-function catShapeInner(cat: CatSlug, c: string): string {
-  const s = `fill="${c}" stroke="${PIN_CREAM}" stroke-linejoin="round"`;
-  switch (cat) {
-    case 'refugia':                     return `<circle cx="12" cy="12" r="6.6" ${s} stroke-width="2"/>`;
-    case 'staroveke-sidla':             return `<rect x="5.6" y="5.6" width="12.8" height="12.8" rx="2" ${s} stroke-width="2"/>`;
-    case 'mocenske-centra':             return `<path d="M12 4.2 L19.8 12 L12 19.8 L4.2 12 Z" ${s} stroke-width="2"/>`;
-    case 'strazna-funkcia':             return `<path d="M12 4.4 L19.8 18.6 L4.2 18.6 Z" ${s} stroke-width="2"/>`;
-    case 'kniezacie-sidla':             return `<path d="M12 3.4 L14.7 9.2 L21 9.9 L16.2 14.3 L17.6 20.5 L12 17.2 L6.4 20.5 L7.8 14.3 L3 9.9 L9.3 9.2 Z" ${s} stroke-width="1.5"/>`;
-    case 'svatyne-a-sakralne-objekty':  return `<path d="M9.6 5 h4.8 v4.6 h4.6 v4.8 h-4.6 v4.6 h-4.8 v-4.6 h-4.6 v-4.8 h4.6 Z" ${s} stroke-width="2"/>`;
-    default:                            return `<circle cx="12" cy="12" r="6.6" ${s} stroke-width="2"/>`;
-  }
-}
+// Jednoduchá „bodka" — farebný kruh s krémovým okrajom a jemným halo.
+// Rozlíšenie kategórie ide cez VÝRAZNÉ farby (viď CATS).
 function catShape(cat: CatSlug, px: number, pulse = false): string {
   const c = CAT_COLOR[cat];
-  const halo = `<circle cx="12" cy="12" r="10.6" fill="${c}" opacity="${pulse ? 0.22 : 0.16}"${pulse ? ' class="mdot-halo"' : ''}/>`;
+  const halo = `<circle cx="12" cy="12" r="10.6" fill="${c}" opacity="${pulse ? 0.24 : 0.16}"${pulse ? ' class="mdot-halo"' : ''}/>`;
   return `
     <svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 24 24" style="overflow:visible; display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));">
       ${halo}
-      ${catShapeInner(cat, c)}
+      <circle cx="12" cy="12" r="6.6" fill="${c}" stroke="${PIN_CREAM}" stroke-width="2"/>
+      <circle cx="9.7" cy="9.7" r="1.8" fill="#ffffff" opacity="0.4"/>
     </svg>
   `;
 }
