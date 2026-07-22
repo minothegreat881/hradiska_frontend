@@ -122,21 +122,15 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
     aktuality: 'Aktuality',
   };
 
-  // Timeline data - use Strapi data if available
-  const timelineData = strapiPost?.timeline?.length
-    ? strapiPost.timeline.map(t => ({
-        year: t.year,
-        title: t.title,
-        description: t.description,
-        type: 'local' as const
-      }))
-    : [
-        { year: '800', title: 'Založenie hradiska', description: 'Prvé osídlenie lokality', type: 'local' as const },
-        { year: '833', title: 'Pribinovo kniežatstvo', description: 'Vznik prvého štátneho útvaru', type: 'global' as const },
-        { year: '863', title: 'Príchod Cyrila a Metoda', description: 'Začiatok christianizácie', type: 'global' as const },
-        { year: '894', title: 'Smrť Svätopluka', description: 'Koniec zlatého veku Veľkej Moravy', type: 'global' as const },
-        { year: '~906', title: 'Zánik hradiska', description: 'Zničenie pri maďarských nájazdoch', type: 'local' as const },
-      ];
+  // Časová os – LEN reálne dáta zo Strapi. Bez nich sa nezobrazuje nič
+  // (predtým tu bol generický „Veľká Morava" fallback, ktorý sa falošne zobrazoval
+  //  aj na článkoch bez vlastnej časovej osi — napr. výzva na 2 % daní).
+  const timelineData = (strapiPost?.timeline || []).map(t => ({
+    year: t.year,
+    title: t.title,
+    description: t.description,
+    type: 'local' as const,
+  }));
 
   // Coordinates - use Strapi location if available (NO default fallback)
   const articleCoordinates =
