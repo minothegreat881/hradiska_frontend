@@ -28,7 +28,7 @@ const CATS: { slug: CatSlug; label: string; color: string }[] = [
 const CAT_COLOR = Object.fromEntries(CATS.map((c) => [c.slug, c.color])) as Record<CatSlug, string>;
 const CAT_LABEL = Object.fromEntries(CATS.map((c) => [c.slug, c.label])) as Record<CatSlug, string>;
 const TYPE_TO_CAT: Record<string, CatSlug> = { hrad: 'mocenske-centra', hradisko: 'strazna-funkcia', zamok: 'kniezacie-sidla' };
-const catOf = (h: Hradisko): CatSlug => TYPE_TO_CAT[h.type] || 'staroveke-sidla';
+const catOf = (h: Hradisko): CatSlug => ((h as any).cat as CatSlug) || TYPE_TO_CAT[h.type] || 'staroveke-sidla';
 
 const PIN_PATH = 'M18 47 C 13 41, 4 31, 4 18 A 14 14 0 1 1 32 18 C 32 31, 23 41, 18 47 Z';
 
@@ -564,8 +564,8 @@ function CityMarker({
     return null;
   }
 
-  const pinSvg = makePinSvg(hradisko.type as PinKind, !!hradisko.unesco, 34);
-  const baseShadow = 'drop-shadow(0 3px 3px rgba(0,0,0,0.5))';
+  const pinSvg = makeCatPin(catOf(hradisko), 26);
+  const baseShadow = 'drop-shadow(0 2px 3px rgba(0,0,0,0.5))';
   const hoverShadow = hradisko.unesco
     ? 'drop-shadow(0 6px 7px rgba(0,0,0,0.6)) drop-shadow(0 0 4px rgba(232,197,110,0.8))'
     : 'drop-shadow(0 6px 7px rgba(0,0,0,0.6)) drop-shadow(0 0 4px rgba(245,233,208,0.7))';
@@ -586,8 +586,8 @@ function CityMarker({
         <div
           className="relative"
           style={{
-            translate: '0 -50%',
-            transformOrigin: '50% 100%',
+            translate: '0 0',
+            transformOrigin: '50% 50%',
             zIndex: isHovered ? 999999 : 1,
           }}
         >
@@ -595,8 +595,8 @@ function CityMarker({
           <div
             className="cursor-pointer"
             style={{
-              transformOrigin: '50% 100%',
-              transform: showHi ? 'scale(1.15)' : 'scale(1)',
+              transformOrigin: '50% 50%',
+              transform: showHi ? 'scale(1.25)' : 'scale(1)',
               transition: 'transform 0.18s ease-out, filter 0.18s ease-out',
               filter: showHi ? hoverShadow : baseShadow,
               willChange: 'transform'
@@ -714,8 +714,8 @@ function LoadingScreen() {
 const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
   function HoverTooltipOverlay({ hradisko }, ref) {
     if (typeof document === 'undefined') return null;
-    const pinColor = PIN_FILL[hradisko.type as PinKind];
-    const typeLabel = hradisko.type === 'hrad' ? 'Hrad' : hradisko.type === 'zamok' ? 'Zámok' : 'Hradisko';
+    const pinColor = CAT_COLOR[catOf(hradisko)];
+    const typeLabel = CAT_LABEL[catOf(hradisko)];
     const fact1 = hradisko.rok;
     const fact2 = hradisko.stav;
     const location = hradisko.okres ? `${hradisko.okres} · ${hradisko.kraj}` : hradisko.kraj;
@@ -792,22 +792,17 @@ const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
             {hradisko.name}
           </div>
           {/* Lokalita */}
-          <div style={{
-            color: '#c8b89a',
-            fontSize: 11,
-            marginTop: 2,
-          }}>
-            {location}
-          </div>
-          {/* 2 fakty */}
-          <div style={{
-            color: '#f0e3c8',
-            fontSize: 11,
-            marginTop: 4,
-            letterSpacing: '0.02em',
-          }}>
-            {fact1} <span style={{ color: '#c4a574', margin: '0 4px' }}>·</span> {fact2}
-          </div>
+          {location && (
+            <div style={{ color: '#c8b89a', fontSize: 11, marginTop: 2 }}>
+              {location}
+            </div>
+          )}
+          {/* 2 fakty – len ak sú vyplnené */}
+          {(fact1 || fact2) && (
+            <div style={{ color: '#f0e3c8', fontSize: 11, marginTop: 4, letterSpacing: '0.02em' }}>
+              {fact1}{fact1 && fact2 ? <span style={{ color: '#c4a574', margin: '0 4px' }}>·</span> : ''}{fact2}
+            </div>
+          )}
           {/* Mikro-hint */}
           <div style={{
             color: '#c4a574',
@@ -864,6 +859,32 @@ export default function Slovakia3DReliefMap() {
   );
   const toggleType = (t: CatSlug) =>
     setEnabledTypes(prev => ({ ...prev, [t]: !prev[t] }));
+
+  // Reálne body zo search-indexu: články so súradnicami, v našich 6 kategóriách,
+  // v hraniciach Slovenska (zahraničné hradiská sa na SK reliéf nezmestia — tie sú na /mapa).
+  type GeoPoint = Hradisko & { cat: CatSlug; slug: string };
+  const [points, setPoints] = useState<GeoPoint[]>([]);
+  useEffect(() => {
+    const STRAPI = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+    const inCats = new Set(CATS.map(c => c.slug));
+    const B = SLOVAKIA_BOUNDS;
+    fetch(`${STRAPI}/api/search-index`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
+      .then(r => r.json())
+      .then(j => {
+        const pts: GeoPoint[] = (j.items || [])
+          .filter((x: any) => x.hasLocation && typeof x.lat === 'number' && typeof x.lng === 'number'
+            && inCats.has(x.categorySlug)
+            && x.lng >= B.minLon && x.lng <= B.maxLon && x.lat >= B.minLat && x.lat <= B.maxLat)
+          .map((x: any) => ({
+            name: x.title, slug: x.slug, cat: x.categorySlug as CatSlug,
+            type: 'hradisko' as const, coordinates: [x.lng, x.lat] as [number, number],
+            description: x.excerpt || '', rok: '', stav: '', okres: '', kraj: x.place || '',
+            nadmorskaVyska: 400, unesco: false,
+          }));
+        setPoints(pts);
+      })
+      .catch(() => { /* mapa funguje aj bez bodov */ });
+  }, []);
 
   // Touch detection – na zariadeniach bez hovera vypneme hover tooltip (ide rovno modal)
   const enableTooltip = useMemo(() => {
@@ -1274,16 +1295,17 @@ export default function Slovakia3DReliefMap() {
               />
               <TerrainMesh heightScale={heightScale} is3D={is3D} />
               <BorderLine is3D={is3D} heightScale={heightScale} />
-              {/* ZATIAĽ BEZ REÁLNYCH BODOV — kým nebudú hradiská so súradnicami + kategóriou.
-                  Legenda nižšie ukazuje naše členenie a nové ikony; mapa je bez pinov. */}
-              {([] as Hradisko[])
+              {/* Reálne body: články so súradnicami (SK), farba podľa kategórie.
+                  Klik na bodku otvorí článok. Filter podľa zapnutých kategórií. */}
+              {points
+                .filter((p) => enabledTypes[p.cat])
                 .map((hradisko) => (
                 <CityMarker
-                  key={hradisko.name}
+                  key={hradisko.slug}
                   hradisko={hradisko}
                   is3D={is3D}
                   heightScale={heightScale}
-                  onClick={() => setSelectedHradisko(hradisko)}
+                  onClick={() => { window.location.href = `/blog/${hradisko.slug}`; }}
                   onZoomTo={zoomToPosition}
                   isSelected={selectedHradisko?.name === hradisko.name}
                   isDetailOpen={selectedHradisko !== null}
@@ -1342,90 +1364,68 @@ export default function Slovakia3DReliefMap() {
                 );
               })()}
 
-              {/* Compact legend bar - bottom center, horizontal */}
-              {!selectedHradisko && (
-              <div
-                className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-lg px-4 py-2 shadow-lg flex flex-wrap items-center justify-center gap-x-5 gap-y-2 max-w-[calc(100vw-20px)]"
-                style={{
-                  background: 'rgba(31, 26, 20, 0.95)',
-                  border: '1px solid rgba(196, 165, 116, 0.4)'
-                }}
-              >
-                {/* Kategórie hradísk – klikateľné filtre (naše členenie) */}
-                <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-                  {CATS.map((c) => {
-                    const short: Record<CatSlug, string> = {
-                      'kniezacie-sidla': 'Kniežacie', 'mocenske-centra': 'Mocenské', 'strazna-funkcia': 'Strážne',
-                      'refugia': 'Refúgiá', 'staroveke-sidla': 'Staroveké', 'svatyne-a-sakralne-objekty': 'Svätyne',
-                    };
-                    const isOn = enabledTypes[c.slug];
-                    return (
-                      <button
-                        key={c.slug}
-                        onClick={(e) => { e.stopPropagation(); toggleType(c.slug); }}
-                        className="flex items-center gap-1.5 cursor-pointer select-none"
-                        style={{
-                          opacity: isOn ? 1 : 0.35,
-                          transition: 'opacity 0.18s ease-out',
-                          background: 'transparent',
-                          border: 'none',
-                          padding: 0,
-                        }}
-                        aria-label={isOn ? `Skryť ${c.label}` : `Zobraziť ${c.label}`}
-                        aria-pressed={isOn}
-                        title={c.label}
-                      >
-                        <span
-                          style={{ width: 14, height: 19, display: 'inline-flex', alignItems: 'flex-end' }}
-                          dangerouslySetInnerHTML={{ __html: makeCatPin(c.slug, 14) }}
-                        />
-                        <span
-                          className="text-[10px]"
-                          style={{
-                            color: isOn ? '#e8dcc8' : '#a89f8f',
-                            textDecoration: isOn ? 'none' : 'line-through',
-                            fontFamily: 'Georgia, serif',
-                          }}
-                        >
-                          {short[c.slug]}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Divider */}
-                <div className="w-px h-4" style={{ background: 'rgba(196, 165, 116, 0.3)' }} />
-
-                {/* Elevation gradient bar */}
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px]" style={{ color: '#a89f8f' }}>0m</span>
+              {/* Legenda – zvislý panel vľavo dole (čitateľný, klikateľné filtre) */}
+              {!selectedHradisko && (() => {
+                const legendLabel: Record<CatSlug, string> = {
+                  'kniezacie-sidla': 'Kniežacie sídla', 'mocenske-centra': 'Mocenské centrá',
+                  'strazna-funkcia': 'Strážna funkcia', 'refugia': 'Refúgiá',
+                  'staroveke-sidla': 'Staroveké sídla', 'svatyne-a-sakralne-objekty': 'Svätyne a sakrálne',
+                };
+                const visible = points.filter((p) => enabledTypes[p.cat]).length;
+                const grad = `linear-gradient(to right,
+                  rgb(${Math.round(HYPSOMETRIC_COLORS[0].color.r*255)},${Math.round(HYPSOMETRIC_COLORS[0].color.g*255)},${Math.round(HYPSOMETRIC_COLORS[0].color.b*255)}),
+                  rgb(${Math.round(HYPSOMETRIC_COLORS[2].color.r*255)},${Math.round(HYPSOMETRIC_COLORS[2].color.g*255)},${Math.round(HYPSOMETRIC_COLORS[2].color.b*255)}),
+                  rgb(${Math.round(HYPSOMETRIC_COLORS[4].color.r*255)},${Math.round(HYPSOMETRIC_COLORS[4].color.g*255)},${Math.round(HYPSOMETRIC_COLORS[4].color.b*255)}),
+                  rgb(${Math.round(HYPSOMETRIC_COLORS[6].color.r*255)},${Math.round(HYPSOMETRIC_COLORS[6].color.g*255)},${Math.round(HYPSOMETRIC_COLORS[6].color.b*255)}))`;
+                return (
                   <div
-                    className="w-24 h-2.5 rounded-sm"
+                    className="absolute bottom-4 left-4 z-10 rounded-xl shadow-2xl"
                     style={{
-                      background: `linear-gradient(to right,
-                        rgb(${Math.round(HYPSOMETRIC_COLORS[0].color.r * 255)}, ${Math.round(HYPSOMETRIC_COLORS[0].color.g * 255)}, ${Math.round(HYPSOMETRIC_COLORS[0].color.b * 255)}),
-                        rgb(${Math.round(HYPSOMETRIC_COLORS[2].color.r * 255)}, ${Math.round(HYPSOMETRIC_COLORS[2].color.g * 255)}, ${Math.round(HYPSOMETRIC_COLORS[2].color.b * 255)}),
-                        rgb(${Math.round(HYPSOMETRIC_COLORS[4].color.r * 255)}, ${Math.round(HYPSOMETRIC_COLORS[4].color.g * 255)}, ${Math.round(HYPSOMETRIC_COLORS[4].color.b * 255)}),
-                        rgb(${Math.round(HYPSOMETRIC_COLORS[6].color.r * 255)}, ${Math.round(HYPSOMETRIC_COLORS[6].color.g * 255)}, ${Math.round(HYPSOMETRIC_COLORS[6].color.b * 255)})
-                      )`
+                      background: 'rgba(28, 23, 16, 0.94)',
+                      border: '1px solid rgba(196, 165, 116, 0.35)',
+                      backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+                      padding: '12px 14px', width: 'min(74vw, 224px)',
                     }}
-                  />
-                  <span className="text-[10px]" style={{ color: '#a89f8f' }}>2655m</span>
-                </div>
+                  >
+                    <div className="flex items-baseline justify-between gap-3" style={{ marginBottom: 9 }}>
+                      <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: '#c4a574', margin: 0 }}>Kategórie</h3>
+                      <span style={{ fontFamily: 'Georgia, serif', fontSize: 11, color: '#a89f8f', whiteSpace: 'nowrap' }}>{visible} / {points.length} lokalít</span>
+                    </div>
 
-                {/* Divider */}
-                <div className="w-px h-4" style={{ background: 'rgba(196, 165, 116, 0.3)' }} />
+                    <div className="flex flex-col" style={{ gap: 3 }}>
+                      {CATS.map((c) => {
+                        const isOn = enabledTypes[c.slug];
+                        return (
+                          <button
+                            key={c.slug}
+                            onClick={(e) => { e.stopPropagation(); toggleType(c.slug); }}
+                            className="flex items-center cursor-pointer select-none text-left"
+                            style={{ gap: 8, opacity: isOn ? 1 : 0.4, transition: 'opacity 0.18s ease-out', background: 'transparent', border: 'none', padding: '2px 0' }}
+                            aria-pressed={isOn}
+                            title={isOn ? `Skryť ${c.label}` : `Zobraziť ${c.label}`}
+                          >
+                            <span style={{ width: 16, height: 16, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                              dangerouslySetInnerHTML={{ __html: makeCatPin(c.slug, 16) }} />
+                            <span style={{ fontFamily: 'Georgia, serif', fontSize: 12.5, color: isOn ? '#ece0c8' : '#8a7f6b', textDecoration: isOn ? 'none' : 'line-through' }}>
+                              {legendLabel[c.slug]}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                {/* Count – zobrazí viditeľné z celkového počtu */}
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3 h-3" style={{ color: '#c4a574' }} />
-                  <span className="text-[10px] font-medium" style={{ color: '#e8dcc8' }}>
-                    Lokality sa dopĺňajú
-                  </span>
-                </div>
-              </div>
-              )}
+                    <div style={{ height: 1, background: 'rgba(196,165,116,0.22)', margin: '10px 0 8px' }} />
+                    <div className="flex items-center" style={{ gap: 7 }}>
+                      <span style={{ fontSize: 10, color: '#a89f8f', whiteSpace: 'nowrap' }}>0 m</span>
+                      <div style={{ flex: 1, height: 7, borderRadius: 3, background: grad }} />
+                      <span style={{ fontSize: 10, color: '#a89f8f', whiteSpace: 'nowrap' }}>2655 m</span>
+                    </div>
+                    <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 10.5, color: '#7c715f', margin: '7px 0 0' }}>
+                      Klikni na bodku pre článok.
+                    </p>
+                  </div>
+                );
+              })()}
 
             </div>
           </div>
@@ -1615,7 +1615,7 @@ export default function Slovakia3DReliefMap() {
       {/* Hover tooltip overlay – renderovaný v body cez portál, mimo Canvas.
           Pozícia sa nastavuje v CityMarker useFrame cez tooltipDomRef. */}
       {hoveredHradisko && enableTooltip && !selectedHradisko && (() => {
-        const h = hradiskaData.find(x => x.name === hoveredHradisko);
+        const h = points.find(x => x.name === hoveredHradisko);
         return h ? <HoverTooltipOverlay ref={tooltipDomRef} hradisko={h} /> : null;
       })()}
 
