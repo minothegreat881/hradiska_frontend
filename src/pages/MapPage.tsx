@@ -57,9 +57,9 @@ export function MapPage() {
                   fontStyle: 'italic'
                 }}
               >
-                Preskúmajte 50+ hradov, hradísk a zámkov na území Slovenska. 
-                Každá lokalita obsahuje GPS súradnice, historický popis, 
-                obdobie vzniku a aktuálny stav pamiatky.
+                Hradiská Slovenska členené podľa ich funkcie — kniežacie sídla,
+                mocenské centrá, strážne hradiská, refúgiá, staroveké sídla a svätyne.
+                Jednotlivé lokality so súradnicami sa priebežne dopĺňajú.
               </motion.p>
 
               <motion.div
@@ -105,7 +105,7 @@ export function MapPage() {
                 Filtrovanie
               </h3>
               <p className="text-sm text-stone-400" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                Filtrujte lokality podľa typu: hrady (červená), hradiská (oranžová), zámky (fialová)
+                Filtrujte lokality podľa nášho členenia — každá funkčná kategória hradiska má vlastnú farbu a ikonu
               </p>
             </div>
 
