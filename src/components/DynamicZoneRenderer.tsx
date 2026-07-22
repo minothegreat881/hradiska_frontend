@@ -432,7 +432,9 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
         <ul
           key={idx}
           className="space-y-2 my-4 text-stone-700 dark:text-stone-300"
-          style={{ listStyle: 'none', paddingLeft: '1.25rem', marginLeft: 0 }}
+          // clear:both — zoznam nikdy nezalamovať okolo plávajúceho obrázka
+          // (odrážky s absolútnou pozíciou sa inak prekrývajú s fotkou naľavo/napravo)
+          style={{ listStyle: 'none', paddingLeft: '1.25rem', marginLeft: 0, clear: 'both' }}
         >
           {block.children?.map((item: any, i: number) => (
             <li
