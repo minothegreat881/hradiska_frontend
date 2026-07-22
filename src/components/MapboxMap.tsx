@@ -33,48 +33,21 @@ const CAT_LABEL = Object.fromEntries(CATS.map((c) => [c.slug, c.label])) as Reco
 // zatiaľ nevykresľujú — POINTS je prázdne).
 const TYPE_TO_CAT: Record<string, CatSlug> = { hrad: 'mocenske-centra', hradisko: 'strazna-funkcia', zamok: 'kniezacie-sidla' };
 
-// Pin tvar (teardrop) – width 36, height 48, špička v (18,47), hlavička ~(18,18) r14
-const PIN_PATH = 'M18 47 C 13 41, 4 31, 4 18 A 14 14 0 1 1 32 18 C 32 31, 23 41, 18 47 Z';
-
-// Čistý, chunky glyf kategórie (cream), vycentrovaný v hlavičke pinu.
-function pinGlyph(cat: CatSlug): string {
-  const f = PIN_CREAM;
-  switch (cat) {
-    case 'kniezacie-sidla': // koruna
-      return `<path d="M10.5 23 V15 l4 3.4 L18 12.4 l3.5 6 4-3.4 V23 Z" fill="${f}"/><rect x="10.5" y="23.4" width="15" height="1.9" rx="0.4" fill="${f}"/>`;
-    case 'mocenske-centra': // veža s cimburím (mocenské stredisko)
-      return `<path d="M11 24.6 V16 h2 v-2.4 h2 v2.4 h2 v-2.4 h2 v2.4 h2 V24.6 Z" fill="${f}"/>`;
-    case 'strazna-funkcia': // štít (stráž)
-      return `<path d="M18 9.4 L25 12 V17.4 C25 21.9 21.6 25 18 26.6 C14.4 25 11 21.9 11 17.4 V12 Z" fill="${f}"/>`;
-    case 'refugia': // vrchy (útočisko v horách)
-      return `<path d="M8.8 25 L14.5 14.6 L17.7 19.4 L20.7 15 L27.2 25 Z" fill="${f}"/>`;
-    case 'staroveke-sidla': // antický chrám (pediment + stĺpy)
-      return `<path d="M9.4 14.4 L18 9.4 L26.6 14.4 Z" fill="${f}"/><rect x="10" y="14.8" width="16" height="1.9" fill="${f}"/><rect x="11.4" y="17" width="2.2" height="6.4" fill="${f}"/><rect x="16.9" y="17" width="2.2" height="6.4" fill="${f}"/><rect x="22.4" y="17" width="2.2" height="6.4" fill="${f}"/><rect x="10" y="23.6" width="16" height="1.9" fill="${f}"/>`;
-    case 'svatyne-a-sakralne-objekty': // kaplnka s krížom
-      return `<rect x="13" y="16" width="10" height="9.4" fill="${f}"/><path d="M12.3 16 L18 10.6 L23.7 16 Z" fill="${f}"/><rect x="17.3" y="7.2" width="1.4" height="4.4" fill="${f}"/><rect x="15.7" y="8.5" width="4.6" height="1.4" fill="${f}"/>`;
-    default:
-      return '';
-  }
-}
-
-function makePinSvg(cat: CatSlug): string {
+// Elegantná „bodka" — farebný kruh podľa kategórie s krémovým okrajom, leskom
+// a jemným pulzujúcim halo (mdot-halo v globals.css). Farba rozlišuje kategóriu.
+function catDot(cat: CatSlug, px: number): string {
+  const c = CAT_COLOR[cat];
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48" style="overflow:visible; display:block;">
-      <path d="${PIN_PATH}" fill="${CAT_COLOR[cat]}" stroke="${PIN_CREAM}" stroke-width="1.6" stroke-linejoin="round"/>
-      ${pinGlyph(cat)}
+    <svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="0 0 24 24" style="overflow:visible; display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));">
+      <circle cx="12" cy="12" r="10.5" fill="${c}" opacity="0.22" class="mdot-halo"/>
+      <circle cx="12" cy="12" r="6.2" fill="${c}" stroke="${PIN_CREAM}" stroke-width="2"/>
+      <circle cx="9.7" cy="9.7" r="1.7" fill="#ffffff" opacity="0.45"/>
     </svg>
   `;
 }
 
-// Mini pin pre legendu (menší, s tieňom)
-function makeMiniPinSvg(cat: CatSlug): string {
-  return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="29" viewBox="0 0 36 48" style="overflow:visible; display:block; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,0.45));">
-      <path d="${PIN_PATH}" fill="${CAT_COLOR[cat]}" stroke="${PIN_CREAM}" stroke-width="1.6" stroke-linejoin="round"/>
-      ${pinGlyph(cat)}
-    </svg>
-  `;
-}
+function makePinSvg(cat: CatSlug): string { return catDot(cat, 30); }
+function makeMiniPinSvg(cat: CatSlug): string { return catDot(cat, 20); }
 
 const MapboxMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -201,7 +174,7 @@ const MapboxMap = () => {
       el.style.width = '36px';
       el.style.height = '48px';
       el.style.cursor = 'pointer';
-      el.style.transformOrigin = '50% 100%'; // pivot na špičke
+      el.style.transformOrigin = '50% 50%'; // bodka sa kotví stredom
       el.style.transition = 'transform 180ms ease-out, filter 180ms ease-out';
       el.style.willChange = 'transform';
       const baseShadow = 'drop-shadow(0 3px 3px rgba(0,0,0,0.45))';
@@ -267,7 +240,7 @@ const MapboxMap = () => {
       popupsRef.current.push(popup);
 
       // Create marker – anchor 'bottom' aby špička pinu presne ukazovala na lokalitu
-      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
         .setLngLat(hradisko.coordinates)
         .setPopup(popup)
         .addTo(map.current!);

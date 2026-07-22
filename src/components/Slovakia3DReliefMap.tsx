@@ -32,33 +32,15 @@ const catOf = (h: Hradisko): CatSlug => TYPE_TO_CAT[h.type] || 'staroveke-sidla'
 
 const PIN_PATH = 'M18 47 C 13 41, 4 31, 4 18 A 14 14 0 1 1 32 18 C 32 31, 23 41, 18 47 Z';
 
-// Čistý, chunky glyf kategórie (cream), vycentrovaný v hlavičke pinu.
-function pinGlyph(cat: CatSlug): string {
-  const f = PIN_CREAM;
-  switch (cat) {
-    case 'kniezacie-sidla': // koruna
-      return `<path d="M10.5 23 V15 l4 3.4 L18 12.4 l3.5 6 4-3.4 V23 Z" fill="${f}"/><rect x="10.5" y="23.4" width="15" height="1.9" rx="0.4" fill="${f}"/>`;
-    case 'mocenske-centra': // veža s cimburím
-      return `<path d="M11 24.6 V16 h2 v-2.4 h2 v2.4 h2 v-2.4 h2 v2.4 h2 V24.6 Z" fill="${f}"/>`;
-    case 'strazna-funkcia': // štít
-      return `<path d="M18 9.4 L25 12 V17.4 C25 21.9 21.6 25 18 26.6 C14.4 25 11 21.9 11 17.4 V12 Z" fill="${f}"/>`;
-    case 'refugia': // vrchy
-      return `<path d="M8.8 25 L14.5 14.6 L17.7 19.4 L20.7 15 L27.2 25 Z" fill="${f}"/>`;
-    case 'staroveke-sidla': // antický chrám
-      return `<path d="M9.4 14.4 L18 9.4 L26.6 14.4 Z" fill="${f}"/><rect x="10" y="14.8" width="16" height="1.9" fill="${f}"/><rect x="11.4" y="17" width="2.2" height="6.4" fill="${f}"/><rect x="16.9" y="17" width="2.2" height="6.4" fill="${f}"/><rect x="22.4" y="17" width="2.2" height="6.4" fill="${f}"/><rect x="10" y="23.6" width="16" height="1.9" fill="${f}"/>`;
-    case 'svatyne-a-sakralne-objekty': // kaplnka s krížom
-      return `<rect x="13" y="16" width="10" height="9.4" fill="${f}"/><path d="M12.3 16 L18 10.6 L23.7 16 Z" fill="${f}"/><rect x="17.3" y="7.2" width="1.4" height="4.4" fill="${f}"/><rect x="15.7" y="8.5" width="4.6" height="1.4" fill="${f}"/>`;
-    default:
-      return '';
-  }
-}
-
-function makeCatPin(cat: CatSlug, size = 36): string {
-  const h = Math.round(size * (48 / 36));
+// Elegantná „bodka" — farebný kruh podľa kategórie s krémovým okrajom, leskom
+// a jemným pulzujúcim halo (mdot-halo v globals.css). Farba rozlišuje kategóriu.
+function makeCatPin(cat: CatSlug, size = 24): string {
+  const c = CAT_COLOR[cat];
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${h}" viewBox="0 0 36 48" style="overflow:visible; display:block;">
-      <path d="${PIN_PATH}" fill="${CAT_COLOR[cat]}" stroke="${PIN_CREAM}" stroke-width="1.6" stroke-linejoin="round"/>
-      ${pinGlyph(cat)}
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" style="overflow:visible; display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));">
+      <circle cx="12" cy="12" r="10.5" fill="${c}" opacity="0.22" class="mdot-halo"/>
+      <circle cx="12" cy="12" r="6.2" fill="${c}" stroke="${PIN_CREAM}" stroke-width="2"/>
+      <circle cx="9.7" cy="9.7" r="1.7" fill="#ffffff" opacity="0.45"/>
     </svg>
   `;
 }

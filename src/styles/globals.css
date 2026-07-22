@@ -2116,6 +2116,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   .ck-btn, .ck-toggle, .ck-toggle-knob, .ck-settings-link { transition: none; }
 }
 
+/* ═══ Mapové „bodky" (markery/legenda) — jemné pulzujúce halo, pôsobí živo ═══ */
+@keyframes mdotPulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.3; }
+  50%      { transform: scale(1.15); opacity: 0.08; }
+}
+.mdot-halo { transform-box: fill-box; transform-origin: center; animation: mdotPulse 2.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .mdot-halo { animation: none; opacity: 0.2; } }
+
 /* ═══ PWA ponuka „Nainštalovať appku" — zdieľa vzhľad kompaktnej cookie karty ═══ */
 .pwa-dock {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 9998;
