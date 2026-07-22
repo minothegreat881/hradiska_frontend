@@ -88,9 +88,18 @@ const STATIC = [
 ];
 
 for (const s of STATIC) {
+  const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Hradiská.sk', url: SITE + '/', publisher: ORG };
+  // Sitelinks searchbox — len na domovskej stránke (Google očakáva WebSite+SearchAction na root).
+  if (s.path === '/') {
+    website.potentialAction = {
+      '@type': 'SearchAction',
+      target: { '@type': 'EntryPoint', urlTemplate: SITE + '/hladat?q={search_term_string}' },
+      'query-input': 'required name=search_term_string',
+    };
+  }
   writePage(s.path, buildHead({
     title: s.title, description: s.description, canonical: SITE + s.path,
-    ld: [{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Hradiská.sk', url: SITE + '/', publisher: ORG }],
+    ld: [website],
   }));
 }
 
