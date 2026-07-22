@@ -253,6 +253,19 @@ export function Footer() {
           >
             Ochrana osobných údajov
           </a>
+          <a
+            href="/podmienky-pouzivania"
+            style={{
+              fontSize: 16,
+              color: 'var(--ft-tagline)',
+              textDecoration: 'none',
+              transition: 'color 0.16s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--ft-link-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--ft-tagline)'; }}
+          >
+            Podmienky používania
+          </a>
           <button
             type="button"
             onClick={openCookieSettings}

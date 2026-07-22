@@ -7,6 +7,7 @@ import { AboutPage } from './pages/AboutPage';
 import { CategoryPage } from './pages/CategoryPage';
 import { AktualityPage } from './pages/AktualityPage';
 import { PrivacyPage } from './pages/PrivacyPage';
+import { TermsPage } from './pages/TermsPage';
 import { AccountPage, type AccountMode } from './pages/AccountPage';
 import { SearchResultsPage } from './pages/SearchResultsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -26,7 +27,7 @@ const AdminApp = lazy(() => import('./admin/AdminApp'));
 const MapPage = lazy(() => import('./pages/MapPage').then((m) => ({ default: m.MapPage })));
 const GalleryPage = lazy(() => import('./pages/GalleryPage').then((m) => ({ default: m.GalleryPage })));
 
-type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'admin' | 'account' | 'hladat' | 'notfound';
+type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
 
 // Cesty účtov → režim AccountPage
 const ACCOUNT_ROUTES: Record<string, AccountMode> = {
@@ -76,6 +77,8 @@ function App() {
         setRoute('aktuality');
       } else if (path === '/ochrana-osobnych-udajov' || path === '/privacy') {
         setRoute('privacy');
+      } else if (path === '/podmienky-pouzivania' || path === '/podmienky') {
+        setRoute('terms');
       } else if (path === '/hradiska' || path.startsWith('/hradiska/')) {
         setRoute('category');
         setParams({ slug: 'hradiska' });
@@ -182,6 +185,7 @@ function App() {
         {route === 'galeria' && <GalleryPage />}
         {route === 'aktuality' && <AktualityPage />}
         {route === 'privacy' && <PrivacyPage />}
+        {route === 'terms' && <TermsPage />}
         {route === 'site' && <SiteDetailPage siteSlug={params.slug} />}
         {route === 'category' && <CategoryPage categorySlug={params.slug} />}
         {route === 'article' && <ArticlePage articleSlug={params.slug} />}

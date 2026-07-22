@@ -23,6 +23,7 @@ const outPath = resolve(__dirname, '..', 'public', 'sitemap.xml');
 const STATIC_PATHS = [
   '/', '/mapa', '/galeria', '/aktuality', '/about',
   '/hradiska', '/kultura', '/archeologia', '/pramene', '/pravek',
+  '/ochrana-osobnych-udajov', '/podmienky-pouzivania',
 ];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

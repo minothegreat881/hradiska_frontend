@@ -51,6 +51,16 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/ochrana-osobnych-udajov</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/podmienky-pouzivania</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/blog/arkona-retra-a-ine-pohanske-svatyne-zapadnych-slovanov</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
