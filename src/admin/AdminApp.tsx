@@ -14,16 +14,17 @@ import { MediaScreen } from './screens/MediaScreen';
 import { CommentsScreen } from './screens/CommentsScreen';
 import { UsersScreen } from './screens/UsersScreen';
 import { StubScreen } from './screens/StubScreen';
-import { TOTALS } from './data';
+import { fetchNavCounts } from './api/posts';
 
 export type AdminRoute =
   | 'articles' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'users' | 'analytics';
 
-const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any; badge?: number }[] }[] = [
+// Badge sa dopĺňa dynamicky z reálnych počtov (viď `badges` v AdminShell) — žiadne statické čísla.
+const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any }[] }[] = [
   {
     label: 'Obsah',
     items: [
-      { id: 'articles', label: 'Články', icon: FileText, badge: TOTALS.all },
+      { id: 'articles', label: 'Články', icon: FileText },
       { id: 'editor', label: 'Editor', icon: PenSquare },
       { id: 'media', label: 'Médiá', icon: ImageIcon },
     ],
@@ -31,7 +32,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
   {
     label: 'Organizácia',
     items: [
-      { id: 'categories', label: 'Kategórie', icon: FolderTree, badge: 13 },
+      { id: 'categories', label: 'Kategórie', icon: FolderTree },
       { id: 'tags', label: 'Štítky', icon: Tag },
       { id: 'comments', label: 'Komentáre', icon: MessageSquare },
       { id: 'users', label: 'Používatelia', icon: Users },
@@ -57,9 +58,18 @@ export default function AdminApp() {
 }
 
 function AdminShell() {
-  const { user, ready, signOut } = useAuth();
+  const { user, ready, signOut, token } = useAuth();
   const [route, setRoute] = useState<AdminRoute>('articles');
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Reálne počty pre badge (články/kategórie/štítky/komentáre) — nie statické čísla.
+  const [badges, setBadges] = useState<Partial<Record<AdminRoute, number>>>({});
+  useEffect(() => {
+    if (!token) return;
+    fetchNavCounts(token)
+      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments }))
+      .catch(() => {});
+  }, [token, route]);
 
   // ⌘K / Ctrl+K na rýchle hľadanie
   const [searchOpen, setSearchOpen] = useState(false);
@@ -138,7 +148,7 @@ function AdminShell() {
                   >
                     <Icon className="w-4 h-4" style={{ flexShrink: 0 }} />
                     {it.label}
-                    {it.badge !== undefined && <span className="ad-badge">{it.badge}</span>}
+                    {badges[it.id] !== undefined && <span className="ad-badge">{badges[it.id]}</span>}
                   </button>
                 );
               })}
@@ -206,7 +216,7 @@ function AdminShell() {
           {route === 'analytics' && <AnalyticsScreen onEdit={openEditor} />}
           {route === 'media' && <MediaScreen />}
           {route === 'categories' && (
-            <StubScreen title="Kategórie" note="13 kategórií, poradie ťahaním cez pole `order`. Polia: name*, slug*, description, order." />
+            <StubScreen title="Kategórie" note={`${badges.categories ?? '…'} kategórií, poradie ťahaním cez pole \`order\`. Polia: name*, slug*, description, order.`} />
           )}
           {route === 'tags' && <StubScreen title="Štítky" note="Polia: name*, slug*. Zobraziť počet použití." />}
           {route === 'comments' && <CommentsScreen />}

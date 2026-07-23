@@ -143,6 +143,24 @@ export async function fetchCounts(token: string) {
   return { all, published, draft: all - published, noCover };
 }
 
+/**
+ * Reálne počty pre badge v bočnom paneli admina (články/kategórie/štítky/komentáre).
+ * `status=draft` počíta VŠETKY dokumenty (každý má draft verziu), teda aj publikované.
+ */
+export async function fetchNavCounts(token: string) {
+  const total = (path: string) =>
+    strapiFetch<any>(`${path}${path.includes('?') ? '&' : '?'}pagination[pageSize]=1`, { token })
+      .then(r => r.meta?.pagination?.total ?? 0)
+      .catch(() => 0);
+  const [articles, categories, tags, comments] = await Promise.all([
+    total('/api/blog-posts?status=draft'),
+    total('/api/blog-categories'),
+    total('/api/blog-tags'),
+    total('/api/blog-comments'),
+  ]);
+  return { articles, categories, tags, comments };
+}
+
 // ── Detail na editáciu ───────────────────────────────────────────────────────
 export async function getPost(token: string, documentId: string): Promise<any> {
   const r = await strapiFetch<any>(
