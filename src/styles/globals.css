@@ -878,10 +878,12 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 /* Jednostĺpec: fotka dominuje (min 55vh), diskusia je vysúvateľný panel.
    Po ťuknutí/potiahnutí lišty sa fotka posunie hore a komentáre sa roztiahnu. */
-.pl-card > .pl-photo   { flex: 1 1 auto; min-height: 55vh; transition: min-height 0.3s ease; }
-.pl-card > .pl-discuss { flex: 0 1 auto; min-height: 0; max-height: 45vh; transition: max-height 0.3s ease; }
-.pl-card.pl-comments-open > .pl-photo   { min-height: 24vh; }
-.pl-card.pl-comments-open > .pl-discuss { max-height: 80vh; }
+.pl-card > .pl-photo   { flex: 0 0 auto; height: 58vh; min-height: 0; transition: height 0.3s ease; }
+.pl-card > .pl-discuss { flex: 1 1 auto; min-height: 0; }
+.pl-card.pl-comments-open > .pl-photo { height: 22vh; }
+
+/* Popis na mobile obmedziť, nech je na fotku aj komentáre miesto */
+.pl-text { max-height: 18vh; overflow-y: auto; }
 
 /* Diskusný panel (obal) + jeho vnútro (PhotoDiscussion) */
 .pl-discuss { display: flex; flex-direction: column; min-height: 0; }
@@ -913,7 +915,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
     grid-template-rows: auto auto minmax(0, 1fr);
   }
   .pl-photo   { grid-column: 1; grid-row: 1 / -1; max-height: none; min-height: 0; }
-  .pl-card > .pl-photo { min-height: 0; }
+  .pl-card > .pl-photo { height: auto; min-height: 0; }
   .pl-photo-img { max-height: 100%; }
   .pl-header  { grid-column: 2; grid-row: 1; }
   .pl-text    { grid-column: 2; grid-row: 2; max-height: 24vh; overflow-y: auto; }
