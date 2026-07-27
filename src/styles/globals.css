@@ -876,8 +876,10 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   border: 0; border-radius: 0; overflow: hidden;
   display: flex; flex-direction: column;
 }
-.pl-card > .pl-photo   { flex-shrink: 0; }
-.pl-card > .pl-discuss { flex: 1 1 auto; min-height: 0; }
+/* Jednostĺpec: fotka vyplní voľné miesto (tmavý letterbox, žiadna biela plocha),
+   diskusia má prirodzenú výšku a scrolluje sa len keď je dlhá. */
+.pl-card > .pl-photo   { flex: 1 1 auto; min-height: 0; }
+.pl-card > .pl-discuss { flex: 0 1 auto; min-height: 0; max-height: 58vh; }
 @media (min-width: 560px) and (orientation: landscape) {
   .pl-card {
     width: 98vw; max-width: 1700px; height: 92vh; max-height: 92vh;
@@ -892,7 +894,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   .pl-photo-img { max-height: 100%; }
   .pl-header  { grid-column: 2; grid-row: 1; }
   .pl-text    { grid-column: 2; grid-row: 2; }
-  .pl-discuss { grid-column: 2; grid-row: 3; min-height: 0; }
+  .pl-discuss { grid-column: 2; grid-row: 3; min-height: 0; max-height: none; }
   .pl-header, .pl-text, .pl-discuss { border-left: 1px solid var(--pl-border-soft); }
 }
 
@@ -910,7 +912,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   position: relative; overflow: hidden;
   background: var(--pl-photo-bg-d);
   display: flex; align-items: center; justify-content: center;
-  max-height: 50vh; min-height: 220px;
+  min-height: 200px;
 }
 .pl-photo-blur {
   position: absolute; inset: 0; z-index: 0;
@@ -920,7 +922,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .pl-photo-img {
   position: relative; z-index: 1; display: block;
-  max-width: 100%; max-height: 50vh; width: auto; height: auto;
+  max-width: 100%; max-height: 100%; width: auto; height: auto;
   object-fit: contain;
 }
 
