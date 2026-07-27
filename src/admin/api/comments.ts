@@ -26,6 +26,10 @@ export interface AdminComment {
   userId?: number;
   /** počet upozornení autora (⚠ v karte) */
   warnsCount?: number;
+  /** 'blog' (článok) alebo 'photo' (galéria) — určuje, ktoré API sa použije */
+  source?: 'blog' | 'photo';
+  /** id fotky v Media Library (len pri source='photo') */
+  fileId?: number;
 }
 
 export interface CommentListResult {

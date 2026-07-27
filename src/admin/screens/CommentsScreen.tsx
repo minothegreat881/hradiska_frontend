@@ -10,6 +10,7 @@ import {
   listComments, commentCounts, setCommentStatus, deleteComment, replyToComment, sendWarning,
   type AdminComment, type CommentStatus, type WarningTemplate,
 } from '../api/comments';
+import { listPhotoComments, photoCommentCounts, setPhotoCommentStatus, deletePhotoComment } from '../api/photoComments';
 import { blockUser } from '../api/users';
 
 const PAGE = 30;
@@ -42,6 +43,7 @@ const chipStyle = (s: React.CSSProperties): React.CSSProperties => ({
 
 export function CommentsScreen() {
   const { token } = useAuth();
+  const [source, setSource] = useState<'blog' | 'photo'>('blog');
   const [status, setStatus] = useState<CommentStatus | 'all'>('waiting');
   const [q, setQ] = useState('');
   const [dq, setDq] = useState('');
@@ -68,19 +70,31 @@ export function CommentsScreen() {
 
   useEffect(() => {
     if (!token) return;
-    commentCounts(token).then(setCounts).catch(() => {});
-  }, [token, reload]);
+    const fn = source === 'photo' ? photoCommentCounts : commentCounts;
+    fn(token).then(setCounts).catch(() => {});
+  }, [token, reload, source]);
 
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
     setLoading(true); setError('');
-    listComments({ token, page, pageSize: PAGE, status, q: dq })
+    const req = source === 'photo'
+      ? listPhotoComments({ token, page, pageSize: PAGE, status, q: dq })
+      : listComments({ token, page, pageSize: PAGE, status, q: dq });
+    req
       .then(r => { if (!cancelled) { setRows(r.items); setTotal(r.total); setPageCount(r.pageCount); } })
       .catch(e => { if (!cancelled) setError(e?.message || 'Načítanie zlyhalo.'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [token, page, status, dq, reload]);
+  }, [token, page, status, dq, reload, source]);
+
+  // Prepnutie zdroja (Blog / Galéria) — rozumný východiskový filter + strana 1.
+  const switchSource = (s: 'blog' | 'photo') => {
+    if (s === source) return;
+    setSource(s);
+    setStatus(s === 'photo' ? 'all' : 'waiting');
+    setPage(1);
+  };
 
   const openPanel = (c: AdminComment, mode: 'reply' | 'warn') => {
     if (panel?.id === c.documentId && panel.mode === mode) { setPanel(null); return; }
@@ -92,7 +106,8 @@ export function CommentsScreen() {
   const act = async (c: AdminComment, next: CommentStatus) => {
     if (!token) return;
     setRows(rs => rs.map(x => x.documentId === c.documentId ? { ...x, status: next } : x));
-    try { await setCommentStatus(token, c.documentId, next); setReload(n => n + 1); }
+    const setStatusFn = source === 'photo' ? setPhotoCommentStatus : setCommentStatus;
+    try { await setStatusFn(token, c.documentId, next); setReload(n => n + 1); }
     catch { setRows(rs => rs.map(x => x.documentId === c.documentId ? { ...x, status: c.status } : x)); }
   };
 
@@ -124,26 +139,53 @@ export function CommentsScreen() {
 
   const doDelete = async () => {
     if (!token || !confirmDel) return;
-    try { await deleteComment(token, confirmDel.documentId); setConfirmDel(null); setReload(n => n + 1); }
+    const delFn = source === 'photo' ? deletePhotoComment : deleteComment;
+    try { await delFn(token, confirmDel.documentId); setConfirmDel(null); setReload(n => n + 1); }
     catch (e: any) { setError(e?.message || 'Mazanie zlyhalo.'); setConfirmDel(null); }
   };
 
-  const chips: { id: CommentStatus | 'all'; label: string; n: number }[] = useMemo(() => [
-    { id: 'waiting', label: 'Čaká na schválenie', n: counts.waiting },
-    { id: 'reported', label: 'Nahlásené', n: counts.reported },
-    { id: 'visible', label: 'Schválené', n: counts.visible },
-    { id: 'hidden', label: 'Skryté', n: counts.hidden },
-    { id: 'spam', label: 'Spam', n: counts.spam },
-    { id: 'all', label: 'Všetky', n: counts.all },
-  ], [counts]);
+  const chips: { id: CommentStatus | 'all'; label: string; n: number }[] = useMemo(() => {
+    if (source === 'photo') return [
+      { id: 'visible', label: 'Schválené', n: counts.visible },
+      { id: 'hidden', label: 'Skryté', n: counts.hidden },
+      { id: 'spam', label: 'Spam', n: counts.spam },
+      { id: 'all', label: 'Všetky', n: counts.all },
+    ];
+    return [
+      { id: 'waiting', label: 'Čaká na schválenie', n: counts.waiting },
+      { id: 'reported', label: 'Nahlásené', n: counts.reported },
+      { id: 'visible', label: 'Schválené', n: counts.visible },
+      { id: 'hidden', label: 'Skryté', n: counts.hidden },
+      { id: 'spam', label: 'Spam', n: counts.spam },
+      { id: 'all', label: 'Všetky', n: counts.all },
+    ];
+  }, [counts, source]);
 
   return (
     <>
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 16 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Komentáre</h1>
         <p style={{ fontSize: 13.5, color: 'var(--ad-secondary)', margin: '6px 0 0' }}>
-          {counts.waiting} čaká · {counts.reported} nahlásených · {counts.visible} schválených · {counts.all} spolu
+          {source === 'photo'
+            ? <>{counts.visible} schválených · {counts.hidden} skrytých · {counts.spam} spam · {counts.all} spolu</>
+            : <>{counts.waiting} čaká · {counts.reported} nahlásených · {counts.visible} schválených · {counts.all} spolu</>}
         </p>
+      </div>
+
+      {/* Prepínač zdroja: komentáre pod článkami vs. komentáre k fotkám v galérii */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        {([['blog', 'Pod článkami'], ['photo', 'Galéria (fotky)']] as const).map(([id, label]) => (
+          <button
+            key={id}
+            className="abtn"
+            onClick={() => switchSource(id)}
+            style={source === id
+              ? { borderColor: 'var(--ad-amber)', background: '#f6ead0', fontWeight: 700 }
+              : {}}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -195,7 +237,7 @@ export function CommentsScreen() {
                   </div>
                   {c.postTitle && (
                     <div style={{ fontSize: 12, color: 'var(--ad-muted)', marginBottom: 6, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <ExternalLink className="w-3 h-3" /> Pod článkom: {c.postTitle}
+                      <ExternalLink className="w-3 h-3" /> {c.source === 'photo' ? 'V galérii' : 'Pod článkom'}: {c.postTitle}
                     </div>
                   )}
                   <div style={{ fontSize: 14.5, color: 'var(--ad-text)', lineHeight: 1.55, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
