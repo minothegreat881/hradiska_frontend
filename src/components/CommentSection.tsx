@@ -20,6 +20,7 @@ interface Comment {
   likes: number;
   sourceBlogger?: boolean;
   mine?: boolean;   // patrí prihlásenému? (príznak zo servera)
+  authorAvatar?: string | null;  // URL avatara autora (ak si ho nastavil)
   replies?: Comment[];
 }
 
@@ -37,6 +38,7 @@ interface StrapiComment {
   originalDate?: string;
   createdAt: string;
   mine?: boolean;
+  authorAvatar?: string | null;
 }
 
 // Lajky sa už nedržia v localStorage — po prechode na účty ide každý lajk
@@ -102,9 +104,12 @@ function CommentItem({
             fontSize: 14,
             fontWeight: 600,
             flexShrink: 0,
+            overflow: 'hidden',
           }}
         >
-          {(comment.author || '?').charAt(0).toUpperCase()}
+          {comment.authorAvatar
+            ? <img src={`${STRAPI_URL}${comment.authorAvatar}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : (comment.author || '?').charAt(0).toUpperCase()}
         </div>
         <div style={{ flex: 1 }}>
           <div
@@ -336,6 +341,7 @@ function mapStrapiComment(c: StrapiComment): Comment {
     likes: c.likes ?? 0,
     sourceBlogger: c.sourceBlogger,
     mine: c.mine,
+    authorAvatar: c.authorAvatar ?? null,
   };
 }
 

@@ -11,6 +11,9 @@ import {
 
 const go = (p: string) => { window.history.pushState({}, '', p); window.dispatchEvent(new PopStateEvent('popstate')); };
 
+// Base URL pre médiá (avatar autora je relatívna /uploads/... cesta).
+const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+
 /** Komentár s vnorenými odpoveďami (strom podľa inReplyTo). */
 interface PhotoCommentNode extends PhotoComment {
   replies: PhotoCommentNode[];
@@ -172,13 +175,15 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
         <div
           aria-hidden="true"
           style={{
-            flexShrink: 0, width: 34, height: 34, borderRadius: 999, marginTop: 2,
+            flexShrink: 0, width: 34, height: 34, borderRadius: 999, marginTop: 2, overflow: 'hidden',
             background: avatarBg(c.authorName), color: '#fff',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700,
           }}
         >
-          {c.authorName.charAt(0).toUpperCase()}
+          {c.authorAvatar
+            ? <img src={`${STRAPI_URL}${c.authorAvatar}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : c.authorName.charAt(0).toUpperCase()}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ background: 'var(--pl-bubble)', borderRadius: 14, padding: '9px 13px' }}>

@@ -14,6 +14,8 @@ export interface PhotoComment {
   createdAt: string;
   inReplyTo?: string | null;
   mine?: boolean;
+  /** URL avatara autora (ak si ho nastavil) */
+  authorAvatar?: string | null;
   /** počet lajkov komentára */
   likeCount?: number;
   /** documentId mojej reakcie (ak som lajkol) — na unlike; null ak nie */
@@ -42,6 +44,7 @@ export async function listPhotoComments(fileId: number, token?: string): Promise
     createdAt: c.createdAt,
     inReplyTo: c.inReplyTo ?? null,
     mine: !!c.mine,
+    authorAvatar: c.authorAvatar ?? null,
     likeCount: c.likeCount ?? 0,
     myLikeId: c.myLikeId ?? null,
   }));
