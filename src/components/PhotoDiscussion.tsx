@@ -210,7 +210,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
   );
 
   return (
-    <div className="pl-discuss" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+    <div className="pl-discuss-inner" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '1 1 auto' }}>
       {/* Riadok reakcií — bez „0" (skryté, keď niet lajkov ani komentárov) */}
       {(likeCount > 0 || commentCount > 0) && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 15px 9px', flexShrink: 0 }}>
@@ -261,8 +261,8 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
         )}
       </div>
 
-      {/* Vstup */}
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 14px', background: 'var(--pl-surface)', borderTop: '1px solid var(--pl-border-soft)', flexShrink: 0 }}>
+      {/* Vstup — safe-area vpravo dole kvôli nainštalovanej appke (home indicator) */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 14px calc(10px + env(safe-area-inset-bottom, 0px))', background: 'var(--pl-surface)', borderTop: '1px solid var(--pl-border-soft)', flexShrink: 0 }}>
         <div
           aria-hidden="true"
           style={{

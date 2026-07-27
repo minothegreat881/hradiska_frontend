@@ -48,8 +48,11 @@ function Lightbox({
   onNext: () => void;
 }) {
   const [zoom, setZoom] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
   const touchX = useRef<number | null>(null);
+  const sheetY = useRef<number | null>(null);
+  const sheetDragged = useRef(false);
   const prefersReduced =
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -118,7 +121,7 @@ function Lightbox({
       transition={{ duration: prefersReduced ? 0 : 0.2 }}
       onClick={onClose}
     >
-      <div className="pl-card" onClick={(e) => e.stopPropagation()}>
+      <div className={`pl-card${commentsOpen ? ' pl-comments-open' : ''}`} onClick={(e) => e.stopPropagation()}>
         {/* Hlavička — NAD fotkou, nič ju neprekrýva. Jedno ✕. */}
         <div
           className="pl-header"
@@ -201,7 +204,31 @@ function Lightbox({
 
         {/* Reakcie + akčná lišta + komentáre + vstup (ak fotka má fileId zo Strapi) */}
         {current.fileId != null ? (
-          <PhotoDiscussion fileId={current.fileId} onShare={share} />
+          <div className="pl-discuss">
+            {/* Lišta na vysunutie komentárov (mobil) — tap alebo swipe hore/dole.
+                Fotka sa posunie hore, komentáre sa roztiahnu. */}
+            <button
+              type="button"
+              className="pl-sheet-handle"
+              aria-label={commentsOpen ? 'Skryť komentáre' : 'Zobraziť komentáre'}
+              aria-expanded={commentsOpen}
+              onTouchStart={(e) => { sheetY.current = e.touches[0].clientY; sheetDragged.current = false; }}
+              onTouchMove={(e) => {
+                if (sheetY.current == null) return;
+                const dy = e.touches[0].clientY - sheetY.current;
+                if (Math.abs(dy) > 24) { sheetDragged.current = true; setCommentsOpen(dy < 0); }
+              }}
+              onTouchEnd={() => { sheetY.current = null; }}
+              onClick={() => {
+                if (sheetDragged.current) { sheetDragged.current = false; return; }
+                setCommentsOpen((o) => !o);
+              }}
+            >
+              <span>{commentsOpen ? 'Skryť komentáre' : 'Komentáre'}</span>
+              <span className="pl-sheet-chev" aria-hidden="true">{commentsOpen ? '▾' : '▴'}</span>
+            </button>
+            <PhotoDiscussion fileId={current.fileId} onShare={share} />
+          </div>
         ) : (
           <div
             className="pl-discuss"
