@@ -676,7 +676,7 @@ function FitCamera({
   userInteractedRef: React.MutableRefObject<boolean>;
   controlsRef: React.MutableRefObject<any>;
 }) {
-  const { camera, size } = useThree();
+  const { camera, size, invalidate } = useThree();
 
   useEffect(() => {
     const aspect = size.width / Math.max(1, size.height);
@@ -688,11 +688,19 @@ function FitCamera({
       camera.position.set(pos[0], pos[1], pos[2]);
       camera.lookAt(0, 0, 0);
       if (controlsRef.current) {
+        // KRITICKÉ: maxDistance sa cez React state (fitDistance) prepíše až v
+        // ďalšom rendri. Keby sme zavolali update() teraz, OrbitControls by
+        // kameru orezal na STARÝ maxDistance (init 8) → priblíži na stred mapy.
+        // Preto maxDistance nastavíme priamo na inštanciu PRED update().
+        // Na úzkom (mobilnom) displeji je fit distance veľká, práve tam to padalo.
+        controlsRef.current.maxDistance = dist * 1.1;
         controlsRef.current.target.set(0, 0, 0);
         controlsRef.current.update();
       }
+      // frameloop="demand": samotné prenastavenie kamery neprekreslí scénu.
+      invalidate();
     }
-  }, [size.width, size.height, is3D, camera, onDistance, userInteractedRef, controlsRef]);
+  }, [size.width, size.height, is3D, camera, invalidate, onDistance, userInteractedRef, controlsRef]);
 
   return null;
 }
@@ -1233,12 +1241,11 @@ export default function Slovakia3DReliefMap() {
             >
             <div
               ref={containerRef}
-              className={`relative rounded-lg overflow-hidden transition-all duration-300 ${
+              className={`map-3d-box relative rounded-lg overflow-hidden transition-all duration-300 ${
                 isMapActive
                   ? 'shadow-2xl shadow-amber-900/50'
                   : 'hover:shadow-xl hover:shadow-amber-900/30'
               }`}
-              style={{ height: 'calc(100vh - 140px)', minHeight: '700px' }}
               onClick={() => setIsMapActive(true)}
             >
               {/* Ornate corner decorations */}

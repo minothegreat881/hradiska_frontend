@@ -1264,7 +1264,7 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
                 V tejto kategórii zatiaľ nie sú žiadne príspevky.
               </p>
             ) : (
-              <div className="aktualita-masonry-scroll" style={{ height: 560, overflowY: 'auto', paddingRight: 10 }}>
+              <div>
                 <div className="aktualita-masonry-cols">
                   {masonryItems.map((item) => (
                     <KronikaCard key={item.documentId} item={item} />

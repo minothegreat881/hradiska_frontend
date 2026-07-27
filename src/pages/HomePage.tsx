@@ -59,8 +59,9 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Aktuality feed – kronika brigád, podujatí, obnov */}
-      <AktualityFeed />
+      {/* Aktuality feed – kronika brigád, podujatí, obnov.
+          Bez vlastnej posuvnej lišty: dlaždice tečú v stránke, viac cez „Načítať staršie". */}
+      <AktualityFeed initialPageSize={6} />
 
       {/* Interactive Map Section - Full Width */}
       <section

@@ -11,7 +11,7 @@ import { ScrollReveal } from '../components/ScrollReveal';
 import { SocialShare } from '../components/SocialShare';
 import { CommentSection } from '../components/CommentSection';
 import { HistoricalGallery } from '../components/HistoricalGallery';
-import { ArticleSidebar } from '../components/ArticleSidebar';
+import { ArticleSidebar, KeyFactsCard, TimelineCard } from '../components/ArticleSidebar';
 import { useBlogPost } from '../hooks/useStrapi';
 import { getStrapiImageUrl, convertStrapiPostToArticle, StrapiQuote } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
@@ -547,6 +547,13 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                   <p className="text-stone-500 dark:text-stone-400 italic">Obsah článku zatiaľ nebol pridaný.</p>
                 </div>
               )}
+
+              {/* Kľúčové fakty + časová os NA MOBILE — pod textom článku (ako scear.sk).
+                  Na desktope sú v sidebare (only-desktop-1024). Tu only-mobile-1024. */}
+              <div className="only-mobile-1024 clear-both" style={{ marginTop: 24 }}>
+                <KeyFactsCard facts={keyFactsData || []} />
+                <TimelineCard timeline={timelineData} />
+              </div>
 
               {/* Strapi Quotes (legacy - for posts without dynamic zone) */}
               {strapiQuotes.length > 0 && !(article as any).blocks?.length && (

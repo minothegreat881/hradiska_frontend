@@ -369,6 +369,17 @@ export function HeroSearch() {
               setPulseKey((k) => k + 1);
               // Zahrej index hneď pri fokuse, nech je prvé hľadanie okamžité.
               getSearchIndex().catch(() => {});
+              // Mobil: softvérová klávesnica prekrýva spodnú polovicu obrazovky a
+              // s ňou aj dropdown s výsledkami. Vyscrollujeme input tesne pod horný
+              // okraj, aby sa výsledky vykreslili nad klávesnicou.
+              if (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) {
+                setTimeout(() => {
+                  const el = inputRef.current;
+                  if (!el) return;
+                  const top = el.getBoundingClientRect().top + window.scrollY - 72;
+                  window.scrollTo({ top, behavior: 'smooth' });
+                }, 300);
+              }
             }}
             onBlur={() => setTimeout(() => setIsFocused(false), 200)}
             onKeyDown={handleKeyDown}
@@ -432,7 +443,7 @@ export function HeroSearch() {
               id="search-dropdown-results"
               role="listbox"
               className="search-dropdown-scroll"
-              style={{ maxHeight: 460, overflowY: 'auto', padding: '6px 0' }}
+              style={{ maxHeight: 'min(460px, 48vh)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '6px 0' }}
             >
               {hasResults ? (
                 <>

@@ -225,6 +225,154 @@ const cardTitleStyle: React.CSSProperties = {
   marginTop: 0,
 };
 
+// ── Vyčlenené karty ─────────────────────────────────────────────────────
+// KeyFacts + Časová os sú samostatné komponenty, aby sa dali vykresliť aj v
+// sidebare (desktop) aj pod textom článku (mobil) – bez duplikovania JSX.
+
+export function KeyFactsCard({ facts }: { facts: KeyFact[] }) {
+  if (!facts || facts.length === 0) return null;
+  return (
+    <div style={cardStyle}>
+      <h3 style={cardTitleStyle}>Kľúčové fakty</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {facts.map((fact, index) => (
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                flexShrink: 0,
+                width: 24,
+                height: 24,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #a87437 0%, #7d4f1d 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontFamily: 'Georgia, serif',
+                fontSize: 12,
+                fontWeight: 700,
+                boxShadow: '0 1px 2px rgba(70,40,20,0.15)',
+              }}
+            >
+              {fact.number || index + 1}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#a87437',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                }}
+              >
+                {fact.title}
+              </div>
+              <div
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  fontSize: 14,
+                  color: '#2d2418',
+                  marginTop: 2,
+                  lineHeight: 1.45,
+                }}
+              >
+                {fact.description}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function TimelineCard({ timeline }: { timeline: TimelineEvent[] }) {
+  if (!timeline || timeline.length === 0) return null;
+  return (
+    <div style={cardStyle}>
+      <h3 style={cardTitleStyle}>Časová os</h3>
+      <div>
+        {timeline.map((item, index) => (
+          <div key={index} style={{ display: 'flex', gap: 12 }}>
+            <div
+              style={{
+                width: 48,
+                flexShrink: 0,
+                textAlign: 'right',
+                fontFamily: 'Georgia, serif',
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#7d4f1d',
+                paddingTop: 1,
+              }}
+            >
+              {item.year}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  background: '#a87437',
+                  marginTop: 5,
+                  flexShrink: 0,
+                }}
+              />
+              {index < timeline.length - 1 && (
+                <div
+                  style={{
+                    width: 2,
+                    flex: 1,
+                    minHeight: '2rem',
+                    background: 'rgba(196,165,116,0.4)',
+                  }}
+                />
+              )}
+            </div>
+
+            <div style={{ flex: 1, paddingBottom: 12 }}>
+              <div
+                style={{
+                  fontFamily: 'Georgia, serif',
+                  fontSize: 14,
+                  color: '#2d2418',
+                  fontWeight: 600,
+                }}
+              >
+                {item.title}
+              </div>
+              {item.description && (
+                <div
+                  style={{
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 12,
+                    color: '#6b5d4d',
+                    marginTop: 2,
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {item.description}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ArticleSidebar({
   article,
   relatedArticles = [],
@@ -277,145 +425,13 @@ export function ArticleSidebar({
         </div>
       )}
 
-      {/* Key Facts — only if there are real facts */}
-      {facts.length > 0 && (
-        <div style={cardStyle}>
-          <h3 style={cardTitleStyle}>Kľúčové fakty</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {facts.map((fact, index) => (
-              <div
-                key={index}
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 12,
-                }}
-              >
-                <div
-                  style={{
-                    flexShrink: 0,
-                    width: 24,
-                    height: 24,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #a87437 0%, #7d4f1d 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                    fontFamily: 'Georgia, serif',
-                    fontSize: 12,
-                    fontWeight: 700,
-                    boxShadow: '0 1px 2px rgba(70,40,20,0.15)',
-                  }}
-                >
-                  {fact.number || index + 1}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontFamily: 'Georgia, serif',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: '#a87437',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                    }}
-                  >
-                    {fact.title}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: 'Georgia, serif',
-                      fontSize: 14,
-                      color: '#2d2418',
-                      marginTop: 2,
-                      lineHeight: 1.45,
-                    }}
-                  >
-                    {fact.description}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Timeline */}
-      {timeline.length > 0 && (
-        <div style={cardStyle}>
-          <h3 style={cardTitleStyle}>Časová os</h3>
-          <div>
-            {timeline.map((item, index) => (
-              <div key={index} style={{ display: 'flex', gap: 12 }}>
-                <div
-                  style={{
-                    width: 48,
-                    flexShrink: 0,
-                    textAlign: 'right',
-                    fontFamily: 'Georgia, serif',
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: '#7d4f1d',
-                    paddingTop: 1,
-                  }}
-                >
-                  {item.year}
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: '50%',
-                      background: '#a87437',
-                      marginTop: 5,
-                      flexShrink: 0,
-                    }}
-                  />
-                  {index < timeline.length - 1 && (
-                    <div
-                      style={{
-                        width: 2,
-                        flex: 1,
-                        minHeight: '2rem',
-                        background: 'rgba(196,165,116,0.4)',
-                      }}
-                    />
-                  )}
-                </div>
-
-                <div style={{ flex: 1, paddingBottom: 12 }}>
-                  <div
-                    style={{
-                      fontFamily: 'Georgia, serif',
-                      fontSize: 14,
-                      color: '#2d2418',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {item.title}
-                  </div>
-                  {item.description && (
-                    <div
-                      style={{
-                        fontFamily: 'Georgia, serif',
-                        fontSize: 12,
-                        color: '#6b5d4d',
-                        marginTop: 2,
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {item.description}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Kľúčové fakty + časová os — LEN na desktope (v sidebare).
+          Na mobile sa vykresľujú pod textom článku (ArticlePage), lebo v úzkom
+          zalomenom sidebare pod komentármi rozbíjali čítanie. */}
+      <div className="only-desktop-1024">
+        <KeyFactsCard facts={facts} />
+        <TimelineCard timeline={timeline} />
+      </div>
 
       {/* Tags */}
       {article.tags && article.tags.length > 0 && (
