@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
-import { isStandalone, openInstall, EVT_AVAILABLE } from '../lib/pwa';
+import { isStandalone, hasDeferredPrompt, promptInstall, openInstall, EVT_AVAILABLE } from '../lib/pwa';
 
 /**
  * Lákavá ikona „Získať appku" — zlatý gradient s pulzujúcim glow efektom.
@@ -26,9 +26,21 @@ export function InstallAppButton({ compact = false }: { compact?: boolean }) {
 
   if (!show) return null;
 
+  // Klik → keď prehliadač vie natívnu inštaláciu (Android/Chrome), spusti rovno
+  // systémový dialóg „Nainštalovať Hradiská.sk?" (jedno potvrdenie, nainštaluje sa
+  // automaticky). Inak (iOS/desktop bez natívneho promptu) ukáž jemnú kartu s návodom.
+  const handleClick = async () => {
+    if (hasDeferredPrompt()) {
+      const r = await promptInstall();
+      if (r === 'unavailable') openInstall();
+      return;
+    }
+    openInstall();
+  };
+
   return (
     <button
-      onClick={() => openInstall()}
+      onClick={handleClick}
       className="install-app-btn"
       title="Nainštalovať Hradiská.sk ako aplikáciu"
       aria-label="Nainštalovať aplikáciu"
