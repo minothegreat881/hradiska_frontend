@@ -6,6 +6,7 @@ import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
 import { TwoTierNav } from './TwoTierNav';
 import { InstallAppButton } from './InstallAppButton';
+import { AccountNavLink } from './AccountNavLink';
 import { useNavigationData } from '../hooks/useNavigationData';
 
 const NAV_BG = '#1f1611';
@@ -237,11 +238,15 @@ export function NavBar() {
     const handleScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 20);
-      // Auto-hide: scroll dole → skry lištu, scroll hore → zobraz. Pri vrchu vždy zobraz.
-      if (Math.abs(y - lastY) > 6) {
-        setNavHidden(y > 90 && y > lastY);
-        lastY = y;
-      }
+      const dy = y - lastY;
+      // Header je pri čítaní SCHOVANÝ. Zobrazí sa len keď:
+      //  - si pri vrchu stránky (< 12 px), alebo
+      //  - RÝCHLO potiahneš hore (väčší skok medzi scroll eventmi → dy < -10).
+      // Pomalé rolovanie hore ho nechá schovaný. Rolovanie dole ho skryje.
+      if (y < 12) setNavHidden(false);
+      else if (dy > 5) setNavHidden(true);
+      else if (dy < -10) setNavHidden(false);
+      lastY = y;
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -334,8 +339,9 @@ export function NavBar() {
             </a>
 
             {/* Akčné tlačidlá */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <InstallAppButton compact />
+              <AccountNavLink compact />
 
               <button
                 type="button"

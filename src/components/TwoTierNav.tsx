@@ -1,53 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapPin, User, LogIn } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
-import { useMember } from '../auth/MemberAuth';
-import { getUnreadCount } from '../lib/profileApi';
 import { InstallAppButton } from './InstallAppButton';
-
-/** Odkaz na účet v navigácii — prihlásenie alebo profil + badge neprečítaných. */
-function AccountNavLink() {
-  const { isLoggedIn, member, token } = useMember();
-  const [unread, setUnread] = useState(0);
-  const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
-
-  // Počet neprečítaných notifikácií — pri prihlásení + periodicky (60 s).
-  useEffect(() => {
-    if (!token) { setUnread(0); return; }
-    let live = true;
-    const poll = () => getUnreadCount(token).then((n) => { if (live) setUnread(n); }).catch(() => {});
-    poll();
-    const id = setInterval(poll, 60_000);
-    return () => { live = false; clearInterval(id); };
-  }, [token]);
-
-  return (
-    <button
-      onClick={() => go(isLoggedIn ? '/profil' : '/prihlasenie')}
-      title={isLoggedIn ? (unread ? `Môj profil — ${unread} nových upozornení` : 'Môj profil') : 'Prihlásiť sa'}
-      style={{
-        position: 'relative', flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 7,
-        padding: '7px 14px', borderRadius: 999, cursor: 'pointer',
-        background: 'rgba(255,247,231,0.08)', border: '1px solid rgba(200,161,90,0.4)',
-        color: '#e8dcc8', fontFamily: 'Georgia, serif', fontSize: 13, whiteSpace: 'nowrap',
-      }}
-    >
-      {isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
-      <span className="hidden sm:inline">
-        {isLoggedIn ? (member?.displayName || member?.username || 'Účet') : 'Prihlásiť sa'}
-      </span>
-      {isLoggedIn && unread > 0 && (
-        <span aria-label={`${unread} neprečítaných`} style={{
-          position: 'absolute', top: -5, right: -5, minWidth: 18, height: 18, padding: '0 5px',
-          borderRadius: 999, background: '#7c1f24', color: '#fff', fontSize: 11, fontWeight: 700,
-          display: 'grid', placeItems: 'center', border: '1px solid #c8a15a', fontFamily: 'system-ui',
-        }}>{unread > 99 ? '99+' : unread}</span>
-      )}
-    </button>
-  );
-}
+import { AccountNavLink } from './AccountNavLink';
 
 /**
  * Dvojriadková horná lišta — varianta 2A „Dvojriadková lišta".

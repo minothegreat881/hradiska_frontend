@@ -2,21 +2,26 @@
 
 import { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
-import { isStandalone, isIOS, hasDeferredPrompt, openInstall, EVT_AVAILABLE } from '../lib/pwa';
+import { isStandalone, openInstall, EVT_AVAILABLE } from '../lib/pwa';
 
 /**
  * Lákavá ikona „Získať appku" — zlatý gradient s pulzujúcim glow efektom.
- * Zobrazí sa len keď je PWA inštalovateľná a ešte nebeží ako standalone.
+ * Zobrazí sa VŽDY, kým appka nebeží ako standalone (t.j. kým nie je nainštalovaná)
+ * — klik otvorí ponuku s inštaláciou alebo návodom (aj iOS/desktop).
  * `compact` = kruhová ikona (mobil), inak pilulka s textom (desktop).
  */
 export function InstallAppButton({ compact = false }: { compact?: boolean }) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const check = () => setShow(!isStandalone() && (hasDeferredPrompt() || isIOS()));
+    const check = () => setShow(!isStandalone());
     check();
     window.addEventListener(EVT_AVAILABLE, check);
-    return () => window.removeEventListener(EVT_AVAILABLE, check);
+    window.addEventListener('appinstalled', check);
+    return () => {
+      window.removeEventListener(EVT_AVAILABLE, check);
+      window.removeEventListener('appinstalled', check);
+    };
   }, []);
 
   if (!show) return null;
