@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ThumbsUp, Send, Trash2, Reply, Loader2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ThumbsUp, MessageCircle, Share2, Heart, Send, Loader2 } from 'lucide-react';
 import { useMember } from '../auth/MemberAuth';
 import {
   listPhotoComments, addPhotoComment, deletePhotoComment,
@@ -15,7 +15,6 @@ interface PhotoCommentNode extends PhotoComment {
   replies: PhotoCommentNode[];
 }
 
-/** Z plochého zoznamu zostav strom podľa inReplyTo (rovnako ako pri článkoch). */
 function buildTree(flat: PhotoComment[]): PhotoCommentNode[] {
   const byId = new Map<string, PhotoCommentNode>();
   for (const c of flat) byId.set(c.documentId, { ...c, replies: [] });
@@ -27,11 +26,45 @@ function buildTree(flat: PhotoComment[]): PhotoCommentNode[] {
   return roots;
 }
 
+function countNodes(nodes: PhotoCommentNode[]): number {
+  return nodes.reduce((n, c) => n + 1 + countNodes(c.replies), 0);
+}
+
+/** Relatívny čas v slovenčine (jednoduchý). */
+function relTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '';
+  const diff = Math.max(0, Date.now() - then);
+  const min = Math.round(diff / 60000);
+  if (min < 1) return 'teraz';
+  if (min < 60) return `pred ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `pred ${h} h`;
+  const d = Math.round(h / 24);
+  if (d < 7) return `pred ${d} d`;
+  return new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'short' });
+}
+
+/** Deterministická farba avatara podľa mena. */
+function avatarBg(name: string): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 360;
+  return `hsl(${h}, 42%, 42%)`;
+}
+
+function skloninaLajk(n: number): string {
+  return n === 1 ? 'lajk' : n < 5 ? 'lajky' : 'lajkov';
+}
+function skloninaKom(n: number): string {
+  return n === 1 ? 'komentár' : n < 5 ? 'komentáre' : 'komentárov';
+}
+
 /**
- * Panel lajkov a komentárov k fotke v lightboxe.
- * Zobrazuje sa v info paneli vedľa obrázka. Aktivita len pre prihlásených.
+ * Reakcie + komentáre k fotke — vykresľuje sa v lightboxe (mobil karta / desktop panel).
+ * Poradie: riadok reakcií → akčná lišta (Páči sa mi / Komentovať / Zdieľať) →
+ * scrollovateľné komentáre → pilulkový vstup. Aktivita len pre prihlásených.
  */
-export function PhotoDiscussion({ fileId }: { fileId: number }) {
+export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?: () => void }) {
   const { member, token, isLoggedIn } = useMember();
 
   const [comments, setComments] = useState<PhotoCommentNode[]>([]);
@@ -40,10 +73,10 @@ export function PhotoDiscussion({ fileId }: { fileId: number }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
-  // documentId komentára, na ktorý práve píšem odpoveď (alebo null)
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [replyBusy, setReplyBusy] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const load = () => {
     setLoading(true);
@@ -58,40 +91,40 @@ export function PhotoDiscussion({ fileId }: { fileId: number }) {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [fileId, isLoggedIn]);
 
+  const commentCount = countNodes(comments);
+  const liked = !!myReaction;
+
   const toggleLike = async () => {
     if (!isLoggedIn || !token) { go('/prihlasenie'); return; }
-    const liked = !!myReaction;
-    // optimisticky
     setMyReaction(liked ? null : 'pending');
-    setLikeCount(n => n + (liked ? -1 : 1));
+    setLikeCount((n) => n + (liked ? -1 : 1));
     try {
       if (liked) await unlikePhoto(token, myReaction!);
       else setMyReaction(await likePhoto(token, fileId));
     } catch {
       setMyReaction(liked ? myReaction : null);
-      setLikeCount(n => n + (liked ? 1 : -1));
+      setLikeCount((n) => n + (liked ? 1 : -1));
     }
+  };
+
+  const focusInput = () => {
+    if (!isLoggedIn) { go('/prihlasenie'); return; }
+    inputRef.current?.focus();
+    inputRef.current?.scrollIntoView({ block: 'nearest' });
   };
 
   const submit = async () => {
     if (!token || !text.trim()) return;
     setBusy(true);
-    try {
-      await addPhotoComment(token, fileId, text.trim());
-      setText('');
-      load();
-    } catch { /* ignore */ } finally { setBusy(false); }
+    try { await addPhotoComment(token, fileId, text.trim()); setText(''); load(); }
+    catch { /* ignore */ } finally { setBusy(false); }
   };
 
   const submitReply = async (parentDocId: string) => {
     if (!token || !replyText.trim()) return;
     setReplyBusy(true);
-    try {
-      await addPhotoComment(token, fileId, replyText.trim(), parentDocId);
-      setReplyText('');
-      setReplyTo(null);
-      load();
-    } catch { /* ignore */ } finally { setReplyBusy(false); }
+    try { await addPhotoComment(token, fileId, replyText.trim(), parentDocId); setReplyText(''); setReplyTo(null); load(); }
+    catch { /* ignore */ } finally { setReplyBusy(false); }
   };
 
   const remove = async (id: string) => {
@@ -100,137 +133,202 @@ export function PhotoDiscussion({ fileId }: { fileId: number }) {
     try { await deletePhotoComment(token, id); load(); } catch {}
   };
 
-  // Rekurzívne vykreslenie komentára aj s odpoveďami (odsadené cez depth).
+  const initial = (member?.displayName || member?.username || '?').charAt(0).toUpperCase();
+
+  /* ── Jeden komentár (bublina) + odpovede ─────────────────────────────── */
   const renderComment = (c: PhotoCommentNode, depth = 0) => (
-    <div key={c.documentId} style={{ marginLeft: depth > 0 ? 20 : 0, marginTop: depth > 0 ? 8 : 0 }}>
+    <div key={c.documentId} style={{ marginLeft: depth > 0 ? 26 : 0, marginTop: depth > 0 ? 8 : 12 }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
-          <span style={{ color: '#a87437', fontSize: 13, fontWeight: 600 }}>{c.authorName}</span>
-          <span style={{ color: '#2d2418', fontSize: 13.5, marginLeft: 8, whiteSpace: 'pre-wrap' }}>{c.content}</span>
-          <div style={{ display: 'flex', gap: 12, marginTop: 3 }}>
+        <div
+          aria-hidden="true"
+          style={{
+            flexShrink: 0, width: 34, height: 34, borderRadius: 999, marginTop: 2,
+            background: avatarBg(c.authorName), color: '#fff',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700,
+          }}
+        >
+          {c.authorName.charAt(0).toUpperCase()}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ background: 'var(--pl-bubble)', borderRadius: 14, padding: '9px 13px' }}>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 700, color: 'var(--pl-title)' }}>
+              {c.authorName}
+            </div>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 16.5, color: 'var(--pl-body)', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              {c.content}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 14, marginTop: 4, paddingLeft: 6, fontFamily: 'var(--font-serif)', fontSize: 14, color: 'var(--pl-muted-2)' }}>
+            <span>{relTime(c.createdAt)}</span>
             {isLoggedIn && (
               <button
                 onClick={() => { setReplyTo(replyTo === c.documentId ? null : c.documentId); setReplyText(''); }}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none',
-                  color: '#7a6b56', cursor: 'pointer', padding: 0, fontFamily: 'Georgia, serif', fontSize: 12 }}
+                className="pl-focusable"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 14 }}
               >
-                <Reply className="w-3 h-3" /> Odpovedať
+                Odpovedať
               </button>
             )}
             {c.mine && (
-              <button onClick={() => remove(c.documentId)} title="Zmazať môj komentár"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none',
-                        color: '#a04338', cursor: 'pointer', padding: 0, fontFamily: 'Georgia, serif', fontSize: 12 }}>
-                <Trash2 className="w-3 h-3" /> Zmazať
+              <button
+                onClick={() => remove(c.documentId)}
+                className="pl-focusable"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--pl-bordo-2)', fontFamily: 'var(--font-serif)', fontSize: 14 }}
+              >
+                Zmazať
               </button>
             )}
           </div>
+
+          {replyTo === c.documentId && isLoggedIn && (
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
+              <input
+                autoFocus
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submitReply(c.documentId); } }}
+                placeholder={`Odpoveď pre ${c.authorName}…`}
+                maxLength={2000}
+                style={pillInputStyle}
+              />
+              <button
+                onClick={() => submitReply(c.documentId)}
+                disabled={replyBusy || !replyText.trim()}
+                aria-label="Odoslať odpoveď"
+                className="pl-focusable"
+                style={{ ...sendBtnStyle, opacity: replyBusy || !replyText.trim() ? 0.5 : 1 }}
+              >
+                {replyBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              </button>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Inline pole odpovede pod komentárom */}
-      {replyTo === c.documentId && isLoggedIn && (
-        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', marginTop: 6, marginLeft: 4 }}>
-          <textarea
-            autoFocus
-            value={replyText}
-            onChange={e => setReplyText(e.target.value)}
-            placeholder={`Odpoveď pre ${c.authorName}…`}
-            rows={2}
-            maxLength={2000}
-            style={{ flex: 1, resize: 'vertical', padding: '7px 10px', borderRadius: 8,
-              background: '#fdfbf6', border: '1px solid #a87437', color: '#2d2418',
-              fontFamily: 'Georgia, serif', fontSize: 13, outline: 'none' }}
-          />
-          <button
-            onClick={() => submitReply(c.documentId)} disabled={replyBusy || !replyText.trim()}
-            style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, cursor: 'pointer', border: 'none',
-              background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              opacity: replyBusy || !replyText.trim() ? 0.5 : 1 }}
-          >
-            {replyBusy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-          </button>
-        </div>
-      )}
-
-      {c.replies.map(r => renderComment(r, depth + 1))}
+      {c.replies.map((r) => renderComment(r, depth + 1))}
     </div>
   );
 
-  const S = {
-    text: { fontFamily: 'Georgia, serif' } as React.CSSProperties,
-  };
-
   return (
-    <div style={{ ...S.text, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Lajk */}
-      <button
-        onClick={toggleLike}
-        style={{
-          alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '7px 14px', borderRadius: 999, cursor: 'pointer',
-          border: `1px solid ${myReaction ? '#c8862f' : 'rgba(196,165,116,0.5)'}`,
-          background: myReaction ? 'rgba(200,134,47,0.14)' : 'transparent',
-          color: myReaction ? '#8a5316' : '#7a6b56', fontFamily: 'Georgia, serif', fontSize: 13,
-        }}
-      >
-        <ThumbsUp className="w-4 h-4" style={{ fill: myReaction ? '#c8862f' : 'transparent' }} />
-        {likeCount} {likeCount === 1 ? 'lajk' : likeCount < 5 ? 'lajky' : 'lajkov'}
-      </button>
+    <div className="pl-discuss" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      {/* Riadok reakcií — bez „0" (skryté, keď niet lajkov ani komentárov) */}
+      {(likeCount > 0 || commentCount > 0) && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 15px 9px', flexShrink: 0 }}>
+          {likeCount > 0 && (
+            <>
+              <span aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <span style={reactChip('linear-gradient(135deg,#c8862f,#9a5d1f)')}><ThumbsUp className="w-3 h-3" style={{ color: '#fff' }} /></span>
+                <span style={{ ...reactChip('linear-gradient(135deg,#a04338,#7c1f24)'), marginLeft: -7 }}><Heart className="w-3 h-3" style={{ color: '#fff' }} /></span>
+              </span>
+              <span style={{ fontFamily: 'var(--font-serif)', fontSize: 16, color: 'var(--pl-muted)' }}>
+                {likeCount} {skloninaLajk(likeCount)}
+              </span>
+            </>
+          )}
+          {commentCount > 0 && (
+            <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-serif)', fontSize: 16, color: 'var(--pl-muted-2)' }}>
+              {commentCount} {skloninaKom(commentCount)}
+            </span>
+          )}
+        </div>
+      )}
 
-      {/* Komentáre */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* Akčná lišta */}
+      <div style={{ display: 'flex', gap: 4, padding: '4px 10px', margin: '0 5px', borderTop: '1px solid var(--pl-border-soft)', flexShrink: 0 }}>
+        <button className="pl-act pl-focusable" data-active={liked} onClick={toggleLike} aria-pressed={liked}>
+          <ThumbsUp className="w-4.5 h-4.5" style={{ width: 18, height: 18, fill: liked ? 'currentColor' : 'transparent' }} /> Páči sa mi
+        </button>
+        <button className="pl-act pl-focusable" onClick={focusInput}>
+          <MessageCircle style={{ width: 18, height: 18 }} /> Komentovať
+        </button>
+        <button className="pl-act pl-focusable" onClick={onShare}>
+          <Share2 style={{ width: 18, height: 18 }} /> Zdieľať
+        </button>
+      </div>
+
+      {/* Komentáre — scrollovateľná časť (na desktope má panel pevnú výšku) */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 15px 8px' }}>
         {loading ? (
-          <span style={{ color: '#7a6b56', fontSize: 13 }}>
+          <span style={{ color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 15 }}>
             <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ display: 'inline' }} /> Načítavam…
           </span>
         ) : comments.length === 0 ? (
-          <span style={{ color: '#7a6b56', fontSize: 13, fontStyle: 'italic' }}>
-            Zatiaľ bez komentárov k tejto fotke.
-          </span>
-        ) : comments.map(c => renderComment(c))}
+          <p style={{ color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 15, margin: '8px 0' }}>
+            Buď prvý, kto sa ozve ✦
+          </p>
+        ) : (
+          comments.map((c) => renderComment(c))
+        )}
       </div>
 
       {/* Vstup */}
-      {isLoggedIn ? (
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
-          <textarea
-            value={text}
-            onChange={e => setText(e.target.value)}
-            placeholder="Napíšte komentár…"
-            rows={2}
-            maxLength={2000}
-            style={{
-              flex: 1, resize: 'vertical', padding: '8px 11px', borderRadius: 8,
-              background: '#fdfbf6', border: '1px solid rgba(196,165,116,0.5)',
-              color: '#2d2418', fontFamily: 'Georgia, serif', fontSize: 13.5, outline: 'none',
-            }}
-          />
-          <button
-            onClick={submit} disabled={busy || !text.trim()}
-            style={{
-              flexShrink: 0, width: 38, height: 38, borderRadius: 8, cursor: 'pointer',
-              border: 'none', background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              opacity: busy || !text.trim() ? 0.5 : 1,
-            }}
-          >
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => go('/prihlasenie')}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 14px', background: 'var(--pl-surface)', borderTop: '1px solid var(--pl-border-soft)', flexShrink: 0 }}>
+        <div
+          aria-hidden="true"
           style={{
-            alignSelf: 'flex-start', fontFamily: 'Georgia, serif', fontSize: 13,
-            color: '#c8862f', background: 'none', border: 'none', cursor: 'pointer',
-            textDecoration: 'underline', padding: 0,
+            flexShrink: 0, width: 34, height: 34, borderRadius: 999,
+            background: isLoggedIn ? 'linear-gradient(135deg,#a87437,#7d4f1d)' : '#e6d7b0',
+            color: isLoggedIn ? '#fffdf8' : '#8a795e',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700,
           }}
         >
-          Prihláste sa a zapojte sa do diskusie
-        </button>
-      )}
+          {isLoggedIn ? initial : '?'}
+        </div>
+        {isLoggedIn ? (
+          <>
+            <input
+              ref={inputRef}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
+              placeholder="Napíš komentár…"
+              maxLength={2000}
+              className="pl-focusable"
+              style={pillInputStyle}
+            />
+            <button
+              onClick={submit}
+              disabled={busy || !text.trim()}
+              aria-label="Odoslať komentár"
+              className="pl-focusable"
+              style={{ ...sendBtnStyle, opacity: busy || !text.trim() ? 0.5 : 1 }}
+            >
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => go('/prihlasenie')}
+            className="pl-focusable"
+            style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--pl-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}
+          >
+            <strong style={{ color: 'var(--pl-amber-2)' }}>Prihláste sa</strong> a zapojte sa do diskusie
+          </button>
+        )}
+      </div>
     </div>
   );
+}
+
+/* ── Zdieľané štýly ─────────────────────────────────────────────────────── */
+const pillInputStyle: React.CSSProperties = {
+  flex: 1, minWidth: 0,
+  background: '#fff', border: '1px solid var(--pl-field)', borderRadius: 999,
+  padding: '9px 14px', color: 'var(--pl-title)',
+  fontFamily: 'var(--font-serif)', fontSize: 16, outline: 'none',
+};
+
+const sendBtnStyle: React.CSSProperties = {
+  flexShrink: 0, width: 38, height: 38, borderRadius: 999, cursor: 'pointer', border: 'none',
+  background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+};
+
+function reactChip(bg: string): React.CSSProperties {
+  return {
+    width: 22, height: 22, borderRadius: 999, background: bg,
+    border: '1.5px solid var(--pl-card)',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  };
 }

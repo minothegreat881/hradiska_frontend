@@ -830,6 +830,140 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   }
 }
 
+/* =====================================================================
+   Fotogaléria — lightbox ako FB-style príspevok (mobil karta / desktop 2 stĺpce)
+   Nové farby ako CSS premenné (nie inline), fonty cez --font-heading/serif.
+   ===================================================================== */
+:root {
+  --pl-card: #fdfaf1;
+  --pl-surface: #faf5e8;
+  --pl-bubble: #f4ead2;
+  --pl-border: #cdb98c;
+  --pl-border-soft: #ece0c2;
+  --pl-field: #ddcba0;
+  --pl-photo-bg-m: #241a10;
+  --pl-photo-bg-d: #1c1510;
+  --pl-amber: #9a5d1f;
+  --pl-amber-2: #8a5316;
+  --pl-amber-3: #c8862f;
+  --pl-gold: #c8a15a;
+  --pl-bordo: #7c1f24;
+  --pl-bordo-2: #a04338;
+  --pl-title: #2e2213;
+  --pl-body: #4a3f2e;
+  --pl-muted: #6f5f47;
+  --pl-muted-2: #8a795e;
+  --pl-placeholder: #a89a7d;
+  --pl-on-overlay: #f0d9a8;
+}
+
+/* Backdrop */
+.pl-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(15, 10, 5, 0.9);
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow-y: auto; padding: 14px;
+}
+@media (min-width: 900px) {
+  .pl-overlay { align-items: center; overflow: hidden; padding: 24px; }
+}
+
+/* Karta */
+.pl-card {
+  width: 100%; max-width: 430px;
+  background: var(--pl-card);
+  border: 1px solid var(--pl-border);
+  border-radius: 22px; overflow: hidden;
+  box-shadow: 0 30px 70px -28px rgba(40, 26, 10, 0.6);
+  display: flex; flex-direction: column;
+}
+@media (min-width: 900px) {
+  .pl-card {
+    max-width: 900px; border-radius: 18px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 342px;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    min-height: 520px;
+    max-height: min(88vh, 760px);
+  }
+  .pl-photo   { grid-column: 1; grid-row: 1 / -1; max-height: none; min-height: 0; }
+  .pl-photo-img { max-height: 100%; }
+  .pl-header  { grid-column: 2; grid-row: 1; }
+  .pl-text    { grid-column: 2; grid-row: 2; }
+  .pl-discuss { grid-column: 2; grid-row: 3; min-height: 0; }
+  .pl-header, .pl-text, .pl-discuss { border-left: 1px solid var(--pl-border-soft); }
+}
+
+/* Avatar účtu v hlavičke */
+.pl-avatar-h {
+  width: 42px; height: 42px; border-radius: 999px; flex-shrink: 0;
+  background: radial-gradient(circle at 36% 30%, #a5651f, var(--pl-bordo));
+  border: 1.5px solid var(--pl-gold);
+  color: var(--pl-on-overlay);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-heading); font-size: 15px; font-weight: 700;
+}
+
+/* Fotka — FB-style: celá fotka (contain) v ohraničenom tmavom ráme s rozmazaným
+   pozadím (letterbox). Portrét sa tak zmestí celý a nepresahuje do textu. */
+.pl-photo {
+  position: relative; overflow: hidden;
+  background: var(--pl-photo-bg-d);
+  display: flex; align-items: center; justify-content: center;
+  max-height: 68vh; min-height: 260px;
+}
+.pl-photo-blur {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  filter: blur(26px) brightness(0.45); transform: scale(1.15);
+  pointer-events: none;
+}
+.pl-photo-img {
+  position: relative; z-index: 1; display: block;
+  max-width: 100%; max-height: 68vh; width: auto; height: auto;
+  object-fit: contain;
+}
+
+/* Navigačné kruhy na fotke */
+.pl-navb {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px; border-radius: 999px; z-index: 3;
+  background: rgba(20, 14, 8, 0.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  border: 1px solid rgba(240, 217, 168, 0.35); color: var(--pl-on-overlay);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.18s;
+}
+.pl-navb:hover { background: rgba(200, 134, 47, 0.55); }
+.pl-corner {
+  position: absolute; z-index: 3; width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(20, 14, 8, 0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  border: 1px solid rgba(240, 217, 168, 0.3); color: var(--pl-on-overlay);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.pl-pill {
+  position: absolute; z-index: 3;
+  background: rgba(20, 14, 8, 0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  color: var(--pl-on-overlay); border: 1px solid rgba(240, 217, 168, 0.3);
+  font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.06em;
+  padding: 4px 10px; border-radius: 999px;
+}
+
+/* Akčná lišta */
+.pl-act {
+  flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 9px 6px; border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+  font-family: var(--font-serif); font-size: 16px; font-weight: 600; color: var(--pl-muted);
+  transition: background 0.15s, color 0.15s;
+}
+.pl-act:hover { background: var(--pl-bubble); color: var(--pl-amber-2); }
+.pl-act[data-active="true"] { color: var(--pl-amber-2); }
+
+.pl-focusable:focus-visible { outline: 2px solid var(--pl-amber); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-navb, .pl-act { transition: none; }
+}
+
 /* Grid items default to min-width:auto, ktorý necháva ich intrinzickú (max-content)
    šírku vyhrať nad max-width obmedzeniami detí — dlhý nezalomiteľný text (napr. URL
    v zozname zdrojov) tak pretlačí celý grid stĺpec cez vyhradený priestor, aj keď má
