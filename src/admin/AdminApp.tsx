@@ -67,7 +67,7 @@ function AdminShell() {
   useEffect(() => {
     if (!token) return;
     fetchNavCounts(token)
-      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments }))
+      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments || undefined }))
       .catch(() => {});
   }, [token, route]);
 

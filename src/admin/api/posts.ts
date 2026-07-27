@@ -152,13 +152,17 @@ export async function fetchNavCounts(token: string) {
     strapiFetch<any>(`${path}${path.includes('?') ? '&' : '?'}pagination[pageSize]=1`, { token })
       .then(r => r.meta?.pagination?.total ?? 0)
       .catch(() => 0);
-  const [articles, categories, tags, comments] = await Promise.all([
+  // „comments" badge = koľko treba MODEROVAŤ (čaká na schválenie + nahlásené),
+  // nie celkový počet. Foto-komentáre sú auto-viditeľné (bez fronty na schválenie),
+  // takže do počtu na moderáciu neprispievajú.
+  const [articles, categories, tags, waiting, reported] = await Promise.all([
     total('/api/blog-posts?status=draft'),
     total('/api/blog-categories'),
     total('/api/blog-tags'),
-    total('/api/blog-comments'),
+    total('/api/blog-comments?filters[status][$eq]=waiting'),
+    total('/api/blog-comments?filters[status][$eq]=reported'),
   ]);
-  return { articles, categories, tags, comments };
+  return { articles, categories, tags, comments: waiting + reported };
 }
 
 // ── Detail na editáciu ───────────────────────────────────────────────────────

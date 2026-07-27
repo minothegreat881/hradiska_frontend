@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useMember } from '../auth/MemberAuth';
 import { deleteMyAccount } from '../lib/memberApi';
 import {
-  getProfile, getNotifications, getMyComments, getMyPhotoComments, getMyFavorites, getMyShares,
+  getProfile, getNotifications, getMyComments, getMyPhotoComments, getMyFavorites, getMyLikedPhotos, getMyShares,
   markAllRead, editComment, deleteComment, editPhotoComment, deletePhotoComment, updateProfile, uploadAvatar,
-  type Profile, type NotificationItem, type MyComment, type FavoritePost, type MyShare,
+  type Profile, type NotificationItem, type MyComment, type FavoritePost, type MyShare, type LikedPhoto,
 } from '../lib/profileApi';
 import {
   pushSupported, pushPermission, enablePush, disablePush, isPushEnabled,
@@ -66,6 +66,7 @@ export function ProfilePage() {
   const [notifs, setNotifs] = useState<NotificationItem[] | null>(null);
   const [comments, setComments] = useState<MyComment[] | null>(null);
   const [favorites, setFavorites] = useState<FavoritePost[] | null>(null);
+  const [likedPhotos, setLikedPhotos] = useState<LikedPhoto[] | null>(null);
   const [shares, setShares] = useState<MyShare[] | null>(null);
   const [unread, setUnread] = useState(0);
 
@@ -88,6 +89,7 @@ export function ProfilePage() {
     if (tab === 'comments' && comments === null) loadComments();
     if (tab === 'saved' && favorites === null) {
       getMyFavorites(token).then(setFavorites).catch(() => setFavorites([]));
+      getMyLikedPhotos(token).then(setLikedPhotos).catch(() => setLikedPhotos([]));
       getMyShares(token).then(setShares).catch(() => setShares([]));
     }
   }, [tab, token]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -172,7 +174,7 @@ export function ProfilePage() {
       {/* ── OBSAH ── */}
       {tab === 'notif' && <div role="tabpanel"><NotifList items={notifs} /></div>}
       {tab === 'comments' && <div role="tabpanel"><CommentsList items={comments} token={token} onChange={loadComments} /></div>}
-      {tab === 'saved' && <div role="tabpanel"><SavedGrid favorites={favorites} shares={shares} /></div>}
+      {tab === 'saved' && <div role="tabpanel"><SavedGrid favorites={favorites} shares={shares} likedPhotos={likedPhotos} /></div>}
 
       {settingsOpen && profile && (
         <Settings profile={profile} token={token}
@@ -367,7 +369,7 @@ function CommentCard({ c, token, onChange }: { c: MyComment; token: string; onCh
 }
 
 /* ── OBĽÚBENÉ A ZDIEĽANÉ ── */
-function SavedGrid({ favorites, shares }: { favorites: FavoritePost[] | null; shares: MyShare[] | null }) {
+function SavedGrid({ favorites, shares, likedPhotos }: { favorites: FavoritePost[] | null; shares: MyShare[] | null; likedPhotos: LikedPhoto[] | null }) {
   const merged = useMemo(() => {
     if (favorites === null) return null;
     const map = new Map<string, { title: string; slug: string; cat?: string | null; cover?: string | null; fav: boolean; shared: boolean }>();
@@ -382,27 +384,57 @@ function SavedGrid({ favorites, shares }: { favorites: FavoritePost[] | null; sh
   }, [favorites, shares]);
 
   if (merged === null) return <Skeleton n={2} />;
-  if (!merged.length) return <Empty>Zatiaľ nemáš obľúbené ani zdieľané články. Klikni na ♥ pri článku, ktorý ťa zaujal.</Empty>;
+  const photos = likedPhotos ?? [];
+  if (!merged.length && !photos.length) return <Empty>Zatiaľ nemáš obľúbené ani zdieľané. Klikni na ♥ pri článku alebo fotke, ktorá ťa zaujme.</Empty>;
+
+  const sectionTitle: React.CSSProperties = { fontFamily: 'Cinzel, serif', fontSize: 13, letterSpacing: '.04em', color: C.amber, margin: '0 0 10px' };
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
-      {merged.map((a) => (
-        <a key={a.slug} href={`/blog/${a.slug}`} style={{
-          display: 'flex', gap: 12, alignItems: 'center', background: C.card, border: `1px solid ${C.border}`,
-          borderRadius: 14, padding: 12, textDecoration: 'none', transition: 'transform .15s, box-shadow .15s',
-        }}>
-          <div style={{ width: 74, height: 54, borderRadius: 9, border: '1px solid #d9c69a', flexShrink: 0, overflow: 'hidden', background: '#efe6d0' }}>
-            {a.cover && <img src={a.cover} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
+      {merged.length > 0 && (
+        <section>
+          <h3 style={sectionTitle}>Články</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
+            {merged.map((a) => (
+              <a key={a.slug} href={`/blog/${a.slug}`} style={{
+                display: 'flex', gap: 12, alignItems: 'center', background: C.card, border: `1px solid ${C.border}`,
+                borderRadius: 14, padding: 12, textDecoration: 'none', transition: 'transform .15s, box-shadow .15s',
+              }}>
+                <div style={{ width: 74, height: 54, borderRadius: 9, border: '1px solid #d9c69a', flexShrink: 0, overflow: 'hidden', background: '#efe6d0' }}>
+                  {a.cover && <img src={a.cover} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 700, color: C.ink, lineHeight: 1.25 }}>{a.title}</div>
+                  {a.cat && <div style={{ fontFamily: 'Cinzel, serif', fontSize: 11, color: C.muted, marginTop: 3 }}>{a.cat}</div>}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 15 }}>
+                  {a.fav && <span style={{ color: C.bordo }} title="Obľúbené">♥</span>}
+                  {a.shared && <span style={{ color: '#5c7a52' }} title="Zdieľané">⇗</span>}
+                </div>
+              </a>
+            ))}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 700, color: C.ink, lineHeight: 1.25 }}>{a.title}</div>
-            {a.cat && <div style={{ fontFamily: 'Cinzel, serif', fontSize: 11, color: C.muted, marginTop: 3 }}>{a.cat}</div>}
+        </section>
+      )}
+
+      {photos.length > 0 && (
+        <section>
+          <h3 style={sectionTitle}>Obľúbené fotky</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 10 }}>
+            {photos.map((p) => (
+              <a
+                key={p.fileId}
+                href={p.post ? `/blog/${p.post.slug}?fotoFile=${p.fileId}` : '#'}
+                title={p.post?.title || 'Fotka'}
+                style={{ display: 'block', position: 'relative', borderRadius: 10, overflow: 'hidden', border: `1px solid ${C.border}`, background: '#efe6d0' }}
+              >
+                <img src={`${STRAPI_URL}${p.thumb}`} alt={p.alt} style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', display: 'block' }} />
+                <span aria-hidden style={{ position: 'absolute', top: 6, right: 6, color: '#fff', fontSize: 13, textShadow: '0 1px 3px rgba(0,0,0,.6)' }}>♥</span>
+              </a>
+            ))}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 15 }}>
-            {a.fav && <span style={{ color: C.bordo }} title="Obľúbené">♥</span>}
-            {a.shared && <span style={{ color: '#5c7a52' }} title="Zdieľané">⇗</span>}
-          </div>
-        </a>
-      ))}
+        </section>
+      )}
     </div>
   );
 }

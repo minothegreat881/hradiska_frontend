@@ -68,6 +68,14 @@ export interface MyShare {
   post: { title: string; slug: string } | null;
 }
 
+export interface LikedPhoto {
+  fileId: number;
+  url: string;
+  thumb: string;
+  alt: string;
+  post: { title: string; slug: string } | null;
+}
+
 export interface Profile {
   id: number;
   username: string;
@@ -119,6 +127,9 @@ export const deletePhotoComment = (token: string, id: string) =>
 /* ── Obľúbené a zdieľané ──────────────────────────────────────────────── */
 export const getMyFavorites = (token: string) =>
   call<{ data: FavoritePost[] }>('/api/reactions/mine/posts', token).then((r) => r.data);
+
+export const getMyLikedPhotos = (token: string) =>
+  call<{ data: LikedPhoto[] }>('/api/reactions/mine/photos', token).then((r) => r.data);
 
 export const getMyShares = (token: string) =>
   call<{ data: MyShare[] }>('/api/shares/mine', token).then((r) => r.data);
