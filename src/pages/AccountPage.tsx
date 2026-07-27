@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useMember } from '../auth/MemberAuth';
+import { ProfilePage } from './ProfilePage';
 import {
-  register, forgotPassword, resetPassword, resendConfirmation, deleteMyAccount, AuthError,
+  register, forgotPassword, resetPassword, resendConfirmation, AuthError,
 } from '../lib/memberApi';
 
 export type AccountMode = 'login' | 'register' | 'forgot' | 'reset' | 'profile';
@@ -62,8 +63,7 @@ function Notice({ tone, children }: { tone: 'ok' | 'err'; children: React.ReactN
 const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
 export function AccountPage({ mode }: { mode: AccountMode }) {
-  const { signIn, member, token, isLoggedIn, signOut, ready } = useMember();
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const { signIn, isLoggedIn, ready } = useMember();
 
   const [identifier, setIdentifier] = useState('');
   const [email, setEmail] = useState('');
@@ -115,55 +115,10 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
     }
   };
 
-  // ── PROFIL ──
+  // ── PROFIL ── (plnohodnotná strana: hlavička, taby, nastavenia)
   if (mode === 'profile') {
-    if (!member) return <div style={wrap}><div style={card}>Načítavam…</div></div>;
-    return (
-      <div style={wrap}>
-        <div style={card}>
-          <h1 style={H1}>Váš profil</h1>
-          <p style={sub}>Prihlásený člen komunity</p>
-          <div style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: '#3d3528', lineHeight: 2 }}>
-            <div><strong>Meno:</strong> {member.displayName || member.username}</div>
-            <div><strong>E-mail:</strong> {member.email}</div>
-          </div>
-          <button style={{ ...primaryBtn, marginTop: 24, background: 'transparent', color: '#9a5d1f', border: '1px solid #d9c69a' }}
-                  onClick={() => { signOut(); go('/'); }}>
-            Odhlásiť sa
-          </button>
-
-          {/* GDPR — zmazanie účtu */}
-          <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px dashed rgba(196,165,116,0.5)' }}>
-            {!confirmDelete ? (
-              <button style={{ ...linkBtn, color: '#a04338' }} onClick={() => setConfirmDelete(true)}>
-                Zmazať účet
-              </button>
-            ) : (
-              <div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 13.5, color: '#5d4a32', lineHeight: 1.5, margin: '0 0 12px' }}>
-                  Účet sa zmaže natrvalo. Vaše komentáre zostanú, ale ako <strong>Zmazaný účet</strong>.
-                  Túto akciu nie je možné vrátiť.
-                </p>
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button style={{ ...linkBtn }} onClick={() => setConfirmDelete(false)}>Zrušiť</button>
-                  <button
-                    style={{ background: '#a04338', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13.5 }}
-                    onClick={async () => {
-                      if (!token) return;
-                      try { await deleteMyAccount(token); signOut(); go('/'); }
-                      catch (e: any) { setErr(e?.message || 'Zmazanie zlyhalo.'); }
-                    }}
-                  >
-                    Zmazať natrvalo
-                  </button>
-                </div>
-                {err && <p style={{ color: '#a04338', fontSize: 13, marginTop: 8, fontFamily: 'Georgia, serif' }}>{err}</p>}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
+    if (ready && !isLoggedIn) return null; // guard vyššie presmeruje na /prihlasenie
+    return <ProfilePage />;
   }
 
   const titles: Record<AccountMode, [string, string]> = {

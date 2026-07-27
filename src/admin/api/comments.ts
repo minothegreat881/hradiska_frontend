@@ -9,7 +9,7 @@
 
 import { strapiFetch, STRAPI_URL } from './client';
 
-export type CommentStatus = 'visible' | 'hidden' | 'spam';
+export type CommentStatus = 'visible' | 'hidden' | 'spam' | 'waiting' | 'reported';
 
 export interface AdminComment {
   documentId: string;
@@ -24,6 +24,8 @@ export interface AdminComment {
   postTitle: string | null;
   postDocumentId: string | null;
   userId?: number;
+  /** počet upozornení autora (⚠ v karte) */
+  warnsCount?: number;
 }
 
 export interface CommentListResult {
@@ -45,6 +47,7 @@ export async function listComments(opts: {
     'populate[post][fields][0]=title',
     'populate[post][fields][1]=documentId',
     'populate[user][fields][0]=id',
+    'populate[user][fields][1]=warnsCount',
     'sort=createdAt:desc',
     `pagination[page]=${page}`,
     `pagination[pageSize]=${pageSize}`,
@@ -67,6 +70,7 @@ export async function listComments(opts: {
     postTitle: c.post?.title ?? null,
     postDocumentId: c.post?.documentId ?? null,
     userId: c.user?.id,
+    warnsCount: c.user?.warnsCount ?? 0,
   }));
   return {
     items,
@@ -80,13 +84,15 @@ export async function commentCounts(token: string) {
   const one = (extra: string) =>
     strapiFetch<any>(`/api/blog-comments?${extra}pagination[pageSize]=1`, { token })
       .then(r => r.meta?.pagination?.total ?? 0);
-  const [all, visible, hidden, spam] = await Promise.all([
+  const [all, waiting, reported, visible, hidden, spam] = await Promise.all([
     one(''),
+    one('filters[status][$eq]=waiting&'),
+    one('filters[status][$eq]=reported&'),
     one('filters[status][$eq]=visible&'),
     one('filters[status][$eq]=hidden&'),
     one('filters[status][$eq]=spam&'),
   ]);
-  return { all, visible, hidden, spam };
+  return { all, waiting, reported, visible, hidden, spam };
 }
 
 export async function setCommentStatus(token: string, documentId: string, status: CommentStatus) {
@@ -95,6 +101,32 @@ export async function setCommentStatus(token: string, documentId: string, status
 
 export async function deleteComment(token: string, documentId: string) {
   return strapiFetch(`/api/blog-comments/${documentId}`, { method: 'DELETE', token });
+}
+
+/**
+ * Verejná odpoveď správcu pod komentárom. Vytvorí bežný komentár s `inReplyTo` =
+ * documentId rodiča → backend pošle autorovi notifikáciu typu `reply`.
+ */
+export async function replyToComment(token: string, postDocumentId: string, parentDocumentId: string, content: string) {
+  return strapiFetch('/api/blog-comments', {
+    method: 'POST', token,
+    body: { data: { content, post: postDocumentId, inReplyTo: parentDocumentId } },
+  });
+}
+
+export type WarningTemplate = 'personal_attack' | 'inappropriate' | 'spam' | 'disinfo' | 'custom';
+
+/**
+ * Súkromné upozornenie autorovi komentára. Backend uloží moderation-warning,
+ * navýši `warnsCount`, voliteľne zapne pre-moderáciu a pošle notifikáciu `warning`.
+ */
+export async function sendWarning(token: string, input: {
+  comment: string; template: WarningTemplate; text: string; preModerate: boolean;
+}) {
+  return strapiFetch('/api/moderation-warnings', {
+    method: 'POST', token,
+    body: { data: input },
+  });
 }
 
 export { STRAPI_URL };

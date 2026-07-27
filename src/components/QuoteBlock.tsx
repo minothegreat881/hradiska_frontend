@@ -82,7 +82,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
                   fontWeight: 600,
                 }}
               >
-                {author}{source && ` — ${source}`}
+                {author}{source && ` – ${source}`}
               </cite>
             </div>
           )}
@@ -133,7 +133,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
                 fontWeight: 600,
               }}
             >
-              — {[author, source].filter(Boolean).join(', ')}
+              – {[author, source].filter(Boolean).join(', ')}
             </span>
           </div>
         )}

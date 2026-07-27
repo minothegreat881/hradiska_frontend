@@ -3,15 +3,25 @@
 import { Facebook, Linkedin, Mail, Link2, Check, Twitter } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner@2.0.3';
+import { useMember } from '../auth/MemberAuth';
+import { recordShare } from '../lib/profileApi';
 
 interface SocialShareProps {
   title: string;
   url?: string;
+  /** documentId článku — ak je zadané a člen je prihlásený, zdieľanie sa započíta do profilu */
+  postDocumentId?: string;
 }
 
-export function SocialShare({ title, url = '' }: SocialShareProps) {
+export function SocialShare({ title, url = '', postDocumentId }: SocialShareProps) {
+  const { token } = useMember();
   const [copied, setCopied] = useState(false);
   const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+
+  // best-effort záznam zdieľania (neblokuje samotné zdieľanie)
+  const track = (channel: string) => {
+    if (token && postDocumentId) recordShare(token, postDocumentId, channel).catch(() => {});
+  };
   const encodedTitle = encodeURIComponent(title);
   const encodedUrl = encodeURIComponent(currentUrl);
 
@@ -42,6 +52,7 @@ export function SocialShare({ title, url = '' }: SocialShareProps) {
     try {
       await navigator.clipboard.writeText(currentUrl);
       setCopied(true);
+      track('copy');
       toast.success('Odkaz skopírovaný');
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -81,6 +92,7 @@ export function SocialShare({ title, url = '' }: SocialShareProps) {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track(name)}
               aria-label={`Zdieľať na ${name}`}
               title={name}
               style={{

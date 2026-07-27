@@ -86,3 +86,37 @@ self.addEventListener('fetch', (event) => {
     );
   }
 });
+
+/* ── Web Push ──────────────────────────────────────────────────────────────
+ * Backend (push-subscription service) posiela JSON { title, body, url, notifId }.
+ * Klik na notifikáciu otvorí/zaostrí appku na danej URL (default /profil).
+ */
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data && event.data.text() }; }
+  const title = data.title || 'Hradiská.sk';
+  const options = {
+    body: data.body || '',
+    icon: '/favicon-192.png',
+    badge: '/favicon-192.png',
+    tag: data.notifId || 'hradiska-notif',
+    data: { url: data.url || '/profil' },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || '/profil';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if ('focus' in client) {
+          client.postMessage({ type: 'notification-click', url: target });
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+    })
+  );
+});

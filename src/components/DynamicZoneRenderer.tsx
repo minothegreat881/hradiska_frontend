@@ -103,6 +103,39 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
     provider === 'vimeo'     ? `https://player.vimeo.com/video/${embedId}` :
     provider === 'sketchfab' ? `https://sketchfab.com/models/${embedId}/embed` :
     url;
+
+  // Facebook post plugin má fixnú šírku a obsah zarovnaný vľavo hore — vynútený
+  // pomer 16:9 by nechal väčšinu rámu prázdnu. Vykresli ho vycentrovane, prirodzenou výškou.
+  const isFacebook = /facebook\.com\/plugins/.test(url);
+  if (isFacebook) {
+    return (
+      <figure className="my-8 clear-both not-prose" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <iframe
+          src={src}
+          title={caption || 'Facebook'}
+          loading="lazy"
+          scrolling="no"
+          style={{
+            width: '100%',
+            maxWidth: 500,
+            height: 320,
+            border: 0,
+            borderRadius: 12,
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(70,40,20,.12)',
+          }}
+          allow="encrypted-media; picture-in-picture; clipboard-write"
+          allowFullScreen
+        />
+        {caption && (
+          <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}>
+            {caption}
+          </figcaption>
+        )}
+      </figure>
+    );
+  }
+
   return (
     <figure className="my-8 clear-both not-prose">
       <div
@@ -369,8 +402,19 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
       if (isFirstParagraphInBlock) isFirstParagraphInBlock = false;
 
       if (shouldDropCap) {
-        const firstLetter = plainText.charAt(0);
-        const restOfText = plainText.slice(1);
+        // Iniciálku odober z prvého textového uzla, ZVYŠOK vykresli cez renderInline,
+        // aby sa zachovali inline odkazy (link) aj bold/italic v prvom odseku.
+        let firstLetter = '';
+        let dropped = false;
+        const restChildren = (block.children || []).map((c: any) => {
+          if (!dropped && c.type !== 'link' && typeof c.text === 'string' && c.text.length > 0) {
+            firstLetter = c.text.charAt(0);
+            dropped = true;
+            return { ...c, text: c.text.slice(1) };
+          }
+          return c;
+        });
+        if (!dropped) firstLetter = plainText.charAt(0);
         elements.push(
           <p
             key={idx}
@@ -387,7 +431,7 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
             >
               {firstLetter}
             </span>
-            {restOfText}
+            {renderInline(restChildren)}
           </p>,
         );
         return;
@@ -541,7 +585,7 @@ function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; nee
         {block.intro && (
           <p className="text-stone-700 mb-3 leading-relaxed">{block.intro}</p>
         )}
-        <ul className="list-none p-0 m-0 space-y-1.5">
+        <ul className="list-none p-0 m-0 space-y-3">
           {items.map((it, j) => {
             const text = (it.text || '').trim();
             const url = (it.url || '').trim();
@@ -684,7 +728,7 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
             fontWeight: 600,
           }}
         >
-          {block.author}{block.source ? ` — ${block.source}` : ''}
+          {block.author}{block.source ? ` – ${block.source}` : ''}
         </div>
       )}
     </div>

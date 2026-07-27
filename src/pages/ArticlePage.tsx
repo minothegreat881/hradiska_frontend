@@ -679,7 +679,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
 
               {/* Social Share */}
               <div className="clear-both">
-                <SocialShare title={article.title} />
+                <SocialShare title={article.title} postDocumentId={strapiPost?.documentId} />
               </div>
 
               {/* Historical Gallery — len top-level `gallery` field zo Strapi.
@@ -776,7 +776,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                     color: '#4a3f2f' /* WCAG AAA - 7.1:1 */
                   }}
                 >
-                  Vybrali sme články príbuzné tejto téme
+                  Vybrali sme články súvisiace s touto témou
                 </p>
               </div>
             </ScrollReveal>
