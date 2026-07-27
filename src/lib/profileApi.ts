@@ -48,6 +48,9 @@ export interface MyComment {
   editedAt: string | null;
   createdAt: string;
   post: { title: string; slug: string } | null;
+  /** 'blog' (pod článkom) alebo 'photo' (v galérii) */
+  source?: 'blog' | 'photo';
+  fileId?: number;
 }
 
 export interface FavoritePost {
@@ -92,15 +95,26 @@ export const markAllRead = (token: string) =>
 export const markNotifRead = (token: string, id: string) =>
   call<unknown>(`/api/notifications/${id}/read`, token, { method: 'PUT' });
 
-/* ── Moje komentáre ───────────────────────────────────────────────────── */
+/* ── Moje komentáre (blog + galéria) ──────────────────────────────────── */
 export const getMyComments = (token: string) =>
-  call<{ data: MyComment[] }>('/api/blog-comments/mine-all', token).then((r) => r.data);
+  call<{ data: MyComment[] }>('/api/blog-comments/mine-all', token)
+    .then((r) => r.data.map((c) => ({ ...c, source: 'blog' as const })));
+
+export const getMyPhotoComments = (token: string) =>
+  call<{ data: MyComment[] }>('/api/photo-comments/mine-all', token)
+    .then((r) => r.data.map((c) => ({ ...c, source: 'photo' as const })));
 
 export const editComment = (token: string, id: string, content: string) =>
   call<unknown>(`/api/blog-comments/${id}`, token, { method: 'PUT', body: { data: { content } } });
 
 export const deleteComment = (token: string, id: string) =>
   call<unknown>(`/api/blog-comments/${id}`, token, { method: 'DELETE' });
+
+export const editPhotoComment = (token: string, id: string, content: string) =>
+  call<unknown>(`/api/photo-comments/${id}`, token, { method: 'PUT', body: { data: { content } } });
+
+export const deletePhotoComment = (token: string, id: string) =>
+  call<unknown>(`/api/photo-comments/${id}`, token, { method: 'DELETE' });
 
 /* ── Obľúbené a zdieľané ──────────────────────────────────────────────── */
 export const getMyFavorites = (token: string) =>

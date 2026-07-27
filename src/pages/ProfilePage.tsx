@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useMember } from '../auth/MemberAuth';
 import { deleteMyAccount } from '../lib/memberApi';
 import {
-  getProfile, getNotifications, getMyComments, getMyFavorites, getMyShares,
-  markAllRead, editComment, deleteComment, updateProfile, uploadAvatar,
+  getProfile, getNotifications, getMyComments, getMyPhotoComments, getMyFavorites, getMyShares,
+  markAllRead, editComment, deleteComment, editPhotoComment, deletePhotoComment, updateProfile, uploadAvatar,
   type Profile, type NotificationItem, type MyComment, type FavoritePost, type MyShare,
 } from '../lib/profileApi';
 import {
@@ -85,12 +85,23 @@ export function ProfilePage() {
     if (tab === 'notif' && unread > 0) {
       markAllRead(token).then(() => setUnread(0)).catch(() => {});
     }
-    if (tab === 'comments' && comments === null) getMyComments(token).then(setComments).catch(() => setComments([]));
+    if (tab === 'comments' && comments === null) loadComments();
     if (tab === 'saved' && favorites === null) {
       getMyFavorites(token).then(setFavorites).catch(() => setFavorites([]));
       getMyShares(token).then(setShares).catch(() => setShares([]));
     }
   }, [tab, token]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // „Moje komentáre" = blog + galéria spolu, zoradené od najnovšieho.
+  function loadComments() {
+    if (!token) return;
+    Promise.all([
+      getMyComments(token).catch(() => []),
+      getMyPhotoComments(token).catch(() => []),
+    ]).then(([blog, photo]) =>
+      setComments([...blog, ...photo].sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
+    );
+  }
 
   if (!member || !token) return <div style={{ padding: 60, textAlign: 'center', fontFamily: 'Cormorant Garamond, serif' }}>Načítavam…</div>;
 
@@ -160,7 +171,7 @@ export function ProfilePage() {
 
       {/* ── OBSAH ── */}
       {tab === 'notif' && <div role="tabpanel"><NotifList items={notifs} /></div>}
-      {tab === 'comments' && <div role="tabpanel"><CommentsList items={comments} token={token} onChange={() => getMyComments(token).then(setComments)} /></div>}
+      {tab === 'comments' && <div role="tabpanel"><CommentsList items={comments} token={token} onChange={loadComments} /></div>}
       {tab === 'saved' && <div role="tabpanel"><SavedGrid favorites={favorites} shares={shares} /></div>}
 
       {settingsOpen && profile && (
@@ -290,23 +301,34 @@ function CommentCard({ c, token, onChange }: { c: MyComment; token: string; onCh
   const [draft, setDraft] = useState(c.content);
   const [busy, setBusy] = useState(false);
 
+  const isPhoto = c.source === 'photo';
   const save = async () => {
     setBusy(true);
-    try { await editComment(token, c.documentId, draft); setEditing(false); onChange(); } finally { setBusy(false); }
+    try {
+      if (isPhoto) await editPhotoComment(token, c.documentId, draft);
+      else await editComment(token, c.documentId, draft);
+      setEditing(false); onChange();
+    } finally { setBusy(false); }
   };
   const remove = async () => {
     if (!window.confirm('Naozaj zmazať tento komentár?')) return;
     setBusy(true);
-    try { await deleteComment(token, c.documentId); onChange(); } finally { setBusy(false); }
+    try {
+      if (isPhoto) await deletePhotoComment(token, c.documentId);
+      else await deleteComment(token, c.documentId);
+      onChange();
+    } finally { setBusy(false); }
   };
 
   return (
     <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '16px 20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <div>
-          <span style={{ fontFamily: 'Cinzel, serif', fontSize: 10, color: C.amber, letterSpacing: '.05em' }}>POD ČLÁNKOM</span>{' '}
-          {c.post ? <a href={`/blog/${c.post.slug}`} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: C.amber, fontWeight: 600 }}>{c.post.title}</a>
-                  : <span style={{ color: C.muted }}>—</span>}
+          <span style={{ fontFamily: 'Cinzel, serif', fontSize: 10, color: C.amber, letterSpacing: '.05em' }}>
+            {isPhoto ? 'K FOTKE V GALÉRII' : 'POD ČLÁNKOM'}
+          </span>{' '}
+          {c.post ? <a href={`/blog/${c.post.slug}${isPhoto ? '#photo-gallery' : ''}`} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: C.amber, fontWeight: 600 }}>{c.post.title}</a>
+                  : <span style={{ color: C.muted }}>{isPhoto ? 'Galéria' : '—'}</span>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontFamily: 'Cinzel, serif', fontSize: 11, padding: '3px 10px', borderRadius: 999, color: chip.fg, background: chip.bg, border: `1px solid ${chip.bd}` }}>{chip.t}</span>
