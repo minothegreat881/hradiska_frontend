@@ -11,7 +11,7 @@
  */
 
 export const STRAPI_URL =
-  (import.meta as any).env?.PROD ? '/strapi' : ((import.meta as any).env?.VITE_STRAPI_URL || 'http://localhost:1337');
+  (import.meta as any).env?.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : ((import.meta as any).env?.VITE_STRAPI_URL || 'http://localhost:1337');
 
 /** Chyba z API so zachovaným stavovým kódom, nech sa dá rozlíšiť 401 od 400. */
 export class StrapiError extends Error {

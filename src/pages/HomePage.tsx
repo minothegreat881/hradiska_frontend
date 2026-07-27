@@ -167,7 +167,7 @@ export function HomePage() {
                   description: category.description,
                   detailedDescription: category.description,
                   icon: category.icon,
-                  image: `${import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337')}${category.image}`,
+                  image: `${import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337')}${category.image}`,
                 }}
                 index={idx}
               />

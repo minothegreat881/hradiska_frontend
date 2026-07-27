@@ -9,7 +9,7 @@
  */
 import { getSearchIndex, fold, type IndexDoc } from './searchIndex';
 
-const STRAPI_URL = import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 
 // Slovenské stopslová — nech dopyt necielime na „a, na, sa, v, že…".
 const STOP = new Set(

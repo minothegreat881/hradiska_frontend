@@ -12,7 +12,7 @@ import {
   pushSupported, pushPermission, enablePush, disablePush, isPushEnabled,
 } from '../lib/push';
 
-const STRAPI_URL = import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
 /* ── odznak úrovne podľa počtu komentárov (gamifikácia) ── */
