@@ -17,9 +17,7 @@
 
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-// Štýly idú cez App.tsx → styles/globals.css (Tailwind 4 + @theme + fonts.css).
-// Starý auto-generovaný src/index.css je gitignored a na Vercli (čistý clone) chýba,
-// preto ho tu NEIMPORTUJEME (inak build padne na "Could not resolve ./index.css").
+import "./index.css";
 import { initPwa } from "./lib/pwa";
 
 // PWA: service worker + odchyt inštalačnej ponuky + počítadlo návštev.
