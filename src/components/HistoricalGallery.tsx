@@ -211,13 +211,36 @@ function Lightbox({
         )}
       </div>
 
-      {/* Zväčšenie na celú obrazovku (celá fotka, contain) */}
+      {/* Zväčšenie na celú obrazovku (celá fotka, contain) — s navigáciou */}
       {zoom && (
         <div
           onClick={(e) => { e.stopPropagation(); setZoom(false); }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
           style={{ position: 'fixed', inset: 0, zIndex: 70, background: 'rgba(5,4,2,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }}
         >
-          <img src={current.url} alt={current.caption || current.alt || ''} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+          {index > 0 && (
+            <button className="pl-navb pl-focusable" style={{ left: 12 }} onClick={(e) => { e.stopPropagation(); onPrev(); }} aria-label="Predchádzajúca fotka">
+              <ChevronLeft style={{ width: 22, height: 22 }} />
+            </button>
+          )}
+          {index < images.length - 1 && (
+            <button className="pl-navb pl-focusable" style={{ right: 12 }} onClick={(e) => { e.stopPropagation(); onNext(); }} aria-label="Nasledujúca fotka">
+              <ChevronRight style={{ width: 22, height: 22 }} />
+            </button>
+          )}
+          <button className="pl-corner pl-focusable" style={{ top: 14, right: 14 }} onClick={(e) => { e.stopPropagation(); setZoom(false); }} aria-label="Zavrieť zväčšenie">
+            <X style={{ width: 18, height: 18 }} />
+          </button>
+          <span className="pl-pill" style={{ bottom: 16, left: '50%', transform: 'translateX(-50%)' }} aria-live="polite">
+            {index + 1} / {images.length}
+          </span>
+          <img
+            src={current.url}
+            alt={current.caption || current.alt || ''}
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', cursor: 'default' }}
+          />
         </div>
       )}
     </motion.div>
