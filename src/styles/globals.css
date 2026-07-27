@@ -865,7 +865,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   overflow: hidden; padding: 0;
 }
 @media (min-width: 900px) {
-  .pl-overlay { align-items: center; padding: 24px; }
+  .pl-overlay { align-items: center; padding: 16px; }
 }
 
 /* Karta — na mobile CELÁ OBRAZOVKA (vstup pripnutý dole, komentáre vyplnia zvyšok) */
@@ -880,14 +880,13 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .pl-card > .pl-discuss { flex: 1 1 auto; min-height: 0; }
 @media (min-width: 900px) {
   .pl-card {
-    max-width: 900px; height: auto; border-radius: 18px;
+    width: 96vw; max-width: 1500px; height: 92vh; max-height: 92vh;
+    border-radius: 14px;
     border: 1px solid var(--pl-border);
     box-shadow: 0 30px 70px -28px rgba(40, 26, 10, 0.6);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 342px;
+    grid-template-columns: minmax(0, 1fr) 360px;
     grid-template-rows: auto auto minmax(0, 1fr);
-    min-height: 520px;
-    max-height: min(88vh, 760px);
   }
   .pl-photo   { grid-column: 1; grid-row: 1 / -1; max-height: none; min-height: 0; }
   .pl-photo-img { max-height: 100%; }
