@@ -4,7 +4,7 @@
  *
  * Endpointy sú v Strapi pod /api/... (notification/share/reaction/account controllers).
  */
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+const STRAPI_URL = import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 
 async function call<T>(path: string, token: string, opts?: { method?: string; body?: unknown }): Promise<T> {
   const res = await fetch(`${STRAPI_URL}${path}`, {

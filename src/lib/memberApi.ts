@@ -10,7 +10,7 @@
  * `register` NEVRÁTI JWT — používateľ najprv klikne v maile.
  */
 
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+const STRAPI_URL = import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 
 export interface Member {
   id: number;

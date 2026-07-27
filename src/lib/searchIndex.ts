@@ -9,7 +9,7 @@
  */
 import MiniSearch from 'minisearch';
 
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+const STRAPI_URL = import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 
 export interface IndexDoc {
   slug: string;

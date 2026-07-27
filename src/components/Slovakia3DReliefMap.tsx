@@ -866,7 +866,7 @@ export default function Slovakia3DReliefMap() {
   type GeoPoint = Hradisko & { cat: CatSlug; slug: string };
   const [points, setPoints] = useState<GeoPoint[]>([]);
   useEffect(() => {
-    const STRAPI = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+    const STRAPI = import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
     const inCats = new Set(CATS.map(c => c.slug));
     const B = SLOVAKIA_BOUNDS;
     fetch(`${STRAPI}/api/search-index`, { headers: { 'ngrok-skip-browser-warning': 'true' } })

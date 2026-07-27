@@ -33,7 +33,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   // Kurátorský popis má prednosť — je písaný podľa toho, čo v kategórii reálne je.
   const categoryDescription = localCategory?.description || strapiCategory?.description || '';
   // Obrázok je z článku v tej istej kategórii, servírovaný zo Strapi médií.
-  const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+  const STRAPI_URL = import.meta.env.PROD ? '/strapi' : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
   const categoryImage = localCategory ? `${STRAPI_URL}${localCategory.image}` : null;
   const categoryIcon = localCategory?.icon || '📜';
 
