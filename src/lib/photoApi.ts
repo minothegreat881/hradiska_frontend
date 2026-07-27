@@ -14,6 +14,10 @@ export interface PhotoComment {
   createdAt: string;
   inReplyTo?: string | null;
   mine?: boolean;
+  /** počet lajkov komentára */
+  likeCount?: number;
+  /** documentId mojej reakcie (ak som lajkol) — na unlike; null ak nie */
+  myLikeId?: string | null;
 }
 
 function authHeaders(token?: string): Record<string, string> {
@@ -38,7 +42,29 @@ export async function listPhotoComments(fileId: number, token?: string): Promise
     createdAt: c.createdAt,
     inReplyTo: c.inReplyTo ?? null,
     mine: !!c.mine,
+    likeCount: c.likeCount ?? 0,
+    myLikeId: c.myLikeId ?? null,
   }));
+}
+
+/** Lajkne foto-komentár (reaction targetType='photo-comment'). Vráti documentId reakcie. */
+export async function likePhotoComment(token: string, commentDocumentId: string): Promise<string> {
+  const r = await fetch(`${STRAPI_URL}/api/reactions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ data: { targetType: 'photo-comment', targetId: commentDocumentId } }),
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  return j.data.documentId;
+}
+
+/** Odoberie lajk foto-komentára (zmaže vlastnú reakciu). */
+export async function unlikePhotoComment(token: string, reactionId: string): Promise<void> {
+  const r = await fetch(`${STRAPI_URL}/api/reactions/${reactionId}`, {
+    method: 'DELETE', headers: authHeaders(token),
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
 }
 
 export async function addPhotoComment(

@@ -34,6 +34,8 @@ export interface NotificationItem {
   actor?: { username: string; displayName?: string | null } | null;
   post?: { title: string; slug: string } | null;
   comment?: { content: string; documentId: string } | null;
+  photoComment?: { content: string; documentId: string; fileId?: number } | null;
+  fileId?: number | null;
   aktualita?: { nazov: string } | null;
 }
 

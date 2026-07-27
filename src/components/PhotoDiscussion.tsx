@@ -5,7 +5,8 @@ import { ThumbsUp, MessageCircle, Share2, Heart, Send, Loader2 } from 'lucide-re
 import { useMember } from '../auth/MemberAuth';
 import {
   listPhotoComments, addPhotoComment, deletePhotoComment,
-  getPhotoLikes, likePhoto, unlikePhoto, type PhotoComment,
+  getPhotoLikes, likePhoto, unlikePhoto,
+  likePhotoComment, unlikePhotoComment, type PhotoComment,
 } from '../lib/photoApi';
 
 const go = (p: string) => { window.history.pushState({}, '', p); window.dispatchEvent(new PopStateEvent('popstate')); };
@@ -28,6 +29,15 @@ function buildTree(flat: PhotoComment[]): PhotoCommentNode[] {
 
 function countNodes(nodes: PhotoCommentNode[]): number {
   return nodes.reduce((n, c) => n + 1 + countNodes(c.replies), 0);
+}
+
+/** Nemenne aktualizuje uzol podľa documentId (aj vo vnorených odpovediach). */
+function patchNode(nodes: PhotoCommentNode[], id: string, patch: Partial<PhotoComment>): PhotoCommentNode[] {
+  return nodes.map((n) =>
+    n.documentId === id
+      ? { ...n, ...patch }
+      : { ...n, replies: patchNode(n.replies, id, patch) },
+  );
 }
 
 /** Relatívny čas v slovenčine (jednoduchý). */
@@ -133,6 +143,26 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
     try { await deletePhotoComment(token, id); load(); } catch {}
   };
 
+  // Lajk/unlike foto-komentára — optimisticky (aj vo vnorených odpovediach).
+  const toggleCommentLike = async (c: PhotoCommentNode) => {
+    if (!isLoggedIn || !token) { go('/prihlasenie'); return; }
+    const liked = !!c.myLikeId;
+    setComments(prev => patchNode(prev, c.documentId, {
+      myLikeId: liked ? null : 'pending',
+      likeCount: Math.max(0, (c.likeCount || 0) + (liked ? -1 : 1)),
+    }));
+    try {
+      if (liked) {
+        await unlikePhotoComment(token, c.myLikeId!);
+      } else {
+        const rid = await likePhotoComment(token, c.documentId);
+        setComments(prev => patchNode(prev, c.documentId, { myLikeId: rid }));
+      }
+    } catch {
+      setComments(prev => patchNode(prev, c.documentId, { myLikeId: c.myLikeId ?? null, likeCount: c.likeCount ?? 0 }));
+    }
+  };
+
   const initial = (member?.displayName || member?.username || '?').charAt(0).toUpperCase();
 
   /* ── Jeden komentár (bublina) + odpovede ─────────────────────────────── */
@@ -161,6 +191,14 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
           </div>
           <div style={{ display: 'flex', gap: 14, marginTop: 4, paddingLeft: 6, fontFamily: 'var(--font-serif)', fontSize: 14, color: 'var(--pl-muted-2)' }}>
             <span>{relTime(c.createdAt)}</span>
+            <button
+              onClick={() => toggleCommentLike(c)}
+              className="pl-focusable"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: c.myLikeId ? 'var(--pl-amber-2)' : 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: c.myLikeId ? 700 : 400 }}
+            >
+              <ThumbsUp style={{ width: 14, height: 14, fill: c.myLikeId ? 'currentColor' : 'transparent' }} />
+              Páči sa{c.likeCount ? ` · ${c.likeCount}` : ''}
+            </button>
             {isLoggedIn && (
               <button
                 onClick={() => { setReplyTo(replyTo === c.documentId ? null : c.documentId); setReplyText(''); }}

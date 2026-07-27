@@ -219,9 +219,17 @@ function NotifCard({ n }: { n: NotificationItem }) {
   const iconBg = { reply: '#e6eddf', like: '#f2dfda', warning: '#f2d5cc', post: '#efe6cf' }[n.type];
   const iconFg = { reply: '#5c7a52', like: '#7c1f24', warning: '#a04338', post: '#9a5d1f' }[n.type];
 
+  // Foto-komentár (galéria) nemá `post` — má photoComment/fileId. Formuluj inak.
+  const isPhoto = !!(n.photoComment || n.fileId);
+  const many = n.aggregateCount > 1;
+
   let text: React.ReactNode;
-  if (n.type === 'reply') text = <><b>{who}</b> odpovedal/a na tvoj komentár pod <i>{postTitle}</i></>;
-  else if (n.type === 'like') text = <><b>{n.aggregateCount > 1 ? `${n.aggregateCount} čitateľov` : who}</b> ocenil{n.aggregateCount > 1 ? 'i' : '/a'} tvoj komentár pod <i>{postTitle}</i></>;
+  if (n.type === 'reply') text = isPhoto
+    ? <><b>{who}</b> odpovedal/a na tvoj komentár k fotke v galérii</>
+    : <><b>{who}</b> odpovedal/a na tvoj komentár pod <i>{postTitle}</i></>;
+  else if (n.type === 'like') text = isPhoto
+    ? <><b>{many ? `${n.aggregateCount} čitateľov` : who}</b> ocenil{many ? 'i' : '/a'} tvoj komentár k fotke</>
+    : <><b>{many ? `${n.aggregateCount} čitateľov` : who}</b> ocenil{many ? 'i' : '/a'} tvoj komentár pod <i>{postTitle}</i></>;
   else if (n.type === 'warning') text = <>Upozornenie správcu o nedodržaní noriem blogu.</>;
   else text = <>Nový článok na Hradiská.sk: <i>{postTitle}</i></>;
 
