@@ -447,13 +447,10 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
           className="rounded-xl shadow-lg overflow-hidden"
           style={{ background: '#faf7f1', color: '#2d2418' }}
         >
-          <div
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gap: 0 }}
-            className="grid-layout article-grid"
-          >
+          <div className="grid-layout article-grid">
 
-            {/* Hero Image - Full Width (12 columns) - SMALLER */}
-            <div style={{ gridColumn: 'span 12' }} className="relative h-48 md:h-64">
+            {/* Hero Image - Full Width */}
+            <div style={{ gridColumn: '1 / -1' }} className="relative h-56 md:h-64">
               {(article as any).hasCover !== false ? (
                 <ImageWithFallback
                   src={article.coverImage}
@@ -501,8 +498,8 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
-                <div className="text-sm text-white/80 mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 text-white">
+                <div className="text-xs md:text-sm text-white/80 mb-1 md:mb-2" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
                   {[
                     new Date(article.publishedAt).toLocaleDateString('sk-SK', {
                       day: 'numeric',
@@ -515,11 +512,32 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                     .filter(Boolean)
                     .join(' · ')}
                 </div>
-                <h1 className="text-2xl md:text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+                {/* Orezanie na 3 riadky (mobil) — dlhé názvy predtým presahovali obrázok. */}
+                <h1
+                  className="text-lg md:text-3xl font-bold mb-1 md:mb-4"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    lineHeight: 1.2,
+                  }}
+                >
                   {article.title}
                 </h1>
                 {article.excerpt && article.excerpt.trim() !== article.title.trim() && (
-                  <p className="text-lg text-white/90 max-w-3xl">{article.excerpt}</p>
+                  <p
+                    className="text-sm md:text-lg text-white/90 max-w-3xl"
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {article.excerpt}
+                  </p>
                 )}
               </div>
             </div>

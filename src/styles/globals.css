@@ -783,18 +783,22 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   max-width: 100%;
 }
 
-/* Responzívne grid v article detaile — na mobile sidebar pod obsahom */
-@media (max-width: 1023px) {
-  .article-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .article-main-col,
-  .article-sidebar-col {
-    grid-column: span 1 !important;
-  }
+/* Grid v article detaile — MOBILE-FIRST a self-contained (žiadna inline vojna).
+   Mobil: 1 stĺpec, všetko na plnú šírku (text, mapa, fakty, časová os, témy, súvisiace
+   sa poukladajú pod seba). Desktop (≥1024): 12-stĺpcový grid, obsah 8 / sidebar 4. */
+.article-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
 }
-
+.article-main-col,
+.article-sidebar-col {
+  grid-column: 1 / -1;
+}
 @media (min-width: 1024px) {
+  .article-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
   .article-main-col {
     grid-column: span 8;
   }
