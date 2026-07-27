@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/strapi/:path*", "destination": "http://188.245.47.29/:path*" }
+    { "source": "/strapi/:path*", "destination": "http://188.245.47.29/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
