@@ -864,7 +864,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   display: flex; align-items: stretch; justify-content: center;
   overflow: hidden; padding: 0;
 }
-@media (min-width: 900px) {
+@media (min-width: 700px) {
   .pl-overlay { align-items: center; padding: 16px; }
 }
 
@@ -878,14 +878,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .pl-card > .pl-photo   { flex-shrink: 0; }
 .pl-card > .pl-discuss { flex: 1 1 auto; min-height: 0; }
-@media (min-width: 900px) {
+@media (min-width: 700px) {
   .pl-card {
-    width: 96vw; max-width: 1500px; height: 92vh; max-height: 92vh;
+    width: 98vw; max-width: 1700px; height: 92vh; max-height: 92vh;
     border-radius: 14px;
     border: 1px solid var(--pl-border);
     box-shadow: 0 30px 70px -28px rgba(40, 26, 10, 0.6);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 32%, 380px);
     grid-template-rows: auto auto minmax(0, 1fr);
   }
   .pl-photo   { grid-column: 1; grid-row: 1 / -1; max-height: none; min-height: 0; }
@@ -896,14 +896,12 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   .pl-header, .pl-text, .pl-discuss { border-left: 1px solid var(--pl-border-soft); }
 }
 
-/* Avatar účtu v hlavičke */
+/* Avatar účtu v hlavičke — logo Slovanských hradísk (ako na homepage) */
 .pl-avatar-h {
   width: 42px; height: 42px; border-radius: 999px; flex-shrink: 0;
-  background: radial-gradient(circle at 36% 30%, #a5651f, var(--pl-bordo));
+  object-fit: contain; background: #f3e8cc; padding: 3px;
   border: 1.5px solid var(--pl-gold);
-  color: var(--pl-on-overlay);
-  display: inline-flex; align-items: center; justify-content: center;
-  font-family: var(--font-heading); font-size: 15px; font-weight: 700;
+  display: block;
 }
 
 /* Fotka — FB-style: celá fotka (contain) v ohraničenom tmavom ráme s rozmazaným

@@ -124,13 +124,16 @@ function Lightbox({
           className="pl-header"
           style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '13px 14px', borderBottom: '1px solid var(--pl-border-soft)' }}
         >
-          <span className="pl-avatar-h" aria-hidden="true">H</span>
+          <picture>
+            <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+            <img className="pl-avatar-h" src="/logo_slovanske_hradiska_256.jpg" alt="" aria-hidden="true" />
+          </picture>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, color: 'var(--pl-title)' }}>
               Hradiská.sk
             </div>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13.5, color: 'var(--pl-muted-2)' }}>
-              Fotogaléria · {index + 1} / {images.length} · <span aria-hidden="true">🌐</span>
+              Fotogaléria · {index + 1} / {images.length}
             </div>
           </div>
           <button
