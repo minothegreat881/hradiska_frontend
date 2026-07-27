@@ -307,12 +307,23 @@ export function HistoricalGallery({ images, title = 'Fotogaléria' }: Historical
     return () => window.removeEventListener('openGalleryModal', onOpen as EventListener);
   }, [images, open]);
 
-  // Deep-link pri načítaní stránky: #foto-N otvorí danú fotku
+  // Deep-link pri načítaní stránky:
+  //  - #foto-N        → otvorí fotku podľa poradia
+  //  - ?fotoFile=<id> → otvorí konkrétnu fotku podľa Strapi fileId (z notifikácie/profilu)
   useEffect(() => {
     const m = window.location.hash.match(/^#foto-(\d+)$/);
     if (m) {
       const i = parseInt(m[1], 10) - 1;
-      if (i >= 0 && i < images.length) setModalIndex(i);
+      if (i >= 0 && i < images.length) { setModalIndex(i); return; }
+    }
+    const ff = new URLSearchParams(window.location.search).get('fotoFile');
+    if (ff) {
+      const idx = images.findIndex((img) => String(img.fileId) === ff);
+      if (idx >= 0) {
+        setModalIndex(idx);
+        // odroluj ku galérii, nech je fotka v zábere aj po zatvorení
+        document.getElementById('photo-gallery')?.scrollIntoView({ block: 'start' });
+      }
     }
     // len raz pri mount-e
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -320,8 +331,11 @@ export function HistoricalGallery({ images, title = 'Fotogaléria' }: Historical
 
   const close = useCallback(() => {
     setModalIndex(null);
-    // Vyčisti #foto-N z URL
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    // Vyčisti #foto-N aj ?fotoFile z URL
+    const sp = new URLSearchParams(window.location.search);
+    sp.delete('fotoFile');
+    const qs = sp.toString();
+    window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : ''));
     // Vráť focus na miniatúru
     triggerRef.current?.focus?.();
   }, []);

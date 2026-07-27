@@ -222,7 +222,11 @@ function NotifList({ items }: { items: NotificationItem[] | null }) {
 function NotifCard({ n }: { n: NotificationItem }) {
   const who = n.actor?.displayName || n.actor?.username || 'Niekto';
   const postTitle = n.post?.title || n.aktualita?.nazov || '';
-  const postHref = n.post ? `/blog/${n.post.slug}` : n.aktualita ? '/aktuality' : '#';
+  // Foto-komentár (galéria) — preklik rovno na tú fotku (?fotoFile), inak na článok.
+  const isPhotoNotif = !!(n.photoComment || n.fileId);
+  const postHref = n.post
+    ? `/blog/${n.post.slug}${isPhotoNotif && n.fileId ? `?fotoFile=${n.fileId}` : ''}`
+    : n.aktualita ? '/aktuality' : '#';
   const isWarn = n.type === 'warning';
   const unreadBar = !n.read && (n.type === 'reply' || n.type === 'like');
 
@@ -230,15 +234,13 @@ function NotifCard({ n }: { n: NotificationItem }) {
   const iconBg = { reply: '#e6eddf', like: '#f2dfda', warning: '#f2d5cc', post: '#efe6cf' }[n.type];
   const iconFg = { reply: '#5c7a52', like: '#7c1f24', warning: '#a04338', post: '#9a5d1f' }[n.type];
 
-  // Foto-komentár (galéria) nemá `post` — má photoComment/fileId. Formuluj inak.
-  const isPhoto = !!(n.photoComment || n.fileId);
   const many = n.aggregateCount > 1;
 
   let text: React.ReactNode;
-  if (n.type === 'reply') text = isPhoto
+  if (n.type === 'reply') text = isPhotoNotif
     ? <><b>{who}</b> odpovedal/a na tvoj komentár k fotke v galérii</>
     : <><b>{who}</b> odpovedal/a na tvoj komentár pod <i>{postTitle}</i></>;
-  else if (n.type === 'like') text = isPhoto
+  else if (n.type === 'like') text = isPhotoNotif
     ? <><b>{many ? `${n.aggregateCount} čitateľov` : who}</b> ocenil{many ? 'i' : '/a'} tvoj komentár k fotke</>
     : <><b>{many ? `${n.aggregateCount} čitateľov` : who}</b> ocenil{many ? 'i' : '/a'} tvoj komentár pod <i>{postTitle}</i></>;
   else if (n.type === 'warning') text = <>Upozornenie správcu o nedodržaní noriem blogu.</>;
@@ -327,7 +329,7 @@ function CommentCard({ c, token, onChange }: { c: MyComment; token: string; onCh
           <span style={{ fontFamily: 'Cinzel, serif', fontSize: 10, color: C.amber, letterSpacing: '.05em' }}>
             {isPhoto ? 'K FOTKE V GALÉRII' : 'POD ČLÁNKOM'}
           </span>{' '}
-          {c.post ? <a href={`/blog/${c.post.slug}${isPhoto ? '#photo-gallery' : ''}`} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: C.amber, fontWeight: 600 }}>{c.post.title}</a>
+          {c.post ? <a href={`/blog/${c.post.slug}${isPhoto && c.fileId ? `?fotoFile=${c.fileId}` : ''}`} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: C.amber, fontWeight: 600 }}>{c.post.title}</a>
                   : <span style={{ color: C.muted }}>{isPhoto ? 'Galéria' : '—'}</span>}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -454,7 +456,20 @@ function Settings({ profile, token, onClose, onSaved, onSignOut, onDeleted }: {
         </Field>
 
         <Field label="Avatar">
-          <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && onAvatar(e.target.files[0])} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {mediaUrl(profile.avatar) ? (
+              <img src={mediaUrl(profile.avatar)!} alt="" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: `1px solid ${C.border}` }} />
+            ) : (
+              <div style={{ width: 56, height: 56, borderRadius: '50%', border: `1px solid ${C.border}`, background: 'radial-gradient(circle at 36% 30%, #a5651f, #7c1f24)', display: 'grid', placeItems: 'center', color: '#f0d9a8', fontFamily: 'Cinzel, serif', fontSize: 20 }}>{initials(profile.displayName || profile.username)}</div>
+            )}
+            <label style={{ cursor: busy ? 'default' : 'pointer', fontFamily: 'Cinzel, serif', fontSize: 12, color: C.amber, background: '#f8f1de', border: `1px solid ${C.border}`, borderRadius: 999, padding: '9px 16px', display: 'inline-flex', alignItems: 'center', gap: 8, opacity: busy ? 0.6 : 1 }}>
+              {busy ? 'Nahrávam…' : (mediaUrl(profile.avatar) ? 'Zmeniť obrázok' : 'Nahrať obrázok')}
+              <input type="file" accept="image/*" disabled={busy} onChange={(e) => e.target.files?.[0] && onAvatar(e.target.files[0])} style={{ display: 'none' }} />
+            </label>
+          </div>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 13.5, color: C.muted, margin: '6px 0 0' }}>
+            Fotka alebo logo, ktoré ťa bude reprezentovať (JPG/PNG).
+          </p>
         </Field>
 
         <fieldset style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', margin: '10px 0' }}>
