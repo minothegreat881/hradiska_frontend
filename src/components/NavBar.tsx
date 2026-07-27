@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Moon, Sun, ChevronDown, MapPin } from 'lucide-react';
+import { Menu, X, ChevronDown, MapPin } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
 import { TwoTierNav } from './TwoTierNav';
+import { InstallAppButton } from './InstallAppButton';
 import { useNavigationData } from '../hooks/useNavigationData';
 
 const NAV_BG = '#1f1611';
@@ -226,22 +227,24 @@ export function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
 
   // Živá navigácia zo Strapi (kategórie + blogy pre dropdown roletky).
   const { items: mainNavigation } = useNavigationData();
 
   useEffect(() => {
+    let lastY = window.scrollY;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const y = window.scrollY;
+      setScrolled(y > 20);
+      // Auto-hide: scroll dole → skry lištu, scroll hore → zobraz. Pri vrchu vždy zobraz.
+      if (Math.abs(y - lastY) > 6) {
+        setNavHidden(y > 90 && y > lastY);
+        lastY = y;
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark');
-    setDarkMode(isDark);
   }, []);
 
   // Zatvor desktop dropdown pri otvorení mobile menu (a naopak)
@@ -260,30 +263,28 @@ export function NavBar() {
     }
   }, [mobileMenuOpen]);
 
-  const toggleDarkMode = () => {
-    document.documentElement.classList.toggle('dark');
-    setDarkMode(!darkMode);
-  };
-
   return (
     <>
       {/* ── Desktop (lg+): dvojriadková lišta 2A ─────────────────────────────── */}
-      <TwoTierNav
-        items={mainNavigation}
-        darkMode={darkMode}
-        onToggleDark={toggleDarkMode}
-      />
+      <TwoTierNav items={mainNavigation} hidden={navHidden && !mobileMenuOpen} />
 
       {/* ── Mobil (<lg): kompaktná lišta + hamburger ─────────────────────────── */}
       <nav
         className="mobile-nav lg:hidden sticky top-0 z-50"
+        onClick={(e) => {
+          // Klik do prázdnej časti lišty (nie na odkaz/tlačidlo) → scroll na vrch.
+          if (!(e.target as HTMLElement).closest('a,button')) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }}
         style={{
           background: NAV_BG,
           borderBottom: `1px solid ${BORDER_GOLD}`,
           boxShadow: scrolled
             ? '0 4px 12px rgba(15,10,5,0.35)'
             : '0 1px 0 rgba(15,10,5,0.2)',
-          transition: 'box-shadow 0.3s',
+          transform: navHidden && !mobileMenuOpen ? 'translateY(-100%)' : 'translateY(0)',
+          transition: 'box-shadow 0.3s, transform 0.28s ease',
         }}
       >
         <div className="container">
@@ -333,37 +334,8 @@ export function NavBar() {
             </a>
 
             {/* Akčné tlačidlá */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <button
-                type="button"
-                onClick={toggleDarkMode}
-                aria-label={darkMode ? 'Svetlý režim' : 'Tmavý režim'}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 38,
-                  height: 38,
-                  borderRadius: 8,
-                  background: 'transparent',
-                  border: 0,
-                  color: TEXT_LIGHT,
-                  cursor: 'pointer',
-                  transition: 'background 0.15s',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = HOVER_BG;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = 'transparent';
-                }}
-              >
-                {darkMode ? (
-                  <Sun style={{ width: 20, height: 20 }} />
-                ) : (
-                  <Moon style={{ width: 20, height: 20 }} />
-                )}
-              </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <InstallAppButton compact />
 
               <button
                 type="button"

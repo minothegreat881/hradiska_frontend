@@ -1,39 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapPin, Moon, Sun, User, LogIn, Download } from 'lucide-react';
+import { MapPin, User, LogIn } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
 import { useMember } from '../auth/MemberAuth';
 import { getUnreadCount } from '../lib/profileApi';
-import { isStandalone, isIOS, hasDeferredPrompt, openInstall, EVT_AVAILABLE } from '../lib/pwa';
-
-/** Malá ikona „Nainštalovať appku" — len keď je appka inštalovateľná a ešte nebeží standalone. */
-function InstallIconButton() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    const check = () => setShow(!isStandalone() && (hasDeferredPrompt() || isIOS()));
-    check();
-    window.addEventListener(EVT_AVAILABLE, check);
-    return () => window.removeEventListener(EVT_AVAILABLE, check);
-  }, []);
-  if (!show) return null;
-  return (
-    <button
-      onClick={() => openInstall()}
-      title="Nainštalovať Hradiská.sk ako aplikáciu"
-      aria-label="Nainštalovať aplikáciu"
-      style={{
-        flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 6,
-        padding: '7px 12px', borderRadius: 999, cursor: 'pointer',
-        background: 'rgba(255,247,231,0.08)', border: '1px solid rgba(200,161,90,0.4)',
-        color: '#e8dcc8', fontFamily: 'Georgia, serif', fontSize: 13, whiteSpace: 'nowrap',
-      }}
-    >
-      <Download className="w-4 h-4" />
-      <span className="hidden md:inline">Appka</span>
-    </button>
-  );
-}
+import { InstallAppButton } from './InstallAppButton';
 
 /** Odkaz na účet v navigácii — prihlásenie alebo profil + badge neprečítaných. */
 function AccountNavLink() {
@@ -134,11 +106,11 @@ function categorySlug(item: NavigationItem): string {
 
 interface TwoTierNavProps {
   items: NavigationItem[];
-  darkMode: boolean;
-  onToggleDark: () => void;
+  /** Auto-hide: keď true, lišta sa vysunie nahor (skryje). */
+  hidden?: boolean;
 }
 
-export function TwoTierNav({ items, darkMode, onToggleDark }: TwoTierNavProps) {
+export function TwoTierNav({ items, hidden = false }: TwoTierNavProps) {
   // id práve otvorenej roletky (accordion — max. jedna naraz)
   const [open, setOpen] = useState<string | null>(null);
   // po tape na pull-tab (dotyk, kde :hover neexistuje) drž 2. riadok otvorený
@@ -193,9 +165,17 @@ export function TwoTierNav({ items, darkMode, onToggleDark }: TwoTierNavProps) {
       data-tier
       data-expanded={expanded ? 'true' : undefined}
       className="two-tier-nav sticky top-0 z-50"
+      onClick={(e) => {
+        // Klik do prázdnej časti lišty (nie na odkaz/tlačidlo) → scroll na vrch.
+        if (!(e.target as HTMLElement).closest('a,button')) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }}
       style={{
         background: NAV_GRADIENT,
         borderBottom: `2px solid ${NAV_BORDER_GOLD}`,
+        transform: hidden ? 'translateY(-100%)' : 'translateY(0)',
+        transition: 'transform 0.28s ease',
       }}
     >
       <div className="container" style={{ paddingTop: 14, paddingBottom: 16 }}>
@@ -242,7 +222,7 @@ export function TwoTierNav({ items, darkMode, onToggleDark }: TwoTierNavProps) {
 
           {/* Appka + účet — prihlásenie alebo odkaz na profil */}
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-            <InstallIconButton />
+            <InstallAppButton />
             <AccountNavLink />
           </div>
         </div>

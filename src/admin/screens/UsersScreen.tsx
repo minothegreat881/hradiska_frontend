@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, Ban, CheckCircle2, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Search, Ban, CheckCircle2, Loader2, AlertCircle, ShieldCheck, Trash2 } from 'lucide-react';
 import { useAuth } from '../AuthContext';
-import { listUsers, blockUser, unblockUser, type AdminUser } from '../api/users';
+import { listUsers, blockUser, unblockUser, deleteUser, type AdminUser } from '../api/users';
 
 export function UsersScreen() {
   const { token } = useAuth();
@@ -14,6 +14,8 @@ export function UsersScreen() {
   const [error, setError] = useState('');
   const [blockTarget, setBlockTarget] = useState<AdminUser | null>(null);
   const [reason, setReason] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const [reload, setReload] = useState(0);
 
   useEffect(() => { const t = setTimeout(() => setDq(q), 350); return () => clearTimeout(t); }, [q]);
@@ -40,6 +42,14 @@ export function UsersScreen() {
     setRows(rs => rs.map(x => x.id === u.id ? { ...x, blocked: false } : x));
     try { await unblockUser(token, u.id); setReload(n => n + 1); }
     catch { setRows(rs => rs.map(x => x.id === u.id ? { ...x, blocked: true } : x)); }
+  };
+
+  const doDelete = async () => {
+    if (!token || !deleteTarget) return;
+    setDeleteBusy(true);
+    try { await deleteUser(token, deleteTarget.id); setDeleteTarget(null); setReload(n => n + 1); }
+    catch (e: any) { setError(e?.message || 'Mazanie zlyhalo.'); setDeleteTarget(null); }
+    finally { setDeleteBusy(false); }
   };
 
   return (
@@ -75,7 +85,7 @@ export function UsersScreen() {
                 <th>Rola</th>
                 <th>Stav</th>
                 <th>Registrácia</th>
-                <th style={{ width: 120 }}></th>
+                <th style={{ width: 210 }}></th>
               </tr>
             </thead>
             <tbody>
@@ -102,17 +112,24 @@ export function UsersScreen() {
                     {new Date(u.createdAt).toLocaleDateString('sk-SK')}
                   </td>
                   <td>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
                       {u.roleName === 'Authenticated' ? (
                         <span style={{ fontSize: 12, color: 'var(--ad-muted)' }}>—</span>
-                      ) : u.blocked ? (
-                        <button className="abtn" style={{ padding: '6px 12px', fontSize: 13 }} onClick={() => doUnblock(u)}>
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Odblokovať
-                        </button>
                       ) : (
-                        <button className="abtn abtn-danger" style={{ padding: '6px 12px', fontSize: 13 }} onClick={() => { setBlockTarget(u); setReason(''); }}>
-                          <Ban className="w-3.5 h-3.5" /> Zablokovať
-                        </button>
+                        <>
+                          {u.blocked ? (
+                            <button className="abtn" style={{ padding: '6px 10px', fontSize: 13 }} onClick={() => doUnblock(u)}>
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Odblokovať
+                            </button>
+                          ) : (
+                            <button className="abtn" style={{ padding: '6px 10px', fontSize: 13 }} onClick={() => { setBlockTarget(u); setReason(''); }}>
+                              <Ban className="w-3.5 h-3.5" /> Blokovať
+                            </button>
+                          )}
+                          <button className="abtn abtn-danger" style={{ padding: '6px 10px', fontSize: 13 }} title="Vymazať účet natrvalo" onClick={() => setDeleteTarget(u)}>
+                            <Trash2 className="w-3.5 h-3.5" /> Vymazať
+                          </button>
+                        </>
                       )}
                     </div>
                   </td>
@@ -144,6 +161,26 @@ export function UsersScreen() {
               <button className="abtn" onClick={() => setBlockTarget(null)}>Zrušiť</button>
               <button className="abtn" onClick={doBlock} style={{ background: 'var(--ad-danger)', color: '#fff', borderColor: 'var(--ad-danger)' }}>
                 Zablokovať
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div onClick={() => !deleteBusy && setDeleteTarget(null)}
+             style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(30,22,12,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(460px,92vw)', padding: 24 }}>
+            <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 10px' }}>Vymazať účet natrvalo?</h2>
+            <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 16px' }}>
+              Účet <strong style={{ color: 'var(--ad-text)' }}>{deleteTarget.displayName || deleteTarget.username}</strong>
+              {' '}(<span style={{ color: 'var(--ad-text)' }}>{deleteTarget.email}</span>) sa <strong style={{ color: 'var(--ad-text)' }}>úplne odstráni</strong>.
+              E-mail aj meno sa uvoľnia — dá sa nimi znovu zaregistrovať. Túto akciu <strong>nemožno vrátiť</strong>.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button className="abtn" disabled={deleteBusy} onClick={() => setDeleteTarget(null)}>Zrušiť</button>
+              <button className="abtn" disabled={deleteBusy} onClick={doDelete} style={{ background: 'var(--ad-danger)', color: '#fff', borderColor: 'var(--ad-danger)' }}>
+                {deleteBusy ? <><Loader2 className="w-3.5 h-3.5 animate-spin" style={{ display: 'inline' }} /> Mažem…</> : 'Vymazať natrvalo'}
               </button>
             </div>
           </div>

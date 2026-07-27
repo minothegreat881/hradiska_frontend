@@ -966,6 +966,18 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   .pl-navb, .pl-act { transition: none; }
 }
 
+/* Install-app tlačidlo — pulzujúci zlatý glow (lákavý efekt) */
+@keyframes install-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 134, 47, 0.5), 0 2px 8px rgba(120, 70, 20, 0.35); }
+  50%      { box-shadow: 0 0 0 7px rgba(200, 134, 47, 0), 0 0 18px rgba(232, 197, 110, 0.7); }
+}
+.install-app-btn { animation: install-glow 2.2s ease-in-out infinite; transition: transform 0.15s ease; }
+.install-app-btn:hover { transform: translateY(-1px) scale(1.04); }
+.install-app-btn:active { transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) {
+  .install-app-btn { animation: none; }
+}
+
 /* Grid items default to min-width:auto, ktorý necháva ich intrinzickú (max-content)
    šírku vyhrať nad max-width obmedzeniami detí — dlhý nezalomiteľný text (napr. URL
    v zozname zdrojov) tak pretlačí celý grid stĺpec cez vyhradený priestor, aj keď má

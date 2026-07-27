@@ -57,3 +57,12 @@ export async function unblockUser(token: string, id: number) {
     body: { blocked: false, blockedReason: null, blockedAt: null },
   });
 }
+
+/**
+ * Úplne vymaže používateľa (DELETE /api/users/:id). Uvoľní e-mail aj meno,
+ * takže sa nimi dá znovu zaregistrovať. Vyžaduje `destroy` permission pre
+ * rolu Authenticated (nastavené na backende).
+ */
+export async function deleteUser(token: string, id: number) {
+  return strapiFetch(`/api/users/${id}`, { method: 'DELETE', token });
+}
