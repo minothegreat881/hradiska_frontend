@@ -157,6 +157,37 @@ function App() {
     };
   }, []);
 
+  // Mobilné gesto: potiahnutie prstom DOĽAVA cez obsah = späť (história prehliadača).
+  // Vylúčené stránky/oblasti s vlastnými horizontálnymi gestami (mapa, galéria,
+  // lightbox fotky, mapy, canvas, polia na písanie).
+  useEffect(() => {
+    if (route === 'mapa' || route === 'galeria') return;
+    let x0 = 0, y0 = 0, t0 = 0, skip = false;
+    const onStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
+      const el = e.target as HTMLElement | null;
+      skip = !!el?.closest?.('.pl-overlay, .map-3d-box, .maplibregl-map, .mapboxgl-map, canvas, input, textarea, [data-swipe-ignore]');
+    };
+    const onEnd = (e: TouchEvent) => {
+      if (skip) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0;
+      const dy = t.clientY - y0;
+      const dt = Date.now() - t0;
+      // Výrazne doľava, dominantne horizontálne, dosť rýchle → späť.
+      if (dx < -90 && Math.abs(dx) > Math.abs(dy) * 1.8 && dt < 800) {
+        if (window.history.length > 1) window.history.back();
+      }
+    };
+    window.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', onStart);
+      window.removeEventListener('touchend', onEnd);
+    };
+  }, [route]);
+
   // Admin má vlastný shell — bez NavBaru, pätičky a Toasteru webu.
   if (route === 'admin') {
     return (
