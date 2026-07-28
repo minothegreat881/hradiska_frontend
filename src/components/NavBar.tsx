@@ -235,18 +235,22 @@ export function NavBar() {
 
   useEffect(() => {
     let lastY = window.scrollY;
+    let accum = 0;        // nazbieraná vzdialenosť v aktuálnom smere
+    const REVEAL = 10;    // px hore na zobrazenie
+    const HIDE = 14;      // px dole na skrytie
     const handleScroll = () => {
       const y = window.scrollY;
-      setScrolled(y > 20);
       const dy = y - lastY;
-      // Header je pri čítaní SCHOVANÝ. Zobrazí sa len keď:
-      //  - si pri vrchu stránky (< 12 px), alebo
-      //  - RÝCHLO potiahneš hore (väčší skok medzi scroll eventmi → dy < -10).
-      // Pomalé rolovanie hore ho nechá schovaný. Rolovanie dole ho skryje.
-      if (y < 12) setNavHidden(false);
-      else if (dy > 5) setNavHidden(true);
-      else if (dy < -10) setNavHidden(false);
       lastY = y;
+      setScrolled(y > 20);
+      // Pri vrchu stránky vždy zobraz (a vynuluj).
+      if (y < 64) { setNavHidden(false); accum = 0; return; }
+      // Zmena smeru → vynuluj akumulátor (hysteréza proti blikaniu).
+      if ((dy > 0 && accum < 0) || (dy < 0 && accum > 0)) accum = 0;
+      accum += dy;
+      // Prepni až po prekročení prahu, potom vynuluj — žiadne rýchle prepínanie.
+      if (accum > HIDE) { setNavHidden(true); accum = 0; }
+      else if (accum < -REVEAL) { setNavHidden(false); accum = 0; }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
