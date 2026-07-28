@@ -1077,7 +1077,6 @@ export default function Slovakia3DReliefMap() {
     <div
       className="relative w-full"
       style={{
-        minHeight: '820px',
         background: 'linear-gradient(180deg, #3d352a 0%, #4a4035 15%, #3d352a 50%, #342d24 85%, #2c2418 100%)'
       }}
     >
