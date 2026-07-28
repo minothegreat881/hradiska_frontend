@@ -18,9 +18,17 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 
-const SITE = (process.env.SITE_URL || 'https://hradiska.sk').replace(/\/$/, '');
-const STRAPI = (process.env.VITE_STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
-const MEDIA = (process.env.MEDIA_URL || SITE).replace(/\/$/, '');
+// Verejná adresa webu. Na Verceli sa vezme produkčná doména projektu; lokálne
+// alebo pri prechode na vlastnú doménu sa dá prepísať cez SITE_URL.
+const SITE = (
+  process.env.SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://webdesignforhradiskask.vercel.app')
+).replace(/\/$/, '');
+// Backend pre build-fetch (search-index) — priamo Hetzner (proxy /strapi pri
+// builde ešte nebeží). Prepísateľné cez PRERENDER_STRAPI_URL.
+const STRAPI = (process.env.PRERENDER_STRAPI_URL || 'http://188.245.47.29').replace(/\/$/, '');
+// Základ pre OG obrázky — obálky sú relatívne /uploads/..., servujú sa cez /strapi proxy.
+const MEDIA = (process.env.MEDIA_URL || `${SITE}/strapi`).replace(/\/$/, '');
 const DEFAULT_OG = `${SITE}/img_header_hradiska_02.png`;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
