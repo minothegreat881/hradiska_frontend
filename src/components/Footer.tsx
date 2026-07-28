@@ -41,17 +41,17 @@ const O_PROJEKTE = [
 const SOCIALS = [
   {
     label: 'Facebook',
-    href: 'https://facebook.com/hradiska',
+    href: 'https://www.facebook.com/groups/118846781525141',
     path: 'M13.5 9H15V6.5h-1.9C10.9 6.5 10 7.9 10 9.6V11H8v2.5h2V21h2.7v-7.5h2l.3-2.5h-2.3V9.9c0-.6.2-.9.8-.9Z',
   },
   {
     label: 'Instagram',
-    href: 'https://instagram.com/hradiska',
+    href: 'https://www.instagram.com/slovanske_hradiska/',
     path: 'M12 7.8A4.2 4.2 0 1 0 12 16.2 4.2 4.2 0 0 0 12 7.8Zm0 6.9a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4Zm5.4-7.1a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM20 8.3c0-1.4-.4-2.6-1.4-3.6S16.4 3.4 15 3.3C13.7 3.2 10.3 3.2 9 3.3c-1.4 0-2.6.4-3.6 1.4S4 6.9 3.9 8.3c-.1 1.4-.1 4.8 0 6.1 0 1.4.4 2.6 1.4 3.6s2.2 1.4 3.6 1.4c1.4.1 4.8.1 6.1 0 1.4 0 2.6-.4 3.6-1.4s1.4-2.2 1.4-3.6c.1-1.3.1-4.7 0-6.1Zm-1.8 7.6a2.7 2.7 0 0 1-1.5 1.5c-1.1.4-3.6.3-4.7.3s-3.7.1-4.7-.3a2.7 2.7 0 0 1-1.5-1.5c-.4-1.1-.3-3.6-.3-4.7s-.1-3.7.3-4.7A2.7 2.7 0 0 1 7.3 5c1.1-.4 3.6-.3 4.7-.3s3.7-.1 4.7.3a2.7 2.7 0 0 1 1.5 1.5c.4 1.1.3 3.6.3 4.7s.1 3.6-.3 4.7Z',
   },
   {
     label: 'YouTube',
-    href: 'https://youtube.com/@hradiska',
+    href: 'https://www.youtube.com/@ozhradiska3940',
     path: 'M21.6 8.2a2.5 2.5 0 0 0-1.8-1.8C18.2 6 12 6 12 6s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 8.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 3.8 2.5 2.5 0 0 0 1.8 1.8C5.8 18 12 18 12 18s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-3.8ZM10 15V9l5.2 3L10 15Z',
   },
   {
@@ -189,7 +189,13 @@ export function Footer() {
 
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {SOCIALS.map((s) => (
-                <a key={s.label} href={s.href} className="soc" aria-label={s.label}>
+                <a
+                  key={s.label}
+                  href={s.href}
+                  className="soc"
+                  aria-label={s.label}
+                  {...(s.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d={s.path} />
                   </svg>

@@ -1271,6 +1271,22 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   }
 }
 
+/* Dlaždice kroniky (AktualityFeed) — správanie ako CategoryCard */
+.ak-tile > article { transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease; }
+.ak-tile:hover > article {
+  transform: translateY(-3px);
+  border-color: rgba(125, 79, 29, 0.55) !important;
+  box-shadow: 0 4px 14px rgba(70,40,20,0.10), 0 10px 24px rgba(70,40,20,0.08) !important;
+}
+.ak-cover { transition: transform 400ms ease-out; }
+.ak-tile:hover .ak-cover { transform: scale(1.04); }
+.ak-cta svg { transition: transform 150ms ease-out; }
+.ak-tile:hover .ak-cta svg { transform: translateX(3px); }
+/* Mobil: excerpt skry (priveľa textu), ostane obrázok + názov + meta */
+@media (max-width: 640px) {
+  .ak-excerpt { display: none !important; }
+}
+
 .aktualita-masonry-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 20px 44px -22px rgba(60, 40, 15, .55);

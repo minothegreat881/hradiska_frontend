@@ -1,6 +1,6 @@
 'use client';
 
-import { Facebook, Linkedin, Mail, Link2, Check, Twitter } from 'lucide-react';
+import { Facebook, Instagram, Youtube, MessageCircle, Link2, Check } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner@2.0.3';
 import { useMember } from '../auth/MemberAuth';
@@ -25,6 +25,8 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
   const encodedTitle = encodeURIComponent(title);
   const encodedUrl = encodeURIComponent(currentUrl);
 
+  // FB a WhatsApp zdieľajú odkaz na článok; Instagram a YouTube (bez URL-share)
+  // vedú na profily OZ Slovanské hradiská.
   const items = [
     {
       name: 'Facebook',
@@ -32,19 +34,19 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
     },
     {
-      name: 'X',
-      Icon: Twitter,
-      href: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+      name: 'WhatsApp',
+      Icon: MessageCircle,
+      href: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
     },
     {
-      name: 'LinkedIn',
-      Icon: Linkedin,
-      href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
+      name: 'Instagram',
+      Icon: Instagram,
+      href: 'https://www.instagram.com/slovanske_hradiska/',
     },
     {
-      name: 'E-mail',
-      Icon: Mail,
-      href: `mailto:?subject=${encodedTitle}&body=${encodedUrl}`,
+      name: 'YouTube',
+      Icon: Youtube,
+      href: 'https://www.youtube.com/@ozhradiska3940',
     },
   ];
 

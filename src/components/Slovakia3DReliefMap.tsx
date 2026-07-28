@@ -862,6 +862,7 @@ export default function Slovakia3DReliefMap() {
   const [selectedHradisko, setSelectedHradisko] = useState<Hradisko | null>(null);
   const [hoveredHradisko, setHoveredHradisko] = useState<string | null>(null);
   const [isMapActive, setIsMapActive] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false); // na mobile skrytá, otvorí sa tlačidlom
   // Filtre legendy podľa nášho členenia (zatiaľ bez bodov — toggly sú pripravené pre budúce dáta).
   const [enabledTypes, setEnabledTypes] = useState<Record<CatSlug, boolean>>(
     Object.fromEntries(CATS.map((c) => [c.slug, true])) as Record<CatSlug, boolean>
@@ -1386,8 +1387,24 @@ export default function Slovakia3DReliefMap() {
                   rgb(${Math.round(HYPSOMETRIC_COLORS[4].color.r*255)},${Math.round(HYPSOMETRIC_COLORS[4].color.g*255)},${Math.round(HYPSOMETRIC_COLORS[4].color.b*255)}),
                   rgb(${Math.round(HYPSOMETRIC_COLORS[6].color.r*255)},${Math.round(HYPSOMETRIC_COLORS[6].color.g*255)},${Math.round(HYPSOMETRIC_COLORS[6].color.b*255)}))`;
                 return (
+                  <>
+                  {/* Mobilný toggle legendy — na telefóne legenda prekrývala mapu, tak
+                      sa skryje a otvorí sa až po ťuknutí. Na desktope je legenda vždy. */}
+                  {!legendOpen && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setLegendOpen(true); }}
+                      className="lg:hidden absolute bottom-4 right-4 z-20 rounded-full shadow-lg inline-flex items-center gap-1.5"
+                      style={{
+                        background: 'rgba(28,23,16,0.94)', border: '1px solid rgba(196,165,116,0.4)',
+                        color: '#c4a574', fontFamily: 'Georgia, serif', fontSize: 12, padding: '8px 13px',
+                      }}
+                      aria-label="Zobraziť legendu"
+                    >
+                      ☰ Legenda
+                    </button>
+                  )}
                   <div
-                    className="absolute bottom-4 right-4 z-10 rounded-xl shadow-2xl"
+                    className={`${legendOpen ? 'block' : 'hidden'} lg:block absolute bottom-4 right-4 z-10 rounded-xl shadow-2xl`}
                     style={{
                       background: 'rgba(28, 23, 16, 0.94)',
                       border: '1px solid rgba(196, 165, 116, 0.35)',
@@ -1397,7 +1414,10 @@ export default function Slovakia3DReliefMap() {
                   >
                     <div className="flex items-baseline justify-between gap-3" style={{ marginBottom: 9 }}>
                       <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: '#c4a574', margin: 0 }}>Kategórie</h3>
-                      <span style={{ fontFamily: 'Georgia, serif', fontSize: 11, color: '#a89f8f', whiteSpace: 'nowrap' }}>{visible} / {points.length} lokalít</span>
+                      <span className="flex items-center gap-2" style={{ fontFamily: 'Georgia, serif', fontSize: 11, color: '#a89f8f', whiteSpace: 'nowrap' }}>
+                        {visible} / {points.length} lokalít
+                        <button onClick={(e) => { e.stopPropagation(); setLegendOpen(false); }} className="lg:hidden" aria-label="Skryť legendu" style={{ background: 'none', border: 'none', color: '#c4a574', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>✕</button>
+                      </span>
                     </div>
 
                     <div className="flex flex-col" style={{ gap: 3 }}>
@@ -1432,6 +1452,7 @@ export default function Slovakia3DReliefMap() {
                       Klikni na bodku pre článok.
                     </p>
                   </div>
+                  </>
                 );
               })()}
 
@@ -1643,9 +1664,7 @@ export default function Slovakia3DReliefMap() {
         </div>
 
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <p className="text-xs" style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: '#8b7355' }}>
-            ✦ SRTM Data • © OpenStreetMap • GADM Boundaries ✦
-          </p>
+          <span />
           <div className="flex items-center gap-4">
             {isMapActive && (
               <button

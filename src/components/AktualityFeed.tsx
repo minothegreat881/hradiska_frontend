@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner@2.0.3';
 import {
   ChevronLeft, ChevronRight, X, MapPin, Pin, Calendar,
-  Shield, Camera, Share2, Images,
+  Shield, Camera, Share2, Images, ArrowRight,
 } from 'lucide-react';
 import {
   getAktuality, getStrapiImageUrl,
@@ -594,68 +594,61 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
   );
 }
 
-/** Karta v 2-stĺpcovej nástenke. „Zobraziť viac" vedie na článok. */
+/** Dlaždica kroniky — vizuálne zladená s CategoryCard (obrázok hore, telo pod ním).
+ *  Na mobile sa excerpt skryje (.ak-excerpt v globals.css), ostane názov + meta. */
 function KronikaCard({ item }: { item: KronikaItem }) {
   return (
-    <article
-      className="aktualita-masonry-card"
-      style={{
-        display: 'inline-block', width: '100%', background: '#fbf6ea', border: '1px solid #e3d4ad',
-        borderRadius: 14, boxShadow: '0 12px 32px -22px rgba(60,40,15,.5)', overflow: 'hidden',
-        marginBottom: 22, breakInside: 'avoid', transition: 'transform .18s, box-shadow .18s',
-      }}
-    >
-      {item.coverUrl && (
-        <a href={`/blog/${item.slug}`} className="block relative overflow-hidden" style={{ height: 210 }}>
-          <SafeImg src={item.coverUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(18,13,8,.55) 0%, rgba(18,13,8,.18) 38%, transparent 62%)', pointerEvents: 'none' }} />
-        </a>
-      )}
-
-      <div style={{ padding: '15px 17px 6px' }}>
-        <div
-          className="flex items-center gap-1.5 flex-wrap"
-          style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e', marginBottom: 7 }}
-        >
-          <Calendar className="w-3 h-3" />
-          <span>{formatSkDate(item.datum)}</span>
-          <span aria-hidden="true">·</span>
-          <span>{item.author}</span>
-          <span aria-hidden="true">·</span>
-          <span>{item.readingTime} min čítania</span>
+    <a href={`/blog/${item.slug}`} className="block h-full group ak-tile" style={{ textDecoration: 'none' }}>
+      <article
+        className="h-full flex flex-col overflow-hidden"
+        style={{
+          background: '#fffdf8',
+          border: '1px solid rgba(196,165,116,0.4)',
+          borderRadius: 12,
+          boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
+        }}
+      >
+        {/* FOTKA */}
+        <div className="relative overflow-hidden flex-shrink-0" style={{ height: 220 }}>
+          {item.coverUrl ? (
+            <SafeImg src={item.coverUrl} alt="" className="w-full h-full object-cover ak-cover" />
+          ) : (
+            <div className="w-full h-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 50% 40%, #f5ecd8 0%, #ece0c4 55%, #ddcba4 100%)' }}>
+              <picture style={{ display: 'contents' }}>
+                <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+                <img src="/logo_slovanske_hradiska_256.jpg" alt="" style={{ height: '58%', width: 'auto', mixBlendMode: 'multiply', opacity: 0.92 }} />
+              </picture>
+            </div>
+          )}
         </div>
 
-        <h3 style={{ margin: '0 0 7px', fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 700, color: '#2e2213', lineHeight: 1.15 }}>
-          <a href={`/blog/${item.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+        {/* TELO */}
+        <div className="flex flex-col flex-1" style={{ padding: 24 }}>
+          <div className="flex items-center gap-1.5 flex-wrap" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, color: '#8a795e', marginBottom: 8 }}>
+            <Calendar className="w-3 h-3" />
+            <span>{formatSkDate(item.datum)}</span>
+            <span aria-hidden="true">·</span>
+            <span>{item.author}</span>
+            <span aria-hidden="true">·</span>
+            <span>{item.readingTime} min čítania</span>
+          </div>
+
+          <h3 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 20, fontWeight: 600, color: '#2d1810', lineHeight: 1.25, letterSpacing: '0.02em', margin: '0 0 10px' }}>
             {item.title}
-          </a>
-        </h3>
+          </h3>
 
-        {item.excerpt && (
-          <p
-            style={{
-              margin: 0, fontFamily: 'var(--font-serif)', fontSize: 16, lineHeight: 1.5, color: '#4a3f2e',
-              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-            }}
-          >
-            {item.excerpt}
-          </p>
-        )}
-      </div>
+          {item.excerpt && (
+            <p className="ak-excerpt" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 14.5, color: '#5d4e37', lineHeight: 1.6, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {item.excerpt}
+            </p>
+          )}
 
-      <div
-        className="flex items-center"
-        style={{ padding: '10px 17px', borderTop: '1px solid #ece0c2', background: '#f7efdb' }}
-      >
-        <div className="flex-1" />
-        <a
-          href={`/blog/${item.slug}`}
-          style={{ fontFamily: 'var(--font-serif)', fontSize: 16, color: '#9a5d1f', textDecoration: 'none' }}
-        >
-          Zobraziť viac →
-        </a>
-      </div>
-    </article>
+          <span className="inline-flex items-center gap-1.5 ak-cta" style={{ marginTop: 'auto', fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, fontWeight: 500, color: '#7d4f1d', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            Čítať <ArrowRight className="w-4 h-4" />
+          </span>
+        </div>
+      </article>
+    </a>
   );
 }
 
@@ -1191,16 +1184,7 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
 
   return (
     <section className="relative" style={{ padding: '48px 16px 64px' }}>
-      <div
-        className="relative mx-auto aktualita-card-outer"
-        style={{
-          maxWidth: 1200,
-          background: '#f3ead6',
-          border: '1px solid #ddcba0',
-          borderRadius: 18,
-          boxShadow: '0 26px 64px -30px rgba(60,40,15,.5)',
-        }}
-      >
+      <div className="relative mx-auto" style={{ maxWidth: 1200 }}>
         {showHeader && (
           <header className="text-center">
             <div className="flex items-center justify-center gap-2 mb-3 opacity-60" aria-hidden="true">
@@ -1265,7 +1249,7 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
               </p>
             ) : (
               <div>
-                <div className="aktualita-masonry-cols">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: '32px 28px' }}>
                   {masonryItems.map((item) => (
                     <KronikaCard key={item.documentId} item={item} />
                   ))}
