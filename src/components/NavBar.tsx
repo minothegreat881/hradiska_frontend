@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown, MapPin } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
@@ -229,6 +229,9 @@ export function NavBar() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
+  // Kým je myš nad lištou (desktop), auto-hide sa pozastaví — inak by hover-
+  // rozbaľovanie 2. riadku a auto-hide vytvorili spätnú slučku (lišta poskakuje).
+  const navHoveredRef = useRef(false);
 
   // Živá navigácia zo Strapi (kategórie + blogy pre dropdown roletky).
   const { items: mainNavigation } = useNavigationData();
@@ -243,6 +246,8 @@ export function NavBar() {
       const dy = y - lastY;
       lastY = y;
       setScrolled(y > 20);
+      // Kým je myš nad lištou, drž ju zobrazenú (žiadne prepínanie → žiadna slučka).
+      if (navHoveredRef.current) { setNavHidden(false); accum = 0; return; }
       // Pri vrchu stránky vždy zobraz (a vynuluj).
       if (y < 64) { setNavHidden(false); accum = 0; return; }
       // Zmena smeru → vynuluj akumulátor (hysteréza proti blikaniu).
@@ -275,7 +280,11 @@ export function NavBar() {
   return (
     <>
       {/* ── Desktop (lg+): dvojriadková lišta 2A ─────────────────────────────── */}
-      <TwoTierNav items={mainNavigation} hidden={navHidden && !mobileMenuOpen} />
+      <TwoTierNav
+        items={mainNavigation}
+        hidden={navHidden && !mobileMenuOpen}
+        onHover={(h) => { navHoveredRef.current = h; if (h) setNavHidden(false); }}
+      />
 
       {/* ── Mobil (<lg): kompaktná lišta + hamburger ─────────────────────────── */}
       <nav

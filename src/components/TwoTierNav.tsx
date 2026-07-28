@@ -65,9 +65,11 @@ interface TwoTierNavProps {
   items: NavigationItem[];
   /** Auto-hide: keď true, lišta sa vysunie nahor (skryje). */
   hidden?: boolean;
+  /** Hlásenie hoveru nad lištou — rodič vtedy pozastaví auto-hide. */
+  onHover?: (hovered: boolean) => void;
 }
 
-export function TwoTierNav({ items, hidden = false }: TwoTierNavProps) {
+export function TwoTierNav({ items, hidden = false, onHover }: TwoTierNavProps) {
   // id práve otvorenej roletky (accordion — max. jedna naraz)
   const [open, setOpen] = useState<string | null>(null);
   // po tape na pull-tab (dotyk, kde :hover neexistuje) drž 2. riadok otvorený
@@ -122,6 +124,8 @@ export function TwoTierNav({ items, hidden = false }: TwoTierNavProps) {
       data-tier
       data-expanded={expanded ? 'true' : undefined}
       className="two-tier-nav sticky top-0 z-50"
+      onMouseEnter={() => onHover?.(true)}
+      onMouseLeave={() => onHover?.(false)}
       onClick={(e) => {
         // Klik do prázdnej časti lišty (nie na odkaz/tlačidlo) → scroll na vrch.
         if (!(e.target as HTMLElement).closest('a,button')) {

@@ -7,7 +7,7 @@
  *   - Vite dev moduly/HMR, cross-origin a API: NEZASAHUJEME (pass-through)
  * Verziu CACHE zvýš pri zmene shellu, nech sa starý cache vyčistí.
  */
-const CACHE = 'hradiska-v3';
+const CACHE = 'hradiska-v4';
 const PRECACHE = [
   '/',
   '/offline.html',
