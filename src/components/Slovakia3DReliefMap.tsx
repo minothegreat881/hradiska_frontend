@@ -1648,36 +1648,25 @@ export default function Slovakia3DReliefMap() {
         return h ? <HoverTooltipOverlay ref={tooltipDomRef} hradisko={h} /> : null;
       })()}
 
-      {/* Decorative Footer - matching parchment theme */}
-      <div
-        className="relative border-t py-5 px-8"
-        style={{
-          background: 'linear-gradient(180deg, rgba(26, 21, 16, 0.95) 0%, rgba(44, 36, 24, 0.9) 100%)',
-          borderColor: 'rgba(196, 165, 116, 0.3)'
-        }}
-      >
-        {/* Footer ornamental line */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center gap-3" style={{ color: '#c4a574' }}>
-          <span className="opacity-60">═══</span>
-          <span className="text-lg">❖</span>
-          <span className="opacity-60">═══</span>
+      {/* Lišta s pomôckou — len keď je mapa AKTÍVNA (inak zbytočne zaberala miesto).
+          Po odstránení atribúcie by tu ostal prázdny tmavý pruh. */}
+      {isMapActive && (
+        <div
+          className="relative border-t py-3 px-8 text-center"
+          style={{
+            background: 'linear-gradient(180deg, rgba(26, 21, 16, 0.95) 0%, rgba(44, 36, 24, 0.9) 100%)',
+            borderColor: 'rgba(196, 165, 116, 0.3)',
+          }}
+        >
+          <button
+            onClick={() => setIsMapActive(false)}
+            className="text-xs transition-colors hover:opacity-80"
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: '#c4a574' }}
+          >
+            ⟨ Klikni mimo mapy pre scrollovanie ⟩
+          </button>
         </div>
-
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <span />
-          <div className="flex items-center gap-4">
-            {isMapActive && (
-              <button
-                onClick={() => setIsMapActive(false)}
-                className="text-xs transition-colors hover:opacity-80"
-                style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: '#c4a574' }}
-              >
-                ⟨ Klikni mimo mapy pre scrollovanie ⟩
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
