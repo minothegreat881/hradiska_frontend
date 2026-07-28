@@ -237,25 +237,18 @@ export function NavBar() {
   const { items: mainNavigation } = useNavigationData();
 
   useEffect(() => {
-    let lastY = window.scrollY;
-    let accum = 0;        // nazbieraná vzdialenosť v aktuálnom smere
-    const REVEAL = 10;    // px hore na zobrazenie
-    const HIDE = 14;      // px dole na skrytie
+    let lastY = Math.max(0, window.scrollY);
+    const TOL = 6; // ignoruj drobné pohyby (jitter z kolieska / momentum scrollu)
     const handleScroll = () => {
-      const y = window.scrollY;
-      const dy = y - lastY;
-      lastY = y;
+      const y = Math.max(0, window.scrollY); // iOS môže dať pri rubber-bande záporné
       setScrolled(y > 20);
-      // Kým je myš nad lištou, drž ju zobrazenú (žiadne prepínanie → žiadna slučka).
-      if (navHoveredRef.current) { setNavHidden(false); accum = 0; return; }
-      // Pri vrchu stránky vždy zobraz (a vynuluj).
-      if (y < 64) { setNavHidden(false); accum = 0; return; }
-      // Zmena smeru → vynuluj akumulátor (hysteréza proti blikaniu).
-      if ((dy > 0 && accum < 0) || (dy < 0 && accum > 0)) accum = 0;
-      accum += dy;
-      // Prepni až po prekročení prahu, potom vynuluj — žiadne rýchle prepínanie.
-      if (accum > HIDE) { setNavHidden(true); accum = 0; }
-      else if (accum < -REVEAL) { setNavHidden(false); accum = 0; }
+      // Pri hoveri nad lištou (desktop) alebo pri vrchu stránky → vždy zobraz.
+      if (navHoveredRef.current || y < 64) { setNavHidden(false); lastY = y; return; }
+      // Menší pohyb než tolerancia IGNORUJ a NEMEŇ referenciu — malé kroky sa tak
+      // nasčítajú (kľúčové pre mobil, ktorý posiela veľa jemných krokov).
+      if (Math.abs(y - lastY) <= TOL) return;
+      setNavHidden(y > lastY); // dole → skry, hore → zobraz
+      lastY = y;
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
