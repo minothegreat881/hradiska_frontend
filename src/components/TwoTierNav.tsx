@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
-import { InstallAppButton } from './InstallAppButton';
 import { AccountNavLink } from './AccountNavLink';
 
 /**
@@ -183,7 +182,7 @@ export function TwoTierNav({ items, hidden = false, onHover }: TwoTierNavProps) 
 
           {/* Appka + účet — prihlásenie alebo odkaz na profil */}
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-            <InstallAppButton />
+            {/* „Získať appku" je len na mobile (v NavBar) — na PC nemá zmysel. */}
             <AccountNavLink />
           </div>
         </div>
