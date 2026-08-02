@@ -58,7 +58,7 @@ export function UsersScreen() {
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Používatelia</h1>
           <p style={{ fontSize: 13.5, color: 'var(--ad-secondary)', margin: '6px 0 0' }}>
-            {rows.length} účtov · {rows.filter(u => u.blocked).length} zablokovaných
+            {rows.length} účtov · {rows.filter(u => u.isStaff).length} superadmin · {rows.filter(u => u.blocked).length} zablokovaných
           </p>
         </div>
         <div style={{ flex: 1 }} />
@@ -99,7 +99,9 @@ export function UsersScreen() {
                   <td><strong>{u.displayName || u.username}</strong></td>
                   <td style={{ color: 'var(--ad-secondary)' }}>{u.email}</td>
                   <td>
-                    <span className="achip achip-cat">{u.roleName || '—'}</span>
+                    {u.isStaff
+                      ? <span className="achip achip-pub" title="Plné práva v administrácii"><ShieldCheck className="w-3 h-3" /> Superadmin</span>
+                      : <span className="achip achip-cat">{u.roleName === 'Member' ? 'Člen' : (u.roleName || '—')}</span>}
                   </td>
                   <td>
                     {u.blocked
@@ -113,8 +115,13 @@ export function UsersScreen() {
                   </td>
                   <td>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-                      {u.roleName === 'Authenticated' ? (
-                        <span style={{ fontSize: 12, color: 'var(--ad-muted)' }}>—</span>
+                      {/* Superadminov sa z tejto obrazovky blokovať ani mazať nedá —
+                          ani seba, ani toho druhého. Zámerne: je to jediná cesta,
+                          ktorou by sa dal web pripraviť o všetkých správcov naraz. */}
+                      {u.isStaff ? (
+                        <span style={{ fontSize: 12, color: 'var(--ad-muted)' }}>
+                          {u.isMe ? 'váš účet' : 'chránený'}
+                        </span>
                       ) : (
                         <>
                           {u.blocked ? (

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 import { useAuth } from '../AuthContext';
+import { forgotPassword } from '../api/account';
 
 export function LoginScreen() {
   const { signIn } = useAuth();
@@ -10,6 +11,28 @@ export function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // Obnova hesla — rozbalí sa pod formulárom, neodvádza na inú stránku.
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotBusy, setForgotBusy] = useState(false);
+  const [forgotMsg, setForgotMsg] = useState('');
+  const [forgotErr, setForgotErr] = useState('');
+
+  const submitForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const addr = forgotEmail.trim();
+    if (!addr) { setForgotErr('Zadajte e-mail účtu.'); return; }
+    setForgotBusy(true); setForgotErr(''); setForgotMsg('');
+    try {
+      const res = await forgotPassword(addr);
+      setForgotMsg(res.message || 'Ak adresa patrí správcovskému účtu, poslali sme na ňu e-mail.');
+    } catch (err: any) {
+      setForgotErr(err?.message || 'Odoslanie zlyhalo. Skúste o chvíľu.');
+    } finally {
+      setForgotBusy(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +122,59 @@ export function LoginScreen() {
             {busy ? (<><Loader2 className="w-4 h-4 animate-spin" /> Prihlasujem…</>) : 'Prihlásiť sa'}
           </button>
         </form>
+
+        {!forgotOpen ? (
+          <button
+            type="button"
+            onClick={() => { setForgotOpen(true); setForgotEmail(email.trim()); }}
+            style={{
+              display: 'block', margin: '14px auto 0', background: 'none', border: 'none',
+              color: 'var(--ad-secondary)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline',
+            }}
+          >
+            Zabudli ste heslo?
+          </button>
+        ) : (
+          <form onSubmit={submitForgot} style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid var(--ad-border)' }}>
+            <label htmlFor="ad-forgot" style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6 }}>
+              E-mail účtu
+            </label>
+            <p style={{ fontSize: 12, color: 'var(--ad-muted)', margin: '0 0 8px', lineHeight: 1.5 }}>
+              Pošleme naň nové heslo. Začne platiť až po potvrdení odkazu v e-maile —
+              dovtedy funguje doterajšie.
+            </p>
+            <input
+              id="ad-forgot" type="email" className="afld" autoComplete="username"
+              value={forgotEmail} onChange={e => { setForgotEmail(e.target.value); setForgotErr(''); setForgotMsg(''); }}
+              placeholder="meno@hradiska.sk" disabled={forgotBusy || !!forgotMsg}
+              style={{ marginBottom: 10 }} autoFocus
+            />
+
+            {forgotErr && (
+              <div role="alert" style={{ color: 'var(--ad-danger)', fontSize: 13, marginBottom: 10 }}>{forgotErr}</div>
+            )}
+            {forgotMsg && (
+              <div role="status" style={{ display: 'flex', gap: 8, alignItems: 'flex-start', color: '#3f6b3a', fontSize: 13, lineHeight: 1.5, marginBottom: 10 }}>
+                <CheckCircle2 className="w-4 h-4" style={{ flexShrink: 0, marginTop: 1 }} />
+                <span>{forgotMsg}</span>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button" className="abtn" style={{ flex: 1, justifyContent: 'center' }}
+                onClick={() => { setForgotOpen(false); setForgotErr(''); setForgotMsg(''); }}
+              >
+                {forgotMsg ? 'Späť na prihlásenie' : 'Zrušiť'}
+              </button>
+              {!forgotMsg && (
+                <button type="submit" className="abtn abtn-primary" disabled={forgotBusy} style={{ flex: 1, justifyContent: 'center' }}>
+                  {forgotBusy ? <><Loader2 className="w-4 h-4 animate-spin" /> Posielam…</> : 'Poslať heslo'}
+                </button>
+              )}
+            </div>
+          </form>
+        )}
 
         <p style={{ fontSize: 12, color: 'var(--ad-muted)', textAlign: 'center', margin: '18px 0 0', lineHeight: 1.5 }}>
           Účty zakladá správca. Registrácia nie je verejná.

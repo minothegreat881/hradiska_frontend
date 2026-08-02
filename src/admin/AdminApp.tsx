@@ -13,11 +13,12 @@ import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { MediaScreen } from './screens/MediaScreen';
 import { CommentsScreen } from './screens/CommentsScreen';
 import { UsersScreen } from './screens/UsersScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
 import { StubScreen } from './screens/StubScreen';
 import { fetchNavCounts } from './api/posts';
 
 export type AdminRoute =
-  | 'articles' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'users' | 'analytics';
+  | 'articles' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'users' | 'analytics' | 'profile';
 
 // Badge sa dopĺňa dynamicky z reálnych počtov (viď `badges` v AdminShell) — žiadne statické čísla.
 const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any }[] }[] = [
@@ -47,6 +48,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
 const ROUTE_LABELS: Record<AdminRoute, string> = {
   articles: 'Články', editor: 'Editor článku', media: 'Médiá',
   categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', users: 'Používatelia', analytics: 'Analytika',
+  profile: 'Môj profil',
 };
 
 export default function AdminApp() {
@@ -168,10 +170,18 @@ function AdminShell() {
           >
             {(user?.username || 'U').charAt(0).toUpperCase()}
           </div>
-          <div style={{ minWidth: 0, flex: 1, lineHeight: 1.3 }}>
+          {/* Klik na meno otvorí vlastný profil (zmena e-mailu a hesla). */}
+          <button
+            onClick={() => setRoute('profile')}
+            title="Môj profil — e-mail a heslo"
+            style={{
+              minWidth: 0, flex: 1, lineHeight: 1.3, textAlign: 'left',
+              background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+            }}
+          >
             <div style={{ fontSize: 13, color: '#e8dcc8', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.username}</div>
-            <div style={{ fontSize: 11, color: 'var(--ad-side-label)' }}>Správca</div>
-          </div>
+            <div style={{ fontSize: 11, color: 'var(--ad-side-label)' }}>Superadmin · upraviť</div>
+          </button>
           <button
             onClick={signOut}
             title="Odhlásiť"
@@ -221,6 +231,7 @@ function AdminShell() {
           {route === 'tags' && <StubScreen title="Štítky" note="Polia: name*, slug*. Zobraziť počet použití." />}
           {route === 'comments' && <CommentsScreen />}
           {route === 'users' && <UsersScreen />}
+          {route === 'profile' && <ProfileScreen />}
         </main>
       </div>
 

@@ -22,6 +22,8 @@ interface AuthValue {
   user: AdminUser | null;
   ready: boolean;
   signIn: (identifier: string, password: string) => Promise<void>;
+  /** Nahradí uložený JWT — po zmene hesla, kde Strapi vydá nový. */
+  updateToken: (jwt: string) => void;
   signOut: () => void;
 }
 
@@ -64,8 +66,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(user);
   }, []);
 
+  // Po zmene hesla vydá Strapi nový JWT. Bez jeho uloženia by v prehliadači
+  // ostal starý — ten síce dobehne do expirácie, ale relácia by sa rozišla
+  // so skutočným stavom účtu.
+  const updateToken = useCallback((jwt: string) => {
+    localStorage.setItem(TOKEN_KEY, jwt);
+    setToken(jwt);
+  }, []);
+
   return (
-    <AuthCtx.Provider value={{ token, user, ready, signIn, signOut }}>
+    <AuthCtx.Provider value={{ token, user, ready, signIn, updateToken, signOut }}>
       {children}
     </AuthCtx.Provider>
   );
