@@ -94,8 +94,10 @@ export function LoginScreen() {
           <label htmlFor="ad-email" style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 6 }}>
             E-mail
           </label>
+          {/* `name` + `autoComplete` sú to, podľa čoho správcovia hesiel bez
+              Credential API (Firefox, Safari) rozpoznajú prihlasovací formulár. */}
           <input
-            id="ad-email" type="email" className="afld" autoComplete="username"
+            id="ad-email" name="username" type="email" className="afld" autoComplete="username"
             value={email} onChange={e => { setEmail(e.target.value); setError(''); }}
             placeholder="meno@hradiska.sk" style={{ marginBottom: 16 }}
             disabled={busy} autoFocus
@@ -105,7 +107,7 @@ export function LoginScreen() {
             Heslo
           </label>
           <input
-            id="ad-pass" type="password" className="afld" autoComplete="current-password"
+            id="ad-pass" name="password" type="password" className="afld" autoComplete="current-password"
             value={password} onChange={e => { setPassword(e.target.value); setError(''); }}
             placeholder="••••••••" style={{ marginBottom: error ? 8 : 20 }}
             disabled={busy}

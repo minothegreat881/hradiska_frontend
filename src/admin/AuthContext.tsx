@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { login as apiLogin, me as apiMe, type AdminUser } from './api/auth';
 import { setUnauthorizedHandler } from './api/client';
+import { rememberCredentials } from './lib/credentials';
 
 /**
  * Držanie prihlásenia.
@@ -64,6 +65,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(TOKEN_KEY, jwt);
     setToken(jwt);
     setUser(user);
+    // Až PO úspešnom prihlásení — nech prehliadač neponúka uložiť heslo,
+    // ktoré nesedí. Heslo si ukladá on, my sa k nemu už nedostaneme.
+    void rememberCredentials(identifier, password, user.username);
   }, []);
 
   // Po zmene hesla vydá Strapi nový JWT. Bez jeho uloženia by v prehliadači

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle2, KeyRound, Loader2, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { changeEmail, changePassword, getMe, type AccountMe } from '../api/account';
+import { rememberCredentials } from '../lib/credentials';
 
 /**
  * Vlastný účet správcu: zmena prihlasovacieho e-mailu a hesla.
@@ -55,6 +56,9 @@ export function ProfileScreen() {
     try {
       const res = await changeEmail(token, next, emailPass);
       setMe(m => (m ? { ...m, email: res.email } : m));
+      // Správca hesiel má záznam pod starou adresou — ulož ho pod novou, inak
+      // by pri ďalšom prihlásení ponúkal e-mail, ktorý už neplatí.
+      void rememberCredentials(res.email, emailPass, me?.username);
       setEmailPass('');
       setEmailMsg({ ok: true, text: `Prihlasovací e-mail zmenený na ${res.email}. Odteraz sa prihlasujete ním.` });
     } catch (err: any) {
@@ -77,8 +81,10 @@ export function ProfileScreen() {
     try {
       const { jwt } = await changePassword(token, oldPass, newPass);
       updateToken(jwt); // Strapi vydá nový token — starý by dobehol až expiráciou
+      // Prepíš uložené heslo na nové, nech správca hesiel neponúka to staré.
+      if (me?.email) void rememberCredentials(me.email, newPass, me.username);
       setOldPass(''); setNewPass(''); setNewPass2('');
-      setPassMsg({ ok: true, text: 'Heslo zmenené. Pri ďalšom prihlásení použite nové.' });
+      setPassMsg({ ok: true, text: 'Heslo zmenené. Prehliadač si aktualizuje uložené heslo, ak ho má.' });
     } catch (err: any) {
       setPassMsg({ ok: false, text: err?.message || 'Zmena hesla zlyhala.' });
     } finally {
