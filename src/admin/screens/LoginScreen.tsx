@@ -45,12 +45,14 @@ export function LoginScreen() {
     try {
       await signIn(email.trim(), password);
     } catch (err: any) {
-      // Strapi vracia pri zlých údajoch 400 s generickou hláškou — nemá zmysel
-      // ju ukazovať doslova.
+      // Zlé údaje sú 400 a Strapi k nim dáva generickú hlášku — tú netreba
+      // ukazovať doslova. VŠETKO ostatné ale áno: predtým sa sem chytalo aj
+      // 429 (prekročený limit pokusov) a zobrazovalo sa ako „nesprávne heslo",
+      // takže sa človek márne pokúšal so správnym heslom dokola.
       setError(
-        err?.status === 0
-          ? err.message
-          : 'Nesprávny e-mail alebo heslo.'
+        err?.status === 400
+          ? 'Nesprávny e-mail alebo heslo.'
+          : (err?.message || 'Prihlásenie zlyhalo.')
       );
       setBusy(false);
     }
