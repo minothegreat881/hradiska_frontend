@@ -2,16 +2,6 @@ import { useState, useEffect } from 'react';
 import { getCategories, getBlogPosts } from '../lib/strapi';
 import { NavigationItem } from '../data/navigation-structure';
 
-const STATIC_UVOD: NavigationItem = {
-  label: 'Úvod',
-  slug: '/',
-  children: [
-    { label: 'Domovská stránka', slug: '/' },
-    { label: 'O projekte', slug: '/about' },
-    { label: 'Mapa hradísk', slug: '/mapa', description: 'Interaktívna 3D mapa všetkých lokalít' },
-  ],
-};
-
 /**
  * Živá navigácia napojená na Strapi: pre každú reálnu kategóriu (blog-categories)
  * načíta jej skutočné články a skutočný počet. Nahrádza predtým ručne vypísané
@@ -21,7 +11,7 @@ const STATIC_UVOD: NavigationItem = {
  * ponuky) — ide o čestný stav, nie chybu, kým sa do nej niečo nemigruje.
  */
 export function useNavigationData() {
-  const [items, setItems] = useState<NavigationItem[]>([STATIC_UVOD]);
+  const [items, setItems] = useState<NavigationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,11 +49,12 @@ export function useNavigationData() {
         );
 
         if (!cancelled) {
-          setItems([STATIC_UVOD, ...categoryItems]);
+          setItems(categoryItems);
         }
       } catch {
-        // Strapi nedostupné — nechaj aspoň Úvod, nech je nav funkčná.
-        if (!cancelled) setItems([STATIC_UVOD]);
+        // Strapi nedostupné — navigácia ostane prázdna. Logo aj odkazy na
+        // domovskú, mapu a účet sú v lište natvrdo, takže sa dá odísť ďalej.
+        if (!cancelled) setItems([]);
       } finally {
         if (!cancelled) setLoading(false);
       }
