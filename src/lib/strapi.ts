@@ -5,6 +5,12 @@
 const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 
 // Types matching Strapi response structure
+export interface StrapiImageFormat {
+  url: string;
+  width?: number;
+  height?: number;
+}
+
 export interface StrapiImage {
   id: number;
   url: string;
@@ -13,10 +19,12 @@ export interface StrapiImage {
   width: number;
   height: number;
   formats?: {
-    thumbnail?: { url: string };
-    small?: { url: string };
-    medium?: { url: string };
-    large?: { url: string };
+    // Strapi pri každej variante vracia aj rozmery — hodia sa na aspect-ratio
+    // box (bráni poskakovaniu rozloženia) aj na výber orientácie fotky.
+    thumbnail?: StrapiImageFormat;
+    small?: StrapiImageFormat;
+    medium?: StrapiImageFormat;
+    large?: StrapiImageFormat;
   };
 }
 
@@ -318,6 +326,182 @@ export async function getKronikaIntro(): Promise<KronikaItem | null> {
     `/blog-posts?filters[slug][$eq]=${KRONIKA_INTRO_SLUG}&populate[0]=coverImage`
   );
   return response.data[0] ? toKronikaItem(response.data[0]) : null;
+}
+
+/**
+ * CELÁ kronika naraz — pre nástenku bez tlačidla „Načítať staršie".
+ *
+ * `config/api.ts` na backende má `maxLimit: 100`, takže väčšiu stránku si
+ * vypýtať nemožno; pri viac než 100 zápisoch sa zvyšok dotiahne ďalšími
+ * stránkami. Dnes je zápisov 80 = jeden dotaz (~120 kB, len obálky).
+ */
+export async function getKronikaAll(sort: 'desc' | 'asc' = 'desc'): Promise<KronikaItem[]> {
+  const PAGE = 100;
+  const first = await getKronika({ page: 1, pageSize: PAGE, sort });
+  const pageCount: number = first.pagination?.pageCount ?? 1;
+  if (pageCount <= 1) return first.items;
+
+  const rest = await Promise.all(
+    Array.from({ length: pageCount - 1 }, (_, i) =>
+      getKronika({ page: i + 2, pageSize: PAGE, sort }).then(r => r.items).catch(() => [])
+    )
+  );
+  return [first.items, ...rest].flat();
+}
+
+/**
+ * Kurátorská galéria z domovskej stránky — single-type `domovska-galeria`
+ * v Strapi. Poradie fotiek v admine = poradie dlaždíc, prvá je veľká.
+ *
+ * Vracia prázdne pole, kým správca do galérie nič nevloží (single type bez
+ * záznamu vracia `data: null`); volajúci vtedy spadne späť na automatický
+ * výber cez `getKronikaPhotos`.
+ */
+export async function getDomovskaGaleria(): Promise<StrapiImage[]> {
+  try {
+    const response = await fetchStrapi<StrapiResponse<{ fotky?: StrapiImage[] } | null>>(
+      '/domovska-galeria?populate=fotky'
+    );
+    return response.data?.fotky ?? [];
+  } catch {
+    return [];   // neexistuje / nedostupné → automatický výber
+  }
+}
+
+/** Jedna fotka zo združenia + článok, z ktorého pochádza. */
+export interface KronikaPhoto {
+  url: string;        // absolútna URL originálu
+  thumb: string;      // absolútna URL varianty na zobrazenie (medium/small)
+  width: number;
+  height: number;
+  alt: string;
+  caption: string;
+  postTitle: string;
+  postSlug: string;
+  /** id súboru v Media Library — bez neho by pod fotkou nešli komentáre ani lajky. */
+  fileId?: number;
+}
+
+/**
+ * Fotky zo života združenia — pozbierané z galérií článkov v kategórii
+ * `aktuality` (výpravy, brigády, podujatia, výskumy).
+ *
+ * Prečo len z niekoľkých článkov: galérie sú veľké (673 fotiek v 71 článkoch),
+ * celý zber by stiahol ~760 kB metadát. `posts` drží prenos rozumný a berie
+ * NAJNOVŠIE zápisy, takže sa výber obmieňa sám, ako združenie pridáva nové
+ * články — bez zásahu do kódu.
+ *
+ * Dva filtre, lebo v kategórii `aktuality` nie sú len reportáže:
+ *   1. `minGallery` — články s pár obrázkami sú oznamy (2 % z daní, stanovy,
+ *      pozvánky). Reportáž z výpravy či brigády má fotiek veľa.
+ *   2. `NON_PHOTO` — vyhodí bannery, logá a plagáty podľa názvu súboru.
+ *
+ * Ani jedno nevie posúdiť, či je fotka pekná. Kurátorská galéria („tieto fotky
+ * a v tomto poradí") potrebuje vlastné pole/kolekciu v Strapi.
+ */
+const NON_PHOTO = /banner|logo|plagat|letak|tlacivo|pozvanka|diplom|sviatky|pf_?20|mapa|map_|schema|graf/i;
+
+export async function getKronikaPhotos(options?: { posts?: number; minGallery?: number }): Promise<KronikaPhoto[]> {
+  const posts = options?.posts ?? 14;
+  const minGallery = options?.minGallery ?? 6;
+  const query = [
+    'filters[category][slug][$eq]=aktuality',
+    'sort=originalPublishedDate:desc',
+    `pagination[pageSize]=${posts}`,
+    'fields[0]=title',
+    'fields[1]=slug',
+    'populate[gallery][fields][0]=url',
+    'populate[gallery][fields][1]=formats',
+    'populate[gallery][fields][2]=alternativeText',
+    'populate[gallery][fields][3]=caption',
+  ].join('&');
+
+  const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(`/blog-posts?${query}`);
+
+  const out: KronikaPhoto[] = [];
+  const seen = new Set<string>();
+  for (const post of response.data) {
+    const gallery = post.gallery || [];
+    if (gallery.length < minGallery) continue;        // oznam, nie reportáž
+    for (const img of gallery) {
+      const fmt = img.formats?.medium || img.formats?.small;
+      if (!fmt?.url || seen.has(img.url)) continue;   // bez varianty by sa ťahal originál (aj niekoľko MB)
+      if (NON_PHOTO.test(img.url)) continue;          // banner / logo / plagát
+      seen.add(img.url);
+      out.push({
+        url: getStrapiImageUrl(img),
+        thumb: fmt.url.startsWith('http') ? fmt.url : `${STRAPI_URL}${fmt.url}`,
+        width: fmt.width ?? img.width ?? 0,
+        height: fmt.height ?? img.height ?? 0,
+        alt: img.alternativeText || '',
+        caption: img.caption || '',
+        postTitle: post.title,
+        postSlug: post.slug,
+        fileId: img.id,
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * Fotky do galérie webu — zo VŠETKÝCH článkov, nielen z kroniky.
+ *
+ * Sťahuje sa po dávkach článkov, nie fotiek: galéria je relácia článku, takže
+ * jeden dotaz vráti článok aj s celou jeho galériou. Dávka 12 článkov je
+ * ~100 fotiek (~110 kB metadát). Naraz by to bolo cez 760 kB, čo je na úvodné
+ * zobrazenie zbytočné — zvyšok si používateľ dožiada tlačidlom.
+ *
+ * `hasMore` sa vracia z počtu strán, nie z počtu fotiek: článok bez galérie
+ * neprispeje ničím, takže prázdna dávka ešte neznamená koniec.
+ */
+export async function getGalleryPhotos(options?: { page?: number; pageSize?: number }): Promise<{
+  photos: KronikaPhoto[];
+  hasMore: boolean;
+  totalPosts: number;
+}> {
+  const page = options?.page ?? 1;
+  const pageSize = options?.pageSize ?? 12;
+  const query = [
+    'sort=originalPublishedDate:desc',
+    `pagination[page]=${page}`,
+    `pagination[pageSize]=${pageSize}`,
+    'fields[0]=title',
+    'fields[1]=slug',
+    'populate[gallery][fields][0]=url',
+    'populate[gallery][fields][1]=formats',
+    'populate[gallery][fields][2]=alternativeText',
+    'populate[gallery][fields][3]=caption',
+  ].join('&');
+
+  const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(`/blog-posts?${query}`);
+
+  const photos: KronikaPhoto[] = [];
+  for (const post of response.data) {
+    for (const img of post.gallery || []) {
+      const fmt = img.formats?.medium || img.formats?.small;
+      if (!fmt?.url) continue;         // bez varianty by sa do mriežky ťahal originál (aj niekoľko MB)
+      if (NON_PHOTO.test(img.url)) continue;   // banner / logo / plagát, nie fotka
+      photos.push({
+        url: getStrapiImageUrl(img),
+        thumb: fmt.url.startsWith('http') ? fmt.url : `${STRAPI_URL}${fmt.url}`,
+        width: fmt.width ?? img.width ?? 0,
+        height: fmt.height ?? img.height ?? 0,
+        alt: img.alternativeText || '',
+        caption: img.caption || '',
+        postTitle: post.title,
+        postSlug: post.slug,
+        fileId: img.id,
+      });
+    }
+  }
+
+  const pagination = response.meta?.pagination;
+  return {
+    photos,
+    hasMore: !!pagination && pagination.page < pagination.pageCount,
+    totalPosts: pagination?.total ?? 0,
+  };
 }
 
 // ============================================================================

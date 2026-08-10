@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown, MapPin } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
+// Vizuálny experiment s lištou žije v `TwoTierNavV2.tsx` — vyskúšať ho možno
+// zmenou tohto jedného importu na `{ TwoTierNavV2 as TwoTierNav } from './TwoTierNavV2'`.
+// V produkcii beží pôvodná lišta.
 import { TwoTierNav } from './TwoTierNav';
 import { InstallAppButton } from './InstallAppButton';
 import { AccountNavLink } from './AccountNavLink';

@@ -34,7 +34,7 @@ const headerBtnStyle: React.CSSProperties = {
 // LIGHTBOX — FB-style príspevok: hlavička → popis → fotka → reakcie/komentáre.
 // Mobil = jednostĺpcová karta, desktop (≥900px) = 2 stĺpce (fotka vľavo, panel vpravo).
 // =============================================================================
-function Lightbox({
+export function Lightbox({
   images,
   index,
   onClose,

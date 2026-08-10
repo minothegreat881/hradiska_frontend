@@ -318,13 +318,35 @@ export function HeroSearch() {
       <div
         style={{
           position: 'relative',
-          background: T.panelBg,
-          border: `1px solid ${T.panelBorder}`,
-          borderRadius: 16,
-          boxShadow: '0 6px 20px rgba(125,79,29,.14)',
+          // Pri fokuse sa rozsvieti pergamen a okraj prejde do zlatej. Toto je
+          // NÁHRADA za obrys prehliadača, nie ozdoba: textové polia zobrazujú
+          // `:focus-visible` aj pri kliknutí myšou, a keďže obal má
+          // `overflow: hidden`, obrys sa orezal a kreslil rámik vnútri baru.
+          // Zrušiť ho bez náhrady sa nedá — kto ovláda web klávesnicou, musí
+          // vidieť, kde stojí. Preto svieti celý bar.
+          background: isFocused
+            ? 'linear-gradient(180deg,#fffdf8,#fbf5e8)'
+            : T.panelBg,
+          border: `1px solid ${isFocused ? T.amberLight : T.panelBorder}`,
+          borderRadius: 18,
+          boxShadow: isFocused
+            ? `0 0 0 4px ${T.focusGlow}, 0 14px 34px -16px rgba(125,79,29,.5), inset 0 1px 0 rgba(255,255,255,.9)`
+            : '0 6px 20px rgba(125,79,29,.14), inset 0 1px 0 rgba(255,255,255,.75)',
+          transition: 'border-color 220ms ease, box-shadow 220ms ease, background 220ms ease',
           overflow: 'hidden',
         }}
       >
+        {/* Zlatý vlások po hornej hrane — pri fokuse zosilnie. Čisto ozdobný. */}
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute', left: 0, right: 0, top: 0, height: 2,
+            background: `linear-gradient(90deg, transparent, ${T.amberLight}, transparent)`,
+            opacity: isFocused ? 0.85 : 0.35,
+            transition: 'opacity 220ms ease',
+            pointerEvents: 'none',
+          }}
+        />
         {/* Input riadok */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' }}>
           <motion.span
@@ -393,6 +415,34 @@ export function HeroSearch() {
             autoComplete="off"
           />
 
+          {/* Nápoveda, že sa hľadá klávesom Enter. Bar nemá odosielacie tlačidlo,
+              takže bez nej to nie je zrejmé. Ukáže sa, až keď je čo odoslať,
+              a na úzkych displejoch sa skryje (miesto tam patrí textu). */}
+          {query && (
+            <motion.span
+              aria-hidden="true"
+              className="hero-search-enter"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              style={{
+                flexShrink: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                fontFamily: 'var(--font-heading)',
+                fontSize: 10,
+                letterSpacing: '.1em',
+                color: T.countChipText,
+                background: T.chipBg,
+                border: `1px solid ${T.chipBorder}`,
+                borderRadius: 999,
+                padding: '4px 9px',
+              }}
+            >
+              ⏎ ENTER
+            </motion.span>
+          )}
+
           {query && (
             <motion.button
               type="button"
@@ -400,17 +450,29 @@ export function HeroSearch() {
               aria-label="Vymazať vyhľadávanie"
               style={{
                 flexShrink: 0,
-                border: 'none',
+                border: `1px solid ${T.chipBorder}`,
                 background: T.clearBg,
                 color: T.clearText,
-                width: 26,
-                height: 26,
+                width: 28,
+                height: 28,
                 borderRadius: 999,
                 fontSize: 13,
+                lineHeight: 1,
                 cursor: 'pointer',
+                transition: 'background 180ms ease, color 180ms ease, border-color 180ms ease',
               }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = T.amber;
+                e.currentTarget.style.color = '#fbf6ea';
+                e.currentTarget.style.borderColor = T.amber;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = T.clearBg;
+                e.currentTarget.style.color = T.clearText;
+                e.currentTarget.style.borderColor = T.chipBorder;
+              }}
             >
               ✕
             </motion.button>
@@ -433,12 +495,22 @@ export function HeroSearch() {
               right: 0,
               background: T.panelBg,
               border: `1px solid ${T.panelBorder}`,
-              borderRadius: 16,
-              boxShadow: '0 26px 64px -24px rgba(60,40,15,.55)',
+              // Zladené s barom (18), inak roletka pôsobí ako cudzí prvok pod ním.
+              borderRadius: 18,
+              boxShadow: '0 26px 64px -24px rgba(60,40,15,.55), inset 0 1px 0 rgba(255,255,255,.75)',
               overflow: 'hidden',
               zIndex: 60,
             }}
           >
+            {/* Rovnaký zlatý vlások ako na bare — spája ich do jedného celku. */}
+            <span
+              aria-hidden="true"
+              style={{
+                position: 'absolute', left: 0, right: 0, top: 0, height: 2,
+                background: `linear-gradient(90deg, transparent, ${T.amberLight}, transparent)`,
+                opacity: 0.5, pointerEvents: 'none',
+              }}
+            />
             <div
               id="search-dropdown-results"
               role="listbox"

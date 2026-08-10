@@ -1317,6 +1317,23 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 
 
 /* Hero search input – vintage placeholder + odstrániť default browser styling */
+/* Obrys prehliadača na poli hľadania zrušený — a to VEDOME, nie z nevedomosti.
+   Textové polia zobrazujú `:focus-visible` aj pri kliknutí myšou (tak to má
+   podľa normy byť), lenže obal baru má `overflow: hidden`, takže sa obrys
+   orezal a kreslil rámik vnútri. Náhrada existuje a je výraznejšia: pri fokuse
+   sa rozsvieti celý bar (zlatý okraj + žiara, viď HeroSearch.tsx). Prístupnosť
+   tým neutrpí — kto ovláda web klávesnicou, vidí, kde stojí. */
+.hero-search-input:focus,
+.hero-search-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Na úzkych displejoch má prednosť samotný text pred nápovedou „⏎ ENTER". */
+@media (max-width: 560px) {
+  .hero-search-enter { display: none !important; }
+}
+
 .hero-search-input::placeholder {
   color: #8b7355;
   opacity: 1;
@@ -1471,6 +1488,33 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
  * `lg:block` sa v tomto builde negeneruje (Tailwind ho v týchto súboroch
  * nezachytí), preto zobrazenie riešime explicitným media query na marker
  * triedach `.two-tier-nav` (desktop 2A lišta) a `.mobile-nav` (mobilná lišta). */
+/* ── Horná lišta v2 (vizuálny experiment, `TwoTierNavV2.tsx`) ───────────────
+   Cieli LEN na `.two-tier-nav-v2`, takže pôvodná lišta ostáva nedotknutá aj
+   vtedy, keď sa späť prepne import v NavBar.tsx. */
+.two-tier-nav-v2 { position: sticky; }
+/* Podčiarknutie kategórie vyrastie od stredu — pokojnejšie než presvietenie
+   celého tlačidla a lepšie ukáže, kde myš stojí. */
+.two-tier-nav-v2 .ttn2-cat { position: relative; }
+.two-tier-nav-v2 .ttn2-cat::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  bottom: 3px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #c8862f, #e9c877, #c8862f);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 220ms cubic-bezier(.22,.61,.36,1);
+  pointer-events: none;
+}
+.two-tier-nav-v2 .ttn2-cat:hover::after,
+.two-tier-nav-v2 .ttn2-cat[aria-expanded='true']::after { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) {
+  .two-tier-nav-v2 .ttn2-cat::after { transition: none; }
+}
+
 .two-tier-nav { display: none; }
 .mobile-nav { display: block; }
 @media (min-width: 1024px) {
@@ -1705,7 +1749,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   background: #fff;
   box-shadow: 0 0 0 4px rgba(200, 134, 47, 0.16);
 }
-.joinus .fld[aria-invalid='true'] { border-color: #c44561; }
+.joinus .fld[aria-invalid='true'] { border-color: #a33a24; }
 
 /* Labely */
 .joinus .lbl {
@@ -1749,6 +1793,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .joinus .ju-grid .ju-full { grid-column: 1 / -1; }
 @media (max-width: 640px) {
   .joinus .ju-grid { grid-template-columns: 1fr; }
+}
+
+/* Riadky „čo pomôže najviac" — jemné podfarbenie pri prejdení myšou, nech je
+   zjavné, že sú to samostatné položky, nie súvislý text. */
+.joinus .ju-ask { transition: background 160ms ease; border-radius: 10px; }
+.joinus .ju-ask:hover { background: rgba(200, 161, 90, 0.09); }
+@media (prefers-reduced-motion: reduce) {
+  .joinus .ju-ask { transition: none; }
 }
 
 /* ============================================================================

@@ -3,11 +3,12 @@
 import { lazy, Suspense } from 'react';
 import { motion } from 'motion/react';
 import { HeroSearch } from '../components/HeroSearch';
-import AktualityFeed from '../components/AktualityFeed';
+// Verzia 2 nástenky („Zo života združenia", návrh 3a). Pôvodný `AktualityFeed`
+// ostáva v repozitári — späť sa prepne zmenou tohto jedného importu.
+import AktualityFeed from '../components/AktualityFeedV2';
 import { JoinUs } from '../components/JoinUs';
 import { CategoryCard } from '../components/CategoryCard';
 import { hradiskaCategories } from '../data/categories';
-import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { InkEffect } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 
@@ -38,12 +39,24 @@ export function HomePage() {
       <section className="relative" style={{ zIndex: 30 }}>
         <div className="container relative pt-8 md:pt-12 pb-8 md:pb-16">
           {/* Image Container - Full image visible */}
+          {/* Hlavička webu. `width`/`height` sú tam kvôli tomu, aby si prehliadač
+              vedel miesto rezervovať ešte pred stiahnutím obrázka a stránka pod
+              ním neposkočila. `fetchPriority=high` + bez `lazy`: je to najväčší
+              prvok nad zlomom, čiže to, čo meria LCP. */}
           <div className="rounded-3xl overflow-hidden shadow-2xl bg-stone-900">
-            <ImageWithFallback
-              src="/img_header_hradiska_02.png"
-              alt="Archeologické hradisko"
-              className="w-full h-auto object-contain"
-            />
+            <picture>
+              <source srcSet="/img_header_hradiska_03.webp" type="image/webp" />
+              <img
+                src="/img_header_hradiska_03.jpg"
+                alt="Slovanské hradiská — pohľad na opevnenie a život na hradisku"
+                width={1329}
+                height={752}
+                fetchPriority="high"
+                decoding="async"
+                className="w-full h-auto object-contain"
+                style={{ display: 'block' }}
+              />
+            </picture>
           </div>
 
           {/* Search Bar Below Image – vycentrovaný v krémovom páse */}
@@ -60,8 +73,8 @@ export function HomePage() {
       </section>
 
       {/* Aktuality feed – kronika brigád, podujatí, obnov.
-          Bez vlastnej posuvnej lišty: dlaždice tečú v stránke, viac cez „Načítať staršie". */}
-      <AktualityFeed initialPageSize={6} />
+          v2: logo + pripnutý zápis, pás CELEJ kroniky s časovou osou, fotogaléria. */}
+      <AktualityFeed />
 
       {/* Interactive Map Section - Full Width */}
       <section

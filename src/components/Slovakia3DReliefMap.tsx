@@ -1195,30 +1195,6 @@ export default function Slovakia3DReliefMap() {
               ~ Hradiská Slovenska členené podľa ich funkcie ~
             </p>
           </div>
-          <div className="hidden lg:flex items-center gap-3">
-            <span
-              className="px-4 py-2 rounded-lg text-xs tracking-wider"
-              style={{
-                background: 'rgba(196, 165, 116, 0.15)',
-                border: '1px solid rgba(196, 165, 116, 0.3)',
-                color: '#c4a574',
-                fontFamily: 'Georgia, serif'
-              }}
-            >
-              ⟲ Ťahaj pre rotáciu
-            </span>
-            <span
-              className="px-4 py-2 rounded-lg text-xs tracking-wider"
-              style={{
-                background: 'rgba(196, 165, 116, 0.15)',
-                border: '1px solid rgba(196, 165, 116, 0.3)',
-                color: '#c4a574',
-                fontFamily: 'Georgia, serif'
-              }}
-            >
-              ⊕ Koliesko pre zoom
-            </span>
-          </div>
         </div>
       </div>
 

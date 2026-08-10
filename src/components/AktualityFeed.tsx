@@ -529,11 +529,15 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
             }}
           >
             <picture style={{ display: 'contents' }}>
-              <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+              {/* Priehľadné logo. Predtým tu bolo `logo_slovanske_hradiska_256`,
+                  ktoré má svetlosivý podklad bez alfy — `mix-blend-mode: multiply`
+                  sivú (na rozdiel od bielej) nezruší, len ňou stmaví pergamen,
+                  takže bolo vidno sivý štvorec obrázka. */}
+              <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
               <img
-                src="/logo_slovanske_hradiska_256.jpg"
+                src="/logo_hradiska_small.png"
                 alt=""
-                style={{ height: '58%', width: 'auto', mixBlendMode: 'multiply', opacity: 0.92 }}
+                style={{ height: '58%', width: 'auto', opacity: 0.92 }}
               />
             </picture>
           </div>
@@ -615,8 +619,9 @@ function KronikaCard({ item }: { item: KronikaItem }) {
           ) : (
             <div className="w-full h-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 50% 40%, #f5ecd8 0%, #ece0c4 55%, #ddcba4 100%)' }}>
               <picture style={{ display: 'contents' }}>
-                <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
-                <img src="/logo_slovanske_hradiska_256.jpg" alt="" style={{ height: '58%', width: 'auto', mixBlendMode: 'multiply', opacity: 0.92 }} />
+                {/* Priehľadné logo — viď poznámku pri prvom zástupnom obrázku vyššie. */}
+                <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
+                <img src="/logo_hradiska_small.png" alt="" style={{ height: '58%', width: 'auto', opacity: 0.92 }} />
               </picture>
             </div>
           )}

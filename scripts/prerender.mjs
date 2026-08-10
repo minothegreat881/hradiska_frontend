@@ -29,7 +29,9 @@ const SITE = (
 const STRAPI = (process.env.PRERENDER_STRAPI_URL || 'http://188.245.47.29').replace(/\/$/, '');
 // Základ pre OG obrázky — obálky sú relatívne /uploads/..., servujú sa cez /strapi proxy.
 const MEDIA = (process.env.MEDIA_URL || `${SITE}/strapi`).replace(/\/$/, '');
-const DEFAULT_OG = `${SITE}/img_header_hradiska_02.png`;
+// Náhľad pre články bez vlastnej obálky. Banner má pomer 1,894 — to je presne
+// formát, ktorý siete pri zdieľaní očakávajú (1200 × 630), takže sa neoreže.
+const DEFAULT_OG = `${SITE}/img_header_hradiska_03.jpg`;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dist = resolve(__dirname, '..', 'dist');

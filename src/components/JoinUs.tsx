@@ -312,33 +312,72 @@ export function JoinUs() {
             </span>
           </a>
 
-          <p
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 19,
-              lineHeight: 1.62,
-              color: 'var(--ju-body)',
-              margin: '0 0 18px',
-            }}
-          >
-            Najhodnotnejšie sú pre mňa zábery na valy, pozostatky opevnení, budov
-            a podobne — najmä pri hradiskách, na ktorých som ešte nebol a ku ktorým
-            preto nemám žiadne fotky. Veľmi zaujímavé sú aj fotky slovanských nálezov
-            v zahraničí, predovšetkým v Maďarsku a Rakúsku.
-          </p>
-          <p
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 19,
-              lineHeight: 1.62,
-              color: 'var(--ju-body)',
-              margin: 0,
-            }}
-          >
-            Ak ste boli v múzeách napríklad vo Visegráde, Novohrade, Ostrihome či
-            Zalavári a podarilo sa vám nafotiť slovanské šperky, zbrane, črepy
-            a podobne, budem vám veľmi vďačný, ak sa o tie fotky s nami podelíte.
-          </p>
+          {/* Pôvodne to boli dva súvislé odstavce. Nesú tri konkrétne prosby,
+              lenže schované vo vete — kto len prebehol očami, nevedel, čo poslať.
+              Vety sú ponechané v pôvodnom znení, len rozdelené a označené. */}
+          <div style={{ display: 'grid', gap: 2 }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.16em',
+                textTransform: 'uppercase', color: 'var(--ju-amber-deep)', marginBottom: 10,
+              }}
+            >
+              Čo pomôže najviac
+            </span>
+
+            {[
+              {
+                t: 'Valy a opevnenia',
+                d: 'Zábery na valy, pozostatky opevnení, budov a podobne — najmä pri hradiskách, na ktorých som ešte nebol a ku ktorým preto nemám žiadne fotky.',
+              },
+              {
+                t: 'Nálezy v zahraničí',
+                d: 'Slovanské nálezy v Maďarsku a Rakúsku — múzeá vo Visegráde, Novohrade, Ostrihome či Zalavári. Šperky, zbrane, črepy a podobne.',
+              },
+            ].map((it, i) => (
+              <div
+                key={it.t}
+                className="ju-ask"
+                style={{
+                  display: 'flex', gap: 14, alignItems: 'flex-start',
+                  padding: '15px 2px',
+                  borderTop: i === 0 ? '1px solid var(--ju-frame)' : 'none',
+                  borderBottom: '1px solid var(--ju-frame)',
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    flexShrink: 0, width: 26, height: 26, borderRadius: 999,
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'var(--font-heading)', fontSize: 12, fontWeight: 600,
+                    color: 'var(--ju-amber-deep)', background: 'var(--ju-callout)',
+                    border: '1px solid var(--ju-border-callout)', marginTop: 3,
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <span style={{ minWidth: 0 }}>
+                  <span
+                    style={{
+                      display: 'block', fontFamily: 'var(--font-serif)', fontSize: 18,
+                      fontWeight: 700, color: 'var(--ju-text)', marginBottom: 3,
+                    }}
+                  >
+                    {it.t}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block', fontFamily: 'var(--font-serif)', fontSize: 17,
+                      lineHeight: 1.55, color: 'var(--ju-body)',
+                    }}
+                  >
+                    {it.d}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
         </motion.div>
 
         {/* ---------- 4) CALLOUT „MÁTE DOMA NÁLEZ?" ---------- */}
@@ -350,8 +389,7 @@ export function JoinUs() {
           style={{
             background: 'var(--ju-callout)',
             border: '1px solid var(--ju-border-callout)',
-            borderLeft: '5px solid var(--ju-amber-mid)',
-            borderRadius: 14,
+            borderRadius: 18,
             padding: '26px 30px',
             marginBottom: 34,
           }}
@@ -359,14 +397,14 @@ export function JoinUs() {
           <div
             style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: 13,
-              letterSpacing: '0.08em',
+              fontSize: 12,
+              letterSpacing: '0.16em',
               textTransform: 'uppercase',
               color: 'var(--ju-amber-deep)',
               marginBottom: 12,
             }}
           >
-            ◆ Máte doma nález?
+            Máte doma nález?
           </div>
           <p
             style={{
@@ -453,8 +491,7 @@ export function JoinUs() {
                   <div className="ju-grid">
                     <div>
                       <label className="lbl" htmlFor="join-name">
-                        Vaše meno <span className="req" aria-hidden="true">✦</span>
-                      </label>
+                        Vaše meno</label>
                       <input
                         id="join-name"
                         name="name"
@@ -474,8 +511,7 @@ export function JoinUs() {
 
                     <div>
                       <label className="lbl" htmlFor="join-email">
-                        E-mail <span className="req" aria-hidden="true">✦</span>
-                      </label>
+                        E-mail</label>
                       <input
                         id="join-email"
                         name="email"
@@ -495,8 +531,7 @@ export function JoinUs() {
 
                     <div className="ju-full">
                       <label className="lbl" htmlFor="join-message">
-                        Vaša správa <span className="req" aria-hidden="true">✦</span>
-                      </label>
+                        Vaša správa</label>
                       <textarea
                         id="join-message"
                         name="message"
@@ -636,7 +671,7 @@ function ErrorMsg({ id, children }: { id?: string; children: React.ReactNode }) 
       role="alert"
       style={{
         marginTop: 6,
-        color: '#c44561',
+        color: '#a33a24',
         fontFamily: 'var(--font-serif)',
         fontSize: 15,
         fontStyle: 'italic',

@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import {
-  Crown, Landmark, Shield, Mountain, Columns, Book, Church, ScrollText, FileText, ArrowRight,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface CategoryCardProps {
   category: {
@@ -19,20 +17,7 @@ interface CategoryCardProps {
   index: number;
 }
 
-const iconMap: Record<string, any> = {
-  crown: Crown,
-  landmark: Landmark,
-  shield: Shield,
-  mountain: Mountain,
-  columns: Columns,
-  book: Book,
-  church: Church,
-  scroll: ScrollText,
-  'file-text': FileText,
-};
-
 export function CategoryCard({ category, index }: CategoryCardProps) {
-  const Icon = iconMap[category.icon] || Book;
   const [hover, setHover] = useState(false);
 
   return (
@@ -75,22 +60,6 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
               transition: 'transform 400ms ease-out',
             }}
           />
-          {/* Badge ikony kategórie – zlatá ikona na tmavohnedom kruhu */}
-          <div
-            className="absolute top-4 right-4 flex items-center justify-center rounded-full"
-            style={{
-              width: 46,
-              height: 46,
-              background: 'rgba(45,24,16,0.88)',
-              border: '1.5px solid rgba(232,197,110,0.55)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-            }}
-            aria-hidden="true"
-          >
-            <Icon className="w-5 h-5" style={{ color: '#E8C56E' }} />
-          </div>
         </div>
 
         {/* TELO KARTY */}
