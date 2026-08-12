@@ -84,6 +84,14 @@ export function LabNav() {
   // okraji. Bez toho by sa odrezaná kategória nedala od konca zoznamu rozoznať.
   const [overflow, setOverflow] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  /**
+   * Mobilná ponuka. Dva rady kategórií, ktoré sa na počítači vysúvajú myšou,
+   * sú na dotyku nedosiahnuteľné — druhý rad sa rozvinie iba pri `hover`,
+   * ktorý na telefóne neexistuje. Preto má telefón vlastnú ponuku: zoznam
+   * kategórií, ktorý sa rozbaľuje ťuknutím.
+   */
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [openMobileCat, setOpenMobileCat] = useState<string | null>(null);
 
   useEffect(() => {
     if (open === null) return;
@@ -111,6 +119,17 @@ export function LabNav() {
     window.addEventListener('resize', check);
     return () => { el.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
   }, [items]);
+
+  /* Kým je ponuka otvorená, stránka pod ňou sa nesmie posúvať — inak sa pri
+     dlhom zozname skroluje pozadie a ponuka ostane visieť. */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('keydown', onEsc);
+    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onEsc); };
+  }, [menuOpen]);
 
   const cats = items.filter(i => i.slug !== '/' && !EXCLUDE_SLUGS.has(catSlug(i)));
   const openCat = open ? cats.find(c => c.label === open.label) ?? null : null;
@@ -165,8 +184,68 @@ export function LabNav() {
           <a href="/galeria" className="lnav-link">Galéria</a>
           <a href="/aktuality" className="lnav-link">Aktuality</a>
           <AccountNavLink />
+          {/* Ponuka pre dotyk. Cieľ má 44 × 44 px — menšie sa palcom trafí ťažko. */}
+          <button
+            type="button"
+            className="lnav-burger"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? 'Zavrieť ponuku' : 'Otvoriť ponuku'}
+            onClick={() => setMenuOpen(v => !v)}
+          >
+            <span className="lnav-burger-i" data-open={menuOpen ? 'true' : undefined} aria-hidden="true" />
+          </button>
         </div>
       </div>
+
+      {/* ── Mobilná ponuka ──────────────────────────────────────────────── */}
+      {menuOpen && (
+        <div className="lnav-mobile" role="dialog" aria-label="Ponuka">
+          {rows.map(row => (
+            <div className="lnav-m-group" key={row.label}>
+              <span className="lnav-m-label">{row.label}</span>
+              {row.items.map(cat => {
+                const isOpen = openMobileCat === cat.label;
+                const children = cat.children ?? [];
+                return (
+                  <div className="lnav-m-cat" key={cat.label}>
+                    <button
+                      type="button"
+                      className="lnav-m-btn"
+                      data-open={isOpen ? 'true' : undefined}
+                      aria-expanded={isOpen}
+                      onClick={() => setOpenMobileCat(prev => (prev === cat.label ? null : cat.label))}
+                    >
+                      <span>{cat.label}</span>
+                      {typeof cat.count === 'number' && cat.count > 0 && <span className="lnav-m-count">{cat.count}</span>}
+                      <span className="lnav-m-chev" aria-hidden="true">{isOpen ? '–' : '+'}</span>
+                    </button>
+                    {isOpen && (
+                      <div className="lnav-m-list">
+                        {children.length > 0
+                          ? children.map(ch => (
+                              <a key={(ch.slug ?? '') + ch.label} href={ch.slug ?? '#'} onClick={() => setMenuOpen(false)}>
+                                {ch.label}
+                              </a>
+                            ))
+                          : <span className="lnav-m-empty">{loading ? 'Načítavam články…' : 'Zatiaľ bez článkov.'}</span>}
+                        {cat.slug && (
+                          <a className="lnav-m-all" href={cat.slug} onClick={() => setMenuOpen(false)}>
+                            Zobraziť všetky{typeof cat.count === 'number' && cat.count > 0 ? ` (${cat.count})` : ''} <span aria-hidden="true">→</span>
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          <div className="lnav-m-group lnav-m-service">
+            <a href="/galeria" onClick={() => setMenuOpen(false)}>Galéria</a>
+            <a href="/aktuality" onClick={() => setMenuOpen(false)}>Aktuality</a>
+          </div>
+        </div>
+      )}
 
       {/* Roletka mimo radov — viď poznámka pri `open` vyššie. */}
       {openCat && (

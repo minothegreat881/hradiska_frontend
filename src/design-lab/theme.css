@@ -2034,3 +2034,172 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   border-color: var(--l-second) !important;
   color: var(--l-card) !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TELEFÓN
+   Šat vznikal na širokom okne, tak sú predošlé pravidlá písané zhora nadol.
+   Tento oddiel to dorovnáva: prechádza celý návrh — lištu, domovskú aj
+   stránku článku — a rieši to, čo na dotyku a na úzkom okne nefunguje.
+   Vzhľad na počítači sa nemení ani o pixel; všetko je za medzidotazmi.
+
+   PRAVIDLÁ, KTORÉ SOM DRŽAL
+     • cieľ pre palec má aspoň 44 × 44 px,
+     • pole formulára má aspoň 16 px — pri menšom si iOS pri ťuknutí
+       priblíži celú stránku a už sa neodpriblíži,
+     • nič nesmie pretiecť do strany; čo je široké, to sa posúva vo vlastnom
+       páse (rad kroniky), nie celou stránkou,
+     • text na fotke len tam, kde je fotka dosť veľká — inak text pod ňu,
+     • spodná výplň počíta s `env(safe-area-inset-bottom)` kvôli gestovej
+       lište na iPhone.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Lišta ─────────────────────────────────────────────────────────────────
+   Dva rady kategórií sa na počítači vysúvajú myšou. Na dotyku `hover`
+   neexistuje, takže druhý rad (pramene, texty, modely, dianie) bol
+   NEDOSIAHNUTEĽNÝ. Telefón preto dostáva vlastnú ponuku. */
+.lnav-burger { display: none; }
+.lnav-mobile { display: none; }
+
+@media (max-width: 900px) {
+  .lnav-row { padding: 9px 14px; gap: 10px; }
+  .lnav-cats { display: none; }
+  .lnav-right .lnav-link { display: none; }
+  .lnav-brand span { font-size: 16px; }
+  .lnav-mark { width: 38px; height: 38px; }
+
+  .lnav-burger {
+    display: grid; place-items: center;
+    width: 44px; height: 44px; margin-left: 2px;
+    background: none; border: 1px solid var(--l-line); border-radius: 10px;
+    cursor: pointer;
+  }
+  .lnav-burger:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; }
+  .lnav-burger-i { position: relative; width: 18px; height: 2px; background: var(--l-ink); border-radius: 2px; }
+  .lnav-burger-i::before, .lnav-burger-i::after {
+    content: ''; position: absolute; left: 0; width: 18px; height: 2px;
+    background: var(--l-ink); border-radius: 2px;
+    transition: transform .18s ease, top .18s ease;
+  }
+  .lnav-burger-i::before { top: -6px; }
+  .lnav-burger-i::after { top: 6px; }
+  /* Otvorená ponuka: z troch čiar sa stane krížik — jedno tlačidlo, dva stavy. */
+  .lnav-burger-i[data-open] { background: transparent; }
+  .lnav-burger-i[data-open]::before { top: 0; transform: rotate(45deg); }
+  .lnav-burger-i[data-open]::after { top: 0; transform: rotate(-45deg); }
+
+  .lnav-mobile {
+    display: block;
+    max-height: calc(100dvh - 60px); overflow-y: auto;
+    background: var(--l-paper); border-top: 1px solid var(--l-line);
+    padding: 4px 14px calc(22px + env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
+  }
+  .lnav-m-label {
+    display: block; padding: 16px 0 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--l-muted-2);
+  }
+  .lnav-m-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    min-height: 48px; padding: 8px 2px;
+    background: none; border: 0; border-bottom: 1px solid var(--l-line);
+    font-family: inherit; font-size: 16px; color: var(--l-ink);
+    text-align: left; cursor: pointer;
+  }
+  .lnav-m-btn > span:first-child { flex: 1; min-width: 0; }
+  .lnav-m-btn[data-open] { color: var(--l-second-deep); border-bottom-color: transparent; }
+  .lnav-m-count { font-size: 12.5px; color: var(--l-muted); font-variant-numeric: tabular-nums; }
+  .lnav-m-chev { width: 22px; text-align: center; font-size: 17px; color: var(--l-second); }
+  .lnav-m-list { display: flex; flex-direction: column; padding: 2px 0 10px 12px; border-bottom: 1px solid var(--l-line); }
+  .lnav-m-list a {
+    min-height: 44px; display: flex; align-items: center;
+    font-size: 15px; color: var(--l-body); text-decoration: none;
+  }
+  .lnav-m-list a + a { border-top: 1px solid var(--l-line); }
+  .lnav-m-all { color: var(--l-second-deep) !important; font-weight: 600; }
+  .lnav-m-empty { padding: 12px 0; font-size: 14px; color: var(--l-muted); }
+  .lnav-m-service { display: flex; gap: 20px; padding-top: 10px; }
+  .lnav-m-service a { min-height: 44px; display: flex; align-items: center; font-size: 16px; color: var(--l-ink); text-decoration: none; }
+}
+
+/* ── Domovská: pás kroniky ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .lakv { padding: 44px 0 52px !important; }
+  .lakv-pinned { padding: 20px 18px !important; }
+  /* Nadpis pripnutého zápisu má 36 px zapísaných v komponente — na 360 px
+     širokej obrazovke sa z neho stane päť riadkov. */
+  .lakv-pinned > span:first-child { font-size: 25px !important; margin-bottom: 10px !important; }
+  .lakv-pinned > span:nth-child(2) { font-size: 16px !important; }
+  /* Karta zápisu na šírku obrazovky mínus náhľad ďalšej — tá vykúkajúca
+     hrana je jediné, čo prstu povie, že sa dá posúvať. */
+  .lakv-card { flex: 0 0 78vw !important; max-width: 320px; height: 268px !important; }
+  .lakv-step { width: 44px; height: 44px; }
+  .lakv-striphead { gap: 10px; }
+  .lakv-stats { padding: 14px 4px 12px; }
+  .lakv-stat-n { font-size: 22px; }
+  .lakv-stat-l { font-size: 12px; }
+  .lakv-gal { grid-auto-rows: 116px; gap: 10px; }
+  .lakv-os { gap: 12px; margin-bottom: 28px; }
+  .lakv-year { font-size: 12px; }
+  /* Ukazovateľ osi je ťahací cieľ — na dotyk potrebuje väčšiu plochu. */
+  .lakv-track { height: 34px; }
+  .lakv-knob { width: 22px; height: 22px; }
+  .lakv-knob-year { opacity: 1; }
+}
+
+/* ── Domovská: kategórie a výzva ───────────────────────────────────────── */
+@media (max-width: 640px) {
+  .lcat-wrap { padding: 44px 16px 52px; }
+  .lcat-lead { min-height: 300px; }
+  .lcat-lead-body { padding: 18px; }
+  .lcat-body { padding: 16px 16px 18px; }
+  .ljoin-wrap { padding: 46px 16px 54px; }
+  .ljoin-card { padding: 20px 18px; }
+  .ljoin-mail { padding: 16px 0; }
+  .ljoin-mail-go { width: 40px; height: 40px; }
+  .ljoin-send { min-height: 48px; }
+  .lfoot-wrap { padding: 40px 16px 0; }
+}
+
+/* ── Stránka článku: hlavička ──────────────────────────────────────────────
+   Na počítači je text NA fotke a je to tam dobre. Na telefóne je fotka nízka
+   a text dlhý — nadpis so štyrmi riadkami cez ňu prekryje celý záber a spodné
+   riadky sa strácajú v tmavom závoji. Preto fotka hore, text pod ňou na
+   papieri: presne to isté rozhodnutie, aké padlo pre produkčnú hlavičku.
+   Perex sa vynecháva — na telefóne je to odsek navyše pred článkom, ktorý
+   sa aj tak o pár riadkov nižšie zopakuje inými slovami. */
+@media (max-width: 700px) {
+  .lart-hero { display: block; height: auto; background: var(--l-paper); }
+  .lart-hero-img {
+    position: static; display: block; width: 100%; height: auto;
+    aspect-ratio: 4 / 3; max-height: 52vh; object-fit: cover;
+  }
+  .lart-hero-veil { display: none; }
+  .lart-hero-in { padding: 16px 16px 2px; }
+  .lart-crumbs { color: var(--l-muted); }
+  .lart-crumbs a:hover { color: var(--l-ink); }
+  .lart .lart-title { color: var(--l-ink); font-size: clamp(23px, 6.6vw, 34px); margin-top: 10px; }
+  .lart-excerpt { display: none; }
+  .lart-meta { margin-top: 12px; font-size: 12.5px; color: var(--l-muted); }
+}
+
+/* ── Stránka článku: telo, pobočný stĺpec, diskusia ────────────────────── */
+@media (max-width: 640px) {
+  .lart-topshare { margin-bottom: 14px; }
+  /* Ikony zdieľania sú odkazy — palec potrebuje 44 px, nie 32. */
+  .lart-topshare a, .lart .article-body-wrapper a[aria-label] { min-width: 44px; min-height: 44px; }
+  .lart-side { padding: 20px 16px !important; }
+  .lart-more { padding: 48px 0 56px; }
+  .lart-more-s { margin-bottom: 22px; }
+  /* Pole pod 16 px = iOS pri ťuknutí priblíži stránku a späť sa nevráti. */
+  .lart input, .lart textarea { font-size: 16px !important; }
+  .lart button { min-height: 44px; }
+  /* Odsadenie komentárov v odpovediach zjedá na úzkom okne šírku textu. */
+  .lart-comments [style*='margin-left: 32px'] { margin-left: 14px !important; }
+}
+
+/* Fotogaléria článku: na telefóne jeden stĺpec (murovaná mriežka v jednom
+   stĺpci = fotky pod sebou v plnej šírke, nič sa neoreže). */
+@media (max-width: 560px) {
+  .lart [style*='minmax(240px, 1fr)'] { columns: 1; }
+}
