@@ -2354,8 +2354,11 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-pin-wrap { transform: translate(-50%, -50%); display: flex; align-items: center; gap: 8px; }
 .lmap-pin {
   position: relative; width: 30px; height: 30px; flex: none; border-radius: 50%;
-  display: grid; place-items: center; cursor: pointer; pointer-events: auto;
-  color: #2A251F;
+  display: grid; place-items: center; color: #2A251F;
+  /* Bod myš NEZACHYTÁVA — inak by mapa nedostala stlačenie, ktoré na ňom
+     začalo, a ťahanie by neposunulo mapu. Kto je pod kurzorom, sa dopočíta
+     z polohy; klávesnici tlačidlo ostáva (tabulátor + Enter fungujú). */
+  pointer-events: none;
   background: linear-gradient(155deg, rgba(255,255,255,.55), rgba(255,255,255,.12) 45%, rgba(255,255,255,.28));
   -webkit-backdrop-filter: blur(6px) saturate(1.3); backdrop-filter: blur(6px) saturate(1.3);
   border: 1px solid rgba(255,255,255,.75);
@@ -2363,19 +2366,18 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
               0 4px 12px rgba(20,18,15,.25), 0 1px 2px rgba(20,18,15,.15);
   transition: transform .18s ease, background .18s ease, color .18s ease;
 }
-.lmap-pin:hover { transform: scale(1.14) rotate(-4deg); }
 .lmap-pin:focus-visible { outline: 2px solid var(--l-second); outline-offset: 3px; }
 /* Vybrany bod. Handoff ho preklapal do tmaveho skla — na atramentovej mape,
    kde su vsetky body rovnake, sa ale tmavy od svetleho na prvy pohlad nelisi.
    Berie preto pecatnu cervenu zo satu: klik je vidno okamzite. */
-.lmap-pin.is-selected {
+.lmap-pin.is-hot {
   background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
   color: var(--l-card); border-color: rgba(255,255,255,.6);
   box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 6px 16px rgba(20,18,15,.4);
   transform: scale(1.08);
 }
-.lmap-pin.is-selected:hover { transform: scale(1.14) rotate(-4deg); }
-.lmap-pin.is-selected .lmap-pin-spec { opacity: .5; }
+
+
 /* Odlesk — bez neho je z „liquid glass" len sivý krúžok. */
 .lmap-pin-spec {
   position: absolute; top: 3px; left: 5px; width: 12px; height: 6px; border-radius: 50%;
@@ -2396,11 +2398,11 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-cluster {
   transform: translate(-50%, -50%);
   width: calc(var(--core) + 26px); height: calc(var(--core) + 26px);
-  background: none; border: 0; padding: 0; cursor: zoom-in; pointer-events: auto;
+  background: none; border: 0; padding: 0; pointer-events: none;
   transition: transform .18s ease;
 }
-.lmap-cluster:hover { transform: translate(-50%, -50%) scale(1.08) rotate(6deg); }
-.lmap-cluster:active { transform: translate(-50%, -50%) scale(1.02) rotate(3deg); }
+.lmap-cluster.is-hot { transform: translate(-50%, -50%) scale(1.08) rotate(6deg); }
+
 .lmap-cluster:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; border-radius: 50%; }
 .lmap-cluster-halo {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -2429,6 +2431,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 /* ── Karta lokality ────────────────────────────────────────────────────── */
 .lmap-card {
+  pointer-events: auto;
   position: absolute; bottom: 40px; left: 15px; transform: translateX(-50%);
   width: 260px; z-index: 40; pointer-events: auto; cursor: default;
   filter: drop-shadow(0 18px 30px rgba(20,18,15,.28));
@@ -2535,8 +2538,8 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 @media (prefers-reduced-motion: reduce) {
   .lmap-pin, .lmap-cluster { transition: none; }
-  .lmap-pin:hover { transform: none; }
-  .lmap-cluster:hover { transform: translate(-50%, -50%); }
+  .lmap-pin.is-hot { transform: none; }
+  .lmap-cluster.is-hot { transform: translate(-50%, -50%); }
 }
 
 /* ── Bod: farba už pri nabehnutí, nie až po kliknutí ───────────────────────
@@ -2544,14 +2547,14 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    v jednom atramente sa ale nedá odhadnúť, čo je pod kurzorom — preto
    pečatná červená naskočí hneď, ako sa myš zastaví pri bode, a klik ju len
    udrží. (Na dotyku `hover` neexistuje, tam ostáva klik.) */
-.lmap-pin:hover {
+.lmap-pin.is-hot {
   transform: scale(1.14) rotate(-4deg);
   background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
   color: var(--l-card);
   border-color: rgba(255, 255, 255, .6);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, .35), 0 6px 16px rgba(20, 18, 15, .35);
 }
-.lmap-pin:hover .lmap-pin-spec { opacity: .5; }
+.lmap-pin.is-hot .lmap-pin-spec { opacity: .5; }
 
 /* Fotka v karte je <img>, nie pozadie — pozadie sa dalo prebiť skratkou
    `background` v kaskáde a chybu načítania nebolo ako zachytiť. */
@@ -2620,13 +2623,13 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 /* ── Zhluk: tá istá reč ako bod ────────────────────────────────────────────
    Bod pri nabehnutí sčervenie, zhluk nie — a pritom je to to isté gesto.
    Teraz sčervenie jadro aj prerušovaný prstenec okolo neho. */
-.lmap-cluster:hover .lmap-cluster-core {
+.lmap-cluster.is-hot .lmap-cluster-core {
   background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
   color: var(--l-card);
   border-color: rgba(255, 255, 255, .6);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, .35), 0 6px 16px rgba(20, 18, 15, .35);
 }
-.lmap-cluster:hover .lmap-cluster-halo { border-color: var(--l-second); }
+.lmap-cluster.is-hot .lmap-cluster-halo { border-color: var(--l-second); }
 .lmap-cluster-core, .lmap-cluster-halo { transition: background .18s ease, color .18s ease, border-color .18s ease; }
 
 /* ── Legenda: čo je pod kurzorom ──────────────────────────────────────────

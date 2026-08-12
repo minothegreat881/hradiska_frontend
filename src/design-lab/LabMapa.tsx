@@ -77,6 +77,11 @@ type Node =
   | { kind: 'one'; x: number; y: number; loc: Loc }
   | { kind: 'many'; x: number; y: number; members: Loc[] };
 
+/** Kľúč uzla — bod má id článku, zhluk zoznam svojich členov. */
+const keyOf = (n: Node) => n.kind === 'one' ? n.loc.id : 'c-' + n.members.map(m => m.id).join('|');
+/** Dosah trafenia v bodoch: bod má 30 px, jadro zhluku rastie s počtom. */
+const hitR = (n: Node) => n.kind === 'one' ? 19 : (30 + Math.min(n.members.length, 14) * 1.1) / 2 + 6;
+
 const Icon = ({ path, size = 13, w = 2.2 }: { path: string; size?: number; w?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
        strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -99,6 +104,14 @@ export function LabMapa() {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const wheelCleanup = useRef<(() => void) | null>(null);
+  /* Uzly a stav tahania pre trafenie bodu — handlery na plátne su zavesene
+     raz a citaju z refov, nie zo zavretej premennej. */
+  const nodesRef = useRef<Node[]>([]);
+  const draggingRef = useRef(false);
+  const moveCleanup = useRef<(() => void) | null>(null);
+  const openHoverRef = useRef<((id: string, cat: string) => void) | null>(null);
+  const closeHoverRef = useRef<(() => void) | null>(null);
+  const clusterRef = useRef<((n: Extract<Node, { kind: 'many' }>) => void) | null>(null);
   const [ready, setReady] = useState(false);
   const [zoom, setZoom] = useState(MIN_Z);
   const [locs, setLocs] = useState<Loc[]>([]);
@@ -107,6 +120,9 @@ export function LabMapa() {
   /** Rozbalený vejár: body na (takmer) rovnakom mieste, ktoré zoom neoddelí. */
   const [spider, setSpider] = useState<{ ids: string[]; x: number; y: number } | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
+  /** Uzol pod kurzorom (id bodu alebo kľúč zhluku) — nahrádza `:hover`,
+      lebo body samy myš už nezachytávajú. */
+  const [hotKey, setHotKey] = useState<string | null>(null);
   /** Kategória bodu pod kurzorom — zvýrazní sa v legende, nech je jasné,
       čo je čo. Ikona sama o sebe to na malej ploche nepovie. */
   const [hoverCat, setHoverCat] = useState<string | null>(null);
@@ -172,6 +188,11 @@ export function LabMapa() {
       maxZoom: MAX_Z,
       maxBounds: ROAM,
       attributionControl: false,
+      /* Bez `alpha` vycisti MapLibre platno do CIERNEJ — odtial cierne okraje
+         okolo krajiny. S nim je platno priehladne a presvita cezen papier,
+         bodkova mriezka aj vodoznak „SK", presne ako to chce handoff (a ako
+         to potrebuju priehladne dlazdice). */
+      canvasContextAttributes: { alpha: true, antialias: true },
       dragRotate: false,
       pitchWithRotate: false,
       touchZoomRotate: true,
@@ -200,13 +221,54 @@ export function LabMapa() {
     el.addEventListener('wheel', onWheel, { passive: false });
     wheelCleanup.current = () => el.removeEventListener('wheel', onWheel);
 
-    /* Klik do mapy mimo bodu zavrie kartu aj vejar — krizik uz nie je jedina
-       cesta von. (Klik na bod sem nepride: body su vo vrstve nad platnom.) */
-    map.on('click', () => { setSelected(null); setSpider(null); setHoverId(null); });
+    /* KTO JE POD KURZOROM sa dopočíta z polôh uzlov, body samy myš
+       nezachytávajú. Dovtedy platilo opačné: bod bol tlačidlo, takže mapa
+       o stlačení nad ním nevedela a ťahanie začaté na bode neposunulo mapu.
+       Pri stovke bodov v priblíženom pohľade sa tak mapa nedala posúvať
+       skoro nikde — a presne to bolo na manévrovaní zlé. */
+    const at = (cx: number, cy: number): Node | null => {
+      const r = el.getBoundingClientRect();
+      const x = cx - r.left, y = cy - r.top;
+      let best: Node | null = null, bestD = Infinity;
+      for (const n of nodesRef.current) {
+        const d = Math.hypot(n.x - x, n.y - y);
+        if (d < hitR(n) && d < bestD) { best = n; bestD = d; }
+      }
+      return best;
+    };
+
+    const onMove = (e: MouseEvent) => {
+      if (draggingRef.current) return;
+      const n = at(e.clientX, e.clientY);
+      if (!n) { setHotKey(null); closeHoverRef.current?.(); el.style.cursor = ''; return; }
+      el.style.cursor = n.kind === 'one' ? 'pointer' : 'zoom-in';
+      setHotKey(keyOf(n));
+      if (n.kind === 'one') openHoverRef.current?.(n.loc.id, n.loc.cat);
+      else closeHoverRef.current?.();
+    };
+    const onLeave = () => { setHotKey(null); closeHoverRef.current?.(); };
+    el.addEventListener('mousemove', onMove);
+    el.addEventListener('mouseleave', onLeave);
+    moveCleanup.current = () => {
+      el.removeEventListener('mousemove', onMove);
+      el.removeEventListener('mouseleave', onLeave);
+    };
+
+    map.on('dragstart', () => { draggingRef.current = true; });
+    map.on('dragend', () => { draggingRef.current = false; });
+
+    /* Klik: bod otvorí kartu (a na dotyku je to jediná cesta), zhluk priblíži,
+       prázdna mapa zavrie. */
+    map.on('click', (ev) => {
+      const n = at(ev.originalEvent.clientX, ev.originalEvent.clientY);
+      if (!n) { setSelected(null); setSpider(null); setHoverId(null); return; }
+      if (n.kind === 'one') setSelected(prev => (prev === n.loc.id ? null : n.loc.id));
+      else clusterRef.current?.(n);
+    });
 
     map.on('load', () => { setReady(true); });
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
@@ -399,11 +461,19 @@ export function LabMapa() {
   };
   useEffect(() => () => { if (hoverTimer.current) window.clearTimeout(hoverTimer.current); }, []);
 
+  /* Handlery na plátne su zavesene raz pri vzniku mapy, tak citaju funkcie
+     cez refy — inak by drzali prvu verziu so starymi datami. */
+  useEffect(() => { nodesRef.current = nodes; }, [nodes]);
+  useEffect(() => { openHoverRef.current = openHover; closeHoverRef.current = closeHoverSoon; });
+  useEffect(() => { clusterRef.current = openCluster; });
+
   const showPills = zoom >= PILL_ZOOM;
   /* Kliknutý bod má prednosť pred tým pod kurzorom — inak by zvýraznenie
      odskočilo hneď, ako sa myš pohne preč. */
   const activeCat = hoverCat ?? (selected ? locs.find(l => l.id === selected)?.cat ?? null : null);
   const all = [...nodes, ...spiderNodes];
+  /* Body rozbaleneho vejara sa daju trafit rovnako ako ostatne. */
+  useEffect(() => { nodesRef.current = [...nodes, ...spiderNodes]; }, [nodes, spiderNodes]);
 
   return (
     <section className="lmap">
@@ -481,7 +551,7 @@ export function LabMapa() {
                  style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)` }}>
             <button
               type="button"
-              className="lmap-cluster"
+              className={hotKey === 'c-' + n.members.map(m => m.id).join('|') ? 'lmap-cluster is-hot' : 'lmap-cluster'}
               style={{ ['--core' as any]: `${30 + Math.min(n.members.length, 14) * 1.1}px` }}
               onClick={() => openCluster(n)}
               aria-label={`Zhluk ${n.members.length} lokalít — priblížiť`}
@@ -504,7 +574,7 @@ export function LabMapa() {
             <div className="lmap-pin-wrap">
               <button
                 type="button"
-                className={(selected === n.loc.id || hoverId === n.loc.id) ? 'lmap-pin is-selected' : 'lmap-pin'}
+                className={(selected === n.loc.id || hoverId === n.loc.id || hotKey === n.loc.id) ? 'lmap-pin is-hot' : 'lmap-pin'}
                 /* Klik ostáva kvôli dotyku — na telefóne `hover` neexistuje. */
                 onClick={() => setSelected(s => (s === n.loc.id ? null : n.loc.id))}
                 onMouseEnter={() => openHover(n.loc.id, n.loc.cat)}
