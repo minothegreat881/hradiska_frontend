@@ -32,24 +32,25 @@ import './theme.css';
    redakčný rozvrh) — líši sa výhradne farebná skladba. */
 const THEMES = [
   { id: 'povodna', label: 'Pôvodná', note: 'Cinzel · pergamen · zlato — dnešný stav' },
-  { id: 'uhlie', label: 'Uhlie', note: 'neutrálny papier · antracit · medená iskra — zvolený štýl' },
+  { id: 'uhlie', label: 'Uhlie', note: 'neutrálny papier · antracit · medená iskra' },
   /* Nové kombinácie. Iskra je v každej teplá (pravidlo šatu), mení sa podklad
      a to, o akú dvojicu ide — viď poznámky pri paletách v `theme.css`. */
   { id: 'patina', label: 'Patina', note: 'zelenkastý papier · zelenočierna · bronz — bronz a patina na ňom' },
   { id: 'bridlica', label: 'Bridlica', note: 'bridlicová šeď · modročierna · med — kameň a teplá iskra oproti sebe' },
   { id: 'mach', label: 'Mach', note: 'olivová · machová čierň · hrdza — zarastený val a hrdzavé železo' },
-  { id: 'pecat', label: 'Pečať', note: 'pieskovec · atramentová čierň · pečatná červená — pergamen, atrament, vosk' },
+  { id: 'pecat', label: 'Pečať', note: 'pieskovec · atramentová čierň · pečatná červená — ZVOLENÝ ŠTÝL' },
   { id: 'hlina', label: 'Hlina', note: 'krém · sýta hrdzavá · tmavohnedá' },
   { id: 'okra', label: 'Okra', note: 'teplá kosť · volová krv · horčicová' },
   { id: 'terakota', label: 'Terakota', note: 'kostený papier · pálená hlina · okrová — najtichšia' },
 ];
 
 export default function DesignLab() {
+  // Bez `?t=` sa otvára zvolený šat, nie prvý pokus v poradí.
   const initial = typeof window !== 'undefined'
-    ? (new URLSearchParams(window.location.search).get('t') || 'uhlie')
-    : 'uhlie';
+    ? (new URLSearchParams(window.location.search).get('t') || 'pecat')
+    : 'pecat';
   const [theme, setTheme] = useState(initial);
-  const current = THEMES.find(t => t.id === theme) ?? THEMES[1];
+  const current = THEMES.find(t => t.id === theme) ?? THEMES[0];
 
   /* Laboratórium má dve plochy: domovskú (`/design`) a stránku článku
      (`/design/blog/<slug>`). Cesta sa číta raz pri otvorení — prepínač tém
