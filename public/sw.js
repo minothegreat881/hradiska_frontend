@@ -7,7 +7,10 @@
  *   - Vite dev moduly/HMR, cross-origin a API: NEZASAHUJEME (pass-through)
  * Verziu CACHE zvýš pri zmene shellu, nech sa starý cache vyčistí.
  */
-const CACHE = 'hradiska-v4';
+/* v5: zmena farby lišty (`theme-color`) a manifestu. Zvýšenie verzie zmaže
+   na telefónoch celý starý cache — inak by si appka ešte dlho niesla starý
+   shell aj s hnedou lištou. */
+const CACHE = 'hradiska-v5';
 const PRECACHE = [
   '/',
   '/offline.html',
