@@ -939,7 +939,7 @@ body[data-lab-theme='pecat'] {
 .lakv-gal { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 158px; gap: 14px; }
 .lakv-place {
   position: absolute; left: 14px; right: 14px; bottom: 12px; display: block; text-align: left;
-  font-family: ui-monospace, monospace; font-size: 11px; color: var(--hr-on-photo-2);
+  font-family: var(--mono); font-size: 11px; color: var(--hr-on-photo-2);
   background: rgba(18, 16, 14, .58); border-radius: 8px; padding: 4px 10px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
@@ -2222,9 +2222,48 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   display: flex;
   height: min(86vh, 940px);
   background: var(--l-dark);
-  font-family: 'Inter', ui-sans-serif, sans-serif;
+  font-family: 'Archivo', 'Inter', ui-sans-serif, sans-serif;
+  font-stretch: 100%;
   overflow: hidden;
 }
+
+/* ── Písmo mapy (handoff „Terénny atlas") ─────────────────────────────────
+   ARCHIVO je variabilné a má OKREM váhy aj šírkovú os (62–125 %), takže
+   „Archivo Expanded" z handoffu je ten istý súbor s `font-stretch`, nie
+   druhá rodina — dva súbory namiesto piatich.
+   IBM PLEX MONO nesie technické popisky: súradnice, počty, zoom.
+   Self-hostované, žiadne CDN (rovnako ako Inter a Fraunces).
+   Platí LEN pre mapu; zvyšok šatu ostáva na Fraunces + Inter.
+   ─────────────────────────────────────────────────────────────────────── */
+@font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400 700; font-stretch: 62% 125%; font-display: swap;
+  src: url('/fonts/archivo-latin-400-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400 700; font-stretch: 62% 125%; font-display: swap;
+  src: url('/fonts/archivo-latin-ext-400-700.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-ext-400.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-ext-500.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+
+.lmap { --mono: 'IBM Plex Mono', ui-monospace, monospace; }
+/* Displej: rozšírený rez, ako to chce handoff. */
+.lmap .lmap-title, .lmap .lmap-sub, .lmap .lmap-count, .lmap .lmap-watermark {
+  font-family: 'Archivo', ui-sans-serif, sans-serif !important;
+  font-stretch: 112%;
+}
+.lmap .lmap-title { font-weight: 700; letter-spacing: -.015em; }
+.lmap .lmap-sub { font-weight: 500; letter-spacing: .02em; }
+.lmap .lmap-count { font-weight: 700; }
+.lmap .lmap-watermark { font-weight: 700; }
 
 /* ── Ľavý panel ────────────────────────────────────────────────────────── */
 .lmap-side {
@@ -2239,7 +2278,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-head { display: flex; flex-direction: column; gap: 18px; }
 .lmap-eyebrow {
   display: flex; align-items: center; gap: 12px;
-  font-family: ui-monospace, monospace; font-size: 11.5px;
+  font-family: var(--mono); font-size: 11.5px;
   letter-spacing: .3em; text-transform: uppercase; color: var(--l-on-dark-3);
 }
 .lmap-eyebrow span { width: 34px; height: 2px; background: var(--l-second); flex: none; }
@@ -2254,6 +2293,15 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   margin-top: -8px;
 }
 .lmap-lead { margin: 4px 0 0; max-width: 280px; font-size: 15px; line-height: 1.55; color: var(--l-on-dark); }
+/* Odkaz na lokality za hranicou — reliéf tam nesiaha, body áno. */
+.lmap-outside {
+  align-self: flex-start; margin-top: 2px; padding: 8px 0 0;
+  background: none; border: 0; border-top: 1px solid var(--l-on-dark-line);
+  font-family: inherit; font-size: 13px; color: var(--l-on-dark-3);
+  cursor: pointer; text-align: left; transition: color .16s ease;
+}
+.lmap-outside span { font-family: var(--mono); color: var(--l-second); margin-right: 4px; }
+.lmap-outside:hover { color: var(--l-on-dark-2); }
 
 /* Legenda. Krúžok je „tmavé sklo" z handoffu. */
 .lmap-legend { display: flex; flex-direction: column; gap: 10px; }
@@ -2261,14 +2309,14 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   display: flex; align-items: center; justify-content: space-between;
   width: 100%; padding: 0 0 10px; background: none; border: 0;
   border-bottom: 1px solid var(--l-on-dark-line);
-  font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .26em;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .26em;
   text-transform: uppercase; color: var(--l-on-dark-3); text-align: left; cursor: default;
 }
 .lmap-legend-h span { display: none; }
 .lmap-legend-body { display: flex; flex-direction: column; gap: 11px; }
 .lmap-legend-row { display: flex; align-items: center; gap: 12px; }
 .lmap-legend-name { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 500; color: var(--l-on-dark-2); }
-.lmap-legend-n { font-family: ui-monospace, monospace; font-size: 11px; color: var(--l-on-dark-3); font-variant-numeric: tabular-nums; }
+.lmap-legend-n { font-family: var(--mono); font-size: 11px; color: var(--l-on-dark-3); font-variant-numeric: tabular-nums; }
 .lmap-legend-cluster { margin-top: 6px; padding-top: 12px; border-top: 1px solid var(--l-on-dark-line); }
 .lmap-legend-cluster .lmap-legend-name { color: var(--l-on-dark); font-size: 13px; }
 .lmap-glass {
@@ -2278,7 +2326,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   border: 1px solid rgba(255,255,255,.3);
   box-shadow: inset 0 1px 1px rgba(255,255,255,.35), inset 0 -2px 4px rgba(0,0,0,.25);
 }
-.lmap-glass-n { font-family: ui-monospace, monospace; font-size: 10px; }
+.lmap-glass-n { font-family: var(--mono); font-size: 10px; }
 
 /* ── Plátno ────────────────────────────────────────────────────────────── */
 .lmap-canvas { position: relative; flex: 1; min-width: 0; background: var(--l-paper-2); overflow: hidden; }
@@ -2299,7 +2347,11 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-overlay { position: absolute; inset: 0; pointer-events: none; }
 
 /* ── Bod ───────────────────────────────────────────────────────────────── */
-.lmap-pin-wrap { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 8px; }
+/* Uzol nesie POLOHU (inline transform), vnutro nesie VZHLAD. Polohovanie
+   cez `left/top` prepocitavalo rozvrh vsetkych bodov pri kazdom snimku
+   posuvania; transform sa len skladá. */
+.lmap-node { position: absolute; left: 0; top: 0; will-change: transform; }
+.lmap-pin-wrap { transform: translate(-50%, -50%); display: flex; align-items: center; gap: 8px; }
 .lmap-pin {
   position: relative; width: 30px; height: 30px; flex: none; border-radius: 50%;
   display: grid; place-items: center; cursor: pointer; pointer-events: auto;
@@ -2313,11 +2365,17 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 }
 .lmap-pin:hover { transform: scale(1.14) rotate(-4deg); }
 .lmap-pin:focus-visible { outline: 2px solid var(--l-second); outline-offset: 3px; }
+/* Vybrany bod. Handoff ho preklapal do tmaveho skla — na atramentovej mape,
+   kde su vsetky body rovnake, sa ale tmavy od svetleho na prvy pohlad nelisi.
+   Berie preto pecatnu cervenu zo satu: klik je vidno okamzite. */
 .lmap-pin.is-selected {
-  background: linear-gradient(155deg, rgba(58,52,44,.92), rgba(28,25,20,.85));
-  color: #F1EDE3; border-color: rgba(241,237,227,.5);
-  box-shadow: inset 0 1px 1px rgba(255,255,255,.25), 0 4px 12px rgba(20,18,15,.4);
+  background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
+  color: var(--l-card); border-color: rgba(255,255,255,.6);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.35), 0 6px 16px rgba(20,18,15,.4);
+  transform: scale(1.08);
 }
+.lmap-pin.is-selected:hover { transform: scale(1.14) rotate(-4deg); }
+.lmap-pin.is-selected .lmap-pin-spec { opacity: .5; }
 /* Odlesk — bez neho je z „liquid glass" len sivý krúžok. */
 .lmap-pin-spec {
   position: absolute; top: 3px; left: 5px; width: 12px; height: 6px; border-radius: 50%;
@@ -2332,16 +2390,17 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   border-radius: 999px; padding: 4px 13px; box-shadow: 0 3px 10px rgba(20,18,15,.14);
 }
 .lmap-pill-n { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #14120F; line-height: 1.25; white-space: nowrap; }
-.lmap-pill-c { font-family: ui-monospace, monospace; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: rgba(20,18,15,.55); white-space: nowrap; }
+.lmap-pill-c { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: rgba(20,18,15,.55); white-space: nowrap; }
 
 /* ── Zhluk: „geodetická pečať" ─────────────────────────────────────────── */
 .lmap-cluster {
-  position: absolute; transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   width: calc(var(--core) + 26px); height: calc(var(--core) + 26px);
   background: none; border: 0; padding: 0; cursor: zoom-in; pointer-events: auto;
   transition: transform .18s ease;
 }
 .lmap-cluster:hover { transform: translate(-50%, -50%) scale(1.08) rotate(6deg); }
+.lmap-cluster:active { transform: translate(-50%, -50%) scale(1.02) rotate(3deg); }
 .lmap-cluster:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; border-radius: 50%; }
 .lmap-cluster-halo {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -2356,7 +2415,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: var(--core); height: var(--core); border-radius: 50%;
   display: grid; place-items: center;
-  font-family: ui-monospace, monospace; font-size: 13px; color: #14120F;
+  font-family: var(--mono); font-size: 13px; color: #14120F;
   background: linear-gradient(155deg, rgba(255,255,255,.55), rgba(255,255,255,.12) 45%, rgba(255,255,255,.28));
   -webkit-backdrop-filter: blur(7px) saturate(1.3); backdrop-filter: blur(7px) saturate(1.3);
   border: 1px solid rgba(255,255,255,.75);
@@ -2364,9 +2423,9 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 }
 
 /* ── Vejár ─────────────────────────────────────────────────────────────── */
-.lmap-spider-line { position: absolute; height: 1px; background: rgba(58,52,44,.45); transform-origin: 0 50%; pointer-events: none; }
+.lmap-spider-line { position: absolute; left: 0; top: 0; height: 1px; background: rgba(58,52,44,.45); transform-origin: 0 50%; pointer-events: none; }
 .lmap-spider-x {
-  position: absolute; transform: translate(-50%, -50%);
+  position: absolute; left: 0; top: 0;
   width: 22px; height: 22px; border-radius: 50%; cursor: pointer; pointer-events: auto;
   background: #F1EDE3; border: 1px solid rgba(58,52,44,.5); color: #14120F;
   font-size: 13px; line-height: 1; display: grid; place-items: center; z-index: 40;
@@ -2386,7 +2445,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-card-cat {
   position: absolute; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 10px 4px 8px; border-radius: 999px; background: rgba(245,241,233,.95); color: #3A342C;
-  font-family: ui-monospace, monospace; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
 }
 .lmap-card-x {
   position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%;
@@ -2395,7 +2454,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 }
 .lmap-card-body { display: flex; flex-direction: column; gap: 7px; padding: 14px 16px 15px; }
 .lmap-card-name { font-size: 15px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--l-ink); }
-.lmap-card-coords { font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: .08em; color: rgba(20,18,15,.45); }
+.lmap-card-coords { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: rgba(20,18,15,.45); }
 .lmap-card-desc {
   margin: 0; font-size: 12px; line-height: 1.55; color: rgba(20,18,15,.62);
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
@@ -2415,7 +2474,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 /* ── HUD ───────────────────────────────────────────────────────────────── */
 .lmap-hud {
   position: absolute; display: flex; align-items: center; gap: 10px; pointer-events: none;
-  font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: .2em; color: rgba(20,18,15,.55);
+  font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: rgba(20,18,15,.55);
 }
 .lmap-hud-tl { top: 32px; left: 40px; }
 .lmap-hud-tr { top: 32px; right: 40px; letter-spacing: .18em; text-transform: uppercase; }
@@ -2443,8 +2502,8 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 }
 .lmap-zoom-box button:last-child { border-bottom: 0; }
 .lmap-zoom-box button:hover { background: rgba(20,18,15,.07); }
-.lmap-zoom-reset { font-family: ui-monospace, monospace !important; font-size: 12px !important; }
-.lmap-zoom-v { font-family: ui-monospace, monospace; font-size: 11px; color: rgba(20,18,15,.55); }
+.lmap-zoom-reset { font-family: var(--mono) !important; font-size: 12px !important; }
+.lmap-zoom-v { font-family: var(--mono); font-size: 11px; color: rgba(20,18,15,.55); }
 .lmap-attrib {
   position: absolute; left: 40px; bottom: 12px; pointer-events: none;
   font-size: 10px; color: rgba(20,18,15,.4);
@@ -2480,6 +2539,6 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 @media (prefers-reduced-motion: reduce) {
   .lmap-pin, .lmap-cluster { transition: none; }
-  .lmap-pin:hover, .lmap-cluster:hover { transform: translate(-50%, -50%); }
   .lmap-pin:hover { transform: none; }
+  .lmap-cluster:hover { transform: translate(-50%, -50%); }
 }

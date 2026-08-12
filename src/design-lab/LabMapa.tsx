@@ -31,9 +31,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-/* Výrez renderu — musí sedieť s BOUNDS_4326 v build_relief.py. */
+/* Výrez RENDERU — musí sedieť s BOUNDS_4326 v build_relief.py. Na tento
+   výrez sa mapa otvára. */
 const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49.65]];
-const MIN_Z = 5.2;
+/* Výrez POHYBU. Reliéf končí na štátnej hranici, ale štrnásť lokalít leží za
+   ňou (Mikulčice, Pohansko, Zalavár, Visegrád, Gars-Thunau, Arkona…). Tie sa
+   kreslia ako body na papieri mimo krajiny — preto sa mapa dá odtiahnuť až
+   po strednú Európu. Kartágo (36,8° N) je jediné, čo sem nepadne; je to
+   článok o rímskych pamiatkach v Afrike, nie o hradisku. */
+const ROAM: [[number, number], [number, number]] = [[11.5, 45.0], [24.5, 55.6]];
+const MIN_Z = 4.4;
 const MAX_Z = 12;
 /** Od tohto priblíženia dostane bod menovku (handoff: 2,4× z rozsahu 1–10×). */
 const PILL_ZOOM = 9.6;
@@ -107,8 +114,8 @@ export function LabMapa() {
         const out: Loc[] = (j.items || [])
           .filter((x: any) => x.hasLocation && typeof x.lat === 'number' && typeof x.lng === 'number'
             && inCats.has(x.categorySlug)
-            && x.lng >= BOUNDS[0][0] && x.lng <= BOUNDS[1][0]
-            && x.lat >= BOUNDS[0][1] && x.lat <= BOUNDS[1][1])
+            && x.lng >= ROAM[0][0] && x.lng <= ROAM[1][0]
+            && x.lat >= ROAM[0][1] && x.lat <= ROAM[1][1])
           .map((x: any) => ({
             id: x.slug, name: x.place || x.title, slug: x.slug, cat: x.categorySlug,
             lat: x.lat, lng: x.lng, excerpt: x.excerpt || '', cover: x.cover || null,
@@ -148,7 +155,7 @@ export function LabMapa() {
       fitBoundsOptions: { padding: 24 },
       minZoom: MIN_Z,
       maxZoom: MAX_Z,
-      maxBounds: [[BOUNDS[0][0] - 1.2, BOUNDS[0][1] - 0.8], [BOUNDS[1][0] + 1.2, BOUNDS[1][1] + 0.8]],
+      maxBounds: ROAM,
       attributionControl: false,
       dragRotate: false,
       pitchWithRotate: false,
@@ -205,10 +212,22 @@ export function LabMapa() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
+    /* MapLibre vysiela `move` niekolkokrat za snimok. Bez tohto sa pri kazdom
+       z nich prepocital cely zhluk a prekreslili vsetky body — posuvanie sa
+       tym menilo na zapas. Takto sa prepocita najviac raz za snimok. */
+    let raf = 0;
+    const onMove = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; recompute(); });
+    };
     recompute();
-    map.on('move', recompute);
-    map.on('resize', recompute);
-    return () => { map.off('move', recompute); map.off('resize', recompute); };
+    map.on('move', onMove);
+    map.on('resize', onMove);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      map.off('move', onMove);
+      map.off('resize', onMove);
+    };
   }, [ready, recompute]);
 
   /* Pohyb mapy zatvára kartu aj vejár — inak by viseli nad prázdnym miestom. */
@@ -257,6 +276,14 @@ export function LabMapa() {
     });
   };
 
+  /* Lokality za hranicou. Reliéf tam nie je, body áno — nech je o nich vedieť
+     aj vtedy, keď sa mapa otvorí na Slovensku a sú mimo obrazovky. */
+  const outside = useMemo(
+    () => locs.filter(l => l.lng < BOUNDS[0][0] || l.lng > BOUNDS[1][0]
+      || l.lat < BOUNDS[0][1] || l.lat > BOUNDS[1][1]).length,
+    [locs]
+  );
+
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
     for (const l of locs) c[l.cat] = (c[l.cat] || 0) + 1;
@@ -289,6 +316,11 @@ export function LabMapa() {
             zhluky sa priblížením rozpadnú na jednotlivé body. Kliknutím na bod
             otvoríte kartu lokality.
           </p>
+          {outside > 0 && (
+            <button type="button" className="lmap-outside" onClick={() => mapRef.current?.fitBounds(ROAM, { padding: 40, duration: 600 })}>
+              <span>{outside}</span> lokalít leží za hranicami — ukázať
+            </button>
+          )}
         </div>
 
         <div className={legendOpen ? 'lmap-legend is-open' : 'lmap-legend'}>
@@ -327,23 +359,23 @@ export function LabMapa() {
                   key={'line-' + n.loc.id}
                   className="lmap-spider-line"
                   style={{
-                    left: spider.x, top: spider.y,
                     width: Math.hypot(n.x - spider.x, n.y - spider.y),
-                    transform: `rotate(${Math.atan2(n.y - spider.y, n.x - spider.x)}rad)`,
+                    transform: `translate3d(${spider.x}px, ${spider.y}px, 0) rotate(${Math.atan2(n.y - spider.y, n.x - spider.x)}rad)`,
                   }}
                 />
               ))}
-              <button type="button" className="lmap-spider-x" style={{ left: spider.x, top: spider.y }}
+              <button type="button" className="lmap-spider-x" style={{ transform: `translate3d(${spider.x}px, ${spider.y}px, 0) translate(-50%, -50%)` }}
                       onClick={() => setSpider(null)} aria-label="Zavrieť vejár">×</button>
             </>
           )}
 
           {all.map(n => n.kind === 'many' ? (
+            <div key={'c-' + n.members.map(m => m.id).join('|')} className="lmap-node"
+                 style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)` }}>
             <button
               type="button"
-              key={'c-' + n.members.map(m => m.id).join('|')}
               className="lmap-cluster"
-              style={{ left: n.x, top: n.y, ['--core' as any]: `${30 + Math.min(n.members.length, 14) * 1.1}px` }}
+              style={{ ['--core' as any]: `${30 + Math.min(n.members.length, 14) * 1.1}px` }}
               onClick={() => openCluster(n)}
               aria-label={`Zhluk ${n.members.length} lokalít — priblížiť`}
             >
@@ -356,8 +388,11 @@ export function LabMapa() {
               })}
               <span className="lmap-cluster-core">{n.members.length}</span>
             </button>
+            </div>
           ) : (
-            <div key={n.loc.id} className="lmap-pin-wrap" style={{ left: n.x, top: n.y, zIndex: selected === n.loc.id ? 30 : 3 }}>
+            <div key={n.loc.id} className="lmap-node"
+                 style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: selected === n.loc.id ? 30 : 3 }}>
+            <div className="lmap-pin-wrap">
               <button
                 type="button"
                 className={selected === n.loc.id ? 'lmap-pin is-selected' : 'lmap-pin'}
@@ -398,6 +433,7 @@ export function LabMapa() {
                   <span className="lmap-card-arrow" aria-hidden="true" />
                 </div>
               )}
+            </div>
             </div>
           ))}
         </div>
