@@ -20,23 +20,23 @@ import { AccountNavLink } from './AccountNavLink';
  */
 
 // ── Design tokens (2A) ───────────────────────────────────────────────────────
-const NAV_GRADIENT = 'linear-gradient(180deg,#2b2016 0%,#1c1510 100%)';
-const NAV_BORDER_GOLD = '#9a5d1f';
-const CAT_TEXT = '#ddcba4';
-const CAT_TEXT_ACTIVE = '#e9c877';
+const NAV_GRADIENT = 'linear-gradient(180deg,var(--hr-dark) 0%,var(--hr-dark-2) 100%)';
+const NAV_BORDER_GOLD = 'var(--hr-accent)';
+const CAT_TEXT = 'var(--hr-on-dark)';
+const CAT_TEXT_ACTIVE = 'var(--hr-on-dark-strong)';
 const CAT_OPEN_BG = 'rgba(200,161,90,0.16)';
 const CAT_HOVER_BG = 'rgba(200,161,90,0.14)';
-const CAT_UNDERLINE = '#c8862f';
-const BADGE_BG = '#c8862f';
-const BADGE_TEXT = '#1c1510';
-const HAIRLINE = '#4a3a28';
+const CAT_UNDERLINE = 'var(--hr-accent-soft)';
+const BADGE_BG = 'var(--hr-accent-soft)';
+const BADGE_TEXT = 'var(--hr-dark-2)';
+const HAIRLINE = 'var(--hr-dark-line)';
 // Roletka (pergamen)
-const ROLETKA_BG = '#f6efdd';
-const ROLETKA_BORDER = '#c8a15a';
-const ROLETKA_ACCENT = '#9a5d1f';
-const ROLETKA_ITEM = '#3a2c1b';
-const ROLETKA_ITEM_HOVER_BG = '#ece0c2';
-const ROLETKA_DIVIDER = '#e3d4ad';
+const ROLETKA_BG = 'var(--hr-surface-2)';
+const ROLETKA_BORDER = 'var(--hr-line-gold)';
+const ROLETKA_ACCENT = 'var(--hr-accent)';
+const ROLETKA_ITEM = 'var(--hr-ink-2)';
+const ROLETKA_ITEM_HOVER_BG = 'var(--hr-surface-3)';
+const ROLETKA_DIVIDER = 'var(--hr-line-strong)';
 
 const FONT_CINZEL = '"Cinzel", Georgia, "Times New Roman", serif';
 const FONT_BODY = '"Cormorant Garamond", Georgia, "Times New Roman", serif';
@@ -216,7 +216,7 @@ export function TwoTierNav({ items, hidden = false, onHover }: TwoTierNavProps) 
               style={{
                 display: 'inline-block',
                 fontSize: 11,
-                color: '#c8a15a',
+                color: 'var(--hr-line-gold)',
                 letterSpacing: '0.3em',
                 lineHeight: 1,
               }}
@@ -363,12 +363,12 @@ function CategoryButton({ cat, isOpen, onToggle }: CategoryButtonProps) {
 // ── Roletka (dropdown so zoznamom lokalít) ────────────────────────────────────
 // Vzhľad prevzatý z pôvodného MegaMenu dropdownu: TMAVÉ pozadie, lokality v
 // 2 STĹPCOCH (2 vedľa seba, viac riadkov), ikonka 📍, svetlý text, zlatá pätička.
-const ROLETKA_DARK_BG = '#2e2317';
+const ROLETKA_DARK_BG = 'var(--hr-dark-3)';
 const ROLETKA_DARK_BORDER = 'rgba(196,165,116,0.25)';
-const ROLETKA_DARK_TEXT = '#f0e8dc';
+const ROLETKA_DARK_TEXT = 'var(--hr-on-dark-2)';
 const ROLETKA_DARK_HOVER_BG = 'rgba(196,165,116,0.15)';
-const ROLETKA_DARK_ACCENT = '#e8c56e';
-const ROLETKA_PIN = '#a87437';
+const ROLETKA_DARK_ACCENT = 'var(--hr-badge)';
+const ROLETKA_PIN = 'var(--hr-accent-deep)';
 
 interface RoletkaProps {
   cat: NavigationItem;

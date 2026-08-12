@@ -182,6 +182,139 @@ html, body, #root, main, article, section, div:not(.pointer-events-none):not([cl
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
+/* ============================================================================
+   DIZAJNOVÉ TOKENY (--hr-*)
+   ----------------------------------------------------------------------------
+   Jediné miesto, kde sú farby webu zapísané. Komponenty ich čítajú cez var(),
+   takže zmena vzhľadu = zmena hodnôt tu, nie prepisovanie desiatok súborov.
+
+   Hodnoty nižšie sú PRESNE tie, ktoré web používal doteraz — zavedením tokenov
+   sa teda vizuálne nič nemení. Prestavba na nový (redakčný) šat prebieha
+   postupne: komponent sa prepíše z natvrdo zapísaného hexu na token a tým sa
+   stane prepínateľným. Skúšobné hodnoty žijú v `src/design-lab/theme.css`.
+   ========================================================================== */
+:root {
+  /* Plochy */
+  --hr-bg: #f9f6f0;              /* pozadie stránky */
+  --hr-surface: #fffdf8;         /* karty, panely */
+  --hr-surface-2: #f6efdd;       /* druhotné plochy (roletky, pásy) */
+  --hr-surface-3: #ece0c2;       /* najtmavšia svetlá plocha */
+
+  /* Text */
+  --hr-ink: #2d1810;             /* nadpisy */
+  --hr-body: #4a3f2e;            /* bežný text */
+  --hr-muted: #8a795e;           /* popisky, druhotné údaje */
+  --hr-ink-2: #3a2c1b;           /* text v roletkách */
+  --hr-body-2: #5d4e37;          /* text na kartách */
+  --hr-body-3: #6f5f47;          /* popisky nástenky */
+  --hr-muted-2: #a89f8f;         /* najtichší text */
+  --hr-ink-3: #2e2213;           /* nadpis pripnutého zápisu */
+
+  /* Linky a rámy */
+  --hr-line: rgba(196, 165, 116, 0.4);
+  --hr-line-strong: #e3d4ad;
+  --hr-line-gold: #c8a15a;       /* výraznejší zlatý rám (roletky) */
+  --hr-line-soft: #e0cb95;       /* rám dlaždíc nástenky */
+  --hr-line-quiet: #c4a574;      /* podčiarknutie odkazov */
+
+  /* Pergamenové prechody nástenky (logo, pripnutý zápis, prázdna obálka) */
+  --hr-wash-1: #f8f1e0;
+  --hr-wash-2: #efe3c6;
+  --hr-wash-3: #dfcda2;
+  --hr-wash-4: #f5ecd8;
+  --hr-wash-5: #ece0c4;
+  --hr-wash-6: #f6ecd4;
+  --hr-wash-7: #efe0bd;
+
+  /* Sklenená pätka na fotke + text na nej */
+  --hr-glass: rgba(28,21,16,.5);
+  --hr-glass-line: rgba(244,234,212,.18);
+  --hr-on-photo: #fbf3e2;
+  --hr-on-photo-2: #f4ead4;
+  --hr-on-photo-3: #e6c98a;
+
+  /* Vyhľadávanie — vlastné odtiene panela a roletky výsledkov */
+  --hr-chip-bg: #efe2c0;
+  --hr-chip-border: #d9c69a;
+  --hr-chip-text: #8a6a35;
+  --hr-hairline: #e6d7b0;
+  --hr-dark-3: #2e2317;          /* medzistupeň tmavej (roletka lišty) */
+  --hr-dark-line: #4a3a28;       /* vlások na tmavom */
+  --hr-on-dark-2: #f0e8dc;       /* svetlý text v roletke */
+  --hr-badge: #e8c56e;           /* počítadlo v lište */
+  --hr-dark-4: #1f1611;          /* pozadie mobilnej lišty */
+  --hr-on-dark-3: #a89a82;       /* tichý text na tmavom */
+  --hr-line-on-dark: rgba(196,165,116,0.25);  /* vlások na tmavej lište */
+
+  /* Výplachy pozadia stránky. V pergamenovom šate kreslia „starý papier";
+     v redakčnom sa zhasnú na `transparent` a ostane plocha. */
+  --hr-wash-tint: rgba(92, 64, 35, 0.03);
+  --hr-wash-glow: rgba(194, 164, 118, 0.1);
+  --hr-bg-mid: #f5f1e8;
+
+  /* Tiene. Redakčný jazyk kreslí hranice čiarou, nie tieňom — téma ich stlmí. */
+  --hr-shadow-sm: 0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05);
+  --hr-shadow-md: 0 4px 14px rgba(70,40,20,0.10), 0 10px 24px rgba(70,40,20,0.08);
+  --hr-footer-bg: #efe6cf;
+  --hr-clear-text: #7a6a52;
+  --hr-mark-bg: #f4dca0;
+  --hr-mark-text: #7a3d0a;
+
+  /* Akcent */
+  --hr-accent: #9a5d1f;          /* hlavný akcent */
+  --hr-accent-soft: #c8862f;     /* svetlejší akcent, prechody */
+  --hr-accent-deep: #7d4f1d;     /* tmavší akcent, hover */
+  --hr-accent-glow: rgba(200, 134, 47, 0.22);
+  --hr-accent-border: rgba(125, 79, 29, 0.55);  /* rám karty pri hoveri */
+
+  /* Tmavé plochy (lišta, pätička, pásy) */
+  --hr-dark: #2b2016;
+  --hr-dark-2: #1c1510;
+  --hr-on-dark: #ddcba4;         /* text na tmavom */
+  --hr-on-dark-strong: #e9c877;  /* zvýraznený text na tmavom */
+
+  /* Domovská stránka a mapa. Doteraz mali tieto tri farby zapísané natvrdo
+     v `HomePage.tsx` a `Slovakia3DReliefMap.tsx`, čo znamenalo, že sekcia
+     kategórií a celá mapa ostávali hnedé bez ohľadu na zvolený šat. */
+  --hr-frame: oklch(.216 .006 56.043);  /* pás za hlavičkovou fotkou a za mapou (bol `bg-stone-900`) */
+  --hr-muted-3: #7a6b56;                /* kurzívny popis pod nadpisom sekcie */
+  /* Predel medzi sekciami — bol `border-amber-900/20`. Projekt má vlastnú
+     `amber-900` (#3f2910, nie predvolenú #78350f), preto tá istá miešanka. */
+  --hr-line-section: color-mix(in oklab, #3f2910 20%, transparent);
+
+  /* Reliéf mapy. Terén je kreslený plátnom, čiže si farby musí prevziať
+     z premenných rovnako ako zvyšok stránky — inak z neutrálnej stránky
+     vytŕča hnedý ostrov. */
+  --hr-relief-high: #e8dcc8;     /* najvyššie polohy */
+  --hr-relief-mid: #d4c0a0;      /* stredné polohy */
+  --hr-relief-low: #a89f8f;      /* nížiny */
+  --hr-relief-deep: #5d4e37;     /* tiene a rokliny */
+  --hr-relief-edge: #8b7355;     /* obrysy a hranice */
+
+  /* Rám a ovládanie mapy. Terén sám (výškové odtiene, farby kategórií pri
+     špendlíkoch) ostáva nezmenený — to sú významové farby, nie ozdoba. */
+  --hr-map-bg: #3a332a;          /* plocha za reliéfom, aj hmla v scéne */
+  --hr-map-frame: #3d352a;       /* drevený pás nad mapou */
+  --hr-map-frame-2: #2a2318;     /* tmavší diel rámu */
+  --hr-map-frame-3: #3d3426;     /* okraj rámu okolo plátna */
+  --hr-map-vignette-1: #4a3f30;  /* vinetácia — stred */
+  --hr-map-vignette-2: #3a2f22;
+  --hr-map-vignette-3: #251d14;  /* vinetácia — okraje */
+  --hr-tooltip-bg: #1a1510;      /* bublina pri špendlíku */
+  --hr-tooltip-text: #fdfbf6;
+  --hr-tooltip-muted: #c8b89a;
+  --hr-tooltip-fact: #f0e3c8;
+  --hr-legend-on: #ece0c8;       /* zapnutá položka legendy */
+  --hr-legend-off: #8a7f6b;      /* vypnutá položka legendy */
+  --hr-legend-note: #7c715f;     /* poznámka pod legendou */
+  --hr-paper-bright: #faf7f1;    /* karta s detailom lokality */
+  --hr-badge-text: #3a2a10;      /* text na zlatom odznaku */
+  --hr-accent-mid: #a87437;      /* stredný akcent v prechodoch */
+  --hr-body-4: #4a3f35;          /* text v detaile lokality */
+  --hr-scroll-track: rgba(196, 165, 116, 0.15);  /* posuvník v aktualitách */
+  --hr-scroll-edge: rgba(196, 165, 116, 0.05);
+}
+
 /* Typography - Fluid scaling */
 :root {
   /* Heading font - Cinzel (rímsky štýl) */
@@ -565,10 +698,10 @@ p {
 /* Parchment effect */
 .parchment {
   background:
-    linear-gradient(to bottom, rgba(92, 64, 35, 0.03) 0%, transparent 50%, rgba(92, 64, 35, 0.03) 100%),
-    radial-gradient(circle at 20% 30%, rgba(194, 164, 118, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(194, 164, 118, 0.1) 0%, transparent 50%),
-    linear-gradient(to bottom, #f9f6f0 0%, #f5f1e8 50%, #f9f6f0 100%);
+    linear-gradient(to bottom, var(--hr-wash-tint) 0%, transparent 50%, var(--hr-wash-tint) 100%),
+    radial-gradient(circle at 20% 30%, var(--hr-wash-glow) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, var(--hr-wash-glow) 0%, transparent 50%),
+    linear-gradient(to bottom, var(--hr-bg) 0%, var(--hr-bg-mid) 50%, var(--hr-bg) 100%);
   position: relative;
   z-index: 1;
 }
@@ -1222,21 +1355,21 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   width: 10px;
 }
 .aktuality-list::-webkit-scrollbar-track {
-  background: rgba(196, 165, 116, 0.15);
+  background: var(--hr-scroll-track);
   border-radius: 5px;
 }
 .aktuality-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #c4a574, #a87437);
+  background: linear-gradient(180deg, var(--hr-line-quiet), var(--hr-accent-mid));
   border-radius: 5px;
-  border: 2px solid rgba(196, 165, 116, 0.05);
+  border: 2px solid var(--hr-scroll-edge);
   background-clip: padding-box;
 }
 .aktuality-list::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #a87437, #7d4f1d);
+  background: linear-gradient(180deg, var(--hr-accent-mid), var(--hr-accent-deep));
   background-clip: padding-box;
 }
 .aktuality-list {
-  scrollbar-color: #a87437 rgba(196, 165, 116, 0.15);
+  scrollbar-color: var(--hr-accent-mid) var(--hr-scroll-track);
   scrollbar-width: thin;
 }
 
@@ -1700,33 +1833,33 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
    Tokeny podľa design handoffu; komponent ich číta cez var(), nie inline hodnoty.
    ========================================================================== */
 .joinus {
-  --ju-page: #f2ead7;
-  --ju-card: #fdfaf1;
-  --ju-frame: #eadcbb;
+  --ju-page: var(--hr-wash-8, #f2ead7);
+  --ju-card: var(--hr-surface);
+  --ju-frame: var(--hr-line-soft);
   --ju-callout: #f4e7cd;
 
-  --ju-border: #ddcba0;
+  --ju-border: var(--hr-line-soft);
   --ju-border-field: #d8c8a4;
   --ju-border-soft: #dcc593;
   --ju-border-callout: #e0cb95;
   --ju-border-banner: #6b4f2a;
 
-  --ju-amber: #9a5d1f;
-  --ju-amber-deep: #8a5316;
-  --ju-amber-mid: #b0813a;
-  --ju-amber-bright: #c8862f;
+  --ju-amber: var(--hr-accent);
+  --ju-amber-deep: var(--hr-accent-deep);
+  --ju-amber-mid: var(--hr-accent-soft);
+  --ju-amber-bright: var(--hr-accent-soft);
 
-  --ju-banner-top: #2c2114;
-  --ju-banner-bottom: #1c1510;
+  --ju-banner-top: var(--hr-dark);
+  --ju-banner-bottom: var(--hr-dark-2);
   --ju-banner-title: #f0d493;
-  --ju-banner-sub: #c9b48c;
-  --ju-banner-orn: #c8a15a;
+  --ju-banner-sub: var(--hr-on-dark);
+  --ju-banner-orn: var(--hr-line-gold);
 
-  --ju-text: #2e2213;
-  --ju-body: #4a3f2e;
+  --ju-text: var(--hr-ink-3);
+  --ju-body: var(--hr-body);
   --ju-muted: #7f6f55;
-  --ju-muted-2: #8a795e;
-  --ju-field-bg: #fbf7ec;
+  --ju-muted-2: var(--hr-muted);
+  --ju-field-bg: var(--hr-surface);
   --ju-placeholder: #a89a7d;
 }
 

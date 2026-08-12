@@ -27,11 +27,11 @@ import {
 import { hradiskaData } from '../data/hradiska';
 
 
-const GOLD_GRAD = 'linear-gradient(180deg,#c8862f,#9a5d1f)';
+const GOLD_GRAD = 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))';
 const GLASS: React.CSSProperties = {
   position: 'absolute', left: 11, right: 11, bottom: 11,
-  background: 'rgba(28,21,16,.5)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(244,234,212,.18)', borderRadius: 17, padding: '13px 16px',
+  background: 'var(--hr-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+  border: '1px solid var(--hr-glass-line)', borderRadius: 17, padding: '13px 16px',
 };
 
 /**
@@ -226,16 +226,16 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, marginBottom: 26 }}>
             <div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(200,134,47,.12)', border: '1px solid rgba(200,134,47,.3)', borderRadius: 999, padding: '7px 16px', marginBottom: 16 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 999, background: '#c8862f' }} />
-                <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.22em', color: '#9a5d1f', whiteSpace: 'nowrap' }}>
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: 'var(--hr-accent-soft)' }} />
+                <span style={{ fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.22em', color: 'var(--hr-accent)', whiteSpace: 'nowrap' }}>
                   KRONIKA · {FOUNDED_YEAR} — {new Date().getFullYear()}
                 </span>
               </div>
-              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 3.6vw, 40px)', fontWeight: 600, letterSpacing: '.06em', color: '#2d1810', margin: 0 }}>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 3.6vw, 40px)', fontWeight: 600, letterSpacing: '.06em', color: 'var(--hr-ink)', margin: 0 }}>
                 Zo života združenia
               </h2>
             </div>
-            <a href="/aktuality" style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: '#7d4f1d', borderBottom: '1px solid #c4a574', paddingBottom: 4, whiteSpace: 'nowrap' }}>
+            <a href="/aktuality" style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: 'var(--hr-accent-deep)', borderBottom: '1px solid var(--hr-line-quiet)', paddingBottom: 4, whiteSpace: 'nowrap' }}>
               CELÁ KRONIKA →
             </a>
           </div>
@@ -247,7 +247,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
               500 px, takže do stĺpca širokého ~470 px sa vošiel štvorcový obrázok
               len na šírku a hore aj dole ostal mŕtvy pás ~44 px — logo v ňom
               plávalo. S `aspect-ratio` sedí rám na obrázok pri každej šírke. */}
-          <div className="akv2-logo" style={{ position: 'relative', aspectRatio: '900 / 886', alignSelf: 'start', borderRadius: 30, overflow: 'hidden', border: '1px solid #e0cb95', background: 'radial-gradient(ellipse at 50% 38%, #f8f1e0 0%, #efe3c6 55%, #dfcda2 100%)', boxShadow: '0 24px 56px -26px rgba(40,26,10,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="akv2-logo" style={{ position: 'relative', aspectRatio: '900 / 886', alignSelf: 'start', borderRadius: 30, overflow: 'hidden', border: '1px solid var(--hr-line-soft)', background: 'radial-gradient(ellipse at 50% 38%, var(--hr-wash-1) 0%, var(--hr-wash-2) 55%, var(--hr-wash-3) 100%)', boxShadow: '0 24px 56px -26px rgba(40,26,10,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {/* Logo má odstránený podklad (priehľadné .webp/.png). Predloha bola
                 render na SVETLOSIVOM podklade (#ececec–#f2f2f2) — ten sa cez
                 `mix-blend-mode: multiply` nezrušil ako biela, ale pergamen stmavil,
@@ -273,35 +273,35 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
             <a
               href={intro ? `/blog/${intro.slug}` : '/aktuality'}
               className="akv2-tile"
-              style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minHeight: 0, borderRadius: 26, overflow: 'hidden', background: 'linear-gradient(160deg, #f6ecd4, #efe0bd)', border: '1px solid #e0cb95', boxShadow: 'inset 0 0 0 6px rgba(255,253,248,.55), inset 0 0 0 7px rgba(200,161,90,.45), 0 16px 36px -20px rgba(40,26,10,.45)', padding: '30px 36px' }}
+              style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minHeight: 0, borderRadius: 26, overflow: 'hidden', background: 'linear-gradient(160deg, var(--hr-wash-6), var(--hr-wash-7))', border: '1px solid var(--hr-line-soft)', boxShadow: 'inset 0 0 0 6px rgba(255,253,248,.55), inset 0 0 0 7px rgba(200,161,90,.45), 0 16px 36px -20px rgba(40,26,10,.45)', padding: '30px 36px' }}
             >
-              <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 36, fontWeight: 700, color: '#2e2213', lineHeight: 1.04, marginBottom: 12 }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 36, fontWeight: 700, color: 'var(--hr-ink-3)', lineHeight: 1.04, marginBottom: 12 }}>
                 {intro?.title ?? 'Prečo to vlastne robím'}
               </span>
               {intro?.excerpt && (
-                <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 17.5, fontStyle: 'italic', lineHeight: 1.5, color: '#4a3f2e', marginBottom: 10 }}>
+                <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 17.5, fontStyle: 'italic', lineHeight: 1.5, color: 'var(--hr-body)', marginBottom: 10 }}>
                   „{intro.excerpt}“
                 </span>
               )}
               {intro && (
-                <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 14.5, color: '#8a795e', marginBottom: 18 }}>
+                <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 14.5, color: 'var(--hr-muted)', marginBottom: 18 }}>
                   {intro.author} · {formatSkDate(intro.datum)} · {intro.readingTime} min čítania
                 </span>
               )}
-              <span style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.08em', color: '#fbf6ea', background: GOLD_GRAD, borderRadius: 999, padding: '11px 20px', boxShadow: '0 10px 24px -10px rgba(154,93,31,.7)' }}>
+              <span style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.08em', color: 'var(--hr-surface)', background: GOLD_GRAD, borderRadius: 999, padding: '11px 20px', boxShadow: '0 10px 24px -10px rgba(154,93,31,.7)' }}>
                 ČÍTAŤ CELÉ <span style={{ fontSize: 14 }}>→</span>
               </span>
             </a>
 
-            <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: '#fffdf8', border: '1px solid rgba(196,165,116,.4)', borderRadius: 22, boxShadow: '0 10px 28px -18px rgba(60,40,15,.3)', padding: '18px 10px 16px' }}>
+            <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,.4)', borderRadius: 22, boxShadow: '0 10px 28px -18px rgba(60,40,15,.3)', padding: '18px 10px 16px' }}>
               {[
                 { n: items.length ? String(items.length) : '—', l: 'zápisov v kronike' },
                 { n: String(yearsActive), l: 'rokov činnosti' },
                 { n: `${hradiskaData.length}+`, l: 'hradísk na mape' },
               ].map((s, i) => (
                 <span key={s.l} style={{ textAlign: 'center', borderLeft: i === 1 ? '1px solid rgba(196,165,116,.35)' : 'none', borderRight: i === 1 ? '1px solid rgba(196,165,116,.35)' : 'none' }}>
-                  <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 27, fontWeight: 600, color: '#9a5d1f', lineHeight: 1 }}>{s.n}</span>
-                  <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 13.5, fontStyle: 'italic', color: '#6f5f47', marginTop: 5 }}>{s.l}</span>
+                  <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 27, fontWeight: 600, color: 'var(--hr-accent)', lineHeight: 1 }}>{s.n}</span>
+                  <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 13.5, fontStyle: 'italic', color: 'var(--hr-body-3)', marginTop: 5 }}>{s.l}</span>
                 </span>
               ))}
             </div>
@@ -310,8 +310,8 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
 
         {/* pás zápisov z aktivít */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '.2em', color: '#9a5d1f' }}>ZÁPISY Z AKTIVÍT</span>
-          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 14, fontStyle: 'italic', color: '#a89f8f' }}>potiahnite doprava — os sa posúva s vami</span>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '.2em', color: 'var(--hr-accent)' }}>ZÁPISY Z AKTIVÍT</span>
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 14, fontStyle: 'italic', color: 'var(--hr-muted-2)' }}>potiahnite doprava — os sa posúva s vami</span>
         </div>
         <div ref={stripRef} onScroll={onStripScroll} className="akv2-strip" style={{ display: 'flex', gap: 18, overflowX: 'auto', overflowY: 'hidden', scrollSnapType: 'x mandatory', padding: '6px 2px 18px' }}>
           {stripItems.map(item => (
@@ -323,7 +323,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
                    ankety, pozvánky). Namiesto prázdneho pergamenu tam ide logo.
                    `paddingBottom` drží logo nad sklenenou pätkou s názvom, aby sa
                    nápis v logu neprekrýval s titulkom zápisu. */
-                <span style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 40%, #f5ecd8 0%, #ece0c4 55%, #ddcba4 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: 96 }}>
+                <span style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 40%, var(--hr-wash-4) 0%, var(--hr-wash-5) 55%, var(--hr-on-dark) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: 96 }}>
                   <picture style={{ display: 'contents' }}>
                     <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
                     <img
@@ -338,10 +338,10 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
                 </span>
               )}
               <span style={GLASS}>
-                <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, letterSpacing: '.12em', color: '#e6c98a', marginBottom: 4, textTransform: 'uppercase' }}>
+                <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 10, letterSpacing: '.12em', color: 'var(--hr-on-photo-3)', marginBottom: 4, textTransform: 'uppercase' }}>
                   {formatSkDate(item.datum)} · {item.readingTime} min
                 </span>
-                <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 19, fontWeight: 700, color: '#fbf3e2', lineHeight: 1.1 }}>
+                <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 19, fontWeight: 700, color: 'var(--hr-on-photo)', lineHeight: 1.1 }}>
                   {item.title}
                 </span>
               </span>
@@ -351,18 +351,18 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
 
         {/* časová os prepojená so scrollom */}
         <div style={{ display: 'flex', alignItems: 'center', margin: '6px 0 36px' }}>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, color: '#7d4f1d', flexShrink: 0, marginRight: 20 }}>{yearNewest}</span>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, color: 'var(--hr-accent-deep)', flexShrink: 0, marginRight: 20 }}>{yearNewest}</span>
           <div style={{ flex: 1, position: 'relative', height: 6, borderRadius: 999, background: 'rgba(168,116,55,.18)' }}>
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: 'linear-gradient(90deg,#c8862f,#a87437)', width: `${osFill}%`, transition: 'width .12s linear' }} />
-            <div style={{ position: 'absolute', top: '50%', left: `${osFill}%`, transform: 'translate(-50%,-50%)', width: 18, height: 18, borderRadius: 999, background: '#fffdf8', border: '2px solid #c8862f', boxShadow: '0 4px 10px rgba(60,40,15,.3)', transition: 'left .12s linear' }} />
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: 'linear-gradient(90deg,var(--hr-accent-soft),var(--hr-accent-deep))', width: `${osFill}%`, transition: 'width .12s linear' }} />
+            <div style={{ position: 'absolute', top: '50%', left: `${osFill}%`, transform: 'translate(-50%,-50%)', width: 18, height: 18, borderRadius: 999, background: 'var(--hr-surface)', border: '2px solid var(--hr-accent-soft)', boxShadow: '0 4px 10px rgba(60,40,15,.3)', transition: 'left .12s linear' }} />
           </div>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, color: '#a89f8f', flexShrink: 0, marginLeft: 20 }}>{yearOldest}</span>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, color: 'var(--hr-muted-2)', flexShrink: 0, marginLeft: 20 }}>{yearOldest}</span>
         </div>
 
         {/* vybraná fotogaléria */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '.2em', color: '#9a5d1f' }}>VYBRANÁ FOTOGALÉRIA</span>
-          <a href="/galeria" style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: '#7d4f1d', borderBottom: '1px solid #c4a574', paddingBottom: 3, whiteSpace: 'nowrap' }}>CELÁ GALÉRIA →</a>
+          <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '.2em', color: 'var(--hr-accent)' }}>VYBRANÁ FOTOGALÉRIA</span>
+          <a href="/galeria" style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: 'var(--hr-accent-deep)', borderBottom: '1px solid var(--hr-line-quiet)', paddingBottom: 3, whiteSpace: 'nowrap' }}>CELÁ GALÉRIA →</a>
         </div>
         <div ref={galleryRef} className="akv2-gal" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridAutoRows: 158, gap: 14 }}>
           {/* Ukážka vedie do galérie — samotné prezeranie fotiek patrí tam,
@@ -376,7 +376,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
             >
               <img src={g.src} alt={g.alt} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               {g.place && (
-                <span style={{ position: 'absolute', left: 14, right: 14, bottom: 12, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#f4ead4', background: 'rgba(28,21,16,.55)', borderRadius: 8, padding: '4px 10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left', display: 'block' }}>◍ {g.place}</span>
+                <span style={{ position: 'absolute', left: 14, right: 14, bottom: 12, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: 'var(--hr-on-photo-2)', background: 'rgba(28,21,16,.55)', borderRadius: 8, padding: '4px 10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left', display: 'block' }}>◍ {g.place}</span>
               )}
             </a>
           ))}

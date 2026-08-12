@@ -93,6 +93,7 @@ export function Footer() {
       {/* Vlnovková horná hrana — zlatý podklad presvitá vo „vlnách". */}
       <div
         aria-hidden="true"
+        className="hr-wave"
         style={{
           position: 'absolute',
           top: 0,
@@ -142,7 +143,7 @@ export function Footer() {
                     objectFit: 'contain',
                     borderRadius: 13,
                     background:
-                      'radial-gradient(circle at 38% 30%, #f0d9a8, #c8a15a)',
+                      'radial-gradient(circle at 38% 30%, #f0d9a8, var(--hr-line-gold))',
                     border: '1px solid var(--ft-head)',
                     boxShadow: '0 6px 16px -6px rgba(0,0,0,.5)',
                     padding: 3,
@@ -213,6 +214,7 @@ export function Footer() {
         {/* ---- Fleur-de-lis oddeľovač ---- */}
         <div
           aria-hidden="true"
+          className="hr-ornament"
           style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 44 }}
         >
           <span

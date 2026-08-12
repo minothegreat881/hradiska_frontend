@@ -4,21 +4,20 @@ import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown, MapPin } from 'lucide-react';
 import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
-// Vizuálny experiment s lištou žije v `TwoTierNavV2.tsx` — vyskúšať ho možno
-// zmenou tohto jedného importu na `{ TwoTierNavV2 as TwoTierNav } from './TwoTierNavV2'`.
-// V produkcii beží pôvodná lišta.
+// Vizuálne skúšky lišty žijú v laboratóriu (`src/design-lab/LabNav.tsx`,
+// otvára sa na `/design`). Tu beží produkčná lišta.
 import { TwoTierNav } from './TwoTierNav';
 import { InstallAppButton } from './InstallAppButton';
 import { AccountNavLink } from './AccountNavLink';
 import { useNavigationData } from '../hooks/useNavigationData';
 
-const NAV_BG = '#1f1611';
-const NAV_BG_DARKER = '#1f1611';
-const GOLD = '#c4a574';
-const GOLD_BRIGHT = '#e8c56e';
-const TEXT_LIGHT = '#f0e8dc';
-const TEXT_MUTED = '#a89a82';
-const BORDER_GOLD = 'rgba(196,165,116,0.25)';
+const NAV_BG = 'var(--hr-dark-4)';
+const NAV_BG_DARKER = 'var(--hr-dark-4)';
+const GOLD = 'var(--hr-line-quiet)';
+const GOLD_BRIGHT = 'var(--hr-badge)';
+const TEXT_LIGHT = 'var(--hr-on-dark-2)';
+const TEXT_MUTED = 'var(--hr-on-dark-3)';
+const BORDER_GOLD = 'var(--hr-line-on-dark)';
 const HOVER_BG = 'rgba(196,165,116,0.15)';
 const ACTIVE_BG = 'rgba(196,165,116,0.20)';
 const PILL_BG = 'rgba(196,165,116,0.18)';
@@ -178,7 +177,7 @@ function MobileAccordion({ item, onItemClick }: MobileItemProps) {
                     style={{
                       width: 12,
                       height: 12,
-                      color: '#a87437',
+                      color: 'var(--hr-accent-deep)',
                       flexShrink: 0,
                     }}
                   />

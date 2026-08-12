@@ -8,7 +8,7 @@ import { HeroSearch } from '../components/HeroSearch';
 import AktualityFeed from '../components/AktualityFeedV2';
 import { JoinUs } from '../components/JoinUs';
 import { CategoryCard } from '../components/CategoryCard';
-import { hradiskaCategories } from '../data/categories';
+import { hradiskaCategories, variant } from '../data/categories';
 import { InkEffect } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 
@@ -19,6 +19,15 @@ import { ScrollReveal } from '../components/ScrollReveal';
 const Slovakia3DReliefMap = lazy(() => import('../components/Slovakia3DReliefMap'));
 
 export function HomePage() {
+  // Základ Strapi. Vo vývoji ide prehliadač priamo na 1337, v produkcii cez
+  // proxy `/strapi/*`. `CategoryCard` dostáva hotovú adresu — základ sa lepí
+  // len tu, aby nevznikol dvojitý (to už raz nechalo dlaždice bez fotiek).
+  const strapiBase = import.meta.env.PROD
+    ? typeof window !== 'undefined'
+      ? window.location.origin + '/strapi'
+      : '/strapi'
+    : import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+
   return (
     <div className="min-h-screen parchment relative">
       {/* SVG Filters */}
@@ -26,7 +35,7 @@ export function HomePage() {
 
       {/* Decorative header border */}
       <motion.div 
-        className="w-full h-3 bg-repeat-x relative z-10" 
+        className="w-full h-3 bg-repeat-x relative z-10 hr-wave" 
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
@@ -43,7 +52,7 @@ export function HomePage() {
               vedel miesto rezervovať ešte pred stiahnutím obrázka a stránka pod
               ním neposkočila. `fetchPriority=high` + bez `lazy`: je to najväčší
               prvok nad zlomom, čiže to, čo meria LCP. */}
-          <div className="rounded-3xl overflow-hidden shadow-2xl bg-stone-900">
+          <div className="rounded-3xl overflow-hidden shadow-2xl" style={{ background: 'var(--hr-frame)' }}>
             <picture>
               <source srcSet="/img_header_hradiska_03.webp" type="image/webp" />
               <img
@@ -63,9 +72,9 @@ export function HomePage() {
           <div className="mt-6 md:mt-12 px-4 md:px-2">
             {/* Subtílny ozdobný oddeľovač – ladí s fleur-de-lis motívmi v sekcii mapy */}
             <div className="flex items-center justify-center gap-2 mb-4 opacity-60" aria-hidden="true">
-              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, transparent, #c4a574)' }} />
-              <span style={{ color: '#c4a574', fontSize: 12, lineHeight: 1 }}>⚜</span>
-              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, #c4a574, transparent)' }} />
+              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-line-quiet))' }} />
+              <span style={{ color: 'var(--hr-line-quiet)', fontSize: 12, lineHeight: 1 }}>⚜</span>
+              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, var(--hr-line-quiet), transparent)' }} />
             </div>
             <HeroSearch />
           </div>
@@ -78,9 +87,10 @@ export function HomePage() {
 
       {/* Interactive Map Section - Full Width */}
       <section
-        className="relative bg-stone-900"
+        className="relative"
         style={{
           zIndex: 5, // pod hero (z:30) aby search dropdown bol nad mapou
+          background: 'var(--hr-frame)',
           // Plynulý prechod z krémovej do tmavej – tenká gold hairline + jemný shadow falloff
           boxShadow: 'inset 0 1px 0 rgba(196, 165, 116, 0.45), inset 0 -1px 0 rgba(196, 165, 116, 0.45), 0 -8px 16px -8px rgba(125, 79, 29, 0.18)',
         }}
@@ -94,11 +104,11 @@ export function HomePage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#c4a574',
+                color: 'var(--hr-line-quiet)',
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 fontSize: 14,
                 letterSpacing: '0.1em',
-                background: '#1f1611',
+                background: 'var(--hr-dark-4)',
               }}
             >
               ✦ Načítavam mapu...
@@ -110,7 +120,7 @@ export function HomePage() {
       </section>
 
       {/* Kategórie */}
-      <section className="py-16 md:py-20 border-b-2 border-amber-900/20 relative">
+      <section className="py-16 md:py-20 relative" style={{ borderBottom: '2px solid var(--hr-line-section)' }}>
         {/* InkSplotch dekorácie odstránené (vyzerali ako rendering chyba) */}
 
         <div className="container relative z-10">
@@ -126,7 +136,7 @@ export function HomePage() {
                   fontFamily: 'Georgia, "Times New Roman", serif',
                   letterSpacing: '0.15em',
                   fontSize: 'clamp(24px, 3.4vw, 34px)',
-                  color: '#2d1810',
+                  color: 'var(--hr-ink)',
                   fontWeight: 600,
                   margin: 0,
                 }}
@@ -143,7 +153,7 @@ export function HomePage() {
                 style={{
                   width: 56,
                   height: 2,
-                  background: 'linear-gradient(90deg, transparent, #a87437, transparent)',
+                  background: 'linear-gradient(90deg, transparent, var(--hr-accent-soft), transparent)',
                   transformOrigin: 'center',
                 }}
               />
@@ -156,7 +166,7 @@ export function HomePage() {
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
                   fontStyle: 'italic',
-                  color: '#7a6b56',
+                  color: 'var(--hr-muted-3)',
                   fontSize: 15,
                 }}
               >
@@ -181,7 +191,12 @@ export function HomePage() {
                   description: category.description,
                   detailedDescription: category.description,
                   icon: category.icon,
-                  image: `${import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337')}${category.image}`,
+                  // Nie originál (7,6 MB spolu), ale zmenšeniny zo Strapi.
+                  // `medium_` má 750 px — dosť aj na retinu pre 363 px dlaždicu.
+                  image: `${strapiBase}${variant(category.image, 'medium')}`,
+                  imageSrcSet:
+                    `${strapiBase}${variant(category.image, 'small')} 500w, ` +
+                    `${strapiBase}${variant(category.image, 'medium')} 750w`,
                 }}
                 index={idx}
               />
@@ -194,7 +209,7 @@ export function HomePage() {
       <JoinUs />
 
       {/* Decorative footer border */}
-      <div className="w-full h-3 bg-repeat-x" style={{
+      <div className="w-full h-3 bg-repeat-x hr-wave" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6 L25 12 L50 6 L75 12 L100 6' stroke='%237d4f1d' stroke-width='2' fill='none'/%3E%3C/svg%3E")`,
         opacity: 0.3
       }}></div>

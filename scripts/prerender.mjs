@@ -91,7 +91,6 @@ const STATIC = [
   { path: '/archeologia', title: 'Archeológia hradísk a nálezov', description: 'Archeologické výskumy, nálezy a odborné texty o hradiskách na Slovensku a v okolitých krajinách.' },
   { path: '/pramene', title: 'Písomné pramene a listiny', description: 'Dobové listiny, kroniky a písomné pramene k dejinám Veľkej Moravy, Nitrianskeho kniežatstva a Slovanov.' },
   { path: '/pravek', title: 'Praveké hradiská a kultúry', description: 'Praveké hradiská na Slovensku — lužická, púchovská, otomanská a ďalšie kultúry doby bronzovej a železnej.' },
-  { path: '/mapa', title: 'Mapa hradísk Slovenska', description: 'Interaktívna mapa hradísk Slovanov, Keltov a iných kultúr na území Slovenska.' },
   { path: '/galeria', title: 'Galéria hradísk a nálezov', description: 'Fotogaléria hradísk, archeologických nálezov, kresieb a 3D rekonštrukcií z dielne Hradiska.sk.' },
   { path: '/aktuality', title: 'Aktuality — kronika OZ Hradiská', description: 'Aktuality, podujatia a činnosť Občianskeho združenia Hradiská pri objavovaní a ochrane hradísk.' },
   { path: '/about', title: 'O projekte Hradiská.sk', description: 'O projekte a Občianskom združení Hradiská venovanom slovanským hradiskám na Slovensku a v zahraničí.' },

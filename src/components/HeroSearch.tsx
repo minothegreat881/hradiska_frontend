@@ -9,25 +9,25 @@ const goTo = (path: string) => { window.history.pushState({}, '', path); window.
 
 // Design tokens – "Vyhľadávací dropdown, varianta 2B (S náhľadmi)"
 const T = {
-  panelBg: '#f6efdd',
-  panelBorder: '#c8a15a',
-  chipBorder: '#d9c69a',
-  dividerStrong: '#e3d4ad',
-  dividerSoft: '#ece0c2',
-  hairline: '#e6d7b0',
-  amber: '#9a5d1f',
-  amberLight: '#c8862f',
-  textMain: '#2e2213',
-  textSecondary: '#8a795e',
-  countChipText: '#8a6a35',
-  chipBg: '#efe2c0',
-  footerBg: '#efe6cf',
-  clearBg: '#ece0c2',
-  clearText: '#7a6a52',
-  markBg: '#f4dca0',
-  markText: '#7a3d0a',
-  chevron: '#c8a15a',
-  focusGlow: 'rgba(200,134,47,.22)',
+  panelBg: 'var(--hr-surface-2)',
+  panelBorder: 'var(--hr-line-gold)',
+  chipBorder: 'var(--hr-chip-border)',
+  dividerStrong: 'var(--hr-line-strong)',
+  dividerSoft: 'var(--hr-surface-3)',
+  hairline: 'var(--hr-hairline)',
+  amber: 'var(--hr-accent)',
+  amberLight: 'var(--hr-accent-soft)',
+  textMain: 'var(--hr-ink-3)',
+  textSecondary: 'var(--hr-muted)',
+  countChipText: 'var(--hr-chip-text)',
+  chipBg: 'var(--hr-chip-bg)',
+  footerBg: 'var(--hr-footer-bg)',
+  clearBg: 'var(--hr-surface-3)',
+  clearText: 'var(--hr-clear-text)',
+  markBg: 'var(--hr-mark-bg)',
+  markText: 'var(--hr-mark-text)',
+  chevron: 'var(--hr-line-gold)',
+  focusGlow: 'var(--hr-accent-glow)',
 } as const;
 
 // Diakritiky-necitlivé, case-insensitive porovnanie, zachováva dĺžku reťazca po znakoch
@@ -127,8 +127,8 @@ function ResultRow({
 }) {
   const fallbackBg =
     kind === 'location'
-      ? 'repeating-linear-gradient(135deg,#e3d3a8 0 6px,#efe2c0 6px 12px)'
-      : 'repeating-linear-gradient(135deg,#d8c7e0 0 6px,#e9e0f0 6px 12px)';
+      ? 'repeating-linear-gradient(135deg,var(--hr-line-strong) 0 6px,var(--hr-chip-bg) 6px 12px)'
+      : 'repeating-linear-gradient(135deg,var(--hr-chip-border) 0 6px,var(--hr-surface-3) 6px 12px)';
 
   return (
     <a
@@ -325,7 +325,7 @@ export function HeroSearch() {
           // Zrušiť ho bez náhrady sa nedá — kto ovláda web klávesnicou, musí
           // vidieť, kde stojí. Preto svieti celý bar.
           background: isFocused
-            ? 'linear-gradient(180deg,#fffdf8,#fbf5e8)'
+            ? 'linear-gradient(180deg,var(--hr-surface),var(--hr-wash-1))'
             : T.panelBg,
           border: `1px solid ${isFocused ? T.amberLight : T.panelBorder}`,
           borderRadius: 18,
@@ -465,7 +465,7 @@ export function HeroSearch() {
               whileTap={{ scale: 0.92 }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = T.amber;
-                e.currentTarget.style.color = '#fbf6ea';
+                e.currentTarget.style.color = 'var(--hr-surface)';
                 e.currentTarget.style.borderColor = T.amber;
               }}
               onMouseLeave={(e) => {

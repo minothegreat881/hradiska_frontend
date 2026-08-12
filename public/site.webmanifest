@@ -20,7 +20,6 @@
     { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
   ],
   "shortcuts": [
-    { "name": "Mapa hradísk", "short_name": "Mapa", "url": "/mapa", "icons": [{ "src": "/favicon-192.png", "sizes": "192x192" }] },
     { "name": "Aktuality", "short_name": "Aktuality", "url": "/aktuality", "icons": [{ "src": "/favicon-192.png", "sizes": "192x192" }] },
     { "name": "Vyhľadávanie", "short_name": "Hľadať", "url": "/hladat", "icons": [{ "src": "/favicon-192.png", "sizes": "192x192" }] }
   ]

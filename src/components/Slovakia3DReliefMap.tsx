@@ -10,6 +10,27 @@ import { Mountain, RotateCcw, ZoomIn, ZoomOut, MapPin, Loader2, Calendar, Hammer
 import { hradiskaData, Hradisko } from '../data/hradiska';
 import { slovakiaBorderDetailed } from '../data/slovakia-border';
 
+/**
+ * Prečíta farbu z premennej `--hr-*`.
+ *
+ * Rám mapy a jej ovládanie sú bežné prvky stránky, čiže si premennú prevezmú
+ * samy. Scéna nie: `three.js` dostáva farbu ako reťazec a zápisu `var(--…)`
+ * nerozumie — namiesto pozadia by nastalo čierno. Preto sa tu hodnota vytiahne
+ * z kaskády ešte predtým, než sa scéne podá.
+ *
+ * Druhý argument je záloha pre vykresľovanie na serveri a pre prípad, že by
+ * premenná chýbala; sú to presne tie hodnoty, ktoré tu boli zapísané natvrdo.
+ */
+function cssColor(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  // Šat z laboratória sedí na `.lab`, nie na koreni dokumentu. Keby sa čítalo
+  // len z koreňa, scéna by si vzala produkčné hodnoty a ostala hnedá aj tam,
+  // kde je zvyšok stránky prefarbený.
+  const host = document.querySelector('.lab') ?? document.documentElement;
+  const v = getComputedStyle(host).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
 // ---------- Piny podľa NÁŠHO členenia (funkčné typy hradísk) ----------
 const PIN_CREAM = '#F5E9D0';
 
@@ -314,9 +335,9 @@ function TerrainMesh({
       uniforms: {
         heightMap: { value: heightMap },
         maskTex: { value: maskTex },
-        bgColor: { value: new THREE.Color('#3a332a') }, // ladí so scene background
+        bgColor: { value: new THREE.Color(cssColor('--hr-map-bg', '#3a332a')) }, // ladí so scene background
         fogActive: { value: is3D ? 1.0 : 0.0 },
-        fogColor: { value: new THREE.Color('#3a332a') },
+        fogColor: { value: new THREE.Color(cssColor('--hr-map-bg', '#3a332a')) },
         fogNear: { value: 6.0 },
         fogFar: { value: 22.0 },
         heightScale: { value: is3D ? heightScale : 0.0 },
@@ -408,7 +429,7 @@ function BorderLine({ is3D, heightScale }: { is3D: boolean; heightScale: number 
       {/* Jemný tmavý podklad pre čitateľnosť proti svetlejším okrovým plochám */}
       <Line
         points={linePoints}
-        color="#2a2318"
+        color={cssColor('--hr-map-frame-2', '#2a2318')}
         lineWidth={2.2}
         transparent
         opacity={0.45}
@@ -416,7 +437,7 @@ function BorderLine({ is3D, heightScale }: { is3D: boolean; heightScale: number 
       {/* Hlavná linka – jedna plynulá, tenká, vintage zlatá */}
       <Line
         points={linePoints}
-        color="#c4a574"
+        color={cssColor('--hr-line-quiet', '#c4a574')}
         lineWidth={1.2}
         transparent
         opacity={0.95}
@@ -443,7 +464,7 @@ function PhotoFallback({ type, className, style }: { type: PinKind; className?: 
       className={className}
       style={{
         background:
-          'radial-gradient(ellipse at 30% 25%, #4a3f30 0%, #3a2f22 45%, #251d14 100%)',
+          'radial-gradient(ellipse at 30% 25%, var(--hr-map-vignette-1) 0%, var(--hr-map-vignette-2) 45%, var(--hr-map-vignette-3) 100%)',
         position: 'relative',
         overflow: 'hidden',
         ...style,
@@ -747,8 +768,8 @@ const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
       >
         <div
           style={{
-            backgroundColor: '#1a1510',
-            border: '1px solid #c4a574',
+            backgroundColor: 'var(--hr-tooltip-bg)',
+            border: '1px solid var(--hr-line-quiet)',
             borderRadius: 10,
             boxShadow: '0 12px 28px rgba(0,0,0,0.7), 0 0 0 3px rgba(0,0,0,0.4)',
             padding: '9px 12px 10px',
@@ -782,7 +803,7 @@ const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
                 padding: '2px 6px',
                 borderRadius: 999,
                 background: PIN_UNESCO,
-                color: '#3a2a10',
+                color: 'var(--hr-badge-text)',
                 fontSize: 8.5,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
@@ -793,7 +814,7 @@ const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
           {/* Názov */}
           <div style={{
             fontFamily: 'Georgia, serif',
-            color: '#fdfbf6',
+            color: 'var(--hr-tooltip-text)',
             fontSize: 14,
             lineHeight: 1.2,
             fontWeight: 600,
@@ -802,19 +823,19 @@ const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
           </div>
           {/* Lokalita */}
           {location && (
-            <div style={{ color: '#c8b89a', fontSize: 11, marginTop: 2 }}>
+            <div style={{ color: 'var(--hr-tooltip-muted)', fontSize: 11, marginTop: 2 }}>
               {location}
             </div>
           )}
           {/* 2 fakty – len ak sú vyplnené */}
           {(fact1 || fact2) && (
-            <div style={{ color: '#f0e3c8', fontSize: 11, marginTop: 4, letterSpacing: '0.02em' }}>
-              {fact1}{fact1 && fact2 ? <span style={{ color: '#c4a574', margin: '0 4px' }}>·</span> : ''}{fact2}
+            <div style={{ color: 'var(--hr-tooltip-fact)', fontSize: 11, marginTop: 4, letterSpacing: '0.02em' }}>
+              {fact1}{fact1 && fact2 ? <span style={{ color: 'var(--hr-line-quiet)', margin: '0 4px' }}>·</span> : ''}{fact2}
             </div>
           )}
           {/* Mikro-hint */}
           <div style={{
-            color: '#c4a574',
+            color: 'var(--hr-line-quiet)',
             fontSize: 9,
             marginTop: 6,
             letterSpacing: '0.1em',
@@ -834,7 +855,7 @@ const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
             height: 0,
             borderLeft: '8px solid transparent',
             borderRight: '8px solid transparent',
-            borderTop: '8px solid #c4a574',
+            borderTop: '8px solid var(--hr-line-quiet)',
           }} />
           {/* Šípka dole – fill (matches tooltip bg) */}
           <div style={{
@@ -846,7 +867,7 @@ const HoverTooltipOverlay = forwardRef<HTMLDivElement, { hradisko: Hradisko }>(
             height: 0,
             borderLeft: '7px solid transparent',
             borderRight: '7px solid transparent',
-            borderTop: '7px solid #1a1510',
+            borderTop: '7px solid var(--hr-tooltip-bg)',
           }} />
         </div>
       </div>,
@@ -1077,7 +1098,7 @@ export default function Slovakia3DReliefMap() {
     <div
       className="relative w-full"
       style={{
-        background: 'linear-gradient(180deg, #3d352a 0%, #4a4035 15%, #3d352a 50%, #342d24 85%, #2c2418 100%)'
+        background: 'linear-gradient(180deg, var(--hr-map-frame) 0%, var(--hr-map-frame) 15%, var(--hr-map-frame) 50%, var(--hr-map-frame-2) 85%, var(--hr-map-frame-2) 100%)'
       }}
     >
       {/* Parchment texture overlay */}
@@ -1097,56 +1118,56 @@ export default function Slovakia3DReliefMap() {
       <div
         className="absolute top-0 left-0 right-0 h-3 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, #8b7355 10%, #c4a574 50%, #8b7355 90%, transparent 100%)',
+          background: 'linear-gradient(90deg, transparent 0%, var(--hr-relief-edge) 10%, var(--hr-line-quiet) 50%, var(--hr-relief-edge) 90%, transparent 100%)',
           opacity: 0.6
         }}
       />
       <div
         className="absolute top-3 left-0 right-0 h-1 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, #5d4e37 10%, #8b7355 50%, #5d4e37 90%, transparent 100%)',
+          background: 'linear-gradient(90deg, transparent 0%, var(--hr-relief-deep) 10%, var(--hr-relief-edge) 50%, var(--hr-relief-deep) 90%, transparent 100%)',
           opacity: 0.4
         }}
       />
 
       {/* Decorative corner flourishes - larger and more ornate */}
-      <div className="absolute top-6 left-6 text-6xl opacity-30 pointer-events-none" style={{ color: '#c4a574', fontFamily: 'Georgia, serif' }}>❦</div>
-      <div className="absolute top-6 right-6 text-6xl opacity-30 pointer-events-none" style={{ color: '#c4a574', fontFamily: 'Georgia, serif', transform: 'scaleX(-1)' }}>❦</div>
-      <div className="absolute bottom-6 left-6 text-6xl opacity-30 pointer-events-none" style={{ color: '#c4a574', fontFamily: 'Georgia, serif', transform: 'scaleY(-1)' }}>❦</div>
-      <div className="absolute bottom-6 right-6 text-6xl opacity-30 pointer-events-none" style={{ color: '#c4a574', fontFamily: 'Georgia, serif', transform: 'scale(-1)' }}>❦</div>
+      <div className="absolute top-6 left-6 text-6xl opacity-30 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-line-quiet)', fontFamily: 'Georgia, serif' }}>❦</div>
+      <div className="absolute top-6 right-6 text-6xl opacity-30 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-line-quiet)', fontFamily: 'Georgia, serif', transform: 'scaleX(-1)' }}>❦</div>
+      <div className="absolute bottom-6 left-6 text-6xl opacity-30 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-line-quiet)', fontFamily: 'Georgia, serif', transform: 'scaleY(-1)' }}>❦</div>
+      <div className="absolute bottom-6 right-6 text-6xl opacity-30 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-line-quiet)', fontFamily: 'Georgia, serif', transform: 'scale(-1)' }}>❦</div>
 
       {/* Additional corner ornaments */}
-      <div className="absolute top-16 left-16 text-2xl opacity-20 pointer-events-none" style={{ color: '#d4c0a0' }}>✧</div>
-      <div className="absolute top-16 right-16 text-2xl opacity-20 pointer-events-none" style={{ color: '#d4c0a0' }}>✧</div>
-      <div className="absolute bottom-16 left-16 text-2xl opacity-20 pointer-events-none" style={{ color: '#d4c0a0' }}>✧</div>
-      <div className="absolute bottom-16 right-16 text-2xl opacity-20 pointer-events-none" style={{ color: '#d4c0a0' }}>✧</div>
+      <div className="absolute top-16 left-16 text-2xl opacity-20 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-relief-mid)' }}>✧</div>
+      <div className="absolute top-16 right-16 text-2xl opacity-20 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-relief-mid)' }}>✧</div>
+      <div className="absolute bottom-16 left-16 text-2xl opacity-20 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-relief-mid)' }}>✧</div>
+      <div className="absolute bottom-16 right-16 text-2xl opacity-20 pointer-events-none hr-map-ornament" style={{ color: 'var(--hr-relief-mid)' }}>✧</div>
 
       {/* Decorative border lines - double line effect */}
-      <div className="absolute top-14 left-14 right-14 h-px opacity-40 pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, #c4a574, transparent)' }} />
-      <div className="absolute top-16 left-20 right-20 h-px opacity-25 pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, #d4c0a0, transparent)' }} />
-      <div className="absolute bottom-14 left-14 right-14 h-px opacity-40 pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, #c4a574, transparent)' }} />
-      <div className="absolute bottom-16 left-20 right-20 h-px opacity-25 pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, #d4c0a0, transparent)' }} />
-      <div className="absolute top-14 bottom-14 left-14 w-px opacity-40 pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #c4a574, transparent)' }} />
-      <div className="absolute top-20 bottom-20 left-16 w-px opacity-25 pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #d4c0a0, transparent)' }} />
-      <div className="absolute top-14 bottom-14 right-14 w-px opacity-40 pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #c4a574, transparent)' }} />
-      <div className="absolute top-20 bottom-20 right-16 w-px opacity-25 pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #d4c0a0, transparent)' }} />
+      <div className="absolute top-14 left-14 right-14 h-px opacity-40 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-line-quiet), transparent)' }} />
+      <div className="absolute top-16 left-20 right-20 h-px opacity-25 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-relief-mid), transparent)' }} />
+      <div className="absolute bottom-14 left-14 right-14 h-px opacity-40 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-line-quiet), transparent)' }} />
+      <div className="absolute bottom-16 left-20 right-20 h-px opacity-25 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-relief-mid), transparent)' }} />
+      <div className="absolute top-14 bottom-14 left-14 w-px opacity-40 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-line-quiet), transparent)' }} />
+      <div className="absolute top-20 bottom-20 left-16 w-px opacity-25 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-relief-mid), transparent)' }} />
+      <div className="absolute top-14 bottom-14 right-14 w-px opacity-40 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-line-quiet), transparent)' }} />
+      <div className="absolute top-20 bottom-20 right-16 w-px opacity-25 pointer-events-none hr-map-ornament" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-relief-mid), transparent)' }} />
 
       {/* Side decorative elements */}
       <div className="absolute left-8 top-1/2 -translate-y-1/2 opacity-15 pointer-events-none hidden lg:block">
-        <div className="flex flex-col items-center gap-4" style={{ color: '#c4a574' }}>
+        <div className="flex flex-col items-center gap-4" style={{ color: 'var(--hr-line-quiet)' }}>
           <span className="text-2xl">⚜</span>
-          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, #c4a574, transparent)' }} />
+          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-line-quiet), transparent)' }} />
           <span className="text-lg">❧</span>
-          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, #c4a574, transparent)' }} />
+          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-line-quiet), transparent)' }} />
           <span className="text-2xl">⚜</span>
         </div>
       </div>
       <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-15 pointer-events-none hidden lg:block">
-        <div className="flex flex-col items-center gap-4" style={{ color: '#c4a574' }}>
+        <div className="flex flex-col items-center gap-4" style={{ color: 'var(--hr-line-quiet)' }}>
           <span className="text-2xl">⚜</span>
-          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, #c4a574, transparent)' }} />
+          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-line-quiet), transparent)' }} />
           <span className="text-lg" style={{ transform: 'scaleX(-1)' }}>❧</span>
-          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, #c4a574, transparent)' }} />
+          <div className="w-px h-20" style={{ background: 'linear-gradient(180deg, transparent, var(--hr-line-quiet), transparent)' }} />
           <span className="text-2xl">⚜</span>
         </div>
       </div>
@@ -1160,7 +1181,7 @@ export default function Slovakia3DReliefMap() {
         }}
       >
         {/* Header ornamental line */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3" style={{ color: '#c4a574' }}>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3" style={{ color: 'var(--hr-line-quiet)' }}>
           <span className="opacity-60">═══</span>
           <span className="text-xl">⚜</span>
           <span className="opacity-60">═══</span>
@@ -1170,25 +1191,25 @@ export default function Slovakia3DReliefMap() {
           <div className="text-center md:text-left flex-1">
             {/* Title with decorative elements */}
             <div className="flex items-center justify-center md:justify-start gap-4 mb-2">
-              <span className="hidden md:inline text-2xl opacity-60" style={{ color: '#c4a574' }}>☙</span>
+              <span className="hidden md:inline text-2xl opacity-60" style={{ color: 'var(--hr-line-quiet)' }}>☙</span>
               <h2
                 className="text-2xl md:text-4xl tracking-widest"
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
                   letterSpacing: '0.15em',
-                  color: '#e8dcc8',
+                  color: 'var(--hr-relief-high)',
                   textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
                 }}
               >
                 MAPA HRADÍSK
               </h2>
-              <span className="hidden md:inline text-2xl opacity-60" style={{ color: '#c4a574', transform: 'scaleX(-1)' }}>☙</span>
+              <span className="hidden md:inline text-2xl opacity-60" style={{ color: 'var(--hr-line-quiet)', transform: 'scaleX(-1)' }}>☙</span>
             </div>
             <p
               className="text-sm mt-2 tracking-wide"
               style={{
                 fontFamily: 'Georgia, "Times New Roman", serif',
-                color: '#a89f8f',
+                color: 'var(--hr-muted-2)',
                 fontStyle: 'italic'
               }}
             >
@@ -1205,14 +1226,14 @@ export default function Slovakia3DReliefMap() {
           <div
             className="relative rounded-2xl p-1"
             style={{
-              background: 'linear-gradient(135deg, #c4a574 0%, #8b7355 25%, #5d4e37 50%, #8b7355 75%, #c4a574 100%)'
+              background: 'linear-gradient(135deg, var(--hr-line-quiet) 0%, var(--hr-relief-edge) 25%, var(--hr-relief-deep) 50%, var(--hr-relief-edge) 75%, var(--hr-line-quiet) 100%)'
             }}
           >
             {/* Inner shadow frame */}
             <div
               className="rounded-xl p-0.5"
               style={{
-                background: 'linear-gradient(135deg, #3d3426 0%, #2a2318 50%, #3d3426 100%)'
+                background: 'linear-gradient(135deg, var(--hr-map-frame-3) 0%, var(--hr-map-frame-2) 50%, var(--hr-map-frame-3) 100%)'
               }}
             >
             <div
@@ -1225,10 +1246,10 @@ export default function Slovakia3DReliefMap() {
               onClick={() => setIsMapActive(true)}
             >
               {/* Ornate corner decorations */}
-              <div className="absolute top-2 left-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: '#c4a574' }}>╔</div>
-              <div className="absolute top-2 right-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: '#c4a574' }}>╗</div>
-              <div className="absolute bottom-2 left-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: '#c4a574' }}>╚</div>
-              <div className="absolute bottom-2 right-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: '#c4a574' }}>╝</div>
+              <div className="absolute top-2 left-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: 'var(--hr-line-quiet)' }}>╔</div>
+              <div className="absolute top-2 right-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: 'var(--hr-line-quiet)' }}>╗</div>
+              <div className="absolute bottom-2 left-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: 'var(--hr-line-quiet)' }}>╚</div>
+              <div className="absolute bottom-2 right-2 text-3xl z-20 pointer-events-none opacity-40" style={{ color: 'var(--hr-line-quiet)' }}>╝</div>
 
               {/* Activation hint overlay - hide when detail is open */}
               {!isMapActive && !selectedHradisko && (
@@ -1245,7 +1266,7 @@ export default function Slovakia3DReliefMap() {
                       className="text-sm tracking-wide"
                       style={{
                         fontFamily: 'Georgia, "Times New Roman", serif',
-                        color: '#e8dcc8'
+                        color: 'var(--hr-relief-high)'
                       }}
                     >
                       ✦ Klikni na mapu pre aktiváciu ✦
@@ -1268,7 +1289,7 @@ export default function Slovakia3DReliefMap() {
                 style={{ width: '100%', height: '100%' }}
               >
                 {/* Warm parchment-like background */}
-                <color attach="background" args={['#3a332a']} />
+                <color attach="background" args={[cssColor('--hr-map-bg', '#3a332a')]} />
             <Suspense fallback={<LoadingScreen />}>
               <SceneLighting />
               <FitCamera
@@ -1322,7 +1343,7 @@ export default function Slovakia3DReliefMap() {
                   borderRadius: 8,
                   border: '1px solid rgba(196, 165, 116, 0.5)',
                   background: 'rgba(31, 26, 20, 0.95)',
-                  color: '#c4a574',
+                  color: 'var(--hr-line-quiet)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1371,7 +1392,7 @@ export default function Slovakia3DReliefMap() {
                       className="lg:hidden absolute bottom-4 right-4 z-20 rounded-full shadow-lg inline-flex items-center gap-1.5"
                       style={{
                         background: 'rgba(28,23,16,0.94)', border: '1px solid rgba(196,165,116,0.4)',
-                        color: '#c4a574', fontFamily: 'Georgia, serif', fontSize: 12, padding: '8px 13px',
+                        color: 'var(--hr-line-quiet)', fontFamily: 'Georgia, serif', fontSize: 12, padding: '8px 13px',
                       }}
                       aria-label="Zobraziť legendu"
                     >
@@ -1388,10 +1409,10 @@ export default function Slovakia3DReliefMap() {
                     }}
                   >
                     <div className="flex items-baseline justify-between gap-3" style={{ marginBottom: 9 }}>
-                      <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: '#c4a574', margin: 0 }}>Kategórie</h3>
-                      <span className="flex items-center gap-2" style={{ fontFamily: 'Georgia, serif', fontSize: 11, color: '#a89f8f', whiteSpace: 'nowrap' }}>
+                      <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--hr-line-quiet)', margin: 0 }}>Kategórie</h3>
+                      <span className="flex items-center gap-2" style={{ fontFamily: 'Georgia, serif', fontSize: 11, color: 'var(--hr-muted-2)', whiteSpace: 'nowrap' }}>
                         {visible} / {points.length} lokalít
-                        <button onClick={(e) => { e.stopPropagation(); setLegendOpen(false); }} className="lg:hidden" aria-label="Skryť legendu" style={{ background: 'none', border: 'none', color: '#c4a574', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>✕</button>
+                        <button onClick={(e) => { e.stopPropagation(); setLegendOpen(false); }} className="lg:hidden" aria-label="Skryť legendu" style={{ background: 'none', border: 'none', color: 'var(--hr-line-quiet)', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0 }}>✕</button>
                       </span>
                     </div>
 
@@ -1409,7 +1430,7 @@ export default function Slovakia3DReliefMap() {
                           >
                             <span style={{ width: 18, height: 18, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                               dangerouslySetInnerHTML={{ __html: makeCatPin(c.slug, 18, true) }} />
-                            <span style={{ fontFamily: 'Georgia, serif', fontSize: 12.5, color: isOn ? '#ece0c8' : '#8a7f6b', textDecoration: isOn ? 'none' : 'line-through' }}>
+                            <span style={{ fontFamily: 'Georgia, serif', fontSize: 12.5, color: isOn ? 'var(--hr-legend-on)' : 'var(--hr-legend-off)', textDecoration: isOn ? 'none' : 'line-through' }}>
                               {legendLabel[c.slug]}
                             </span>
                           </button>
@@ -1419,11 +1440,11 @@ export default function Slovakia3DReliefMap() {
 
                     <div style={{ height: 1, background: 'rgba(196,165,116,0.22)', margin: '10px 0 8px' }} />
                     <div className="flex items-center" style={{ gap: 7 }}>
-                      <span style={{ fontSize: 10, color: '#a89f8f', whiteSpace: 'nowrap' }}>0 m</span>
+                      <span style={{ fontSize: 10, color: 'var(--hr-muted-2)', whiteSpace: 'nowrap' }}>0 m</span>
                       <div style={{ flex: 1, height: 7, borderRadius: 3, background: grad }} />
-                      <span style={{ fontSize: 10, color: '#a89f8f', whiteSpace: 'nowrap' }}>2655 m</span>
+                      <span style={{ fontSize: 10, color: 'var(--hr-muted-2)', whiteSpace: 'nowrap' }}>2655 m</span>
                     </div>
-                    <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 10.5, color: '#7c715f', margin: '7px 0 0' }}>
+                    <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 10.5, color: 'var(--hr-legend-note)', margin: '7px 0 0' }}>
                       Klikni na bodku pre článok.
                     </p>
                   </div>
@@ -1468,7 +1489,7 @@ export default function Slovakia3DReliefMap() {
               <motion.div
                 className="relative w-full max-w-3xl overflow-hidden"
                 style={{
-                  background: '#faf7f1',
+                  background: 'var(--hr-paper-bright)',
                   borderRadius: 20,
                   boxShadow: '0 30px 70px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(196,165,116,0.4)',
                   maxHeight: 'calc(100vh - 64px)',
@@ -1500,7 +1521,7 @@ export default function Slovakia3DReliefMap() {
                       width: 44,
                       height: 44,
                       background: 'rgba(15,11,7,0.78)',
-                      color: '#faf7f1',
+                      color: 'var(--hr-paper-bright)',
                       backdropFilter: 'blur(8px)',
                       border: '1px solid rgba(196,165,116,0.45)',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
@@ -1519,7 +1540,7 @@ export default function Slovakia3DReliefMap() {
                     </div>
                     {selectedHradisko.unesco && (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wider"
-                        style={{ background: PIN_UNESCO, color: '#3a2a10', letterSpacing: '0.1em', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>
+                        style={{ background: PIN_UNESCO, color: 'var(--hr-badge-text)', letterSpacing: '0.1em', boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }}>
                         <Sparkles className="w-3.5 h-3.5" /> UNESCO
                       </div>
                     )}
@@ -1530,25 +1551,25 @@ export default function Slovakia3DReliefMap() {
                 <div className="overflow-y-auto px-6 md:px-8 pt-6" style={{ flex: '1 1 auto', paddingBottom: 56 }}>
                   {/* Title */}
                   <h2 className="font-semibold leading-tight tracking-tight"
-                    style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(26px, 4vw, 36px)', color: '#2d1810' }}>
+                    style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(26px, 4vw, 36px)', color: 'var(--hr-ink)' }}>
                     {selectedHradisko.name}
                   </h2>
 
                   {/* Lokalita so zlatou pin ikonkou */}
-                  <p className="text-sm mt-1.5 flex items-center gap-1.5" style={{ color: '#7d4f1d' }}>
-                    <MapPin className="w-4 h-4" style={{ color: '#c4a574' }} />
+                  <p className="text-sm mt-1.5 flex items-center gap-1.5" style={{ color: 'var(--hr-accent-deep)' }}>
+                    <MapPin className="w-4 h-4" style={{ color: 'var(--hr-line-quiet)' }} />
                     {selectedHradisko.okres ? `${selectedHradisko.okres} · ${selectedHradisko.kraj} kraj` : `${selectedHradisko.kraj} kraj`}
                   </p>
 
                   {/* Tenká zlatá linka */}
                   <div className="h-px my-5" style={{
-                    background: 'linear-gradient(90deg, transparent 0%, #c4a574 25%, #c4a574 75%, transparent 100%)'
+                    background: 'linear-gradient(90deg, transparent 0%, var(--hr-line-quiet) 25%, var(--hr-line-quiet) 75%, transparent 100%)'
                   }} />
 
                   {/* Popis – line-height 1.6, max ~70 znakov na riadok */}
                   {selectedHradisko.description && (
                     <p className="mb-6"
-                      style={{ color: '#4a3f35', fontFamily: 'Georgia, serif', fontSize: 15, lineHeight: 1.65, maxWidth: '68ch' }}>
+                      style={{ color: 'var(--hr-body-4)', fontFamily: 'Georgia, serif', fontSize: 15, lineHeight: 1.65, maxWidth: '68ch' }}>
                       {selectedHradisko.description}
                     </p>
                   )}
@@ -1567,12 +1588,12 @@ export default function Slovakia3DReliefMap() {
                           border: '1px solid rgba(196,165,116,0.28)',
                         }}>
                         <div className="flex items-center gap-1.5 mb-1.5">
-                          <Icon className="w-3.5 h-3.5" style={{ color: '#c4a574' }} />
-                          <span className="text-[10px] uppercase font-medium" style={{ color: '#8b7355', letterSpacing: '0.12em' }}>
+                          <Icon className="w-3.5 h-3.5" style={{ color: 'var(--hr-line-quiet)' }} />
+                          <span className="text-[10px] uppercase font-medium" style={{ color: 'var(--hr-relief-edge)', letterSpacing: '0.12em' }}>
                             {label}
                           </span>
                         </div>
-                        <div className="text-[15px] font-medium leading-snug truncate" style={{ color: '#2d1810' }} title={String(value)}>
+                        <div className="text-[15px] font-medium leading-snug truncate" style={{ color: 'var(--hr-ink)' }} title={String(value)}>
                           {value}
                         </div>
                       </div>
@@ -1586,8 +1607,8 @@ export default function Slovakia3DReliefMap() {
                       className="flex-1 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all hover:brightness-110"
                       style={{
                         height: 44,
-                        background: 'linear-gradient(135deg, #7d4f1d 0%, #a87437 100%)',
-                        color: '#faf7f1',
+                        background: 'linear-gradient(135deg, var(--hr-accent-deep) 0%, var(--hr-accent-mid) 100%)',
+                        color: 'var(--hr-paper-bright)',
                         boxShadow: '0 4px 12px rgba(125,79,29,0.4)',
                       }}
                     >
@@ -1600,7 +1621,7 @@ export default function Slovakia3DReliefMap() {
                       style={{
                         height: 44,
                         background: 'transparent',
-                        color: '#5d4e37',
+                        color: 'var(--hr-relief-deep)',
                         border: '1px solid rgba(93,78,55,0.35)',
                       }}
                     >
@@ -1636,7 +1657,7 @@ export default function Slovakia3DReliefMap() {
           <button
             onClick={() => setIsMapActive(false)}
             className="text-xs transition-colors hover:opacity-80"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: '#c4a574' }}
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif', color: 'var(--hr-line-quiet)' }}
           >
             ⟨ Klikni mimo mapy pre scrollovanie ⟩
           </button>

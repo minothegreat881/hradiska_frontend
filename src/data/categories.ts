@@ -28,6 +28,19 @@ export interface HradiskaCategory {
   image: string;
 }
 
+/**
+ * Cesta k zmenšenine, ktorú Strapi vyrobil pri nahratí (`small_`, `medium_`,
+ * `large_`, `thumbnail_`). Predpona sa lepí pred názov súboru, nie pred celú
+ * cestu — `/uploads/Foo.jpg` → `/uploads/small_Foo.jpg`.
+ *
+ * Dlaždica má 363 × 220 px, originály majú 1280–3183 px a spolu 7,6 MB. Kým sa
+ * stiahli, ostávali karty prázdne — pri studenej pamäti prehliadača aj desiatky
+ * sekúnd. So `small_`/`medium_` je to 1,2–2,7 MB.
+ */
+export function variant(path: string, size: 'thumbnail' | 'small' | 'medium' | 'large'): string {
+  return path.replace(/([^/]+)$/, `${size}_$1`);
+}
+
 export const hradiskaCategories: HradiskaCategory[] = [
   {
     slug: 'kniezacie-sidla',

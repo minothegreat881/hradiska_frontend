@@ -122,31 +122,60 @@ export interface StrapiResponse<T> {
 /**
  * Fetch helper with error handling
  */
+/** Oneskorenia medzi pokusmi (ms). Pozri `fetchStrapi`. */
+const RETRY_DELAYS = [700, 2000, 4000];
+
 async function fetchStrapi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${STRAPI_URL}/api${endpoint}`;
 
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        // ngrok free-tier shows a browser warning page on first request from a
-        // typical browser User-Agent. This header bypasses it so fetch receives
-        // JSON instead of HTML. No-op for non-ngrok backends.
-        'ngrok-skip-browser-warning': 'true',
-        ...options?.headers,
-      },
-    });
+  // Opakovať sa smie iba čítanie. Zápis by sa opakovaním mohol vykonať dvakrát
+  // (dva komentáre, dve registrácie), takže ten ide na jeden pokus.
+  const method = (options?.method || 'GET').toUpperCase();
+  const mayRetry = method === 'GET';
+  const attempts = mayRetry ? RETRY_DELAYS.length + 1 : 1;
 
-    if (!response.ok) {
-      throw new Error(`Strapi API error: ${response.status} ${response.statusText}`);
+  let lastError: unknown;
+
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          // ngrok free-tier shows a browser warning page on first request from a
+          // typical browser User-Agent. This header bypasses it so fetch receives
+          // JSON instead of HTML. No-op for non-ngrok backends.
+          'ngrok-skip-browser-warning': 'true',
+          ...options?.headers,
+        },
+      });
+
+      if (!response.ok) {
+        // 4xx je odpoveď servera na zlú otázku — opakovanie ju nezlepší.
+        // 5xx a výpadok spojenia áno: Strapi po štarte ešte chvíľu nepočúva.
+        if (response.status < 500 || i === attempts - 1) {
+          throw new Error(`Strapi API error: ${response.status} ${response.statusText}`);
+        }
+        lastError = new Error(`Strapi API error: ${response.status}`);
+      } else {
+        return response.json();
+      }
+    } catch (error) {
+      lastError = error;
+      // Posledný pokus alebo chyba, ktorá sa opakovaním nezmení → von.
+      if (i === attempts - 1 || !mayRetry) {
+        console.error(`Failed to fetch from Strapi: ${url}`, error);
+        throw error;
+      }
     }
 
-    return response.json();
-  } catch (error) {
-    console.error(`Failed to fetch from Strapi: ${url}`, error);
-    throw error;
+    // Vývojový Strapi štartuje aj dve minúty. Keď sa stránka otvorí skôr,
+    // bez tohto čakania ostane navigácia, kronika aj dlaždice navždy prázdne —
+    // stav sa nastaví raz a nikto ho už neskúsi znova.
+    await new Promise((r) => setTimeout(r, RETRY_DELAYS[i]));
   }
+
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 /**

@@ -12,7 +12,19 @@ interface CategoryCardProps {
     description: string;
     detailedDescription: string;
     icon: string;
+    /**
+     * PLNÁ adresa obrázka, nie cesta v médiách. Základ Strapi dopĺňa volajúci
+     * (`HomePage`), lebo ten už vie, či beží vývoj alebo produkcia. Keby sa
+     * základ pridával aj tu, vzniklo by `http://…1337http://…1337/uploads/…`
+     * a na dlaždici by namiesto fotky ostal `alt`.
+     */
     image: string;
+    /**
+     * Voliteľná sada veľkostí (`srcset`). Prehliadač si z nej vyberie podľa
+     * šírky dlaždice a hustoty obrazovky, takže na mobile nesťahuje to isté
+     * čo 4K monitor. Bez nej sa použije samotný `image`.
+     */
+    imageSrcSet?: string;
   };
   index: number;
 }
@@ -40,12 +52,10 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
       <article
         className="h-full flex flex-col overflow-hidden"
         style={{
-          background: '#fffdf8',
-          border: `1px solid ${hover ? 'rgba(125,79,29,0.55)' : 'rgba(196,165,116,0.4)'}`,
+          background: 'var(--hr-surface)',
+          border: `1px solid ${hover ? 'var(--hr-accent-border)' : 'var(--hr-line)'}`,
           borderRadius: 12,
-          boxShadow: hover
-            ? '0 4px 14px rgba(70,40,20,0.10), 0 10px 24px rgba(70,40,20,0.08)'
-            : '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
+          boxShadow: hover ? 'var(--hr-shadow-md)' : 'var(--hr-shadow-sm)',
           transition: 'border-color 150ms ease, box-shadow 150ms ease',
         }}
       >
@@ -53,7 +63,11 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
         <div className="relative overflow-hidden flex-shrink-0" style={{ height: 220 }}>
           <ImageWithFallback
             src={category.image}
+            srcSet={category.imageSrcSet}
+            sizes="(max-width: 767px) 92vw, (max-width: 1023px) 46vw, 380px"
             alt={category.label}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
             style={{
               transform: hover ? 'scale(1.04)' : 'scale(1)',
@@ -70,7 +84,7 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
               fontFamily: 'Georgia, "Times New Roman", serif',
               fontSize: 20,
               fontWeight: 600,
-              color: '#2d1810',
+              color: 'var(--hr-ink)',
               lineHeight: 1.25,
               letterSpacing: '0.02em',
               margin: 0,
@@ -85,7 +99,7 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
             style={{
               fontFamily: 'Georgia, "Times New Roman", serif',
               fontSize: 14.5,
-              color: '#5d4e37',
+              color: 'var(--hr-body-2)',
               lineHeight: 1.6,
               textAlign: 'left',
               margin: 0,
@@ -107,7 +121,7 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
               fontFamily: 'Georgia, "Times New Roman", serif',
               fontSize: 13,
               fontWeight: 500,
-              color: '#7d4f1d',
+              color: 'var(--hr-accent-deep)',
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
             }}

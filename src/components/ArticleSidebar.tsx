@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -189,13 +189,9 @@ function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; ln
   return (
     <div className="relative w-full rounded-lg overflow-hidden border border-stone-200 dark:border-stone-600 shadow-md" style={{ height: '220px' }}>
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
-      <a
-        href="/mapa"
-        className="absolute bottom-2 left-2 px-3 py-1.5 bg-stone-900/90 hover:bg-amber-700 text-white text-xs font-medium rounded-full flex items-center gap-1.5 transition-colors shadow-lg"
-      >
-        <MapPin className="w-3 h-3" />
-        Zobraziť na mape
-      </a>
+      {/* Tlačidlo „Zobraziť na mape" viedlo na /mapa — tá stránka je zrušená,
+          takže by to bol odkaz do prázdna. Mapka v paneli ostáva, len už
+          nikam neodkazuje. */}
       {/* 3D Badge - same as main map */}
       <div className="absolute top-2 left-2 px-2 py-1 bg-emerald-600/90 text-white text-xs font-semibold rounded shadow">
         3D Mapa
