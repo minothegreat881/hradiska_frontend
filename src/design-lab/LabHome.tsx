@@ -14,13 +14,10 @@
  * labové komponenty, takže poradie stránky ostáva zachované.
  */
 
-import { lazy, Suspense } from 'react';
-import { motion } from 'motion/react';
 import { HeroSearch } from '../components/HeroSearch';
 import { InkEffect } from '../components/InkEffect';
 import LabAktuality from './LabAktuality';
-
-const Slovakia3DReliefMap = lazy(() => import('../components/Slovakia3DReliefMap'));
+import LabMapa from './LabMapa';
 
 export function LabHome() {
   return (
@@ -59,30 +56,11 @@ export function LabHome() {
 
       <LabAktuality />
 
-      {/* Mapa */}
-      <section
-        className="relative"
-        style={{
-          zIndex: 5,
-          background: 'var(--hr-frame)',
-          boxShadow: 'inset 0 1px 0 rgba(196, 165, 116, 0.45), inset 0 -1px 0 rgba(196, 165, 116, 0.45), 0 -8px 16px -8px rgba(125, 79, 29, 0.18)',
-        }}
-      >
-        <Suspense
-          fallback={
-            <div
-              style={{
-                width: '100%', height: 600, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'var(--hr-line-quiet)', fontFamily: 'Georgia, "Times New Roman", serif',
-                fontSize: 14, letterSpacing: '0.1em', background: 'var(--hr-dark-4)',
-              }}
-            >
-              ✦ Načítavam mapu...
-            </div>
-          }
-        >
-          <Slovakia3DReliefMap />
-        </Suspense>
+      {/* Mapa — nová (reliéfne dlaždice + MapLibre) namiesto 3D scény
+          v Three.js. Produkčná `Slovakia3DReliefMap` ostáva nedotknutá
+          a téma „Pôvodná" ju naďalej vykresľuje, nech sa dá porovnať. */}
+      <section className="relative" style={{ zIndex: 5 }}>
+        <LabMapa />
       </section>
     </div>
   );
