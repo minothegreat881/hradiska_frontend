@@ -376,6 +376,17 @@ export function LabMapa() {
   }, [spider, locs]);
 
   const canvasW = mapRef.current?.getCanvas().getBoundingClientRect().width ?? 1200;
+  /** Klik mimo bodu, karty a ovládania = zavrieť. */
+  const closeOnOutside = (e: React.MouseEvent) => {
+    const t = e.target as HTMLElement;
+    if (t.closest?.('.lmap-pin, .lmap-card, .lmap-cluster, .lmap-spider-x, .lmap-zoom')) return;
+    if (hoverTimer.current) { window.clearTimeout(hoverTimer.current); hoverTimer.current = null; }
+    setSelected(null);
+    setSpider(null);
+    setHoverId(null);
+    setHoverCat(null);
+  };
+
   const openHover = (id: string, cat: string) => {
     if (hoverTimer.current) { window.clearTimeout(hoverTimer.current); hoverTimer.current = null; }
     setHoverId(id); setHoverCat(cat);
@@ -435,7 +446,12 @@ export function LabMapa() {
       </div>
 
       {/* ── Plátno ─────────────────────────────────────────────────────── */}
-      <div className="lmap-canvas">
+      {/* Zatvorenie karty klikom KAMKOĽVEK mimo bodu. Nestačí `map.on('click')`:
+          MapLibre ohlási klik len z vlastného plátna, takže klik do mriežky,
+          vodoznaku či HUD-u by kartu nechal otvorenú a jedinou cestou von by
+          ostal krížik. Toto beží na úrovni DOM v zachytávacej fáze, takže
+          zabera vsade — okrem samotného bodu, karty a ovládania. */}
+      <div className="lmap-canvas" onClickCapture={closeOnOutside}>
         <div className="lmap-grid" aria-hidden="true" />
         <div className="lmap-watermark" aria-hidden="true">SK</div>
 
