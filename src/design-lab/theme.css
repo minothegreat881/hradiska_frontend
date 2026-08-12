@@ -1,0 +1,2036 @@
+/* ── Písmo (self-hostované, žiadne CDN) ───────────────────────────────────
+   INTER — text, popisky, rozhranie. Skutočné textové písmo: veľká výška
+     malých písmen a plnohodnotný rez 400, takže je čitateľné aj v drobnom.
+   FRAUNCES — LEN veľké nadpisy, v reze 700. Má charakter, ale na text nie je.
+
+   PREČO NIE Space Grotesk (predchádzajúci pokus): má výšku malých písmen
+   0,49 em (Inter 0,55) — pri rovnakej veľkosti pôsobí o tretinu menšie —
+   a jeho premenlivá os má PREDVOLENÚ váhu 300, teda Light. Malé a tenké
+   naraz; na text bola zlá voľba.
+
+   POZOR na `format()`: `format('woff2-variations')` je nefunkčný reťazec,
+   prehliadač taký zdroj preskočí a písmo sa vôbec nenačíta. Správne `woff2`.
+   Latin-ext je nutný, inak ž, š, č, ľ, ô padnú na náhradné písmo. */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/fonts/inter-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/fonts/inter-latin-ext-400-normal.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('/fonts/inter-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('/fonts/inter-latin-ext-500-normal.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('/fonts/inter-latin-600-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('/fonts/inter-latin-ext-600-normal.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('/fonts/inter-latin-700-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('/fonts/inter-latin-ext-700-normal.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url('/fonts/fraunces-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122; }
+@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url('/fonts/fraunces-latin-ext-wght-normal.woff2') format('woff2');
+  unicode-range: U+0100-024F,U+1E00-1EFF,U+2C60-2C7F,U+A720-A7FF; }
+
+/**
+ * REDAKČNÝ ŠTÝL — skúšobná téma nad skutočnou domovskou stránkou.
+ * Zapuzdrené pod `.lab`, takže sa NIKDY neprejaví na produkčnom webe.
+ *
+ * KONCEPT STRÁNKY OSTÁVA: titulná fotografia → searchbar → aktuality → mapa →
+ * kategórie → text s formulárom.
+ *
+ * Farby idú cez dizajnové tokeny `--hr-*`, ktoré berú hodnoty zo sémantických
+ * premenných `--l-*`. Nová téma je preto otázka dvadsiatich riadkov na konci
+ * súboru, nie prepisovania päťdesiatich hodnôt.
+ */
+
+.lab {
+  --font-heading: 'Inter', ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: 'Inter', ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+
+  /* ── Mapovanie tokenov na sémantické premenné ───────────────────────── */
+  --hr-bg: var(--l-paper);
+  --hr-surface: var(--l-card);
+  --hr-surface-2: var(--l-card);
+  --hr-surface-3: var(--l-paper-2);
+
+  --hr-ink: var(--l-ink);
+  --hr-ink-2: var(--l-ink);
+  --hr-ink-3: var(--l-ink);
+  --hr-body: var(--l-body);
+  --hr-body-2: var(--l-body);
+  --hr-body-3: var(--l-muted);
+  --hr-muted: var(--l-muted);
+  --hr-muted-2: var(--l-muted-2);
+
+  --hr-line: var(--l-line);
+  --hr-line-strong: var(--l-line);
+  --hr-line-gold: var(--l-line-2);
+  --hr-line-soft: var(--l-line);
+  --hr-line-quiet: var(--l-line-2);
+  --hr-hairline: var(--l-line);
+
+  --hr-accent: var(--l-accent);
+  --hr-accent-soft: var(--l-accent-soft);
+  --hr-accent-deep: var(--l-accent-deep);
+  --hr-accent-glow: var(--l-accent-glow);
+  --hr-accent-border: var(--l-accent-glow);
+
+  --hr-dark: var(--l-dark);
+  --hr-dark-2: var(--l-dark-2);
+  --hr-dark-3: var(--l-dark-3);
+  --hr-dark-4: var(--l-dark);
+  --hr-dark-line: var(--l-on-dark-line);
+  --hr-line-on-dark: var(--l-on-dark-line);
+  --hr-on-dark: var(--l-on-dark);
+  --hr-on-dark-2: var(--l-on-dark-2);
+  --hr-on-dark-3: var(--l-on-dark-3);
+  --hr-on-dark-strong: var(--l-accent-soft);
+  --hr-badge: var(--l-accent-soft);
+
+  /* Pergamenové výplachy sa zhasnú — ostane plocha. */
+  --hr-wash-1: var(--l-card);
+  --hr-wash-2: var(--l-paper);
+  --hr-wash-3: var(--l-paper-2);
+  --hr-wash-4: var(--l-card);
+  --hr-wash-5: var(--l-paper-2);
+  --hr-wash-6: var(--l-card);
+  --hr-wash-7: var(--l-paper);
+  --hr-wash-8: var(--l-paper-2);
+  --hr-wash-tint: transparent;
+  --hr-wash-glow: transparent;
+  --hr-bg-mid: var(--l-paper);
+
+  /* Pätka na fotke ostáva tmavá — text na fotke musí byť čitateľný. */
+  --hr-glass: rgba(20,17,13,.58);
+  --hr-glass-line: rgba(255,255,255,.16);
+  --hr-on-photo: #ffffff;
+  --hr-on-photo-2: rgba(255,255,255,.9);
+  /* Tichšia farba NA FOTKE (dátumy, popisky pod sklom). Brala akcent, čo je
+     najtmavší člen rodiny — tmavé písmo na tmavom skle sa nedalo prečítať.
+     Patrí sem svetlá odnož iskry: teplá, ale dosť svetlá na tmavý podklad. */
+  --hr-on-photo-3: var(--l-second-light);
+
+  --hr-chip-bg: var(--l-paper-2);
+  --hr-chip-border: var(--l-line);
+  --hr-chip-text: var(--l-second-deep);
+  --hr-footer-bg: var(--l-paper-2);
+  --hr-clear-text: var(--l-body);
+  --hr-mark-bg: var(--l-accent-glow);
+  --hr-mark-text: var(--l-accent-deep);
+
+  --hr-shadow-sm: 0 0 0 1px var(--l-line);
+  --hr-shadow-md: 0 0 0 1px var(--l-line-2);
+
+  /* Domovská — pás za hlavičkovou fotkou a za mapou, predel sekcií. */
+  --hr-frame: var(--l-dark-2);
+  --hr-muted-3: var(--l-muted);
+  --hr-line-section: var(--l-line);
+
+  /* Mapa. Terén ostáva taký, aký je — je to zemepis, nie ozdoba. Mení sa
+     všetko okolo: doska pod reliéfom, rám, legenda aj karta s detailom.
+     Práve tie robili z mapy hnedý ostrov uprostred neutrálnej stránky. */
+  --hr-map-bg: var(--l-dark-2);
+  --hr-map-frame: var(--l-dark-3);
+  --hr-map-frame-2: var(--l-dark-2);
+  --hr-map-frame-3: var(--l-dark-3);
+  --hr-map-vignette-1: var(--l-dark-3);
+  --hr-map-vignette-2: var(--l-dark);
+  --hr-map-vignette-3: var(--l-dark-2);
+  --hr-tooltip-bg: var(--l-dark-2);
+  --hr-tooltip-text: var(--l-on-dark);
+  --hr-tooltip-muted: var(--l-on-dark-3);
+  --hr-tooltip-fact: var(--l-on-dark-2);
+  --hr-legend-on: var(--l-on-dark);
+  --hr-legend-off: var(--l-on-dark-3);
+  --hr-legend-note: var(--l-on-dark-3);
+  --hr-paper-bright: var(--l-card);
+  --hr-badge-text: var(--l-dark-2);
+  --hr-accent-mid: var(--l-second);
+  --hr-body-4: var(--l-body);
+  --hr-relief-high: var(--l-on-dark-2);
+  --hr-relief-mid: var(--l-on-dark);
+  --hr-relief-low: var(--l-muted-2);
+  --hr-relief-deep: var(--l-on-dark-line);
+  --hr-relief-edge: var(--l-on-dark-line);
+
+  --color-primary: var(--l-accent);
+  --color-primary-hover: var(--l-accent-deep);
+  --gold-accent: var(--l-accent);
+  --gold-accent-light: var(--l-accent-soft);
+
+  background: var(--l-paper);
+}
+
+/* ── Typografia ─────────────────────────────────────────────────────────
+   Nadpisy nesie Fraunces; prestrk je stiahnutý, lebo na rozdiel od Cinzelu
+   nie je verzálkový a vzduch nepotrebuje. */
+.lab h1, .lab h2 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 700; font-optical-sizing: auto;
+  letter-spacing: -0.025em; text-transform: none !important; line-height: 1.06;
+}
+.lab h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 700; letter-spacing: -0.015em; }
+.lab .parchment h2 { font-size: clamp(30px, 3.6vw, 46px); }
+
+/* Drop-cap iniciála je ozdoba z rukopisu — v redakčnom jazyku nemá miesto. */
+.lab .joinus .dropcap::first-letter {
+  float: none; font-size: inherit; line-height: inherit;
+  font-weight: inherit; color: inherit; margin: 0; font-family: inherit;
+}
+/* Ozdobná vlnovka (kľukatá SVG linka) — na stránke je dvakrát. */
+.lab .h-3.bg-repeat-x { display: none; }
+
+/* ── ČITATEĽNOSŤ ────────────────────────────────────────────────────────
+   Veľkosti na stránke boli navrhnuté pre Cormorant Garamond — serif s malou
+   výškou malých písmen, ktorý sa preto sádzal veľký. Iné písmo v tých istých
+   číslach vyzerá drobne. Nestačí teda vymeniť rodinu; treba zdvihnúť aj
+   veľkosti, váhu a riadkovanie.
+
+   Spodná hranica je 15 px pre bežný text a 12,5 px pre popisky — pod tým sa
+   na bežnej obrazovke číta ťažko bez ohľadu na to, aké písmo sa použije. */
+
+/* Základ: nič pod 15 px, plnší rez, voľnejšie riadkovanie. */
+.lab .parchment { font-size: 16.5px; line-height: 1.6; font-weight: 400; }
+.lab .parchment p,
+.lab .parchment span,
+.lab .parchment a,
+.lab .parchment div { letter-spacing: 0; }
+
+/* Drobné veľkosti zapísané v komponentoch natvrdo sa zdvihnú na čitateľné.
+   Zoznam pokrýva zápisy, ktoré React vypisuje ako `font-size: Npx`. */
+.lab .parchment [style*="font-size: 10px"],
+.lab .parchment [style*="font-size: 10.5px"],
+.lab .parchment [style*="font-size: 11px"],
+.lab .parchment [style*="font-size: 11.5px"],
+.lab .parchment [style*="font-size: 12px"] { font-size: 12.5px !important; font-weight: 500 !important; }
+.lab .parchment [style*="font-size: 13px"],
+.lab .parchment [style*="font-size: 13.5px"],
+.lab .parchment [style*="font-size: 14px"] { font-size: 15px !important; }
+.lab .parchment [style*="font-size: 15px"],
+.lab .parchment [style*="font-size: 15.5px"] { font-size: 16px !important; }
+.lab .parchment [style*="font-size: 16px"],
+.lab .parchment [style*="font-size: 17px"] { font-size: 17px !important; }
+
+/* Široký prestrk bol nastavený pre verzálky Cinzelu; groteska ho pri malých
+   veľkostiach neznesie — písmená sa rozsypú a slovo prestane držať pokope. */
+.lab .parchment [style*="letter-spacing: 0.3em"],
+.lab .parchment [style*="letter-spacing: 0.22em"],
+.lab .parchment [style*="letter-spacing: 0.2em"],
+.lab .parchment [style*="letter-spacing: 0.18em"],
+.lab .parchment [style*="letter-spacing: 0.16em"],
+.lab .parchment [style*="letter-spacing: 0.14em"],
+.lab .parchment [style*="letter-spacing: 0.12em"] { letter-spacing: .06em !important; }
+
+/* Kurzíva v tichých popiskoch pri malej veľkosti len zhoršuje čitateľnosť. */
+.lab .parchment [style*="font-style: italic"][style*="font-size: 1"] { font-style: normal !important; }
+
+/* ══ HORNÁ LIŠTA ═══════════════════════════════════════════════════════ */
+.lnav { position: sticky; top: 0; z-index: 60; background: var(--l-paper); border-bottom: 1px solid var(--l-line); }
+.lnav::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--l-second) 30%, var(--l-second) 70%, transparent);
+  opacity: .4;
+}
+/* Širší kontajner a tesnejšie tlačidlá — šesť typov hradísk s dlhými názvami
+   („Strážna a hospodárska funkcia") sa inak zalomí do troch riadkov. */
+.lnav-row { max-width: 1560px; margin: 0 auto; padding: 12px 28px 10px; display: flex; align-items: center; gap: 24px; }
+
+/* Značka: logo v kruhu vyplnenom papierom, obopnuté vláskom. */
+.lnav-brand { display: flex; align-items: center; gap: 14px; text-decoration: none; flex-shrink: 0; }
+.lnav-mark {
+  width: 74px; height: 74px; flex-shrink: 0; border-radius: 999px;
+  background: var(--l-card); border: 1px solid var(--l-line);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  transition: border-color .2s ease, transform .3s ease;
+}
+.lnav-brand:hover .lnav-mark { border-color: var(--l-accent); transform: scale(1.04); }
+.lnav-mark img { width: 82%; height: 82%; object-fit: contain; display: block; }
+.lnav-brand span {
+  font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 700;
+  letter-spacing: -.02em; color: var(--l-ink); white-space: nowrap; line-height: 1;
+}
+
+.lnav-cats { flex: 1; min-width: 0; display: grid; gap: 0; }
+/* PREHĽADNOSŤ: oba rady vyzerali rovnako, hoci rovnako dôležité nie sú.
+   Prvý (typy hradísk) je jadro webu — väčší a tmavší. Druhý (ostatný obsah)
+   je doplnok — menší a tichší. Oko tak pozná dôležitosť skôr, než prečíta. */
+/* Bez zalamovania — rad ide do dĺžky. Ak by sa na úzkom okne aj tak nezmestil,
+   dá sa posunúť prstom/kolieskom namiesto toho, aby narástol do výšky. */
+.lnav-cats-row {
+  display: flex; flex-wrap: nowrap; align-items: center; gap: 2px; padding: 4px 0;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+}
+.lnav-cats-row::-webkit-scrollbar { display: none; }
+.lnav-cats-row + .lnav-cats-row { border-top: 1px solid var(--l-line); }
+.lnav-cats-row[data-secondary] .lnav-cat-btn { font-size: 13px; font-weight: 400; color: var(--l-muted); }
+.lnav-cats-row[data-secondary] .lnav-cat-btn:hover { color: var(--l-ink); }
+
+/* Druhý riadok sa rozvinie, keď je myš nad lištou — mechanika pôvodnej lišty. */
+.lnav-cats-row[data-secondary] {
+  max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0;
+  border-top-color: transparent; overflow: hidden;
+  transition: max-height .3s ease, opacity .22s ease, padding .3s ease, border-color .3s ease;
+}
+.lnav[data-expanded] .lnav-cats-row[data-secondary] {
+  max-height: 130px; opacity: 1; padding-top: 6px; padding-bottom: 4px; border-top-color: var(--l-line);
+  /* Orezanie tu ostáva — inak by kategórie pretiekli cez služobné odkazy.
+     Roletka sa vykresľuje mimo radu (viď LabNav.tsx), takže ju to netrápi. */
+}
+
+/* Názov radu — 11 px, hustejší prestrk a vlások pod ním, aby čítal ako
+   nadpis stĺpca, nie ako ďalšia položka na kliknutie. */
+.lnav-rowlabel {
+  flex-shrink: 0; width: 108px; padding-right: 14px; margin-right: 4px;
+  border-right: 1px solid var(--l-line);
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--l-muted); line-height: 1.4;
+}
+
+.lnav-cat { position: relative; }
+.lnav-cat-btn {
+  position: relative; border: none; background: transparent; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: var(--l-body);
+  padding: 6px 10px; display: inline-flex; align-items: baseline; gap: 7px;
+  white-space: nowrap; transition: color .18s ease;
+}
+.lnav-cat-btn::after {
+  content: ''; position: absolute; left: 10px; right: 10px; bottom: 0; height: 2px;
+  background: var(--l-accent); border-radius: 2px;
+  transform: scaleX(0); transform-origin: center;
+  transition: transform .24s cubic-bezier(.22,.61,.36,1);
+}
+.lnav-cat-btn:hover { color: var(--l-ink); }
+.lnav-cat-btn:hover::after, .lnav-cat-btn[data-open]::after { transform: scaleX(1); }
+.lnav-cat-btn[data-open] { color: var(--l-accent); }
+
+/* Počet: tichšie než názov, ale čitateľné. Trinásť čísel v lište nesmie
+   súťažiť s názvami kategórií o pozornosť. */
+.lnav-count {
+  font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 500;
+  color: var(--l-muted-2); letter-spacing: .01em; font-variant-numeric: tabular-nums;
+}
+.lnav-cat-btn:hover .lnav-count, .lnav-cat-btn[data-open] .lnav-count { color: var(--l-accent-soft); }
+
+/* Služobné odkazy (Galéria, Aktuality, účet) oddelené vláskom — patria inam
+   než kategórie a bez predelu s nimi splývali. */
+.lnav-right {
+  display: flex; align-items: center; gap: 20px; flex-shrink: 0;
+  padding-left: 24px; border-left: 1px solid var(--l-line); align-self: stretch;
+}
+.lnav-link {
+  font-family: 'Inter', sans-serif; font-size: 14.5px; color: var(--l-body);
+  text-decoration: none; white-space: nowrap; transition: color .18s ease;
+}
+.lnav-link:hover { color: var(--l-accent); }
+
+/* ── ROLETKA ────────────────────────────────────────────────────────────
+   PREHĽADNOSŤ: dva stĺpce boli chyba. Názvy článkov majú aj cez 50 znakov
+   („Gars - Thunau - Veľkomoravské hradisko v Rakúsku"), ale v dvoch stĺpcoch
+   na 540 px má položka asi 30 znakov — väčšina sa orezala tromi bodkami
+   a zoznam sa nedal prečítať, len odhadnúť.
+
+   Preto JEDEN stĺpec, užší panel a názov, ktorý sa smie zalomiť do dvoch
+   riadkov. Zmestí sa menej položiek naraz, ale tie sú čitateľné celé. */
+.lnav-panel {
+  /* Voči LIŠTE, nie voči tlačidlu — `left` dopĺňa React podľa polohy tlačidla. */
+  position: absolute; top: calc(100% + 10px);
+  width: 380px; max-width: calc(100vw - 32px);
+  background: var(--l-card); border: 1px solid var(--l-line);
+  border-radius: 14px; box-shadow: 0 26px 64px -30px rgba(30,24,18,.55);
+  padding: 6px; z-index: 80; animation: lnav-in .16s ease-out;
+}
+@keyframes lnav-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* Hlavička hovorí, čoho zoznam to je — bez nej sa po otvorení nedalo hneď
+   zorientovať, ktorá kategória je rozbalená. */
+.lnav-panel-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding: 10px 12px 12px; margin-bottom: 4px; border-bottom: 1px solid var(--l-line);
+  font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--l-second-deep);
+}
+.lnav-panel-head span {
+  font-weight: 500; letter-spacing: 0; text-transform: none;
+  color: var(--l-muted); font-variant-numeric: tabular-nums;
+}
+
+.lnav-panel-list {
+  display: block; max-height: min(56vh, 480px); overflow-y: auto; overflow-x: hidden;
+}
+.lnav-panel-list a {
+  display: block; padding: 10px 12px; border-radius: 9px; text-decoration: none;
+  font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.35;
+  color: var(--l-ink); transition: background .14s ease, color .14s ease;
+  /* Dva riadky stačia aj na najdlhšie názvy; tri by z roletky spravili stenu. */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.lnav-panel-list a:hover { background: var(--l-paper-2); color: var(--l-accent); }
+.lnav-panel-empty {
+  padding: 14px 12px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--l-muted);
+}
+.lnav-panel-all {
+  display: block; margin-top: 4px; padding: 12px; border-top: 1px solid var(--l-line);
+  text-decoration: none; font-family: 'Inter', sans-serif; font-size: 14px;
+  font-weight: 500; color: var(--l-accent);
+}
+.lnav-panel-all:hover { color: var(--l-accent-deep); background: var(--l-paper-2); border-radius: 0 0 9px 9px; }
+
+@media (max-width: 1100px) { .lnav-rowlabel { display: none; } }
+@media (max-width: 900px) { .lnav-cats { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .lnav-cat-btn, .lnav-cat-btn::after, .lnav-cats-row[data-secondary], .lnav-mark { transition: none; }
+  .lnav-panel { animation: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FAREBNÉ TROJICE
+
+   PRAVIDLO, KTORÉ PLATÍ VO VŠETKÝCH: iskra je vždy teplá.
+   Fotky sú hlina, kameň, drevo a suchá tráva. Chladná iskra na nich pôsobí
+   ako cudzí prvok — preto je to, čo svieti (odkaz, číslo, podčiarknutie,
+   vrub v pätičke), v každej téme meď, bronz, med, hrdza alebo pečatná
+   červená. Chlad smie vstúpiť len ako PODKLAD: bridlicová šeď či
+   atramentová čierň sú neutrály, nie akcenty, a s teplou iskrou na nich
+   drží dvojica, ktorá k sebe patrí (doplnkové farby na kruhu).
+
+   Každá téma stojí na troch farbách: PAPIER + AKCENT + ISKRA.
+     akcent — veľké plochy (tlačidlá, tmavé pásy). Vždy najtmavší člen
+              rodiny, nikdy nie iskra: medené tlačidlo cez celú šírku spraví
+              zo stránky hlinitú plochu.
+     iskra  — drobnosti, ktoré vedú oko. Musí sa dať čítať na papieri
+              aj na uhľovej pätičke, čiže stred jasu (ani svetlá, ani tmavá);
+              na drobný text na papieri je od nej odvodená tmavšia `-deep`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* TERAKOTA — kostený papier · pálená hlina · okrová. Najtichšia, archívna. */
+.lab[data-theme='terakota'],
+body[data-lab-theme='terakota'] {
+  --l-paper: #f5f1e8; --l-paper-2: #ebe4d6; --l-card: #fffefb;
+  --l-ink: #1a1510; --l-body: #453d33; --l-muted: #6f6658; --l-muted-2: #928878;
+  --l-line: #ded5c2; --l-line-2: #c9bda5;
+  --l-accent: #a6472a; --l-accent-soft: #c4633d; --l-accent-deep: #7d3320;
+  --l-accent-glow: rgba(166,71,42,.14);
+  --l-second: #9a7526; --l-second-deep: #7a5c1c; --l-second-light: #d9b26a;
+  --l-dark: #241f19; --l-dark-2: #191510; --l-dark-3: #2e2820;
+  --l-on-dark: rgba(245,241,232,.82); --l-on-dark-2: #f5f1e8;
+  --l-on-dark-3: rgba(245,241,232,.6); --l-on-dark-line: rgba(245,241,232,.15);
+}
+
+/* HLINA — krémový papier · sýta hrdzavá · tmavohnedá.
+   Tá istá rodina ako terakota, ale akcent je o dva stupne sýtejší a papier
+   svetlejší — tým vznikne kontrast, ktorý terakote chýbal. */
+.lab[data-theme='hlina'],
+body[data-lab-theme='hlina'] {
+  --l-paper: #faf6ec; --l-paper-2: #f0e8d7; --l-card: #ffffff;
+  --l-ink: #17120c; --l-body: #443a2c; --l-muted: #6d6151; --l-muted-2: #948873;
+  --l-line: #e4dac4; --l-line-2: #cfc2a5;
+  --l-accent: #bd4b16; --l-accent-soft: #db6a2e; --l-accent-deep: #94380e;
+  --l-accent-glow: rgba(189,75,22,.13);
+  --l-second: #6b4423; --l-second-deep: #533218; --l-second-light: #e8a877;
+  --l-dark: #21190f; --l-dark-2: #17110a; --l-dark-3: #2b2115;
+  --l-on-dark: rgba(250,246,236,.82); --l-on-dark-2: #faf6ec;
+  --l-on-dark-3: rgba(250,246,236,.6); --l-on-dark-line: rgba(250,246,236,.15);
+}
+
+/* OKRA — teplá kosť · volová krv · horčicová.
+   Najsýtejšia. Tmavočervená a horčicová sú obe zemité, takže sa nebijú, ale
+   spolu majú silu, akú jedna farba nedosiahne. */
+.lab[data-theme='okra'],
+body[data-lab-theme='okra'] {
+  --l-paper: #f8f3e9; --l-paper-2: #eee5d2; --l-card: #fffdf8;
+  --l-ink: #1c1310; --l-body: #4a3b32; --l-muted: #736355; --l-muted-2: #9a8b7a;
+  --l-line: #e2d7c2; --l-line-2: #ccbea3;
+  --l-accent: #8a2b20; --l-accent-soft: #ab4132; --l-accent-deep: #661d15;
+  --l-accent-glow: rgba(138,43,32,.13);
+  --l-second: #b8891f; --l-second-deep: #8f6813; --l-second-light: #e3bb63;
+  --l-dark: #241813; --l-dark-2: #19100c; --l-dark-3: #2e201a;
+  --l-on-dark: rgba(248,243,233,.82); --l-on-dark-2: #f8f3e9;
+  --l-on-dark-3: rgba(248,243,233,.6); --l-on-dark-line: rgba(248,243,233,.15);
+}
+
+/* UHLIE — takmer neutrálny papier · antracit · medená iskra.
+   Odvaha iným smerom: takmer monochromatická stránka, kde je jedinou farebnou
+   škvrnou meď. Fotky sú potom to jediné farebné na obrazovke. */
+.lab[data-theme='uhlie'],
+body[data-lab-theme='uhlie'] {
+  --l-paper: #f4f2ee; --l-paper-2: #e8e5df; --l-card: #ffffff;
+  --l-ink: #16150f; --l-body: #403d37; --l-muted: #6a665e; --l-muted-2: #928d84;
+  --l-line: #ded9d1; --l-line-2: #c6c0b6;
+  --l-accent: #2b2724; --l-accent-soft: #4a443e; --l-accent-deep: #16130f;
+  --l-accent-glow: rgba(43,39,36,.1);
+  --l-second: #c06a34; --l-second-deep: #a3552a; --l-second-light: #e0a074;
+  --l-dark: #1f1d1a; --l-dark-2: #141210; --l-dark-3: #292623;
+  --l-on-dark: rgba(244,242,238,.82); --l-on-dark-2: #f4f2ee;
+  --l-on-dark-3: rgba(244,242,238,.6); --l-on-dark-line: rgba(244,242,238,.15);
+}
+
+/* ── Nové kombinácie ────────────────────────────────────────────────────
+   Uhlie je čierno-biele: zaujímavé, ale bez farby. Tieto štyri pridávajú
+   farbu tak, aby dvojica držala spolu — nie tak, že sa do neutrálu pridá
+   náhodný odtieň. Každá má vysvetlené, odkiaľ sa berie.
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* PATINA — bledá zelenkastá · zelenočierna · bronz.
+   Dvojica priamo z vitríny: bronzový šperk a zelená patina na ňom. Zeleň je
+   podklad (papier aj tmavý pás), bronz je jediné, čo svieti — doplnkové
+   farby, takže sa navzájom zosilňujú. */
+.lab[data-theme='patina'],
+body[data-lab-theme='patina'] {
+  --l-paper: #eff1e9; --l-paper-2: #e2e6da; --l-card: #fbfcf8;
+  --l-ink: #12160f; --l-body: #3b4136; --l-muted: #646b5c; --l-muted-2: #8b9182;
+  --l-line: #d7dccd; --l-line-2: #bec5b2;
+  --l-accent: #2a3324; --l-accent-soft: #47533d; --l-accent-deep: #171d13;
+  --l-accent-glow: rgba(42,51,36,.12);
+  --l-second: #b8862f; --l-second-deep: #7d5a1c; --l-second-light: #dfb972;
+  --l-dark: #1c211a; --l-dark-2: #131711; --l-dark-3: #262d23;
+  --l-on-dark: rgba(239,241,233,.82); --l-on-dark-2: #eff1e9;
+  --l-on-dark-3: rgba(239,241,233,.6); --l-on-dark-line: rgba(239,241,233,.15);
+}
+
+/* BRIDLICA — bridlicová šeď · modročierna · med.
+   Kameň a med: chladný neutrál a teplá iskra sú na farebnom kruhu oproti
+   sebe, čo je najstabilnejšia dvojica vôbec. Šeď navyše nie je „farba", takže
+   fotky na nej ostávajú jediné farebné miesto — to, čo robí Uhlie, ale
+   s vlastným tónom a s medom namiesto medi. */
+.lab[data-theme='bridlica'],
+body[data-lab-theme='bridlica'] {
+  --l-paper: #eef0f2; --l-paper-2: #e0e4e8; --l-card: #ffffff;
+  --l-ink: #12161a; --l-body: #3a4149; --l-muted: #626a74; --l-muted-2: #8b939d;
+  --l-line: #d6dbe0; --l-line-2: #bbc2c9;
+  --l-accent: #232b33; --l-accent-soft: #3f4a55; --l-accent-deep: #141a20;
+  --l-accent-glow: rgba(35,43,51,.12);
+  --l-second: #c68f36; --l-second-deep: #8a6017; --l-second-light: #e5bd76;
+  --l-dark: #1b2127; --l-dark-2: #12171b; --l-dark-3: #242c33;
+  --l-on-dark: rgba(238,240,242,.82); --l-on-dark-2: #eef0f2;
+  --l-on-dark-3: rgba(238,240,242,.6); --l-on-dark-line: rgba(238,240,242,.15);
+}
+
+/* MACH — olivová · machová čierň · hrdza.
+   To, čo na hradisku naozaj vidno: trávou zarastený val a hrdzavé železo
+   z nálezu. Zeleň a hrdza sú susedia cez oranžovú, čiže tichšia dvojica než
+   patina — najbližšie k prírode zo všetkých. */
+.lab[data-theme='mach'],
+body[data-lab-theme='mach'] {
+  --l-paper: #eff0e4; --l-paper-2: #e1e4d2; --l-card: #fbfbf4;
+  --l-ink: #171a10; --l-body: #414534; --l-muted: #6a6e59; --l-muted-2: #8f937c;
+  --l-line: #dbdeca; --l-line-2: #c2c6ad;
+  --l-accent: #2f3a23; --l-accent-soft: #4a5738; --l-accent-deep: #1d2415;
+  --l-accent-glow: rgba(47,58,35,.12);
+  --l-second: #c05f2e; --l-second-deep: #94441d; --l-second-light: #e59a72;
+  --l-dark: #1e2318; --l-dark-2: #141810; --l-dark-3: #282e20;
+  --l-on-dark: rgba(239,240,228,.82); --l-on-dark-2: #eff0e4;
+  --l-on-dark-3: rgba(239,240,228,.6); --l-on-dark-line: rgba(239,240,228,.15);
+}
+
+/* PEČAŤ — pieskovec · atramentová čierň · pečatná červená.
+   Trojica z listiny: pergamen, duběnkový atrament (nie čierny, ale
+   modročierny) a vosková pečať. Web má na tieto pramene celú kategóriu, tak
+   je to jediná téma, ktorá pomenúva sama seba. Červená je najsilnejšia iskra
+   zo štyroch — preto je jej v šate najmenej. */
+.lab[data-theme='pecat'],
+body[data-lab-theme='pecat'] {
+  --l-paper: #f3ede1; --l-paper-2: #e8e0cf; --l-card: #fffcf6;
+  --l-ink: #14161d; --l-body: #3e414a; --l-muted: #6d6f74; --l-muted-2: #96938c;
+  --l-line: #ded5c2; --l-line-2: #c8bda7;
+  --l-accent: #1c1f28; --l-accent-soft: #343949; --l-accent-deep: #10131a;
+  --l-accent-glow: rgba(28,31,40,.12);
+  --l-second: #c9483a; --l-second-deep: #8f2c22; --l-second-light: #eda093;
+  --l-dark: #191c24; --l-dark-2: #11141a; --l-dark-3: #232733;
+  --l-on-dark: rgba(243,237,225,.82); --l-on-dark-2: #f3ede1;
+  --l-on-dark-3: rgba(243,237,225,.6); --l-on-dark-line: rgba(243,237,225,.15);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EFEKTY
+   Držané pri zemi: nič neposkakuje ani nebliká, len sa jemne rozsvieti to,
+   čoho sa dotkneš. Všetko sa vypína pri `prefers-reduced-motion`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Značka: kruh dostane pri nabehnutí prstenec v akcente a logo sa nadýchne. */
+.lnav-mark { position: relative; }
+.lnav-mark::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 999px;
+  border: 1px solid var(--l-accent); opacity: 0; transform: scale(.92);
+  transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1);
+  pointer-events: none;
+}
+.lnav-brand:hover .lnav-mark::after { opacity: .45; transform: scale(1); }
+.lnav-mark img { transition: transform .4s cubic-bezier(.22,.61,.36,1); }
+.lnav-brand:hover .lnav-mark img { transform: scale(1.06); }
+
+/* Názov značky: podčiarknutie vyrastie zľava spolu s logom. */
+.lnav-brand span { position: relative; }
+.lnav-brand span::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
+  background: var(--l-accent); border-radius: 2px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .32s cubic-bezier(.22,.61,.36,1);
+}
+.lnav-brand:hover span::after { transform: scaleX(1); }
+
+/* Kategória sa pri nabehnutí nepatrne nadvihne — dá to lište „hmat". */
+.lnav-cat-btn { transition: color .18s ease, transform .18s ease; }
+.lnav-cat-btn:hover { transform: translateY(-1px); }
+
+/* Položky roletky sa vysunú postupne, nie všetky naraz. Zdržanie je krátke
+   (35 ms na položku) a zastropované, aby posledná nečakala pri dlhom zozname. */
+.lnav-panel-list a { animation: lnav-item .22s ease-out both; }
+.lnav-panel-list a:nth-child(1) { animation-delay: .02s }
+.lnav-panel-list a:nth-child(2) { animation-delay: .055s }
+.lnav-panel-list a:nth-child(3) { animation-delay: .09s }
+.lnav-panel-list a:nth-child(4) { animation-delay: .125s }
+.lnav-panel-list a:nth-child(5) { animation-delay: .16s }
+.lnav-panel-list a:nth-child(n+6) { animation-delay: .18s }
+@keyframes lnav-item { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+
+/* Položka roletky: pri nabehnutí sa posunie doprava a naľavo jej narastie
+   akcentový prúžok — nahrádza zmazanú ikonku miesta, ale nezaberá riadok. */
+.lnav-panel-list a { position: relative; transition: background .14s ease, color .14s ease, padding-left .18s ease; }
+.lnav-panel-list a::before {
+  content: ''; position: absolute; left: 4px; top: 50%; width: 2px; height: 0;
+  background: var(--l-accent); border-radius: 2px; transform: translateY(-50%);
+  transition: height .2s cubic-bezier(.22,.61,.36,1);
+}
+.lnav-panel-list a:hover { padding-left: 16px; }
+.lnav-panel-list a:hover::before { height: 60%; }
+
+/* Lišta pri posúvaní stránky mierne zhustne a získa tieň — dá najavo, že
+   obsah pod ňou uteká. */
+.lnav { transition: box-shadow .25s ease, background .25s ease; }
+.lnav:not([data-expanded]) { box-shadow: 0 1px 0 rgba(0,0,0,.02); }
+.lnav[data-expanded] { box-shadow: 0 10px 30px -22px rgba(30,24,18,.5); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lnav-mark::after, .lnav-mark img, .lnav-brand span::after,
+  .lnav-cat-btn, .lnav-panel-list a, .lnav-panel-list a::before, .lnav { transition: none; }
+  .lnav-panel-list a { animation: none; }
+  .lnav-cat-btn:hover { transform: none; }
+  .lnav-panel-list a:hover { padding-left: 12px; }
+}
+
+/* ── Náznak, že rad pokračuje ───────────────────────────────────────────
+   Posuvník je skrytý (v lište by rušil), takže keď sa rad nezmestí, obsah sa
+   potichu odreže a nedá sa uhádnuť, že tam ešte niečo je — presne to sa stalo
+   kategórii „Všeobecne o hradiskách". Zľava aj sprava preto pribudne mäkké
+   vytratenie do farby lišty; keď je rad zarovnaný na kraj, prekrytie zmizne. */
+.lnav-cats { position: relative; }
+.lnav-cats::before,
+.lnav-cats::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 40px;
+  pointer-events: none; z-index: 2; opacity: 0; transition: opacity .2s ease;
+}
+.lnav-cats::before { left: 0; background: linear-gradient(90deg, var(--l-paper), transparent); }
+.lnav-cats::after { right: 0; background: linear-gradient(270deg, var(--l-paper), transparent); }
+/* `scroll-state` zatiaľ nie je všade, preto sa vytratenie vpravo ukáže vždy,
+   keď rad naozaj pretečie — o tom rozhoduje trieda z JS nižšie. */
+.lnav-cats[data-overflow='true']::after { opacity: 1; }
+.lnav-cats[data-scrolled='true']::before { opacity: 1; }
+
+/* ── Účet v lište ───────────────────────────────────────────────────────
+   `AccountNavLink` je produkčný komponent kreslený pre TMAVÚ lištu: má
+   natvrdo krémovú farbu a takmer priehľadné pozadie, takže na svetlej lište
+   zmizne. Komponent nechávam na pokoji a prefarbím ho zvonku — je to jediné
+   miesto, kde sa v téme siaha na cudzí štýl, preto to `!important`.
+   Pri prenose do produkcie sa toto vyrieši prevodom komponentu na tokeny. */
+.lnav-right a,
+.lnav-right button {
+  color: var(--l-ink) !important;
+  background: var(--l-paper-2) !important;
+  border: 1px solid var(--l-line) !important;
+  border-radius: 999px !important;
+  padding: 8px 16px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.lnav-right a:hover,
+.lnav-right button:hover {
+  background: var(--l-accent) !important;
+  border-color: var(--l-accent) !important;
+  color: var(--l-card) !important;
+}
+/* Odkazy Galéria/Aktuality ostávajú textové — pilulku má len účet. */
+.lnav-right .lnav-link {
+  background: transparent !important; border: 0 !important; padding: 0 !important;
+  color: var(--l-body) !important;
+}
+.lnav-right .lnav-link:hover { color: var(--l-accent) !important; background: transparent !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DYNAMIKA STRÁNKY
+   Pravidlo: nič sa nehýbe samo od seba a nič neposkakuje pri načítaní. Pohyb
+   je vždy odpoveď — na posun stránky alebo na myš. Všetko sa vypína pri
+   `prefers-reduced-motion`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* 1 · Sekcie sa vynoria pri prvom priblížení k oku.
+   `animation-timeline: view()` je čisto CSS — žiadny pozorovateľ v JS. Kde ho
+   prehliadač nepozná, obsah sa jednoducho zobrazí bez animácie. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lab .parchment > section,
+    .lab .joinus > div > * {
+      animation: lab-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 42%;
+    }
+    @keyframes lab-rise {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: none; }
+    }
+  }
+}
+
+/* 2 · Titulná fotografia sa pri posúvaní nepatrne priblíži — dá stránke hĺbku
+   bez toho, aby čokoľvek „lietalo". */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lab .parchment picture img[src*="img_header"] {
+      animation: lab-hero linear both;
+      animation-timeline: view();
+      animation-range: entry 100% exit 0%;
+    }
+    @keyframes lab-hero { from { transform: scale(1); } to { transform: scale(1.06); } }
+  }
+}
+
+/* 3 · Dlaždice kategórií: fotka sa priblíži, karta sa nadvihne a spodok
+   podčiarkne akcent. Meď je v tomto štýle jediná farba, tak nech je vidieť. */
+.lab .parchment article { position: relative; transition: transform .28s cubic-bezier(.22,.61,.36,1); }
+.lab .parchment article::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  background: var(--l-second); transform: scaleX(0); transform-origin: left;
+  transition: transform .32s cubic-bezier(.22,.61,.36,1);
+}
+.lab .parchment a:hover article::after { transform: scaleX(1); }
+.lab .parchment a:hover article { transform: translateY(-4px); }
+
+/* 4 · Fotky v páse kroniky a v galérii sa pri nabehnutí pomaly priblížia. */
+.lab .parchment a img { transition: transform .6s cubic-bezier(.22,.61,.36,1); }
+.lab .parchment a:hover img { transform: scale(1.045); }
+
+/* 5 · Odkazy v texte podčiarkne meď zľava doprava. */
+.lab .parchment p a, .lab .parchment li a {
+  background-image: linear-gradient(var(--l-second), var(--l-second));
+  background-size: 0% 1.5px; background-position: 0 100%; background-repeat: no-repeat;
+  transition: background-size .28s cubic-bezier(.22,.61,.36,1);
+  text-decoration: none;
+}
+.lab .parchment p a:hover, .lab .parchment li a:hover { background-size: 100% 1.5px; }
+
+/* 6 · Tmavý pás s mapou dostane jemné rozžiarenie zhora — inak je to len
+   čierny obdĺžnik uprostred svetlej stránky. */
+.lab .parchment section[style*="background: rgb"] { position: relative; }
+
+/* 7 · Tlačidlá: stlačenie má byť cítiť. */
+.lab .parchment button, .lab .joinus button {
+  transition: transform .12s ease, filter .18s ease, background .18s ease;
+}
+.lab .parchment button:active, .lab .joinus button:active { transform: translateY(1px) scale(.995); }
+
+/* 8 · Výber textu v akcente — drobnosť, ktorú si nikto nevšimne vedome,
+   ale bez nej pôsobí stránka ako nedokončená. */
+.lab ::selection { background: var(--l-second); color: var(--l-card); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lab .parchment article,
+  .lab .parchment article::after,
+  .lab .parchment a img,
+  .lab .parchment p a, .lab .parchment li a,
+  .lab .parchment button, .lab .joinus button { transition: none; }
+  .lab .parchment a:hover article { transform: none; }
+  .lab .parchment a:hover img { transform: none; }
+}
+
+/* ── Zvyšky starého šatu ────────────────────────────────────────────────
+   Miesta, ktoré si nesú pergamenové farby natvrdo v `globals.css`
+   (nie v komponentoch), takže sa cez tokeny nedali prefarbiť. */
+
+/* Vyhľadávanie: podfarbenie výsledku pod myšou bolo hlinité `#ece0c2`. */
+.lab .search-result-row:hover,
+.lab .search-result-row[data-selected='true'] { background: var(--l-paper-2) !important; }
+
+/* Posuvníky: hnedé palce a zlaté dráhy. Tenké, v šedi papiera. */
+.lab .search-dropdown-scroll,
+.lab .roletka-scroll,
+.lab .custom-scrollbar,
+.lab .dropdown-scroll,
+.lab .lnav-panel-list { scrollbar-width: thin; scrollbar-color: var(--l-line-2) transparent; }
+.lab .search-dropdown-scroll::-webkit-scrollbar,
+.lab .roletka-scroll::-webkit-scrollbar,
+.lab .custom-scrollbar::-webkit-scrollbar,
+.lab .dropdown-scroll::-webkit-scrollbar,
+.lab .lnav-panel-list::-webkit-scrollbar { width: 8px; height: 8px; }
+.lab .search-dropdown-scroll::-webkit-scrollbar-track,
+.lab .roletka-scroll::-webkit-scrollbar-track,
+.lab .custom-scrollbar::-webkit-scrollbar-track,
+.lab .dropdown-scroll::-webkit-scrollbar-track,
+.lab .lnav-panel-list::-webkit-scrollbar-track { background: transparent; }
+.lab .search-dropdown-scroll::-webkit-scrollbar-thumb,
+.lab .roletka-scroll::-webkit-scrollbar-thumb,
+.lab .custom-scrollbar::-webkit-scrollbar-thumb,
+.lab .dropdown-scroll::-webkit-scrollbar-thumb,
+.lab .lnav-panel-list::-webkit-scrollbar-thumb {
+  background: var(--l-line-2); border-radius: 999px; border: 2px solid transparent; background-clip: content-box;
+}
+
+/* Mapa: ozdobný rám bol zlatohnedý prechod („rímsky" rámik okolo reliéfu)
+   a pás okolo nej tmavohnedý. V tomto štýle je všetko uhľové, meď je jediná
+   farba — rám preto zaniká do tenkej linky. */
+.lab .parchment [style*="linear-gradient(135deg, rgb(196, 165, 116)"],
+.lab .parchment [style*="linear-gradient(135deg,#c4a574"] {
+  background: var(--l-line-2) !important;
+}
+.lab .parchment [style*="background: rgb(41, 37, 36)"],
+.lab .parchment [style*="background-color: rgb(41, 37, 36)"],
+.lab .parchment .bg-stone-900 { background: var(--l-dark) !important; }
+.lab .parchment .bg-stone-800 { background: var(--l-dark-3) !important; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ZO ŽIVOTA ZDRUŽENIA (LabAktuality.tsx)
+   Skladba ostáva: logo · pripnutý zápis · štatistiky · pás zápisov · časová
+   os · fotogaléria. Mení sa povrch (zlaté rámiky a dvojité prstence preč)
+   a hlavne to, že PÁS SA DÁ LISTOVAŤ: šípky nad ním a časová os, ktorá je po
+   novom posuvník, nie ukazovateľ.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lakv a { text-decoration: none; }
+.lakv-top { display: grid; grid-template-columns: 1fr 1.3fr; gap: 22px; }
+
+/* Odznak „KRONIKA · 2010 — 2026" mal natvrdo zapísané zlaté rgba hodnoty. */
+.lakv-kronika {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  padding: 7px 16px; border-radius: 999px;
+  background: var(--l-paper-2); border: 1px solid var(--l-line-2);
+  font-family: var(--font-heading); font-size: 11px; letter-spacing: .16em;
+  color: var(--l-second-deep); white-space: nowrap;
+}
+.lakv-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--l-second); }
+
+.lakv-label {
+  font-family: var(--font-heading); font-size: 12px; font-weight: 600;
+  letter-spacing: .16em; color: var(--l-second-deep); white-space: nowrap;
+}
+.lakv-more {
+  font-family: var(--font-heading); font-size: 12px; letter-spacing: .06em;
+  color: var(--l-muted); border-bottom: 1px solid var(--l-line-2);
+  padding-bottom: 3px; white-space: nowrap; transition: color .16s ease, border-color .16s ease;
+}
+.lakv-more:hover { color: var(--l-ink); border-color: var(--l-second); }
+
+/* Pripnutý zápis: pôvodne dva vnútorné prstence (biely + zlatý) a zlatý tieň.
+   Tu je to obyčajná karta — rám drží jeden vlások. */
+.lakv-pinned {
+  position: relative; display: flex; flex-direction: column; justify-content: center;
+  flex: 1; min-height: 0; padding: 30px 36px;
+  background: var(--l-card); border: 1px solid var(--l-line); border-radius: 22px;
+}
+.lakv-stats {
+  flex-shrink: 0; display: grid; grid-template-columns: repeat(3, 1fr);
+  background: var(--l-card); border: 1px solid var(--l-line); border-radius: 18px;
+  padding: 18px 10px 16px;
+}
+.lakv-stat { text-align: center; }
+.lakv-stat-mid { border-left: 1px solid var(--l-line); border-right: 1px solid var(--l-line); }
+.lakv-stat-n {
+  display: block; font-family: var(--font-heading); font-size: 27px; font-weight: 600;
+  line-height: 1; color: var(--l-ink);
+}
+.lakv-stat-l {
+  display: block; margin-top: 5px; font-family: var(--font-serif);
+  font-size: 13.5px; color: var(--l-muted);
+}
+
+/* ── Hlavička pásu so šípkami ──────────────────────────────────────────── */
+.lakv-striphead { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.lakv-hint { font-family: var(--font-serif); font-size: 14px; color: var(--l-muted-2); }
+.lakv-steps { display: flex; gap: 8px; margin-left: auto; }
+.lakv-step {
+  width: 38px; height: 38px; display: grid; place-items: center;
+  border-radius: 50%; border: 1px solid var(--l-line-2); background: var(--l-card);
+  color: var(--l-second-deep); cursor: pointer;
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+.lakv-step:hover:not(:disabled) {
+  background: var(--l-second); border-color: var(--l-second); color: var(--l-card);
+  transform: translateY(-2px);
+}
+/* Vypnutá šípka ostáva viditeľná, len stlmená — zmiznutie by posúvalo dvojicu. */
+.lakv-step:disabled { opacity: .35; cursor: default; }
+.lakv-step:focus-visible { outline: 2px solid var(--l-second); outline-offset: 3px; }
+
+/* ── Pás ───────────────────────────────────────────────────────────────── */
+.lakv-strip {
+  display: flex; gap: 18px; overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory; padding: 6px 2px 18px;
+  scrollbar-width: none;
+}
+.lakv-strip::-webkit-scrollbar { display: none; }
+.lakv-card {
+  scroll-snap-align: start; flex: 0 0 300px; position: relative; display: block;
+  height: 300px; border-radius: 26px; overflow: hidden;
+  box-shadow: 0 18px 40px -26px rgba(20, 18, 15, .55);
+}
+.lakv-date {
+  display: block; margin-bottom: 4px; text-transform: uppercase;
+  font-family: var(--font-heading); font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; color: var(--hr-on-photo-3);
+}
+.lakv-tile { transition: transform .2s ease; }
+.lakv-tile:hover { transform: translateY(-4px); }
+.lakv-tile img { transition: transform .5s ease; }
+.lakv-tile:hover img { transform: scale(1.05); }
+
+/* ── Časová os ako posuvník ────────────────────────────────────────────── */
+.lakv-os { display: flex; align-items: center; gap: 20px; margin: 6px 0 36px; }
+.lakv-year {
+  flex-shrink: 0; font-family: var(--font-heading); font-size: 13px; font-weight: 600;
+  color: var(--l-ink);
+}
+.lakv-year-old { color: var(--l-muted-2); }
+/* Dráha je vysoká 24 px kvôli prstu, ale vidno z nej len 6 px vlásku. */
+.lakv-track { position: relative; flex: 1; height: 24px; cursor: pointer; touch-action: none; }
+.lakv-track::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+  height: 6px; border-radius: 999px; background: var(--l-line);
+}
+.lakv-fill {
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  height: 6px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--l-second), var(--l-second-deep));
+  transition: width .12s linear;
+}
+.lakv-knob {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 18px; height: 18px; border-radius: 999px;
+  background: var(--l-card); border: 2px solid var(--l-second);
+  box-shadow: 0 4px 10px rgba(20, 18, 15, .25);
+  transition: left .12s linear, box-shadow .16s ease;
+}
+.lakv-track:hover .lakv-knob,
+.lakv-track:focus-visible .lakv-knob { box-shadow: 0 0 0 6px var(--l-accent-glow); }
+.lakv-track:focus-visible { outline: none; }
+/* Rok sa ukáže, až keď os niekto ovláda — inak by visel nad stránkou stále. */
+.lakv-knob-year {
+  position: absolute; bottom: calc(100% + 9px); left: 50%; transform: translateX(-50%);
+  padding: 3px 9px; border-radius: 999px;
+  background: var(--l-accent); color: var(--l-card);
+  font-family: var(--font-heading); font-size: 11px; font-weight: 600; letter-spacing: .04em;
+  white-space: nowrap; opacity: 0; transition: opacity .16s ease;
+  pointer-events: none;
+}
+.lakv-track:hover .lakv-knob-year,
+.lakv-track:focus-visible .lakv-knob-year,
+.lakv-track-live .lakv-knob-year { opacity: 1; }
+
+/* ── Fotogaléria ───────────────────────────────────────────────────────── */
+.lakv-gal { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 158px; gap: 14px; }
+.lakv-place {
+  position: absolute; left: 14px; right: 14px; bottom: 12px; display: block; text-align: left;
+  font-family: ui-monospace, monospace; font-size: 11px; color: var(--hr-on-photo-2);
+  background: rgba(18, 16, 14, .58); border-radius: 8px; padding: 4px 10px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .lakv-top { grid-template-columns: 1fr; }
+  .lakv-logo { max-height: 68vh; }
+  .lakv-gal { grid-template-columns: repeat(2, 1fr); }
+  /* Popiska by šípky vytlačila do druhého riadka; na mobile aj tak listuje prst. */
+  .lakv-hint { display: none; }
+  .lakv-pinned { padding: 24px 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lakv-tile, .lakv-tile img, .lakv-step { transition: none; }
+  .lakv-tile:hover { transform: none; }
+  .lakv-tile:hover img { transform: none; }
+  .lakv-step:hover:not(:disabled) { transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   KATEGÓRIE HRADÍSK (LabCategories.tsx)
+   Pôvodná sekcia z `HomePage` sa skrýva a nahrádza touto — je to jediná
+   sekcia domovskej, ktorá má na `<section>` spodný vlások, takže sa dá
+   zamerať bez zásahu do produkčného súboru.
+
+   POZNÁMKA  pôvodná sekcia sa už neskrýva cez CSS — labová domovská
+   (`LabHome.tsx`) ju jednoducho nevykresľuje.
+
+   MYŠLIENKA  deväť rovnakých dlaždíc nemalo poradie čítania. Prvá kategória
+   je preto vstupná brána cez dva stĺpce a dva riadky, s textom priamo na
+   fotografii; zvyšných osem sú tiché biele dlaždice okolo nej.
+
+   Prečo nie všetkých deväť na fotke: hneď nad touto sekciou je tmavý pás
+   s mapou. Deväť tmavých dlaždíc pod ním by z polovice stránky spravilo
+   jednu súvislú tmavú plochu.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lcat { background: var(--l-paper); border-bottom: 1px solid var(--l-line); }
+.lcat-wrap { max-width: 1280px; margin: 0 auto; padding: 88px 32px 96px; }
+
+/* Hlavička: názov vľavo, veta vpravo — namiesto vycentrovaného nadpisu so
+   zlatou ozdôbkou pod ním. Obidve časti sedia na spoločnej účiare. */
+.lcat-head {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 44px; align-items: end;
+}
+.lcat-title {
+  margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 700;
+  font-size: clamp(30px, 3.6vw, 46px); line-height: 1.05; letter-spacing: -.025em;
+  color: var(--l-ink); text-wrap: balance;
+}
+.lcat-intro {
+  margin: 0; font-family: 'Inter', sans-serif; font-size: 17px; line-height: 1.62;
+  color: var(--l-muted); max-width: 52ch;
+}
+.lcat-rule { height: 1px; background: var(--l-line); margin: 28px 0 36px; }
+@media (max-width: 860px) {
+  .lcat-head { grid-template-columns: 1fr; gap: 14px; align-items: start; }
+  .lcat-rule { margin: 22px 0 26px; }
+}
+
+.lcat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.lcat-img { transition: transform .55s cubic-bezier(.22, .61, .36, 1); }
+
+/* ── Vstupná brána ─────────────────────────────────────────────────────── */
+.lcat-lead {
+  position: relative; display: block; overflow: hidden;
+  grid-column: span 2; grid-row: span 2; min-height: 460px;
+  border-radius: 16px; background: var(--l-dark);
+  text-decoration: none;
+}
+.lcat-lead .lcat-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Závoj musí byť dosť silný, aby sa text dal čítať aj na svetlej oblohe. */
+.lcat-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(18, 16, 14, 0) 28%, rgba(18, 16, 14, .58) 62%, rgba(18, 16, 14, .92) 100%);
+}
+.lcat-lead-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 34px; }
+.lcat-lead-name {
+  margin: 0; font-size: clamp(26px, 3vw, 36px); line-height: 1.1;
+  letter-spacing: -.022em; color: #fff;
+}
+.lcat-lead-desc {
+  margin: 12px 0 0; max-width: 54ch;
+  font-family: 'Inter', sans-serif; font-size: 15.5px; line-height: 1.6;
+  color: rgba(255, 255, 255, .86);
+}
+
+/* ── Ostatné dlaždice ──────────────────────────────────────────────────── */
+.lcat-tile {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--l-card); border: 1px solid var(--l-line); border-radius: 16px;
+  text-decoration: none;
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.lcat-photo { position: relative; flex-shrink: 0; aspect-ratio: 16 / 10; overflow: hidden; }
+.lcat-photo .lcat-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.lcat-body { display: flex; flex-direction: column; flex: 1; padding: 20px 22px 22px; }
+/* Dvojtriedny zápis: názov je `h3` a `.lab h3` (Fraunces) by vyhral
+   špecificitou. Fraunces nesie nadpisy sekcií, nie názvy v mriežke. */
+.lcat .lcat-name {
+  margin: 0; font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 600;
+  letter-spacing: -.005em; line-height: 1.3; color: var(--l-ink);
+}
+/* Popis sa NEOREZÁVA. Pôvodné `line-clamp: 3` končilo skoro každú kategóriu
+   v polovici vety; rovnakú výšku dlaždíc drží mriežka, nie sekanie textu. */
+.lcat-desc {
+  margin: 9px 0 18px;
+  font-family: 'Inter', sans-serif; font-size: 14.8px; line-height: 1.6;
+  color: var(--l-body);
+}
+
+.lcat-go {
+  margin-top: auto; display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--l-second-deep);
+}
+.lcat-go-on-photo { margin-top: 18px; color: #fff; }
+.lcat-arrow { transition: transform .18s ease; }
+
+.lcat-tile:hover {
+  transform: translateY(-3px); border-color: var(--l-second);
+  box-shadow: 0 24px 50px -34px rgba(20, 18, 15, .5);
+}
+.lcat-tile:hover .lcat-img,
+.lcat-lead:hover .lcat-img { transform: scale(1.045); }
+.lcat-tile:hover .lcat-arrow,
+.lcat-lead:hover .lcat-arrow { transform: translateX(4px); }
+.lcat-lead:focus-visible,
+.lcat-tile:focus-visible { outline: 2px solid var(--l-second); outline-offset: 3px; }
+
+@media (max-width: 1100px) {
+  .lcat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lcat-lead { grid-row: span 1; min-height: 400px; }
+}
+@media (max-width: 640px) {
+  .lcat-wrap { padding: 56px 20px 64px; }
+  .lcat-grid { grid-template-columns: 1fr; gap: 18px; }
+  .lcat-lead { grid-column: span 1; min-height: 340px; }
+  .lcat-lead-body { padding: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lcat-img, .lcat-arrow, .lcat-tile { transition: border-color .18s ease; }
+  .lcat-tile:hover { transform: none; }
+  .lcat-tile:hover .lcat-img, .lcat-lead:hover .lcat-img { transform: none; }
+  .lcat-tile:hover .lcat-arrow, .lcat-lead:hover .lcat-arrow { transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   „PRIDAJTE SA K NÁM" (LabJoinUs.tsx)
+   Pôvodná sekcia sa v laboratóriu skrýva a nahrádza touto. Text je doslova
+   ten istý; mení sa podanie.
+
+   SKLADBA  dva pohyby, nie jeden dlhý stĺpec:
+     1. dôvod (nadpis · citát · odsek · e-mail)  ×  formulár
+     2. cez celú šírku trojica „čo pomôže najviac", delená zvislými vláskami
+
+   FARBA  jediné farebné miesto je citát v medi. Nadpis je čierny, telo šedé,
+   formulár biely — meď tak nesie presne to, čo má človek pochopiť, aj keď
+   sekciu len prebehne očami.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* (Pôvodná sekcia sa už neskrýva — labová domovská ju nevykresľuje.) */
+
+.ljoin {
+  position: relative; overflow: hidden;
+  background: var(--l-paper-2); border-top: 1px solid var(--l-line);
+}
+/* Vrstevnice v prázdne naľavo od textu (ten istý motív ako v pätičke).
+   Na úzkom okne by liezli pod text, tak sa zhasnú. */
+.ljoin-rings {
+  position: absolute; left: -230px; top: -110px;
+  width: 620px; height: 620px;
+  color: var(--l-second); opacity: .3;
+  pointer-events: none;
+}
+@media (max-width: 1180px) { .ljoin-rings { display: none; } }
+
+.ljoin-wrap { max-width: 1280px; margin: 0 auto; padding: 96px 32px 104px; position: relative; z-index: 1; }
+.ljoin-top {
+  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 64px;
+  align-items: start;
+}
+@media (max-width: 980px) {
+  .ljoin-wrap { padding: 64px 20px 72px; }
+  .ljoin-top { grid-template-columns: 1fr; gap: 44px; }
+}
+
+.ljoin-eyebrow {
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--l-muted);
+}
+.ljoin-title {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 700;
+  font-size: clamp(34px, 4.4vw, 56px); line-height: 1.04; letter-spacing: -.025em;
+  color: var(--l-ink); margin: 14px 0 0; text-wrap: balance;
+}
+/* Citát bez úvodzoviek a kurzívy — nesie ho veľkosť a farba, nie ozdoba.
+   Stojí hneď pod nadpisom, lebo je to dôvod, prečo má niekto čítať ďalej. */
+.ljoin-quote {
+  margin: 18px 0 0; padding: 0;
+  font-family: 'Fraunces', Georgia, serif; font-size: clamp(20px, 2.5vw, 27px);
+  font-weight: 600; line-height: 1.3; letter-spacing: -.018em;
+  color: var(--l-second-deep); max-width: 26ch;
+}
+.ljoin-lead {
+  font-family: 'Inter', sans-serif; font-size: 17.5px; line-height: 1.65;
+  color: var(--l-body); margin: 22px 0 0; max-width: 54ch;
+}
+
+/* E-mail nie je karta ani tlačidlo — je to najdôležitejší riadok sekcie,
+   tak vyzerá ako nadpis, ktorý sa dá stlačiť. Pribudla len šípka, aby bolo
+   na prvý pohľad jasné, že to niekam vedie. */
+.ljoin-mail {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 20px;
+  margin: 34px 0 0; padding: 20px 0;
+  border-top: 1px solid var(--l-line); border-bottom: 1px solid var(--l-line);
+  text-decoration: none; transition: border-color .2s ease;
+}
+.ljoin-mail-lbl {
+  display: block; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--l-muted); margin-bottom: 6px;
+}
+.ljoin-mail strong {
+  font-family: 'Fraunces', Georgia, serif; font-size: clamp(24px, 3vw, 34px);
+  font-weight: 700; letter-spacing: -.02em; color: var(--l-ink);
+  background-image: linear-gradient(var(--l-second), var(--l-second));
+  background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat;
+  transition: background-size .3s cubic-bezier(.22,.61,.36,1);
+}
+.ljoin-mail-go {
+  width: 44px; height: 44px; flex-shrink: 0;
+  display: grid; place-items: center; border-radius: 50%;
+  border: 1px solid var(--l-line-2); color: var(--l-second);
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.ljoin-mail:hover { border-color: var(--l-second); }
+.ljoin-mail:hover strong { background-size: 100% 2px; }
+.ljoin-mail:hover .ljoin-mail-go {
+  background: var(--l-second); border-color: var(--l-second);
+  color: var(--l-card); transform: translateX(4px);
+}
+.ljoin-mail:focus-visible { outline: 2px solid var(--l-second); outline-offset: 6px; }
+
+/* ── Trojica „čo pomôže najviac" ───────────────────────────────────────── */
+.ljoin-asks { margin-top: 76px; }
+.ljoin-askhead { display: flex; align-items: center; gap: 18px; margin-bottom: 30px; }
+.ljoin-askhead span:first-child {
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--l-muted);
+  white-space: nowrap;
+}
+.ljoin-askrule { flex: 1; height: 1px; background: var(--l-line); }
+
+.ljoin-ask-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+/* Zvislý vlások medzi bodmi — novinový stĺpec. Rám okolo každého bodu by
+   zo sekcie spravil tri karty a jediný rám tu má byť formulár. */
+.ljoin-ask { padding: 0 34px; border-left: 1px solid var(--l-line); }
+.ljoin-ask:first-child { padding-left: 0; border-left: 0; }
+.ljoin-ask:last-child { padding-right: 0; }
+/* Číslo je drobný tučný text na papieri — berie tmavšiu odnož iskry, aby sa
+   dalo prečítať aj v témach, kde je iskra jasnejšia (med, bronz). */
+.ljoin-num {
+  display: block; margin-bottom: 14px;
+  font-family: 'Fraunces', Georgia, serif; font-size: 15px; font-weight: 700;
+  line-height: 1; color: var(--l-second-deep);
+}
+/* Číslo sedí na krátkej medenej linke — trojica tak drží spoločnú základňu. */
+.ljoin-num::after {
+  content: ''; display: block; width: 26px; height: 2px; margin-top: 10px;
+  background: var(--l-second); opacity: .45;
+}
+/* Dvojtriedny zápis zámerne: názov bodu je `h3` a `.lab h3` (Fraunces) by
+   inak vyhral špecificitou. Fraunces je tu na nadpisy, nie na názvy v zozname. */
+.ljoin .ljoin-ask-t {
+  font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 600;
+  letter-spacing: -.005em; color: var(--l-ink); margin: 0;
+}
+.ljoin-ask-d {
+  font-family: 'Inter', sans-serif; font-size: 15.5px; line-height: 1.62;
+  color: var(--l-body); margin: 8px 0 0;
+}
+@media (max-width: 860px) {
+  .ljoin-asks { margin-top: 52px; }
+  .ljoin-ask-grid { grid-template-columns: 1fr; gap: 0; }
+  /* Na úzkom okne vlások nemôže deliť stĺpce — tak delí riadky. */
+  .ljoin-ask { padding: 22px 0; border-left: 0; border-top: 1px solid var(--l-line); }
+  .ljoin-ask:first-child { padding-top: 0; border-top: 0; }
+  .ljoin-ask:last-child { padding-bottom: 0; }
+  .ljoin-num { margin-bottom: 10px; }
+}
+
+/* ── Formulár: jediný rám v sekcii ─────────────────────────────────────── */
+.ljoin-right { position: sticky; top: 96px; }
+@media (max-width: 980px) { .ljoin-right { position: static; } }
+.ljoin-card {
+  background: var(--l-card); border: 1px solid var(--l-line);
+  border-radius: 18px; padding: 32px;
+  box-shadow: 0 30px 70px -46px rgba(20,18,15,.5);
+}
+.ljoin-card-t {
+  font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700;
+  letter-spacing: -.02em; color: var(--l-ink); margin: 0;
+}
+.ljoin-card-s {
+  font-family: 'Inter', sans-serif; font-size: 15px; color: var(--l-muted); margin: 6px 0 26px;
+}
+.ljoin-card label {
+  display: block; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  color: var(--l-body); margin: 0 0 7px;
+}
+.ljoin-fld {
+  width: 100%; font-family: 'Inter', sans-serif; font-size: 16px; color: var(--l-ink);
+  background: var(--l-paper); border: 1px solid var(--l-line); border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 18px; outline: none; resize: vertical;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.ljoin-fld::placeholder { color: var(--l-muted-2); }
+.ljoin-fld:focus {
+  border-color: var(--l-accent); background: var(--l-card);
+  box-shadow: 0 0 0 4px var(--l-accent-glow);
+}
+.ljoin-fld[aria-invalid='true'] { border-color: #a33a24; }
+.ljoin-err {
+  display: block; margin: -12px 0 16px; font-family: 'Inter', sans-serif;
+  font-size: 13.5px; color: #a33a24;
+}
+
+.ljoin-send {
+  width: 100%; border: none; cursor: pointer; border-radius: 10px; padding: 15px 20px;
+  font-family: 'Inter', sans-serif; font-size: 15.5px; font-weight: 600;
+  /* Veľká plocha patrí HLAVNEJ farbe témy, nie iskre. V štýle Uhlie je meď
+     len zvýraznenie — medené tlačidlo cez celú šírku spravilo zo sekcie
+     hlinitú plochu, čo je presne to, čo tento štýl nemá byť. */
+  background: var(--l-accent); color: var(--l-card);
+  transition: filter .18s ease, transform .12s ease, background .18s ease;
+}
+.ljoin-send:hover:not(:disabled) { background: var(--l-second); }
+.ljoin-send:active:not(:disabled) { transform: translateY(1px); }
+.ljoin-send:disabled { opacity: .6; cursor: default; }
+.ljoin-note {
+  font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.55;
+  color: var(--l-muted); margin: 14px 0 0; text-align: center;
+}
+
+.ljoin-done { text-align: center; padding: 20px 0; }
+.ljoin-done-mark {
+  width: 54px; height: 54px; margin: 0 auto 18px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center; font-size: 26px;
+  background: var(--l-accent); color: var(--l-card);
+}
+.ljoin-done h3 {
+  font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 700;
+  color: var(--l-ink); margin: 0 0 10px;
+}
+.ljoin-done p { font-family: 'Inter', sans-serif; font-size: 15.5px; line-height: 1.6; color: var(--l-body); margin: 0; }
+.ljoin-ghost {
+  margin-top: 22px; background: transparent; cursor: pointer;
+  border: 1px solid var(--l-line); border-radius: 999px; padding: 11px 22px;
+  font-family: 'Inter', sans-serif; font-size: 14px; color: var(--l-body);
+  transition: border-color .18s ease, color .18s ease;
+}
+.ljoin-ghost:hover { border-color: var(--l-second); color: var(--l-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ljoin-mail strong, .ljoin-fld, .ljoin-send, .ljoin-ghost { transition: none; }
+  .ljoin-mail-go { transition: background .2s ease, color .2s ease; }
+  .ljoin-mail:hover .ljoin-mail-go { transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MAPA V NOVOM ŠATE
+   Doska pod reliéfom, rám aj legenda si farby berú z tokenov (prevedené
+   v `Slovakia3DReliefMap.tsx`). Ostávajú dve veci, ktoré sa tokenmi vyriešiť
+   nedajú a rozhodujú o tom, či mapa pôsobí moderne alebo ako stará listina.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Ozdoby rámu — rožné ❦, hviezdičky ✧ a dvojité zlaté vlásky okolo plátna.
+      V produkcii ostávajú; tu prekážajú najviac zo všetkého. */
+.lab .hr-map-ornament { display: none; }
+
+/* 2. Terén. Výškové odtiene sú zemepis, nie ozdoba — meniť ich by znamenalo
+      klamať o krajine, tak sa iba stlmia, aby uprostred uhľovej stránky
+      nesvietili dopergamenova. Plátno prijíma `filter` ako každý iný prvok. */
+.lab canvas { filter: saturate(.62) contrast(1.05) brightness(.98); }
+
+/* Karta s detailom lokality sedí na svetlom podklade — tieň namiesto zlatého
+   rámu, rovnako ako karty kategórií. */
+.lab .hr-map-detail { box-shadow: var(--hr-shadow-md); }
+
+/* Posuvník v páse aktualít — mal vlastný zlato-hnedý prechod, ktorý na
+   neutrálnej stránke trčal viac než čokoľvek iné vedľa neho. */
+.lab {
+  --hr-scroll-track: var(--l-paper-2);
+  --hr-scroll-edge: transparent;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   VLNOVKY A OZDOBY PREČ
+   Zubatý pás nad hlavičkou aj pod obsahom, vlnitá hrana pätičky a ⚜ oddeľovač
+   sú posledné pozostatky štýlu starej listiny. V produkcii ostávajú — tu ich
+   stačí zhasnúť, lebo sú označené triedou, nie hľadané podľa vzhľadu.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lab .hr-wave,
+.lab .hr-ornament { display: none; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PÄTIČKA V NOVOM ŠATE  (`LabFooter.tsx`)
+   Pôvodne sa tu len prefarbovala produkčná pätička cez `--ft-*`. Farba ale
+   nespravila nič s tým, čo na nej v novom šate neladilo: vlnitá hrana,
+   ⚜ oddeľovač, devätnásťbodové odkazy v serife a spodný pruh, ktorý mal
+   rovnakú váhu ako celý zvyšok. Preto má lab vlastnú pätičku.
+
+   Ostáva tmavá zámerne: po svetlej stránke uzatvára čítanie a oddeľuje
+   služobné odkazy od obsahu. Mení sa jej povaha — z hnedej dosky so zlatým
+   písmom je uhľová plocha, na ktorej svieti jediná farba: meď.
+
+   RASTER  značka (1 diel) | tri stĺpce odkazov (2 diely), pod tým vláskom
+           oddelený služobný riadok.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lfoot {
+  position: relative;
+  overflow: hidden;
+  background: var(--l-dark);
+  color: var(--l-on-dark);
+  font-family: var(--font-heading);
+  border-top: 1px solid var(--l-on-dark-line);
+}
+
+/* Medený vrub v hornej hrane. Jediná ozdoba, ktorú si pätička dovolí — a je
+   to zároveň to isté gesto, aké má v šate podčiarknutie odkazu. */
+.lfoot::before {
+  content: '';
+  position: absolute; top: -1px; left: 0;
+  width: 88px; height: 2px;
+  background: var(--l-second);
+}
+
+/* Vrstevnice v pozadí. Tlmené natoľko, aby sa dali prehliadnuť — nesmú
+   súperiť s textom, len prerušiť prázdnu plochu vpravo. */
+.lfoot-rings {
+  position: absolute;
+  right: -90px; top: 50%;
+  width: 520px; height: 520px;
+  transform: translateY(-50%);
+  color: var(--l-second);
+  opacity: .5;
+  pointer-events: none;
+}
+
+.lfoot-wrap {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 66px 44px 0;
+}
+
+.lfoot-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 56px;
+  padding-bottom: 46px;
+}
+
+/* ── Značka ──────────────────────────────────────────────────────────── */
+.lfoot-id { display: inline-flex; align-items: center; gap: 13px; text-decoration: none; }
+.lfoot-logo {
+  width: 44px; height: 44px; flex-shrink: 0;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #fff;
+  padding: 3px;
+  border: 1px solid var(--l-on-dark-line);
+  transition: border-color 180ms ease;
+}
+.lfoot-id:hover .lfoot-logo { border-color: var(--l-second); }
+.lfoot-name {
+  display: block;
+  font-size: 19px; font-weight: 700; letter-spacing: -.012em;
+  color: var(--l-on-dark-2);
+}
+/* Podtitul nesie meď — je to zároveň legenda k celej farebnej skladbe. */
+.lfoot-tag {
+  display: block; margin-top: 4px;
+  font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--l-second);
+}
+.lfoot-desc {
+  margin: 20px 0 22px;
+  max-width: 34ch;
+  font-size: 15px; line-height: 1.65;
+  color: var(--l-on-dark);
+}
+
+/* ── Siete ───────────────────────────────────────────────────────────── */
+.lfoot-soc { display: flex; gap: 8px; flex-wrap: wrap; }
+.lfoot-soc a {
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--l-on-dark-line);
+  background: rgba(255, 255, 255, .025);
+  color: var(--l-on-dark-3);
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+.lfoot-soc a:hover,
+.lfoot-soc a:focus-visible {
+  color: var(--l-dark);
+  background: var(--l-second);
+  border-color: var(--l-second);
+  transform: translateY(-2px);
+}
+
+/* ── Stĺpce odkazov ──────────────────────────────────────────────────── */
+.lfoot-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+/* Názov stĺpca je popiska, nie nadpis — drží sa pri zemi, aby odkazy pod ním
+   boli to prvé, čo oko chytí. */
+.lfoot-h {
+  margin: 0 0 12px;
+  font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--l-on-dark-3);
+}
+/* Podčiarknutie vyrastie zľava. Pôvodná pätička posúvala celý riadok doprava
+   a odhaľovala ›, čiže text pri každom prejdení myšou poskočil. */
+.lfoot-col a {
+  display: block; width: fit-content;
+  padding: 6px 0;
+  font-size: 15px; line-height: 1.35;
+  color: var(--l-on-dark);
+  text-decoration: none;
+  background-image: linear-gradient(var(--l-second), var(--l-second));
+  background-repeat: no-repeat;
+  background-position: 0 calc(100% - 5px);
+  background-size: 0 1.5px;
+  transition: color 160ms ease, background-size 280ms cubic-bezier(.22, .61, .36, 1);
+}
+.lfoot-col a:hover,
+.lfoot-col a:focus-visible {
+  color: var(--l-on-dark-2);
+  background-size: 100% 1.5px;
+}
+
+/* ── Služobný riadok ─────────────────────────────────────────────────────
+   Nesmie sa zalamovať, ako mu príde. Preto mriežka s pomenovanými poľami
+   a dva presne určené stavy:
+
+     ≥ 1081 px   © … odkazy … ↑        (jeden riadok)
+     ≤ 1080 px   odkazy … ↑
+                 ©                     (dva riadky, obidva od ľavej hrany)
+
+   Voľné `flex-wrap` predtým dávalo tretí, neželaný stav: časť odkazov ostala
+   hore, zvyšok spadol dole a riadok vyzeral roztrhnuto. */
+.lfoot-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'legal up'
+    'copy  copy';
+  align-items: center;
+  gap: 14px 24px;
+  padding: 20px 0 26px;
+  border-top: 1px solid var(--l-on-dark-line);
+}
+.lfoot-copy { grid-area: copy; font-size: 13.5px; color: var(--l-on-dark-3); }
+.lfoot-sep { margin: 0 8px; color: var(--l-second); }
+.lfoot-legal { grid-area: legal; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.lfoot-legal a,
+.lfoot-legal button {
+  font: inherit; font-size: 13.5px;
+  color: var(--l-on-dark-3);
+  background: none; border: 0; padding: 0; margin: 0;
+  cursor: pointer; text-decoration: none;
+  transition: color 140ms ease;
+}
+.lfoot-legal a:hover, .lfoot-legal a:focus-visible,
+.lfoot-legal button:hover, .lfoot-legal button:focus-visible { color: var(--l-on-dark-2); }
+
+/* Inštalácia appky na PC nefunguje — v širokom okne sa neponúka. Bez nej sa
+   zvyšné tri odkazy aj s ©-riadkom pohodlne zmestia do jedného riadka. */
+.lfoot-install { display: none; }
+@media (max-width: 1080px) { .lfoot-install { display: inline; } }
+
+.lfoot-up {
+  grid-area: up;
+  width: 38px; height: 38px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--l-on-dark-line);
+  background: transparent;
+  color: var(--l-on-dark-2);
+  cursor: pointer;
+  transition: color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+.lfoot-up:hover, .lfoot-up:focus-visible {
+  color: var(--l-second);
+  border-color: var(--l-second);
+  transform: translateY(-2px);
+}
+
+/* Klávesnica musí vidieť, kde je — inline `onMouseEnter` v pôvodnej pätičke
+   žiadny takýto stav nemal. */
+.lfoot a:focus-visible,
+.lfoot button:focus-visible { outline: 2px solid var(--l-second); outline-offset: 3px; }
+
+/* Široké okno: všetko do jedného riadka. Stredný stĺpec (`1fr`) tlačí odkazy
+   doprava, takže © vľavo a šípka vpravo držia obidve hrany. */
+@media (min-width: 1081px) {
+  .lfoot-bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'copy legal up';
+    gap: 0 28px;
+  }
+  .lfoot-copy { white-space: nowrap; }
+  .lfoot-legal { justify-content: flex-end; flex-wrap: nowrap; white-space: nowrap; }
+}
+
+/* ── Užšie okná ──────────────────────────────────────────────────────── */
+@media (max-width: 1000px) {
+  .lfoot-top { grid-template-columns: 1fr; gap: 40px; }
+  .lfoot-rings { right: -170px; opacity: .35; }
+}
+@media (max-width: 640px) {
+  .lfoot-wrap { padding: 46px 22px 0; }
+  .lfoot-top { gap: 34px; padding-bottom: 34px; }
+  .lfoot-cols { grid-template-columns: 1fr 1fr; gap: 28px 18px; }
+  .lfoot-desc { margin-bottom: 18px; }
+  .lfoot-rings { display: none; }
+  /* Šípka drží pravý horný roh pruhu, aj keď sa odkazy zalomia do dvoch
+     riadkov — preto `align-self`, nie zvislé centrovanie. */
+  .lfoot-bar { gap: 14px 18px; }
+  .lfoot-up { align-self: start; }
+  .lfoot-legal { gap: 8px 18px; }
+}
+@media (max-width: 380px) {
+  .lfoot-cols { grid-template-columns: 1fr; gap: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lfoot-soc a, .lfoot-up { transition: color 160ms ease, border-color 160ms ease; }
+  .lfoot-soc a:hover, .lfoot-up:hover { transform: none; }
+  .lfoot-col a { transition: color 160ms ease; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STRÁNKA ČLÁNKU (LabArticle.tsx) — `/design/blog/<slug>`
+
+   ROZSAH: kompozícia je PRODUKČNÁ. Tie isté komponenty v tom istom poradí
+   a s tým istým zarovnaním. Táto vrstva je z drvivej väčšiny PREKLAD FARIEB:
+   produkčné komponenty (`ArticlePage`, `DynamicZoneRenderer`, `ArticleSidebar`,
+   `CommentSection`, `HistoricalGallery`) majú farby zapísané natvrdo —
+   v triedach (`text-stone-700`) aj v inline štýloch (`#a87437`) — takže sa
+   prekladajú podľa hodnoty. Až sa na šate zhodneme, komponenty sa prepíšu na
+   tokeny a celá táto vrstva zmizne.
+
+   NAD RÁMEC FARIEB len tri veci, ktoré si vypýtali:
+     1. titulná fotografia na plnú šírku,
+     2. zdieľanie aj na začiatku,
+     3. murovaná fotogaléria bez orezávania (svetelný box ostáva produkčný).
+   ══════════════════════════════════════════════════════════════════════════ */
+.lart { background: var(--l-paper); }
+.lart-wait { padding: 120px 32px; text-align: center; color: var(--l-muted); background: var(--l-paper); }
+.lart-empty { font-family: 'Inter', sans-serif; color: var(--l-muted); }
+
+/* ── 1 · Titulná fotografia ────────────────────────────────────────────── */
+.lart-hero {
+  position: relative; display: flex; align-items: flex-end;
+  height: clamp(380px, 58vh, 640px); overflow: hidden; background: var(--l-dark);
+}
+.lart-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Hore takmer priehľadný — fotografia je dôvod, prečo je hlavička vysoká. */
+.lart-hero-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(15,17,22,.10) 0%, rgba(15,17,22,.30) 42%, rgba(15,17,22,.72) 74%, rgba(15,17,22,.94) 100%);
+}
+.lart-hero-in { position: relative; width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 32px 46px; }
+.lart-crumbs { display: flex; align-items: center; gap: 9px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,.62); }
+.lart-crumbs a { color: inherit; text-decoration: none; transition: color .15s ease; }
+.lart-crumbs a:hover { color: #fff; }
+.lart .lart-title {
+  margin: 15px 0 0;
+  font-family: 'Fraunces', Georgia, serif; font-weight: 700;
+  font-size: clamp(32px, 5vw, 58px); line-height: 1.04; letter-spacing: -.03em;
+  color: #fff; text-wrap: balance;
+}
+.lart-excerpt { margin: 15px 0 0; max-width: 62ch; font-family: 'Inter', sans-serif; font-size: 17px; line-height: 1.56; color: rgba(255,255,255,.84); }
+.lart-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 20px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,.72); }
+.lart-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--l-second); flex-shrink: 0; }
+/* 80 z 364 článkov nemá obálku — vtedy hlavička na papieri, nie tmavá plocha. */
+.lart-hero-plain { height: auto; background: var(--l-paper-2); border-bottom: 1px solid var(--l-line); }
+.lart-hero-plain .lart-hero-veil { display: none; }
+.lart-hero-plain .lart-hero-in { padding-top: 46px; }
+.lart .lart-hero-plain .lart-title { color: var(--l-ink); }
+.lart-hero-plain .lart-excerpt { color: var(--l-body); }
+.lart-hero-plain .lart-meta, .lart-hero-plain .lart-crumbs { color: var(--l-muted); }
+
+/* ── 2 · Zdieľanie na začiatku ─────────────────────────────────────────── */
+.lart-topshare { max-width: 1180px; margin: 0 auto 22px; }
+
+/* ── Rám článku a pobočný stĺpec ───────────────────────────────────────── */
+.lart-card { background: var(--l-card); border: 1px solid var(--l-line); }
+.lart-side { background: var(--l-paper-2); }
+
+/* ══ PREKLAD FARIEB ═══════════════════════════════════════════════════════
+   Inline hodnoty sa v DOM serializujú do `rgb()`, tak sa podľa toho aj
+   hľadajú. Zoznam pokrýva farby, ktoré sa na stránke článku naozaj
+   vyskytujú (vyzbierané z troch produkčných komponentov).
+   ═══════════════════════════════════════════════════════════════════════ */
+/* Plochy */
+.lart [style*='rgb(250, 247, 241)'] { background: var(--l-card) !important; }
+.lart [style*='rgb(245, 239, 227)'] { background: var(--l-paper-2) !important; }
+.lart [style*='rgb(255, 253, 248)'] { background: var(--l-card) !important; }
+.lart [style*='rgb(253, 251, 246)'] { background: var(--l-paper) !important; }
+.lart [style*='rgb(240, 233, 220)'] { background: var(--l-paper-2) !important; }
+/* Iskra: akcentové plochy a odkazy */
+.lart [style*='background: rgb(168, 116, 55)'] { background: var(--l-second) !important; color: var(--l-card) !important; }
+.lart [style*='color: rgb(168, 116, 55)'] { color: var(--l-second-deep) !important; }
+.lart [style*='rgb(125, 79, 29)'] { color: var(--l-second-deep) !important; }
+.lart [style*='rgb(93, 58, 20)'] { color: var(--l-second-deep) !important; }
+/* Text */
+.lart [style*='rgb(45, 36, 24)'],
+.lart [style*='rgb(45, 24, 16)'],
+.lart [style*='rgb(31, 26, 18)'] { color: var(--l-ink) !important; }
+.lart [style*='rgb(74, 63, 47)'],
+.lart [style*='rgb(61, 48, 32)'],
+.lart [style*='rgb(58, 48, 36)'] { color: var(--l-body) !important; }
+.lart [style*='rgb(139, 122, 94)'],
+.lart [style*='rgb(122, 107, 86)'],
+.lart [style*='rgb(107, 93, 77)'] { color: var(--l-muted) !important; }
+/* Vlásky a rámy */
+.lart [style*='rgba(196, 165, 116'] { border-color: var(--l-line) !important; }
+.lart [style*='rgb(196, 165, 116)'] { border-color: var(--l-line-2) !important; }
+
+/* Triedy Tailwindu s natvrdo zapísanou paletou kameňa a jantáru. */
+.lart .text-stone-900, .lart .text-stone-800, .lart .text-amber-950 { color: var(--l-ink) !important; }
+.lart .text-stone-700, .lart .text-stone-600 { color: var(--l-body) !important; }
+.lart .text-stone-500, .lart .text-stone-400 { color: var(--l-muted) !important; }
+.lart .text-amber-900, .lart .text-amber-800 { color: var(--l-ink) !important; }
+.lart .text-amber-700, .lart .text-amber-600, .lart .text-amber-500 { color: var(--l-second-deep) !important; }
+.lart .bg-amber-600, .lart .bg-amber-700 { background-color: var(--l-second) !important; }
+.lart .border-amber-600, .lart .border-amber-500, .lart .border-amber-600\/40, .lart .border-amber-800\/30 { border-color: var(--l-line-2) !important; }
+.lart .border-stone-200, .lart .border-stone-300 { border-color: var(--l-line) !important; }
+
+/* Písmo: Georgia je z pôvodného šatu. Obsah nesie Fraunces, rozhranie Inter. */
+.lart [style*='Georgia'] { font-family: 'Fraunces', Georgia, serif !important; }
+.lart .article-content [style*='Georgia'] { font-family: 'Fraunces', Georgia, serif !important; }
+.lart nav [style*='Georgia'], .lart button[style*='Georgia'], .lart input, .lart textarea { font-family: 'Inter', sans-serif !important; }
+
+/* Iniciála: 72 px oranžové písmeno na začiatku textu. Ostáva (je to pôvodné
+   riešenie), len sa prefarbí a stiahne, aby netlačila prvý odsek nabok. */
+.lart .article-content .float-left.text-6xl,
+.lart .article-content .float-left.text-7xl,
+.lart .article-content [class*='text-6xl'][class*='float-left'] { color: var(--l-second) !important; }
+
+/* Ozdobné SVG ornamenty a zubaté pásy — v šate ich nemá ani zvyšok webu. */
+.lart svg[width='200'] { display: none; }
+
+/* ── 3 · Fotogaléria: murovaná, bez orezávania ─────────────────────────────
+   Produkčná mriežka je `repeat(auto-fill, minmax(240px, 1fr))` a každá fotka
+   sedí v okne s pomerom 4:3 cez `object-cover`, čiže sa oreže. Z 22 fotiek
+   Mikulčíc je 6 na výšku — tie prišli o hlavu aj pätu. Tu sa mriežka prepne
+   na stĺpce a fotka si nesie svoj pomer strán.
+   Svetelný box po kliknutí ostáva PRODUKČNÝ (komentáre a lajky pod fotkou),
+   len prefarbený — viď `--pl-*` nižšie. */
+.lart [style*='minmax(240px, 1fr)'] {
+  display: block !important;
+  columns: 3; column-gap: 12px;
+}
+.lart [style*='minmax(240px, 1fr)'] > * { break-inside: avoid; margin: 0 0 12px; display: block; }
+.lart [style*='aspect-ratio: 4 / 3'] { aspect-ratio: auto !important; height: auto !important; }
+.lart [style*='aspect-ratio: 4 / 3'] > img,
+.lart [style*='aspect-ratio: 4 / 3'] .absolute {
+  position: static !important; height: auto !important; width: 100% !important;
+  object-fit: contain !important;
+}
+@media (max-width: 900px) { .lart [style*='minmax(240px, 1fr)'] { columns: 2; } }
+@media (max-width: 560px) { .lart [style*='minmax(240px, 1fr)'] { columns: 1; } }
+
+/* ── Svetelný box (`--pl-*` z globals.css) ─────────────────────────────────
+   Vykresľuje sa portálom priamo do `body`, teda MIMO `.lab`. Preto sú palety
+   šatu vypísané aj na `body[data-lab-theme]` — inak by sa sem tokeny
+   nedostali a box by ostal zlatohnedý. */
+body[data-lab-theme] .pl-overlay {
+  --pl-card: var(--l-card);
+  --pl-surface: var(--l-paper);
+  --pl-bubble: var(--l-paper-2);
+  --pl-border: var(--l-line-2);
+  --pl-border-soft: var(--l-line);
+  --pl-field: var(--l-line-2);
+  --pl-photo-bg-m: var(--l-dark);
+  --pl-photo-bg-d: var(--l-dark-2);
+  --pl-amber: var(--l-second);
+  --pl-amber-2: var(--l-second-deep);
+  --pl-amber-3: var(--l-second);
+  --pl-gold: var(--l-line-2);
+  --pl-bordo: var(--l-second-deep);
+  --pl-bordo-2: var(--l-second);
+  --pl-title: var(--l-ink);
+  --pl-body: var(--l-body);
+  --pl-muted: var(--l-muted);
+  --pl-muted-2: var(--l-muted-2);
+  --pl-placeholder: var(--l-muted-2);
+  --pl-on-overlay: var(--l-second-light);
+  font-family: 'Inter', ui-sans-serif, sans-serif;
+}
+body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans-serif !important; }
+
+/* ── Súvisiace články ──────────────────────────────────────────────────── */
+.lart-more { padding: 72px 0 88px; background: var(--l-paper-2); border-top: 1px solid var(--l-line); }
+.lart .lart-more-h {
+  margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 700;
+  font-size: clamp(26px, 3vw, 36px); letter-spacing: -.025em; color: var(--l-ink);
+}
+.lart-more-s { margin: 10px 0 30px; font-family: 'Inter', sans-serif; font-size: 16px; color: var(--l-muted); }
+
+@media (max-width: 860px) {
+  .lart-hero { height: clamp(320px, 46vh, 460px); }
+  .lart-hero-in { padding: 0 22px 32px; }
+}
+
+/* ── Doladenie: to, čo prekladová vrstva farieb nechytila ──────────────────
+   Preklad podľa hodnoty zvládne plochy a písmo, ale nie veci, kde je stará
+   estetika v TVARE, nie vo farbe: sklenená guľa s prechodom, hnedý tieň pod
+   kartou, krémová nálepka na krémovom papieri. Toto je tá „voľnejšia ruka" —
+   kompozícia ostáva, mení sa povrch.
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Zdieľanie na začiatku: kompaktný riadok, nie sekcia. Zlatá linka nad ním
+   patrí k tomu na konci článku (tam oddeľuje text od pätky), hore je len
+   šum pod titulnou fotografiou. */
+.lart-topshare > div { margin: 0 !important; }
+.lart-topshare > div > div:first-child { display: none !important; }
+.lart-topshare span[style*='letter-spacing: 0.15em'] {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 11px !important; letter-spacing: .16em !important;
+  color: var(--l-muted-2) !important;
+}
+
+/* ── Karty pobočného stĺpca ───────────────────────────────────────────────
+   Boli to krémové nálepky s hnedým tieňom na krémovom papieri — po prefarbení
+   ostali takmer neviditeľné (dve odtiene toho istého). Sú to panely: bez
+   tieňa, bez rámu, delené vláskou. Hľadajú sa podľa tieňa, ktorý má len
+   `cardStyle` — súvisiace články v stĺpci si karty ponechajú. */
+.lart [style*='rgba(70, 40, 20, 0.06)'] {
+  background: transparent !important;
+  border: 0 !important;
+  border-top: 1px solid var(--l-line-2) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 20px 0 6px !important;
+  margin-bottom: 20px !important;
+}
+/* Názov karty: Georgia 13 px vo farbe akcentu → tichá popiska v Interi.
+   Farbu si necháva to, čo označuje (čísla, body osi), nie nadpisy. */
+.lart .article-sidebar-col h3[style*='rgb(168, 116, 55)'],
+.lart .only-mobile-1024 h3[style*='rgb(168, 116, 55)'] {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 11px !important; font-weight: 700 !important;
+  letter-spacing: .16em !important;
+  color: var(--l-muted-2) !important;
+  margin-bottom: 14px !important;
+}
+
+/* „Hnedá guľa" pri kľúčových faktoch: sklenený prechod 135° s tieňom.
+   Ostáva číslo, mizne guľa — pečatná značka so zaoblením 6 px. */
+.lart [style*='linear-gradient(135deg, rgb(168, 116, 55)'] {
+  background: var(--l-second) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  color: var(--l-card) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 11px !important;
+  width: 22px !important; height: 22px !important;
+}
+/* Popiska faktu — verzálky patria Interu, hodnota ostáva vo Fraunces. */
+.lart [style*='letter-spacing: 0.08em'][style*='rgb(168, 116, 55)'] {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 10.5px !important; letter-spacing: .13em !important;
+  color: var(--l-second-deep) !important;
+}
+
+/* Bod časovej osi: plná bodka → prstenec, ako má os v ostatných sekciách. */
+.lart [style*='width: 10px'][style*='border-radius: 50%'] {
+  background: var(--l-paper-2) !important;
+  border: 2px solid var(--l-second) !important;
+  width: 11px !important; height: 11px !important;
+}
+/* Zvislá spojnica medzi bodmi. */
+.lart [style*='width: 2px'][style*='rgba(196, 165, 116'] { background: var(--l-line-2) !important; }
+
+/* Odznak nad mini-mapou bol smaragdový — jediná studená farba na stránke. */
+.lart .bg-emerald-600\/90, .lart [class*='bg-emerald'] { background-color: var(--l-accent) !important; }
+
+/* Súvisiace v pobočnom stĺpci: karta ostáva, len bez hnedého rámu. */
+.lart .article-sidebar-col [style*='rgba(196, 165, 116, 0.25)'] {
+  border-color: var(--l-line) !important;
+  background: var(--l-card) !important;
+}
+
+/* ── Telo textu ────────────────────────────────────────────────────────────
+   Sadzba ostáva produkčná (zarovnanie, obtekanie, iniciála). Menia sa dve
+   veci, ktoré rozhodujú o tom, ako sa to číta: riadkovanie a odstup odsekov. */
+.lart .article-content p { line-height: 1.72 !important; }
+.lart .article-content h2 { letter-spacing: -.015em; }
+/* Iniciála ostáva — je pôvodná — len v pečatnej červenej a o niečo menšia,
+   aby netlačila prvé riadky nabok. */
+.lart .article-content [class*='float-left'][class*='text-6xl'],
+.lart .article-content [class*='float-left'][class*='text-7xl'] {
+  color: var(--l-second) !important;
+  font-family: 'Fraunces', Georgia, serif !important;
+}
+/* Popisky pod obrázkami: kurzíva v Georgii → tichý Inter. */
+.lart .article-content figcaption { font-family: 'Inter', sans-serif !important; font-style: normal !important; }
+
+/* Nadpis fotogalérie a diskusie — rovnaké ako nadpisy v texte, nie väčšie. */
+.lart h2[style*='font-size: 22px'] {
+  font-family: 'Fraunces', Georgia, serif !important;
+  letter-spacing: -.015em !important;
+  color: var(--l-ink) !important;
+}
+/* Počítadlo pri nadpise (kruh s číslom) — pilulka, nie medajlón. */
+.lart [style*='border-radius: 9999px'][style*='rgb(168, 116, 55)'] {
+  background: var(--l-second) !important;
+  color: var(--l-card) !important;
+  font-family: 'Inter', sans-serif !important;
+  border-radius: 999px !important;
+}
+
+/* ── Časová os: viac miesta bodom ─────────────────────────────────────────
+   Rok mal stĺpec široký 48 px. Pre „1960" to stačí, pre „prvá tretina
+   9. storočia" nie — text sa v ňom zlomil na štyri riadky a rozhodil
+   zarovnanie celého bodu.
+
+   Rok ide preto NAD názov (dva riadky namiesto troch stĺpcov) a zvislá
+   spojnica s bodkou ostáva vľavo cez obidva riadky. Dĺžka roku tak už
+   nemá na rozvrh vplyv.
+
+   `:has()` vyberá riadok podľa toho, že OBSAHUJE bunku s rokom — inak by
+   sa nedal odlíšiť od riadkov v kľúčových faktoch (majú rovnaké značky). */
+.lart div:has(> [style*='width: 48px'][style*='text-align: right']) {
+  display: grid !important;
+  grid-template-columns: 15px minmax(0, 1fr);
+  grid-template-areas: 'mark year' 'mark body';
+  column-gap: 14px !important;
+  row-gap: 3px;
+}
+.lart [style*='width: 48px'][style*='text-align: right'] {
+  grid-area: year;
+  width: auto !important; text-align: left !important; padding-top: 0 !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 11px !important; font-weight: 700 !important;
+  letter-spacing: .12em !important; text-transform: uppercase;
+  color: var(--l-second-deep) !important;
+}
+.lart div:has(> [style*='width: 48px'][style*='text-align: right']) > div:nth-child(2) { grid-area: mark; }
+.lart div:has(> [style*='width: 48px'][style*='text-align: right']) > div:nth-child(3) {
+  grid-area: body;
+  padding-bottom: 22px !important;
+}
+/* Bodka sadá na účiaru roku, nie doprostred medzery. */
+.lart div:has(> [style*='width: 48px'][style*='text-align: right']) > div:nth-child(2) > div:first-child { margin-top: 3px !important; }
+
+/* ── Súvisiace články: nech je na nich vidieť, že sa dajú stlačiť ─────────
+   Karta mala len jemné zosvetlenie titulku. Teraz sa celá pohne doprava,
+   rám sa prefarbí do pečatnej a náhľad sa priblíži. */
+.lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)'] {
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)']:hover {
+  border-color: var(--l-second) !important;
+  background: var(--l-card) !important;
+  transform: translateX(4px);
+  box-shadow: 0 12px 26px -20px rgba(20, 18, 15, .6);
+}
+.lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)'] img { transition: transform .45s cubic-bezier(.22,.61,.36,1); }
+.lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)']:hover img { transform: scale(1.1); }
+.lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)']:hover [style*='rgb(45, 36, 24)'] { color: var(--l-second-deep) !important; }
+.lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)']:focus-visible {
+  outline: 2px solid var(--l-second); outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)']:hover { transform: none; }
+  .lart .article-sidebar-col a[style*='rgba(196, 165, 116, 0.25)']:hover img { transform: none; }
+}
+
+/* ── Výzva na prihlásenie v diskusii ──────────────────────────────────────
+   Prerušovaný zlatý rám a dve zlaté pilulky s prechodom boli posledný kus
+   starého šatu na stránke. Ostáva jedna plná pečatná (prihlásenie je to,
+   čo od človeka chceme) a jedna vlásková vedľa nej. */
+.lart [style*='dashed'] {
+  background: var(--l-paper-2) !important;
+  border: 1px solid var(--l-line) !important;
+  border-radius: 12px !important;
+}
+.lart [style*='rgb(93, 74, 50)'] { color: var(--l-body) !important; font-family: 'Inter', sans-serif !important; }
+/* „Prihlásiť sa" — zlatý prechod → plná pečatná.
+   POZOR NA SELEKTOR: `linear-gradient(180deg, …)` sa v DOM serializuje BEZ
+   uhla (180° je predvolený smer), takže hľadať ho podľa `180deg` nefunguje —
+   presne na tomto zlyhal prvý pokus. Hľadá sa preto podľa farby, ktorá je na
+   stránke jedinečná. */
+.lart [style*='rgb(176, 129, 58)'] {
+  background: var(--l-second) !important;
+  border-color: var(--l-second) !important;
+  color: var(--l-card) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+}
+/* Rám toho istého tlačidla (#7c4a13). */
+.lart [style*='rgb(124, 74, 19)'] { border-color: var(--l-second) !important; }
+/* „Zaregistrovať sa" — vlásková, aby si dvojica neprekážala. */
+.lart [style*='rgb(217, 198, 154)'] {
+  border-color: var(--l-line-2) !important;
+  color: var(--l-body) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.lart [style*='rgb(154, 93, 31)'] { color: var(--l-second-deep) !important; }
+/* Vypnuté tlačidlo „Pridať komentár". */
+.lart [style*='rgba(168, 116, 55, 0.3)'] { background: var(--l-line-2) !important; color: var(--l-card) !important; }
+/* Polia formulára diskusie. */
+.lart .lart-comments input, .lart .lart-comments textarea,
+.lart input[style*='rgb(253, 251, 246)'], .lart textarea[style*='rgb(253, 251, 246)'] {
+  font-family: 'Inter', sans-serif !important;
+  border-color: var(--l-line) !important;
+}
+
+/* ── Kľúčové fakty v reči časovej osi ─────────────────────────────────────
+   Os fungovala preto, že má TRI veci: úzku koľajnicu so značkou vľavo,
+   drobnú popisku verzálkami nad obsahom a hairline, ktorý body oddelí.
+   Fakty mali popisku aj hodnotu, ale namiesto koľajnice sklenenú guľu
+   s číslom a namiesto predelu len medzeru — takže sa zliali do jednej masy.
+
+   Tu majú tú istú stavbu ako os: koľajnica 15 px s pečatnou číslicou,
+   popiska verzálkami, hodnota pod ňou, medzi bodmi vláska.
+   Číslica ostáva holá — guľa nič nehovorila, poradie áno.
+
+   `:has()` vyberá riadok podľa toho, že OBSAHUJE bunku s číslom; inak sa
+   riadok faktu nedá odlíšiť od ostatných dvojstĺpcov v pobočnom stĺpci. */
+.lart div:has(> [style*='linear-gradient(135deg, rgb(168, 116, 55)']) {
+  display: grid !important;
+  grid-template-columns: 15px minmax(0, 1fr);
+  column-gap: 14px !important;
+  align-items: start !important;
+  padding: 13px 0 14px !important;
+  border-top: 1px solid var(--l-line);
+}
+/* Prvý fakt nadväzuje na popisku karty, tak nad ním vláska netreba. */
+.lart div:has(> [style*='linear-gradient(135deg, rgb(168, 116, 55)']):first-child {
+  border-top: 0; padding-top: 0 !important;
+}
+.lart [style*='linear-gradient(135deg, rgb(168, 116, 55)'] {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  width: 15px !important; height: auto !important;
+  justify-content: flex-end !important;
+  padding-top: 1px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 11px !important; font-weight: 700 !important;
+  color: var(--l-second) !important;
+}
+/* Popiska faktu — tá istá miera ako rok na osi. */
+.lart [style*='letter-spacing: 0.08em'][style*='rgb(168, 116, 55)'] {
+  font-size: 11px !important; letter-spacing: .12em !important;
+  color: var(--l-second-deep) !important;
+}
+/* Hodnota faktu: o pol stupňa väčšia a vzdušnejšia, nech sa dá čítať. */
+.lart div:has(> [style*='linear-gradient(135deg, rgb(168, 116, 55)']) [style*='font-size: 14px'] {
+  font-size: 14.5px !important; line-height: 1.55 !important; margin-top: 4px !important;
+}
+
+/* ── Kľúčové slová (karta „Témy") ─────────────────────────────────────────
+   Zlaté pilulky s výplňou boli z pôvodného šatu; v novom sú z nich ploché
+   štítky — vlásková, žiadna výplň, a plnú pečatnú dostane až ten, na ktorom
+   stojíš. Mikulčice témy nemajú, takže vidno až na článkoch, ktoré ich majú.
+   (Hover si komponent prepisuje inline, preto `!important`.) */
+.lart a[style*='rgba(196, 165, 116, 0.45)'] {
+  background: transparent !important;
+  border: 1px solid var(--l-line-2) !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12.5px !important; font-weight: 500 !important;
+  color: var(--l-second-deep) !important;
+  transition: background .16s ease, border-color .16s ease, color .16s ease !important;
+}
+.lart a[style*='rgba(196, 165, 116, 0.45)']:hover,
+.lart a[style*='rgba(196, 165, 116, 0.45)']:focus-visible {
+  background: var(--l-second) !important;
+  border-color: var(--l-second) !important;
+  color: var(--l-card) !important;
+}

@@ -24,11 +24,16 @@ import './styles/globals.css';
 const AdminApp = lazy(() => import('./admin/AdminApp'));
 
 // Mapa (Cesium/maplibre) a galéria (lightgallery) sú najťažšie závislosti.
-// Lazy → nesťahuje ich bežný návštevník článku, len kto otvorí /mapa alebo /galeria.
-const MapPage = lazy(() => import('./pages/MapPage').then((m) => ({ default: m.MapPage })));
+// Lazy → nesťahuje ich bežný návštevník článku, len kto otvorí /galeria.
+
 const GalleryPage = lazy(() => import('./pages/GalleryPage').then((m) => ({ default: m.GalleryPage })));
 
-type Route = 'home' | 'site' | 'article' | 'about' | 'category' | 'mapa' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
+// Skúšobná plocha pre farebný šat domovskej stránky (/design). Lazy — bežný
+// návštevník ju nikdy nestiahne. Vykresľuje SKUTOČNÚ HomePage, len ju zvonku
+// prefarbí; produkčné komponenty sa nemenia.
+const DesignLab = lazy(() => import('./design-lab/DesignLab'));
+
+type Route = 'design' | 'home' | 'site' | 'article' | 'about' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
 
 // Cesty účtov → režim AccountPage
 const ACCOUNT_ROUTES: Record<string, AccountMode> = {
@@ -69,11 +74,13 @@ function App() {
       } else if (ACCOUNT_ROUTES[path]) {
         setRoute('account');
         setAccountMode(ACCOUNT_ROUTES[path]);
+      } else if (path === '/design' || path.startsWith('/design/')) {
+        // Laboratórium má aj podstránky (`/design/blog/<slug>`); cestu si
+        // rozoberie samo, router ju sem len pustí.
+        setRoute('design');
       } else if (path === '/hladat' || path === '/vyhladavanie') {
         setRoute('hladat');
         setParams({ q: searchParams.get('q') || '' });
-      } else if (path === '/mapa') {
-        setRoute('mapa');
       } else if (path === '/aktuality' || path.startsWith('/aktuality/')) {
         setRoute('aktuality');
       } else if (path === '/ochrana-osobnych-udajov' || path === '/privacy') {
@@ -161,7 +168,7 @@ function App() {
   // Vylúčené stránky/oblasti s vlastnými horizontálnymi gestami (mapa, galéria,
   // lightbox fotky, mapy, canvas, polia na písanie).
   useEffect(() => {
-    if (route === 'mapa' || route === 'galeria') return;
+    if (route === 'galeria') return;
     let x0 = 0, y0 = 0, t0 = 0, skip = false;
     const onStart = (e: TouchEvent) => {
       const t = e.touches[0];
@@ -188,6 +195,16 @@ function App() {
     };
   }, [route]);
 
+
+  // Laboratórium má vlastný rám — prepínač tém je nad stránkou.
+  if (route === 'design') {
+    return (
+      <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', color: '#888', fontSize: 14 }}>Načítavam…</div>}>
+        <DesignLab />
+      </Suspense>
+    );
+  }
+
   // Admin má vlastný shell — bez NavBaru, pätičky a Toasteru webu.
   if (route === 'admin') {
     return (
@@ -213,7 +230,6 @@ function App() {
         </div>
       }>
         {route === 'home' && <HomePage />}
-        {route === 'mapa' && <MapPage />}
         {route === 'galeria' && <GalleryPage />}
         {route === 'aktuality' && <AktualityPage />}
         {route === 'privacy' && <PrivacyPage />}
