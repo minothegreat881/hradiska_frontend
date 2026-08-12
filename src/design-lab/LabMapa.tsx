@@ -110,6 +110,11 @@ export function LabMapa() {
   /** Kategória bodu pod kurzorom — zvýrazní sa v legende, nech je jasné,
       čo je čo. Ikona sama o sebe to na malej ploche nepovie. */
   const [hoverCat, setHoverCat] = useState<string | null>(null);
+  /** Bod, nad ktorým je kurzor — karta sa otvára prejdením, nie klikom.
+      Zatvára sa s krátkym odkladom, aby sa dalo prejsť z bodu do karty
+      (medzi nimi je medzera a bez odkladu by karta zmizla pod rukou). */
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const hoverTimer = useRef<number | null>(null);
   const [center, setCenter] = useState<{ lat: number; lng: number }>({ lat: 48.67, lng: 19.70 });
   /** Obdĺžnik aktuálneho pohľadu v súradniciach navigátora (0–100 %). */
   const [view, setView] = useState({ l: 0, t: 0, w: 100, h: 100 });
@@ -197,7 +202,7 @@ export function LabMapa() {
 
     /* Klik do mapy mimo bodu zavrie kartu aj vejar — krizik uz nie je jedina
        cesta von. (Klik na bod sem nepride: body su vo vrstve nad platnom.) */
-    map.on('click', () => { setSelected(null); setSpider(null); });
+    map.on('click', () => { setSelected(null); setSpider(null); setHoverId(null); });
 
     map.on('load', () => { setReady(true); });
     mapRef.current = map;
@@ -284,7 +289,7 @@ export function LabMapa() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    const clear = () => { setSelected(null); setSpider(null); };
+    const clear = () => { setSelected(null); setSpider(null); setHoverId(null); };
     map.on('dragstart', clear);
     map.on('zoomstart', clear);
     return () => { map.off('dragstart', clear); map.off('zoomstart', clear); };
@@ -371,10 +376,22 @@ export function LabMapa() {
   }, [spider, locs]);
 
   const canvasW = mapRef.current?.getCanvas().getBoundingClientRect().width ?? 1200;
+  const openHover = (id: string, cat: string) => {
+    if (hoverTimer.current) { window.clearTimeout(hoverTimer.current); hoverTimer.current = null; }
+    setHoverId(id); setHoverCat(cat);
+  };
+  const closeHoverSoon = () => {
+    if (hoverTimer.current) window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = window.setTimeout(() => {
+      setHoverId(null); setHoverCat(null); hoverTimer.current = null;
+    }, 160);
+  };
+  useEffect(() => () => { if (hoverTimer.current) window.clearTimeout(hoverTimer.current); }, []);
+
   const showPills = zoom >= PILL_ZOOM;
   /* Kliknutý bod má prednosť pred tým pod kurzorom — inak by zvýraznenie
      odskočilo hneď, ako sa myš pohne preč. */
-  const activeCat = selected ? (locs.find(l => l.id === selected)?.cat ?? hoverCat) : hoverCat;
+  const activeCat = hoverCat ?? (selected ? locs.find(l => l.id === selected)?.cat ?? null : null);
   const all = [...nodes, ...spiderNodes];
 
   return (
@@ -387,8 +404,8 @@ export function LabMapa() {
           <div className="lmap-sub">Slovenska</div>
           <p className="lmap-lead">
             Interaktívna mapa lokalít. Skrolovaním približujete, ťahaním posúvate —
-            zhluky sa priblížením rozpadnú na jednotlivé body. Kliknutím na bod
-            otvoríte kartu lokality.
+            zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode
+            otvoríte kartu lokality, klikom do mapy ju zavriete.
           </p>
           {outside > 0 && (
             <button type="button" className="lmap-outside" onClick={() => mapRef.current?.fitBounds(ROAM, { padding: 40, duration: 600 })}>
@@ -466,30 +483,35 @@ export function LabMapa() {
             <div className="lmap-pin-wrap">
               <button
                 type="button"
-                className={selected === n.loc.id ? 'lmap-pin is-selected' : 'lmap-pin'}
+                className={(selected === n.loc.id || hoverId === n.loc.id) ? 'lmap-pin is-selected' : 'lmap-pin'}
+                /* Klik ostáva kvôli dotyku — na telefóne `hover` neexistuje. */
                 onClick={() => setSelected(s => (s === n.loc.id ? null : n.loc.id))}
-                onMouseEnter={() => setHoverCat(n.loc.cat)}
-                onMouseLeave={() => setHoverCat(null)}
+                onMouseEnter={() => openHover(n.loc.id, n.loc.cat)}
+                onMouseLeave={closeHoverSoon}
+                onFocus={() => openHover(n.loc.id, n.loc.cat)}
+                onBlur={closeHoverSoon}
                 aria-label={n.loc.name}
               >
                 <span className="lmap-pin-spec" aria-hidden="true" />
                 <Icon path={(CAT_BY_SLUG[n.loc.cat] || CATS[0]).icon} />
               </button>
 
-              {showPills && selected !== n.loc.id && !spider && (
+              {showPills && selected !== n.loc.id && hoverId !== n.loc.id && !spider && (
                 <span className="lmap-pill">
                   <span className="lmap-pill-n">{n.loc.name}</span>
                   <span className="lmap-pill-c">{(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}</span>
                 </span>
               )}
 
-              {selected === n.loc.id && (
+              {(selected === n.loc.id || hoverId === n.loc.id) && (
                 /* Karta sa otvara nad bodom. Pri bodoch pri hornej hrane by ju
                    platno orezalo (a nad platnom je hlavicka stranky), tak sa
                    preklopi pod bod; pri okrajoch sa posunie dovnutra. */
                 <div
                   className={'lmap-card' + (n.y < 200 ? ' is-below' : '') + (n.x < 150 ? ' is-right' : n.x > canvasW - 150 ? ' is-left' : '')}
                   onClick={e => e.stopPropagation()}
+                  onMouseEnter={() => openHover(n.loc.id, n.loc.cat)}
+                  onMouseLeave={closeHoverSoon}
                 >
                   <div className="lmap-card-in">
                     <div className="lmap-card-photo">
