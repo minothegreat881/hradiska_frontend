@@ -64,6 +64,28 @@ export default function DesignLab() {
     window.history.replaceState(null, '', `${path}?t=${id}`);
   };
 
+  /**
+   * Odkazy vnútri laboratória vedú na produkčné adresy (`/`, `/blog/…`),
+   * lenže tie sú v starom šate — jedno ťuknutie na logo a človek je zrazu
+   * na hnedom pergamene a myslí si, že tak vyzerá návrh. Kde má lab vlastnú
+   * plochu, klik sa preto presmeruje na ňu a téma sa nesie so sebou.
+   *
+   * Kategórie, galéria a aktuality labovú plochu nemajú, takže tie
+   * z laboratória naozaj odvedú — inak by sa tvárili, že existujú.
+   */
+  const keepInLab = (e: React.MouseEvent) => {
+    if (theme === 'povodna') return;
+    const a = (e.target as HTMLElement).closest?.('a');
+    if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    const href = a.getAttribute('href') || '';
+    const dest = href === '/' ? `/design?t=${theme}`
+      : href.startsWith('/blog/') ? `/design${href}?t=${theme}`
+      : null;
+    if (!dest) return;
+    e.preventDefault();
+    window.location.href = dest;
+  };
+
   /* Svetelný box galérie sa vykresľuje portálom priamo do `body`, teda mimo
      `.lab`. Bez tejto značky by sa k nemu tokeny šatu nedostali a ostal by
      zlatohnedý. Po odchode z laboratória sa značka upratuje. */
@@ -100,12 +122,18 @@ export default function DesignLab() {
           ))}
           <span style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginLeft: 4 }}>{current.note}</span>
           <span style={{ flex: 1 }} />
-          <a href="/" style={{ fontSize: 12, color: 'rgba(255,255,255,.6)', textDecoration: 'none' }}>← na web</a>
+          {/* Pomenované naplno: mimo laboratória je stále starý šat, nech to
+              nie je prekvapenie po ťuknutí na kategóriu či galériu. */}
+          <a href="/" style={{ fontSize: 12, color: 'rgba(255,255,255,.6)', textDecoration: 'none' }}>← na web (starý šat)</a>
         </div>
       </div>
 
       {/* `povodna` = bez prekrytia, teda presne dnešný web. */}
-      <div className={theme === 'povodna' ? undefined : 'lab'} data-theme={theme === 'povodna' ? undefined : theme}>
+      <div
+        className={theme === 'povodna' ? undefined : 'lab'}
+        data-theme={theme === 'povodna' ? undefined : theme}
+        onClickCapture={keepInLab}
+      >
         {theme === 'povodna' ? <NavBar /> : <LabNav />}
 
         {articleSlug ? (

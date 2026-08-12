@@ -1,6 +1,29 @@
 @import "tailwindcss";
 @import "./fonts.css";
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * TMAVÝ REŽIM SA NEZAPÍNA SÁM
+ *
+ * Tailwind 4 má variant `dark:` predvolene napojený na `prefers-color-scheme`,
+ * teda na systémové nastavenie zariadenia — bez akéhokoľvek zásahu z kódu.
+ * V komponentoch je takých tried veľa (`dark:bg-stone-900`, `dark:text-amber-200`,
+ * `dark:prose-invert` …), takže na telefóne so zapnutým tmavým režimom naskočili
+ * VŠETKY naraz a stránka sa zobrazila tmavohnedá.
+ *
+ * Prepínač tmavého režimu bol z lišty odstránený, čiže ten vzhľad nikto
+ * nenavrhol ani neodladil — bol to zvyšok, ktorý sa zapínal sám a nedal
+ * sa vypnúť. Tu sa variant preväzuje na triedu `.dark`, ktorú nikto
+ * nenastavuje; web je tak vždy svetlý, ako je navrhnutý.
+ *
+ * Keby sa tmavý režim niekedy robil poriadne, stačí `.dark` niekde pridať —
+ * všetky `dark:` triedy aj pravidlá `.dark …` v tomto súbore ožijú.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Aj natívne prvky (polia, posuvníky, výbery) sa majú kresliť svetlo —
+   inak ich prehliadač na telefóne v tmavom režime prefarbí sám. */
+:root { color-scheme: light; }
+
 /* ULTIMATE FIX: Force all text to be selectable and clickable */
 * {
   -webkit-user-select: text !important;
