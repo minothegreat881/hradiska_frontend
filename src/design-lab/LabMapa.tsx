@@ -495,7 +495,12 @@ export function LabMapa() {
             </div>
           ) : (
             <div key={n.loc.id} className="lmap-node"
-                 style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: selected === n.loc.id ? 30 : 3 }}>
+                 /* Uzol s otvorenou kartou musí ísť nad ostatné. `transform`
+                    na uzle vytvára vlastný kontext vrstiev, takže z-index
+                    karty vnútri sa voči susedným bodom neuplatní — rozhoduje
+                    z-index uzla. Doteraz stúpal len po kliknutí, takže cez
+                    kartu otvorenú prejdením presvitali okolité body. */
+                 style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: (selected === n.loc.id || hoverId === n.loc.id) ? 30 : 3 }}>
             <div className="lmap-pin-wrap">
               <button
                 type="button"
