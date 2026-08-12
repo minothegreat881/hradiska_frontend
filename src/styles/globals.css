@@ -12,11 +12,15 @@
  *
  * Prepínač tmavého režimu bol z lišty odstránený, čiže ten vzhľad nikto
  * nenavrhol ani neodladil — bol to zvyšok, ktorý sa zapínal sám a nedal
- * sa vypnúť. Tu sa variant preväzuje na triedu `.dark`, ktorú nikto
- * nenastavuje; web je tak vždy svetlý, ako je navrhnutý.
+ * sa vypnúť.
  *
- * Keby sa tmavý režim niekedy robil poriadne, stačí `.dark` niekde pridať —
- * všetky `dark:` triedy aj pravidlá `.dark …` v tomto súbore ožijú.
+ * POZOR, TÁTO SMERNICA SAMA NESTAČÍ: utility triedy v tomto projekte
+ * nevznikajú pri builde, ale sú vygenerované vopred v `src/index.css`
+ * (uloženom v repozitári). Na hotové pravidlá sa `@custom-variant` už
+ * nevzťahuje, preto sú tam bloky tmavého režimu vypnuté podmienkou — viď
+ * hlavičku toho súboru. Táto smernica platí pre všetko, čo by sa niekedy
+ * prekladalo, a stane sa jediným potrebným riešením v deň, keď sa
+ * `src/index.css` pregeneruje.
  * ═══════════════════════════════════════════════════════════════════════════ */
 @custom-variant dark (&:where(.dark, .dark *));
 
