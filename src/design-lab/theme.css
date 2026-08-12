@@ -2407,10 +2407,6 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   width: calc(var(--core) + 8px); height: calc(var(--core) + 8px);
   border-radius: 50%; border: 1px dashed rgba(58,52,44,.45);
 }
-.lmap-orbit {
-  position: absolute; width: 4.5px; height: 4.5px; border-radius: 50%;
-  background: #3A342C; transform: translate(-50%, -50%);
-}
 .lmap-cluster-core {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: var(--core); height: var(--core); border-radius: 50%;
@@ -2620,3 +2616,30 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lmap-pad { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 34px); }
   .lmap-zoom { gap: 8px; }
 }
+
+/* ── Zhluk: tá istá reč ako bod ────────────────────────────────────────────
+   Bod pri nabehnutí sčervenie, zhluk nie — a pritom je to to isté gesto.
+   Teraz sčervenie jadro aj prerušovaný prstenec okolo neho. */
+.lmap-cluster:hover .lmap-cluster-core {
+  background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
+  color: var(--l-card);
+  border-color: rgba(255, 255, 255, .6);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .35), 0 6px 16px rgba(20, 18, 15, .35);
+}
+.lmap-cluster:hover .lmap-cluster-halo { border-color: var(--l-second); }
+.lmap-cluster-core, .lmap-cluster-halo { transition: background .18s ease, color .18s ease, border-color .18s ease; }
+
+/* ── Legenda: čo je pod kurzorom ──────────────────────────────────────────
+   Ikona v 26 px krúžku sama nepovie, ktorá kategória to je. Riadok legendy
+   sa preto rozsvieti podľa bodu pod kurzorom (a podľa kliknutého, kým je
+   karta otvorená). */
+.lmap-legend-row { padding: 3px 8px; margin: -3px -8px; border-radius: 8px; transition: background .16s ease; }
+.lmap-legend-row.is-active { background: rgba(255, 255, 255, .07); }
+.lmap-legend-row.is-active .lmap-legend-name { color: var(--l-on-dark-2); font-weight: 600; }
+.lmap-legend-row.is-active .lmap-legend-n { color: var(--l-second); }
+.lmap-legend-row.is-active .lmap-glass {
+  background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
+  border-color: rgba(255, 255, 255, .5);
+  color: var(--l-card);
+}
+.lmap-glass { transition: background .16s ease, border-color .16s ease, color .16s ease; }

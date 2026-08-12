@@ -98,6 +98,7 @@ const strapiBase = () =>
 export function LabMapa() {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const wheelCleanup = useRef<(() => void) | null>(null);
   const [ready, setReady] = useState(false);
   const [zoom, setZoom] = useState(MIN_Z);
   const [locs, setLocs] = useState<Loc[]>([]);
@@ -106,6 +107,9 @@ export function LabMapa() {
   /** Rozbalený vejár: body na (takmer) rovnakom mieste, ktoré zoom neoddelí. */
   const [spider, setSpider] = useState<{ ids: string[]; x: number; y: number } | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
+  /** Kategória bodu pod kurzorom — zvýrazní sa v legende, nech je jasné,
+      čo je čo. Ikona sama o sebe to na malej ploche nepovie. */
+  const [hoverCat, setHoverCat] = useState<string | null>(null);
   const [center, setCenter] = useState<{ lat: number; lng: number }>({ lat: 48.67, lng: 19.70 });
   /** Obdĺžnik aktuálneho pohľadu v súradniciach navigátora (0–100 %). */
   const [view, setView] = useState({ l: 0, t: 0, w: 100, h: 100 });
@@ -168,9 +172,36 @@ export function LabMapa() {
       touchZoomRotate: true,
     });
     map.touchZoomRotate.disableRotation();
+
+    /* POHYB MYSOU. Predvolene koliesko priblizuje — lenze v priblizenom
+       reliefe je castejsie treba posunut nabok nez zoomovat, a dvoma prstami
+       na trackpade je posun prirodzeny pohyb. Koliesko preto POSUVA (aj
+       doprava/dolava cez `deltaX` alebo Shift), priblizuje az Ctrl/⌘. */
+    map.scrollZoom.disable();
+    const el = map.getCanvasContainer();
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (e.ctrlKey || e.metaKey) {
+        map.zoomTo(
+          Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() - e.deltaY * 0.01)),
+          { around: map.unproject([e.offsetX, e.offsetY]), duration: 0 }
+        );
+        return;
+      }
+      const dx = e.shiftKey ? e.deltaY : e.deltaX;
+      const dy = e.shiftKey ? 0 : e.deltaY;
+      map.panBy([dx, dy], { duration: 0 }, { originalEvent: e });
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    wheelCleanup.current = () => el.removeEventListener('wheel', onWheel);
+
+    /* Klik do mapy mimo bodu zavrie kartu aj vejar — krizik uz nie je jedina
+       cesta von. (Klik na bod sem nepride: body su vo vrstve nad platnom.) */
+    map.on('click', () => { setSelected(null); setSpider(null); });
+
     map.on('load', () => { setReady(true); });
     mapRef.current = map;
-    return () => { map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
@@ -341,6 +372,9 @@ export function LabMapa() {
 
   const canvasW = mapRef.current?.getCanvas().getBoundingClientRect().width ?? 1200;
   const showPills = zoom >= PILL_ZOOM;
+  /* Kliknutý bod má prednosť pred tým pod kurzorom — inak by zvýraznenie
+     odskočilo hneď, ako sa myš pohne preč. */
+  const activeCat = selected ? (locs.find(l => l.id === selected)?.cat ?? hoverCat) : hoverCat;
   const all = [...nodes, ...spiderNodes];
 
   return (
@@ -369,7 +403,7 @@ export function LabMapa() {
           </button>
           <div className="lmap-legend-body">
             {CATS.map(c => (
-              <div className="lmap-legend-row" key={c.slug}>
+              <div className={activeCat === c.slug ? 'lmap-legend-row is-active' : 'lmap-legend-row'} key={c.slug}>
                 <span className="lmap-glass"><Icon path={c.icon} size={13} w={2} /></span>
                 <span className="lmap-legend-name">{c.label}</span>
                 <span className="lmap-legend-n">{String(counts[c.slug] || 0).padStart(2, '0')}</span>
@@ -419,13 +453,10 @@ export function LabMapa() {
               onClick={() => openCluster(n)}
               aria-label={`Zhluk ${n.members.length} lokalít — priblížiť`}
             >
+              {/* Obežné bodky (jedna = jedna lokalita) z handoffu sú preč —
+                  pri desiatkach bodov robili z mapy čierne machule a počet
+                  v jadre povie to isté zrozumiteľnejšie. */}
               <span className="lmap-cluster-halo" aria-hidden="true" />
-              {Array.from({ length: Math.min(n.members.length, 12) }).map((_, i, arr) => {
-                const a = (i / arr.length) * Math.PI * 2 - Math.PI / 2;
-                const r = (30 + Math.min(n.members.length, 14) * 1.1) / 2 + 10;
-                return <span key={i} className="lmap-orbit" aria-hidden="true"
-                             style={{ left: `calc(50% + ${Math.cos(a) * r}px)`, top: `calc(50% + ${Math.sin(a) * r}px)` }} />;
-              })}
               <span className="lmap-cluster-core">{n.members.length}</span>
             </button>
             </div>
@@ -437,6 +468,8 @@ export function LabMapa() {
                 type="button"
                 className={selected === n.loc.id ? 'lmap-pin is-selected' : 'lmap-pin'}
                 onClick={() => setSelected(s => (s === n.loc.id ? null : n.loc.id))}
+                onMouseEnter={() => setHoverCat(n.loc.cat)}
+                onMouseLeave={() => setHoverCat(null)}
                 aria-label={n.loc.name}
               >
                 <span className="lmap-pin-spec" aria-hidden="true" />
