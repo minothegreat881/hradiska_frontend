@@ -27,7 +27,7 @@
  * mapa (107 v hraniciach SR). Žiadny nový endpoint.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { SK_OUTLINE, SK_OUTLINE_BOX, SK_OUTLINE_RANGE } from './skOutline';
@@ -104,6 +104,108 @@ const strapiBase = () =>
   import.meta.env.PROD
     ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi')
     : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+
+/**
+ * Jeden bod. Vlastný komponent so `memo` zámerne: pri stovke bodov (najviac
+ * priblížený pohľad) sa inak pri každom prejdení myšou prekresľovali všetky
+ * naraz — a to bolo to sekanie. Takto sa prekreslia len tie dva, ktorým sa
+ * stav naozaj zmenil.
+ */
+const PinNode = memo(function PinNode({
+  n, hot, openCard, showPill, canvasW, canvasH, onEnter, onLeave, onToggle,
+}: {
+  n: Extract<Node, { kind: 'one' }>;
+  hot: boolean; openCard: boolean; showPill: boolean;
+  canvasW: number; canvasH: number;
+  onEnter: (id: string, cat: string) => void;
+  onLeave: () => void;
+  onToggle: (id: string) => void;
+}) {
+  return (
+      <div className="lmap-node"
+           /* Uzol s otvorenou kartou musí ísť nad ostatné. `transform`
+              na uzle vytvára vlastný kontext vrstiev, takže z-index
+              karty vnútri sa voči susedným bodom neuplatní — rozhoduje
+              z-index uzla. Doteraz stúpal len po kliknutí, takže cez
+              kartu otvorenú prejdením presvitali okolité body. */
+           style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: openCard ? 30 : 3 }}>
+      <div className="lmap-pin-wrap">
+        <button
+          type="button"
+          className={(openCard || hot) ? 'lmap-pin is-hot' : 'lmap-pin'}
+          /* Klik ostáva kvôli dotyku — na telefóne `hover` neexistuje. */
+          onClick={() => onToggle(n.loc.id)}
+          onMouseEnter={() => onEnter(n.loc.id, n.loc.cat)}
+          onMouseLeave={onLeave}
+          onFocus={() => onEnter(n.loc.id, n.loc.cat)}
+          onBlur={onLeave}
+          aria-label={n.loc.name}
+        >
+          <span className="lmap-pin-spec" aria-hidden="true" />
+          <Icon path={(CAT_BY_SLUG[n.loc.cat] || CATS[0]).icon} />
+        </button>
+
+        {showPill && !openCard && (
+          <span className="lmap-pill">
+            <span className="lmap-pill-n">{n.loc.name}</span>
+            <span className="lmap-pill-c">{(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}</span>
+          </span>
+        )}
+
+        {openCard && (
+          /* Karta sa otvara nad bodom. Pri bodoch pri hornej hrane by ju
+             platno orezalo (a nad platnom je hlavicka stranky), tak sa
+             preklopi pod bod; pri okrajoch sa posunie dovnutra. */
+          <div
+            className={'lmap-card'
+              /* Nad bodom karta potrebuje CARD_H + odstup. Ked sa tam
+                 nezmesti a dole je viac miesta, preklopi sa pod bod —
+                 inak by ju platno (`overflow: hidden`) orezalo. Prah
+                 bol predtym 200 px, teda menej, nez je karta vysoka. */
+              + (n.y < CARD_H + 48 && (canvasH - n.y) > n.y ? ' is-below' : '')
+              + (n.x < 140 ? ' is-right' : n.x > canvasW - 140 ? ' is-left' : '')}
+            onClick={e => e.stopPropagation()}
+            onMouseEnter={() => onEnter(n.loc.id, n.loc.cat)}
+            onMouseLeave={onLeave}
+          >
+            <div className="lmap-card-in">
+              <div className="lmap-card-photo">
+                {/* Skutocny <img>, nie pozadie: pozadie sa da prebit
+                    skratkou `background` v kaskade a chybu nie je ako
+                    zachytit. Takto sa da aj lazy-loadovat. */}
+                {n.loc.cover && (
+                  <img
+                    className="lmap-card-img"
+                    src={`${strapiBase()}${n.loc.cover}`}
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
+                )}
+                <span className="lmap-card-veil" aria-hidden="true" />
+                <span className="lmap-card-cat">
+                  <Icon path={(CAT_BY_SLUG[n.loc.cat] || CATS[0]).icon} size={11} w={2.4} />
+                  {(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}
+                </span>
+                <button type="button" className="lmap-card-x" onClick={() => setSelected(null)} aria-label="Zavrieť">×</button>
+              </div>
+              <div className="lmap-card-body">
+                <span className="lmap-card-name">{n.loc.name}</span>
+                <span className="lmap-card-coords">{deg(n.loc.lat, 'N', 'S')} · {deg(n.loc.lng, 'E', 'W')}</span>
+                {n.loc.excerpt && <p className="lmap-card-desc">{n.loc.excerpt}</p>}
+                <a className="lmap-card-cta" href={`/blog/${n.loc.slug}`}>
+                  Čítať článok <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+            <span className="lmap-card-arrow" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+      </div>
+  );
+});
 
 export function LabMapa() {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -491,16 +593,21 @@ export function LabMapa() {
     setHoverCat(null);
   };
 
-  const openHover = (id: string, cat: string) => {
+  /* Stála totožnosť obsluh — bez nej by `memo` na bode nemalo zmysel a body
+     by sa prekresľovali všetky, ako predtým. */
+  const openHover = useCallback((id: string, cat: string) => {
     if (hoverTimer.current) { window.clearTimeout(hoverTimer.current); hoverTimer.current = null; }
     setHoverId(id); setHoverCat(cat);
-  };
-  const closeHoverSoon = () => {
+  }, []);
+  const closeHoverSoon = useCallback(() => {
     if (hoverTimer.current) window.clearTimeout(hoverTimer.current);
     hoverTimer.current = window.setTimeout(() => {
       setHoverId(null); setHoverCat(null); hoverTimer.current = null;
     }, 160);
-  };
+  }, []);
+  const toggleSelected = useCallback((id: string) => {
+    setSelected(prev => (prev === id ? null : id));
+  }, []);
   useEffect(() => () => { if (hoverTimer.current) window.clearTimeout(hoverTimer.current); }, []);
 
   /* Handlery na plátne su zavesene raz pri vzniku mapy, tak citaju funkcie
@@ -614,88 +721,18 @@ export function LabMapa() {
             </button>
             </div>
           ) : (
-            <div key={n.loc.id} className="lmap-node"
-                 /* Uzol s otvorenou kartou musí ísť nad ostatné. `transform`
-                    na uzle vytvára vlastný kontext vrstiev, takže z-index
-                    karty vnútri sa voči susedným bodom neuplatní — rozhoduje
-                    z-index uzla. Doteraz stúpal len po kliknutí, takže cez
-                    kartu otvorenú prejdením presvitali okolité body. */
-                 style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: (selected === n.loc.id || hoverId === n.loc.id) ? 30 : 3 }}>
-            <div className="lmap-pin-wrap">
-              <button
-                type="button"
-                className={(selected === n.loc.id || hoverId === n.loc.id || hotKey === n.loc.id) ? 'lmap-pin is-hot' : 'lmap-pin'}
-                /* Klik ostáva kvôli dotyku — na telefóne `hover` neexistuje. */
-                onClick={() => setSelected(s => (s === n.loc.id ? null : n.loc.id))}
-                onMouseEnter={() => openHover(n.loc.id, n.loc.cat)}
-                onMouseLeave={closeHoverSoon}
-                onFocus={() => openHover(n.loc.id, n.loc.cat)}
-                onBlur={closeHoverSoon}
-                aria-label={n.loc.name}
-              >
-                <span className="lmap-pin-spec" aria-hidden="true" />
-                <Icon path={(CAT_BY_SLUG[n.loc.cat] || CATS[0]).icon} />
-              </button>
-
-              {showPills && selected !== n.loc.id && hoverId !== n.loc.id && !spider && (
-                <span className="lmap-pill">
-                  <span className="lmap-pill-n">{n.loc.name}</span>
-                  <span className="lmap-pill-c">{(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}</span>
-                </span>
-              )}
-
-              {(selected === n.loc.id || hoverId === n.loc.id) && (
-                /* Karta sa otvara nad bodom. Pri bodoch pri hornej hrane by ju
-                   platno orezalo (a nad platnom je hlavicka stranky), tak sa
-                   preklopi pod bod; pri okrajoch sa posunie dovnutra. */
-                <div
-                  className={'lmap-card'
-                    /* Nad bodom karta potrebuje CARD_H + odstup. Ked sa tam
-                       nezmesti a dole je viac miesta, preklopi sa pod bod —
-                       inak by ju platno (`overflow: hidden`) orezalo. Prah
-                       bol predtym 200 px, teda menej, nez je karta vysoka. */
-                    + (n.y < CARD_H + 48 && (canvasH - n.y) > n.y ? ' is-below' : '')
-                    + (n.x < 140 ? ' is-right' : n.x > canvasW - 140 ? ' is-left' : '')}
-                  onClick={e => e.stopPropagation()}
-                  onMouseEnter={() => openHover(n.loc.id, n.loc.cat)}
-                  onMouseLeave={closeHoverSoon}
-                >
-                  <div className="lmap-card-in">
-                    <div className="lmap-card-photo">
-                      {/* Skutocny <img>, nie pozadie: pozadie sa da prebit
-                          skratkou `background` v kaskade a chybu nie je ako
-                          zachytit. Takto sa da aj lazy-loadovat. */}
-                      {n.loc.cover && (
-                        <img
-                          className="lmap-card-img"
-                          src={`${strapiBase()}${n.loc.cover}`}
-                          alt=""
-                          loading="eager"
-                          decoding="async"
-                          onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                        />
-                      )}
-                      <span className="lmap-card-veil" aria-hidden="true" />
-                      <span className="lmap-card-cat">
-                        <Icon path={(CAT_BY_SLUG[n.loc.cat] || CATS[0]).icon} size={11} w={2.4} />
-                        {(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}
-                      </span>
-                      <button type="button" className="lmap-card-x" onClick={() => setSelected(null)} aria-label="Zavrieť">×</button>
-                    </div>
-                    <div className="lmap-card-body">
-                      <span className="lmap-card-name">{n.loc.name}</span>
-                      <span className="lmap-card-coords">{deg(n.loc.lat, 'N', 'S')} · {deg(n.loc.lng, 'E', 'W')}</span>
-                      {n.loc.excerpt && <p className="lmap-card-desc">{n.loc.excerpt}</p>}
-                      <a className="lmap-card-cta" href={`/blog/${n.loc.slug}`}>
-                        Čítať článok <span aria-hidden="true">→</span>
-                      </a>
-                    </div>
-                  </div>
-                  <span className="lmap-card-arrow" aria-hidden="true" />
-                </div>
-              )}
-            </div>
-            </div>
+            <PinNode
+              key={n.loc.id}
+              n={n}
+              hot={hotKey === n.loc.id}
+              openCard={selected === n.loc.id || hoverId === n.loc.id}
+              showPill={showPills && !spider}
+              canvasW={canvasW}
+              canvasH={canvasH}
+              onEnter={openHover}
+              onLeave={closeHoverSoon}
+              onToggle={toggleSelected}
+            />
           ))}
         </div>
 
