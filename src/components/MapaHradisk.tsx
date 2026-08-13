@@ -793,9 +793,18 @@ export function MapaHradisk() {
   useEffect(() => { nodesRef.current = [...nodes, ...spiderNodes]; }, [nodes, spiderNodes]);
 
   return (
-    <section className={full ? 'lmap is-full' : 'lmap'}>
+    <section
+      className={full ? 'lmap is-full' : 'lmap'}
+      /* To isté pre celú obrazovku: `position: fixed` v inline štýle sa
+         uplatní bez ohľadu na to, či sa medzidotaz na danom telefóne trafí. */
+      style={full ? {
+        position: 'fixed', inset: 0, zIndex: 4000,
+        flexDirection: 'column', flexWrap: 'nowrap',
+        height: '100dvh', width: '100vw',
+      } : undefined}
+    >
       {/* ── Ľavý panel ─────────────────────────────────────────────────── */}
-      <div className="lmap-side">
+      <div className="lmap-side" style={full ? { display: 'none' } : undefined}>
         <div className="lmap-head">
           <div className="lmap-eyebrow"><span /> Terénny atlas · 02</div>
           <h2 className="lmap-title">Hradiská</h2>
@@ -838,7 +847,11 @@ export function MapaHradisk() {
           vodoznaku či HUD-u by kartu nechal otvorenú a jedinou cestou von by
           ostal krížik. Toto beží na úrovni DOM v zachytávacej fáze, takže
           zabera vsade — okrem samotného bodu, karty a ovládania. */}
-      <div className="lmap-canvas" onClickCapture={closeOnOutside}>
+      <div
+        className="lmap-canvas"
+        onClickCapture={closeOnOutside}
+        style={full ? { flex: 1, width: '100%', height: 'auto', aspectRatio: 'auto', maxHeight: 'none', minHeight: 0 } : undefined}
+      >
         <div className="lmap-grid" aria-hidden="true" />
         <div className="lmap-watermark" aria-hidden="true">SK</div>
 
@@ -857,6 +870,15 @@ export function MapaHradisk() {
             className="lmap-open"
             role="button"
             tabIndex={0}
+            /* Kľúčové vlastnosti sú inline zámerne. Cez CSS to zlyhávalo a
+               z telefónu sa nedalo zistiť prečo — inline štýl neprebije
+               medzidotaz, poradie súborov ani cudzie `!important`. */
+            style={{
+              position: 'absolute', inset: 0, zIndex: 900,
+              display: 'grid', placeItems: 'end center', paddingBottom: 16,
+              pointerEvents: 'auto', touchAction: 'manipulation',
+              background: 'transparent', border: 0, cursor: 'pointer',
+            }}
             /* `pointerdown` chytí prst, pero aj myš a príde skôr, než sa
                k udalosti dostane plátno mapy. */
             onPointerDown={e => {
@@ -881,7 +903,20 @@ export function MapaHradisk() {
           </div>
         )}
         {touch && full && (
-          <button type="button" className="lmap-close" onPointerDown={() => setFull(false)} aria-label="Zavrieť mapu">
+          <button
+            type="button"
+            className="lmap-close"
+            onPointerDown={() => setFull(false)}
+            aria-label="Zavrieť mapu"
+            style={{
+              position: 'absolute', zIndex: 4100,
+              top: 'calc(12px + env(safe-area-inset-top))', right: 12,
+              width: 44, height: 44, borderRadius: '50%',
+              display: 'grid', placeItems: 'center', pointerEvents: 'auto',
+              background: 'rgba(20,18,15,.85)', color: '#f3ede1',
+              border: '1px solid rgba(255,255,255,.25)', touchAction: 'manipulation',
+            }}
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
