@@ -2633,6 +2633,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 /* ── Zhluk: tá istá reč ako bod ────────────────────────────────────────────
    Bod pri nabehnutí sčervenie, zhluk nie — a pritom je to to isté gesto.
    Teraz sčervenie jadro aj prerušovaný prstenec okolo neho. */
+/* Farba AZ pri nabehnuti — v pokoji je zhluk sklo ako bod. */
 .lmap-cluster.is-hot .lmap-cluster-core {
   background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
   color: var(--l-card);
