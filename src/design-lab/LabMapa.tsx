@@ -188,7 +188,7 @@ export function LabMapa() {
         ],
       },
       bounds: SK,
-      fitBoundsOptions: { padding: 8 },
+      fitBoundsOptions: { padding: 0 },
       minZoom: MIN_Z,
       maxZoom: MAX_Z,
       maxBounds: ROAM,
@@ -367,7 +367,7 @@ export function LabMapa() {
     if (!map) return;
     map.easeTo({ zoom: Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() + f)), duration: 260 });
   };
-  const reset = () => mapRef.current?.fitBounds(SK, { padding: 8, duration: 420 });
+  const reset = () => mapRef.current?.fitBounds(SK, { padding: 0, duration: 420 });
 
   /** Posun o tretinu obrazovky — šípky sú presnejšie než ťahanie prstom. */
   const pan = (dx: number, dy: number) => {

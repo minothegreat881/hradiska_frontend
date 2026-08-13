@@ -2338,7 +2338,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-canvas {
   position: relative; flex: 1; min-width: 0; overflow: hidden;
   background: var(--l-paper-2);
-  aspect-ratio: 2.011; max-height: 88vh;
+  aspect-ratio: 2.0113; max-height: 88vh;
 }
 .lmap-grid {
   position: absolute; inset: 0; pointer-events: none;
