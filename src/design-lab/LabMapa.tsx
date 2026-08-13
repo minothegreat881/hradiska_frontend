@@ -240,14 +240,21 @@ export function LabMapa() {
     const at = (cx: number, cy: number): Node | null => {
       const r = el.getBoundingClientRect();
       const x = cx - r.left, y = cy - r.top;
+      /* OTVORENÝ BOD MÁ PREDNOSŤ, kým z neho kurzor naozaj neodíde.
+         Predtým vyhrával najbližší — a tam, kde sú body nahustené (Hatné,
+         Prosné, Dolná Mariková), stačilo pohnúť myšou o pár bodov a karta
+         preskočila na suseda. Každý preskok znamená novú kartu s novou
+         fotkou, a to je to sekanie. Dosah otvoreného bodu je navyše o osem
+         bodov väčší, než aký potreboval na otvorenie. */
+      const open = nodesRef.current.find(
+        n => n.kind === 'one' && n.loc.id === hoverIdRef.current
+      );
+      if (open && Math.hypot(open.x - x, open.y - y) < hitR(open) + 8) return open;
+
       let best: Node | null = null, bestD = Infinity;
       for (const n of nodesRef.current) {
         const d = Math.hypot(n.x - x, n.y - y);
-        /* Otvorený bod si drží dosah o osem bodov väčší. Bez toho kurzor na
-           hranici dosahu kartu striedavo otvára a zatvára — druhá polovica
-           toho zásekU. */
-        const r2 = hitR(n) + (n.kind === 'one' && n.loc.id === hoverIdRef.current ? 8 : 0);
-        if (d < r2 && d < bestD) { best = n; bestD = d; }
+        if (d < hitR(n) && d < bestD) { best = n; bestD = d; }
       }
       return best;
     };
@@ -663,7 +670,7 @@ export function LabMapa() {
                           className="lmap-card-img"
                           src={`${strapiBase()}${n.loc.cover}`}
                           alt=""
-                          loading="lazy"
+                          loading="eager"
                           decoding="async"
                           onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                         />
