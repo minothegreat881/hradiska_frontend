@@ -704,6 +704,17 @@
 .lmap .lmap-side .lmap-locator-view,
 .lmap .lmap-canvas .lmap-open { pointer-events: none !important; }
 
+/* Aj VNÚTRO bodu musí byť priehľadné. `globals.css` má ešte jedno pravidlo,
+   `.parchment *:not(.pointer-events-none) { pointer-events: auto }`, ktoré
+   zapne dotyk každému potomkovi — vrátane `svg` s ikonou v bode. Meranie to
+   ukázalo priamo: pod kurzorom nebolo plátno mapy, ale `svg`. Bod tak
+   pohlcoval pohyb myši a karta sa neotvorila. Vnútro zhluku je na tom
+   rovnako; samotné tlačidlo zhluku klikateľné ostáva. */
+.lmap .lmap-canvas .lmap-pin *,
+.lmap .lmap-canvas .lmap-pill *,
+.lmap .lmap-canvas .lmap-cluster *,
+.lmap .lmap-canvas .lmap-open * { pointer-events: none !important; }
+
 .lmap .lmap-canvas .lmap-card,
 .lmap .lmap-canvas .lmap-sheet,
 .lmap .lmap-canvas .lmap-sheet-x,
