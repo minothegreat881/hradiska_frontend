@@ -2589,49 +2589,6 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-card.is-right .lmap-card-arrow { margin-left: 18%; }
 .lmap-card.is-left .lmap-card-arrow { margin-left: 82%; }
 
-/* ── Navigátor ─────────────────────────────────────────────────────────────
-   Reliéf nemá popisy miest, takže v priblíženom pohľade nie je podľa čoho sa
-   zorientovať. Obrys s obdĺžnikom pohľadu to povie na jeden pohľad; klik doň
-   pohľad prenesie a krížik posúva po tretinách obrazovky (presnejšie než ťah). */
-.lmap-locator {
-  position: relative; width: 148px; aspect-ratio: 1000 / 485;
-  background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
-  border-radius: 10px; overflow: hidden; cursor: crosshair;
-  box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
-}
-.lmap-locator svg { position: absolute; inset: 0; width: 100%; height: 100%; padding: 6px; box-sizing: border-box; }
-.lmap-locator path { fill: rgba(20, 18, 15, .1); stroke: rgba(20, 18, 15, .55); stroke-width: 4; vector-effect: non-scaling-stroke; }
-.lmap-locator-view {
-  position: absolute; pointer-events: none;
-  border: 1.5px solid var(--l-second); background: rgba(201, 72, 58, .12);
-  border-radius: 2px; min-width: 3px; min-height: 3px;
-}
-
-.lmap-pad {
-  display: grid; grid-template-columns: repeat(3, 34px); grid-template-rows: repeat(3, 28px);
-  background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
-  border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
-}
-.lmap-pad button {
-  display: grid; place-items: center; background: none; border: 0; cursor: pointer;
-  color: rgba(20, 18, 15, .7); font-size: 10px; font-family: inherit;
-  transition: background .14s ease, color .14s ease;
-}
-.lmap-pad button:hover { background: rgba(20, 18, 15, .07); color: #14120F; }
-.lmap-pad-u { grid-area: 1 / 2; }
-.lmap-pad-l { grid-area: 2 / 1; }
-.lmap-pad-c { grid-area: 2 / 2; color: var(--l-second) !important; font-size: 13px; }
-.lmap-pad-r { grid-area: 2 / 3; }
-.lmap-pad-d { grid-area: 3 / 2; }
-
-@media (max-width: 900px) {
-  /* Na telefóne je navigátor väčšia pomoc než na počítači (prst posúva
-     hrubšie), ale musí ostať malý — plátno je vzácne. */
-  .lmap-locator { width: 108px; }
-  .lmap-pad { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 34px); }
-  .lmap-zoom { gap: 8px; }
-}
-
 /* ── Zhluk: tá istá reč ako bod ────────────────────────────────────────────
    Bod pri nabehnutí sčervenie, zhluk nie — a pritom je to to isté gesto.
    Teraz sčervenie jadro aj prerušovaný prstenec okolo neho. */
@@ -2708,8 +2665,6 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 }
 
 @media (max-width: 900px) {
-  /* Na dotyku posúva mapu až druhý prst, takže krížik šípok je tu
-     užitočnejší než na počítači — dostáva plné palcové ciele. */
   .lmap-zoom-box button { width: 44px; height: 44px; font-size: 20px; }
   .lmap-zoom-slider { width: 44px; height: 128px; }
   .lmap-zoom-slider::-webkit-slider-thumb { width: 20px; height: 20px; margin-left: -8px; }
