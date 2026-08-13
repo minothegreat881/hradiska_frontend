@@ -2511,6 +2511,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   transition: background .14s ease;
 }
 .lmap-zoom-box button:last-child { border-bottom: 0; }
+.lmap-zoom-reset { border-top: 1px solid rgba(20,18,15,.15); }
 .lmap-zoom-box button:hover { background: rgba(20,18,15,.07); }
 .lmap-zoom-reset { font-family: var(--mono) !important; font-size: 12px !important; }
 .lmap-zoom-v { font-family: var(--mono); font-size: 11px; color: rgba(20,18,15,.55); }
@@ -2660,3 +2661,68 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   color: var(--l-card);
 }
 .lmap-glass { transition: background .16s ease, border-color .16s ease, color .16s ease; }
+
+/* ── Priblíženie: tlačidlá + posuvník ──────────────────────────────────────
+   Samotné „+/−" nepovedia, kde v rozsahu človek je, a pri siedmich stupňoch
+   reliéfu je to rozdiel medzi orientáciou a hádaním. Posuvník to ukáže
+   naraz a jedným ťahom prejde celý rozsah; tlačidlá ostávajú na presný krok. */
+.lmap-zoom-slider {
+  writing-mode: vertical-lr; direction: rtl;   /* zvislý, hore = bližšie */
+  width: 42px; height: 108px; margin: 0; padding: 0;
+  background: none; border: 0; border-bottom: 1px solid rgba(20, 18, 15, .15);
+  appearance: none; -webkit-appearance: none; cursor: ns-resize;
+}
+.lmap-zoom-slider::-webkit-slider-runnable-track {
+  width: 3px; border-radius: 999px; background: rgba(20, 18, 15, .22);
+}
+.lmap-zoom-slider::-moz-range-track {
+  width: 3px; border-radius: 999px; background: rgba(20, 18, 15, .22);
+}
+.lmap-zoom-slider::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--l-second); border: 2px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 2px 6px rgba(20, 18, 15, .35);
+  margin-left: -6px;
+}
+.lmap-zoom-slider::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--l-second); border: 2px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 2px 6px rgba(20, 18, 15, .35);
+}
+.lmap-zoom-slider:focus-visible { outline: 2px solid var(--l-second); outline-offset: -2px; }
+
+/* ── Merítko ───────────────────────────────────────────────────────────────
+   Nahrádza text „zoom 1.0×". Reliéf nemá popisy, takže vzdialenosť je jediná
+   vec, podľa ktorej sa dá odhadnúť, na čo sa človek pozerá. */
+.lmap-scale { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.lmap-scale-bar {
+  height: 6px; min-width: 24px;
+  border: 1px solid rgba(20, 18, 15, .55); border-top: 0;
+  background: linear-gradient(90deg, rgba(20, 18, 15, .12), transparent);
+  transition: width .12s linear;
+}
+.lmap-scale-l {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+  color: rgba(20, 18, 15, .62); font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  /* Na dotyku posúva mapu až druhý prst, takže krížik šípok je tu
+     užitočnejší než na počítači — dostáva plné palcové ciele. */
+  .lmap-zoom-box button { width: 44px; height: 44px; font-size: 20px; }
+  .lmap-zoom-slider { width: 44px; height: 128px; }
+  .lmap-zoom-slider::-webkit-slider-thumb { width: 20px; height: 20px; margin-left: -8px; }
+  .lmap-zoom-slider::-moz-range-thumb { width: 20px; height: 20px; }
+  .lmap-scale-bar { height: 5px; }
+  .lmap-scale-l { font-size: 10px; }
+  .lmap-zoom { bottom: calc(16px + env(safe-area-inset-bottom)); }
+}
+
+/* Nápoveda dvoch prstov od MapLibre — do šatu, nie do jeho predvoleného vzhľadu. */
+.lmap .maplibregl-cooperative-gesture-screen {
+  background: rgba(20, 18, 15, .55);
+  font-family: 'Archivo', 'Inter', sans-serif;
+  font-size: 15px; letter-spacing: .01em;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
