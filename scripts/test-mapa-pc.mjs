@@ -51,10 +51,33 @@ const run = async () => {
   await page.waitForTimeout(600);
   console.log('bodov:', await page.locator('.lmap-pin').count(), ' zhlukov:', await page.locator('.lmap-cluster').count());
   const sel = (await page.locator('.lmap-pin').count()) ? '.lmap-pin' : '.lmap-cluster';
-  const pin = (await page.locator(sel).count()) ? await page.locator(sel).first().boundingBox() : null;
+  // len bod, ktorý naozaj leží na plátne — po ťahu časť z nich vyjde mimo,
+  // pod bočný panel, a tam by ho myš nikdy nenašla
+  const cbox = await page.locator('.lmap-canvas').boundingBox();
+  let pin = null;
+  const many = page.locator(sel);
+  for (let i = 0, n = await many.count(); i < n && !pin; i++) {
+    const b = await many.nth(i).boundingBox();
+    if (!b) continue;
+    const x = b.x + b.width / 2, y = b.y + b.height / 2;
+    if (x > cbox.x + 40 && x < cbox.x + cbox.width - 40 && y > cbox.y + 40 && y < cbox.y + cbox.height - 40) pin = b;
+  }
   if (pin) {
-    await page.mouse.move(pin.x + pin.width / 2, pin.y + pin.height / 2);
+    // plynulý príchod: zvýraznenie sa počíta z POHYBU myši, skok ho nespustí
+    const px = pin.x + pin.width / 2, py = pin.y + pin.height / 2;
+    await page.mouse.move(px - 120, py - 120);
+    for (let i = 1; i <= 20; i++) {
+      await page.mouse.move(px - 120 + (120 * i) / 20, py - 120 + (120 * i) / 20);
+      await page.waitForTimeout(30);
+    }
     await page.waitForTimeout(900);
+    const under = await page.evaluate(([x, y]) => {
+      const e = document.elementFromPoint(x, y);
+      const b = document.querySelector('.lmap-canvas').getBoundingClientRect();
+      return { el: e ? e.tagName + '.' + (e.className.baseVal ?? e.className) : null, x, y, canvas: [b.x, b.y, b.width, b.height].map(Math.round) };
+    }, [px, py]);
+    console.log('  pod kurzorom pri bode:', JSON.stringify(under));
+    console.log(`${(await page.locator('.lmap-pin.is-hot').count()) ? '✔' : '✘'}  bod sa zvýraznil`);
     const card = await page.locator('.lmap-card').count();
     console.log(`${card ? '✔' : '✘'}  karta po nabehnutí na bod: ${card}`);
   } else console.log('✘  žiadny bod na plátne');
