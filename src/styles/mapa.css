@@ -50,7 +50,11 @@
   /* `stretch` by prebilo `aspect-ratio` platna (roztiahnutie vyhrava nad
      pomerom), takze by si vysku nedrzalo. Vysku urcuje platno, panel sa
      don roztiahne sam. */
-  display: flex; align-items: flex-start;
+  /* `flex-wrap` je tu kvôli riadku s uvedením zdrojov: je to tretie dieťa
+     tohto pruhu a bez zalomenia sa vtlačilo VEDĽA panela a plátna ako tretí
+     stĺpec — tým sa mapa na počítači zúžila a rozsypala. Takto ostane panel
+     a plátno v prvom riadku a zdroje sa zalomia pod ne. */
+  display: flex; flex-wrap: wrap; align-items: flex-start;
   background: var(--l-dark);
   font-family: 'Archivo', 'Inter', ui-sans-serif, sans-serif;
   font-stretch: 100%;
@@ -330,6 +334,7 @@
 .lmap-zoom-reset { font-family: var(--mono) !important; font-size: 12px !important; }
 /* Uvedenie zdrojov — pod mapou, nie cez krajinu. */
 .lmap-attrib {
+  width: 100%;
   margin: 0; padding: 9px 22px;
   background: var(--l-dark); color: var(--l-on-dark-3);
   font-size: 11px; text-align: right;
