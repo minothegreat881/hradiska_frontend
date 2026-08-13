@@ -50,6 +50,10 @@ const MIN_Z = 4.4;
 const MAX_Z = 12;
 /** Od tohto priblíženia dostane bod menovku (handoff: 2,4× z rozsahu 1–10×). */
 const PILL_ZOOM = 9.6;
+/** Približná výška karty (fotka 130 + telo). Podľa nej sa rozhoduje, na ktorú
+    stranu bodu sa karta otvorí, aby ju plátno neorezalo. Musí byť na úrovni
+    súboru — číta ju `PinNode`, ktorý stojí mimo tela komponentu. */
+const CARD_H = 300;
 /** Polomer zhlukovania v obrazovkových bodoch (handoff: 38 px). */
 const CLUSTER_PX = 38;
 
@@ -579,9 +583,7 @@ export function LabMapa() {
   const canvasBox = mapRef.current?.getCanvas().getBoundingClientRect();
   const canvasW = canvasBox?.width ?? 1200;
   const canvasH = canvasBox?.height ?? 700;
-  /** Priblizna vyska karty (fotka 130 + telo). Podla nej sa rozhoduje, na
-      ktoru stranu bodu sa otvori, aby ju platno neorezalo. */
-  const CARD_H = 300;
+
   /** Klik mimo bodu, karty a ovládania = zavrieť. */
   const closeOnOutside = (e: React.MouseEvent) => {
     const t = e.target as HTMLElement;
