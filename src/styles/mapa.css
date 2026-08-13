@@ -477,3 +477,26 @@
   color: var(--l-card);
 }
 .lmap-glass { transition: background .16s ease, border-color .16s ease, color .16s ease; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DOTYK — platí len pre zariadenia bez myši, počítača sa to netýka
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (hover: none) {
+  /* Zhluk je na počítači tlačidlo (kvôli sfarbeniu pri prejdení myšou). Na
+     telefóne z toho ostáva len škoda: prst pri ťahaní pristane na zhluku,
+     mapa o ňom nevie a neposunie sa — a v priblížení, kde je zhlukov veľa,
+     sa nedá hýbať skoro vôbec. Na dotyku ho preto otvára klik do mapy. */
+  .lmap-cluster { pointer-events: none; }
+}
+
+/* Nápoveda „dvoma prstami" od MapLibre. `pointer-events` je tu s dôrazom
+   zámerne: `globals.css` má pravidlo, ktoré vynúti `pointer-events: auto`
+   na každý `div`, a táto nápoveda je div cez celú mapu so `z-index: 99999`
+   — bez toho by prehltla každé ťuknutie na bod aj na tlačidlá. */
+.lmap .maplibregl-cooperative-gesture-screen {
+  pointer-events: none !important;
+  background: rgba(20, 18, 15, .55);
+  font-family: 'Archivo', 'Inter', ui-sans-serif, sans-serif;
+  font-size: 15px; letter-spacing: .01em;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}

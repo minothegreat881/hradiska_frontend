@@ -40,6 +40,9 @@ const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49
    nechávalo nad Slovenskom a pod ním pás navyše. Pomer 2,011 : 1 sedí
    s pomerom plátna. */
 const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 49.6138]];
+/** Dotykové zariadenie — `hover` na ňom neexistuje. Rozhoduje IBA o správaní
+    na dotyku; na počítači sa vďaka nemu nemení nič. */
+const isTouch = () => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
 /* Výrez POHYBU. Reliéf končí na štátnej hranici, ale štrnásť lokalít leží za
    ňou (Mikulčice, Pohansko, Zalavár, Visegrád, Gars-Thunau, Arkona…). Tie sa
    kreslia ako body na papieri mimo krajiny — preto sa mapa dá odtiahnuť až
@@ -306,6 +309,18 @@ export function MapaHradisk() {
       maxZoom: MAX_Z,
       maxBounds: ROAM,
       attributionControl: false,
+      /* NA TELEFÓNE: JEDEN PRST POSÚVA STRÁNKU, DVA MAPU, DVOJŤUK PRIBLÍŽI.
+         Mapa sedí uprostred dlhej domovskej — keď brala jeden prst, cez ňu
+         sa nedalo prelistovať ďalej a zakaždým človek skončil v mape.
+         Prehliadač na to sám ukáže nápovedu, keď to niekto skúsi jedným.
+         NA POČÍTAČI JE TO VYPNUTÉ — tam ostáva koliesko aj ťahanie tak,
+         ako doteraz. */
+      cooperativeGestures: isTouch(),
+      locale: {
+        'CooperativeGesturesHandler.MobileHelpText': 'Mapu posuniete dvoma prstami',
+        'CooperativeGesturesHandler.WindowsHelpText': 'Priblížite kolieskom s Ctrl',
+        'CooperativeGesturesHandler.MacHelpText': 'Priblížite kolieskom s ⌘',
+      },
       /* Bez `alpha` vycisti MapLibre platno do CIERNEJ — odtial cierne okraje
          okolo krajiny. S nim je platno priehladne a presvita cezen papier,
          bodkova mriezka aj vodoznak „SK", presne ako to chce handoff (a ako
@@ -427,7 +442,12 @@ export function MapaHradisk() {
     map.on('click', (ev) => {
       const n = at(ev.originalEvent.clientX, ev.originalEvent.clientY);
       if (!n) { setSelected(null); setSpider(null); setHoverId(null); return; }
-      if (n.kind === 'one') setSelected(prev => (prev === n.loc.id ? null : n.loc.id));
+      if (n.kind === 'one') { setSelected(prev => (prev === n.loc.id ? null : n.loc.id)); return; }
+      /* Na dotyku zhluk prst nezachytáva (viď `mapa.css`), aby sa dala mapa
+         ťahať aj cezeň — otvorí ho preto až klik do mapy. Na počítači to má
+         na starosti tlačidlo zhluku; keby sa priblížilo aj odtiaľto, bežali
+         by dve animácie naraz. */
+      if (isTouch()) clusterRef.current?.(n);
     });
 
     map.on('load', () => { setReady(true); });
