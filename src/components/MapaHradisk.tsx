@@ -227,6 +227,9 @@ const PinNode = memo(function PinNode({
 });
 
 export function MapaHradisk() {
+  const rootRef = useRef<HTMLElement | null>(null);
+  /* Kam sa sekcia po zavreti vrati. */
+  const homeRef = useRef<{ parent: Node | null; next: Node | null }>({ parent: null, next: null });
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const wheelCleanup = useRef<(() => void) | null>(null);
@@ -792,8 +795,42 @@ export function MapaHradisk() {
   /* Body rozbaleneho vejara sa daju trafit rovnako ako ostatne. */
   useEffect(() => { nodesRef.current = [...nodes, ...spiderNodes]; }, [nodes, spiderNodes]);
 
+  /* Celá obrazovka: sekciu fyzicky presuniem pod `<body>`.
+     `position: fixed` sa totiž nemeria voči okну prehliadača, ale voči
+     najbližšiemu rodičovi s `transform`, `filter` alebo `backdrop-filter` —
+     a takých má stránka niekoľko (atramentová vrstva, karty). Mapa sa preto
+     „roztiahla" iba na svojho rodiča a navonok to vyzeralo, akoby ťuknutie
+     nespravilo nič. Mimo stránky nemá čo prekážať. */
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    if (full) {
+      homeRef.current = { parent: el.parentNode, next: el.nextSibling };
+      document.body.appendChild(el);
+      document.body.style.overflow = 'hidden';
+    } else if (homeRef.current.parent) {
+      (homeRef.current.parent as Node).insertBefore(el, homeRef.current.next);
+      homeRef.current = { parent: null, next: null };
+      document.body.style.overflow = '';
+    }
+    /* Plátno má po presune iný rozmer, MapLibre to samo nezistí. */
+    const t = window.setTimeout(() => mapRef.current?.resize(), 60);
+    return () => window.clearTimeout(t);
+  }, [full]);
+
+  /* Keby stránka zmizla otvorená: vrátiť posúvanie tela a sekciu na jej
+     pôvodné miesto — inak by ju React hľadal tam, kde už nie je. */
+  useEffect(() => () => {
+    document.body.style.overflow = '';
+    const el = rootRef.current, home = homeRef.current;
+    if (el && home.parent && el.parentNode === document.body) {
+      try { (home.parent as Node).insertBefore(el, home.next); } catch { /* rodič už zanikol */ }
+    }
+  }, []);
+
   return (
     <section
+      ref={rootRef as React.RefObject<HTMLElement>}
       className={full ? 'lmap is-full' : 'lmap'}
       /* To isté pre celú obrazovku: `position: fixed` v inline štýle sa
          uplatní bez ohľadu na to, či sa medzidotaz na danom telefóne trafí. */
