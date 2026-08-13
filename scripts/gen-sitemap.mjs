@@ -14,7 +14,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const SITE = (process.env.SITE_URL || 'https://hradiska.sk').replace(/\/$/, '');
-const STRAPI = (process.env.VITE_STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
+// Pri builde na Verceli ziadny localhost nebezi — `VITE_STRAPI_URL` tam nie je
+// nastavena a fetch na 1337 padal, takze sa do mapy stranok zapisalo 11 URL
+// a ZIADNY clanok. Rovnaka zaloha ako v `prerender.mjs`: backend na Hetzneri.
+// Prepisatelne cez SITEMAP_STRAPI_URL (lokalne staci VITE_STRAPI_URL).
+const STRAPI = (process.env.SITEMAP_STRAPI_URL || process.env.VITE_STRAPI_URL || 'http://188.245.47.29').replace(/\/$/, '');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outPath = resolve(__dirname, '..', 'public', 'sitemap.xml');
