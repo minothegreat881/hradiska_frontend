@@ -40,10 +40,6 @@ const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49
    nechávalo nad Slovenskom a pod ním pás navyše. Pomer 2,011 : 1 sedí
    s pomerom plátna. */
 const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 49.6138]];
-/** Dotykové zariadenie — `hover` na ňom neexistuje. Rozhoduje o tom, či mapa
-    berie jeden prst, alebo dva (viď `cooperativeGestures`), a o dosahu trafenia. */
-const isTouch = () => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
-
 /* Výrez POHYBU. Reliéf končí na štátnej hranici, ale štrnásť lokalít leží za
    ňou (Mikulčice, Pohansko, Zalavár, Visegrád, Gars-Thunau, Arkona…). Tie sa
    kreslia ako body na papieri mimo krajiny — preto sa mapa dá odtiahnuť až
@@ -101,23 +97,6 @@ const Icon = ({ path, size = 13, w = 2.2 }: { path: string; size?: number; w?: n
 /** Mercator y v stupňoch — tá istá projekcia, v akej je obrys navigátora. */
 const mercY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2)) * 180 / Math.PI;
 
-/**
- * Merítko: koľko metrov je jeden bod obrazovky. Číslo „zoom 8,3" nepovie
- * návštevníkovi nič — pruh s „20 km" povie všetko, a na reliéfe bez popisov
- * je to jediná informácia o vzdialenosti.
- */
-function scaleBar(zoom: number, lat: number): { px: number; label: string } {
-  const mPerPx = (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
-  const raw = mPerPx * 110;                    // cielova dlzka pruhu v bodoch
-  const p = Math.pow(10, Math.floor(Math.log10(raw)));
-  const n = raw / p;
-  const dist = (n >= 5 ? 5 : n >= 2 ? 2 : 1) * p;   // 1 / 2 / 5 × 10ⁿ
-  return {
-    px: Math.round(dist / mPerPx),
-    label: dist >= 1000 ? `${Math.round(dist / 1000)} km` : `${Math.round(dist)} m`,
-  };
-}
-
 const deg = (v: number, pos: string, neg: string) => `${Math.abs(v).toFixed(2)}° ${v >= 0 ? pos : neg}`;
 
 /** Základ Strapi — vo vývoji priamo 1337, v produkcii cez proxy `/strapi`. */
@@ -130,7 +109,6 @@ export function LabMapa() {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const wheelCleanup = useRef<(() => void) | null>(null);
-  const resizeCleanup = useRef<(() => void) | null>(null);
   /* Uzly a stav tahania pre trafenie bodu — handlery na plátne su zavesene
      raz a citaju z refov, nie zo zavretej premennej. */
   const nodesRef = useRef<Node[]>([]);
@@ -215,16 +193,6 @@ export function LabMapa() {
       maxZoom: MAX_Z,
       maxBounds: ROAM,
       attributionControl: false,
-      /* NA TELEFÓNE JEDEN PRST POSÚVA STRÁNKU, dva mapu. Mapa je uprostred
-         dlhej stránky; keby brala jeden prst, návštevník by sa cez ňu nedostal
-         ďalej a zakaždým skončil v mape. Na počítači to vypnuté ostáva — tam
-         je koliesko aj ťahanie jednoznačné. */
-      cooperativeGestures: isTouch(),
-      locale: {
-        'CooperativeGesturesHandler.MobileHelpText': 'Mapu posuniete dvoma prstami',
-        'CooperativeGesturesHandler.WindowsHelpText': 'Priblížite kolieskom s Ctrl',
-        'CooperativeGesturesHandler.MacHelpText': 'Priblížite kolieskom s ⌘',
-      },
       /* Bez `alpha` vycisti MapLibre platno do CIERNEJ — odtial cierne okraje
          okolo krajiny. S nim je platno priehladne a presvita cezen papier,
          bodkova mriezka aj vodoznak „SK", presne ako to chce handoff (a ako
@@ -244,22 +212,11 @@ export function LabMapa() {
     const el = map.getCanvasContainer();
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      /* KOLIESKO ROBÍ TO, ČO ČLOVEK ČAKÁ OD SVOJHO ZARIADENIA. Predtým vždy
-         posúvalo a približovalo až s Ctrl — to sedelo trackpadu, ale kto má
-         myš, čaká od kolieska priblíženie a mapa mu pripadala pokazená.
-         Zariadenie sa preto rozpozná z udalosti:
-           myš       veľké skokové `deltaY` bez vodorovnej zložky → PRIBLÍŽENIE
-           trackpad  drobné spojité delty, často aj `deltaX`      → POSUN
-           štipnutie prehliadač posiela `ctrlKey`                 → PRIBLÍŽENIE */
-      const pinch = e.ctrlKey || e.metaKey;
-      const wheelish = e.deltaMode !== 0 || (Math.abs(e.deltaY) >= 50 && e.deltaX === 0);
-      if (pinch || wheelish) {
-        const step = pinch ? -e.deltaY * 0.01 : -Math.sign(e.deltaY) * 0.6;
-        map.easeTo({
-          zoom: Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() + step)),
-          around: map.unproject([e.offsetX, e.offsetY]),
-          duration: pinch ? 0 : 150,
-        });
+      if (e.ctrlKey || e.metaKey) {
+        map.zoomTo(
+          Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() - e.deltaY * 0.01)),
+          { around: map.unproject([e.offsetX, e.offsetY]), duration: 0 }
+        );
         return;
       }
       const dx = e.shiftKey ? e.deltaY : e.deltaX;
@@ -278,11 +235,9 @@ export function LabMapa() {
       const r = el.getBoundingClientRect();
       const x = cx - r.left, y = cy - r.top;
       let best: Node | null = null, bestD = Infinity;
-      /* Prst trafí horšie než kurzor — na dotyku sa dosah zväčší o polovicu. */
-      const k = isTouch() ? 1.5 : 1;
       for (const n of nodesRef.current) {
         const d = Math.hypot(n.x - x, n.y - y);
-        if (d < hitR(n) * k && d < bestD) { best = n; bestD = d; }
+        if (d < hitR(n) && d < bestD) { best = n; bestD = d; }
       }
       return best;
     };
@@ -317,18 +272,8 @@ export function LabMapa() {
     });
 
     map.on('load', () => { setReady(true); });
-
-    /* PLÁTNO SI MENÍ ROZMER SO STRÁNKOU, nie s oknom. Jeho výšku určuje pomer
-       krajiny a šírku zvyšok riadka, takže sa zmení aj vtedy, keď sa okno
-       nehýbe (iná šírka panela, pribudnutý pás pod mapou, načítané písmo).
-       MapLibre o tom sám nevie a kreslí do starých rozmerov — mapa potom
-       ostane v ľavom hornom rohu a zvyšok plátna zíva. */
-    const ro = new ResizeObserver(() => { map.resize(); });
-    ro.observe(hostRef.current!);
-    resizeCleanup.current = () => ro.disconnect();
-
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); resizeCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
@@ -532,7 +477,6 @@ export function LabMapa() {
   useEffect(() => { openHoverRef.current = openHover; closeHoverRef.current = closeHoverSoon; });
   useEffect(() => { clusterRef.current = openCluster; });
 
-  const bar = scaleBar(zoom, center.lat);
   const showPills = zoom >= PILL_ZOOM;
   /* Kliknutý bod má prednosť pred tým pod kurzorom — inak by zvýraznenie
      odskočilo hneď, ako sa myš pohne preč. */
@@ -543,7 +487,6 @@ export function LabMapa() {
 
   return (
     <section className="lmap">
-      <div className="lmap-row">
       {/* ── Ľavý panel ─────────────────────────────────────────────────── */}
       <div className="lmap-side">
         <div className="lmap-head">
@@ -561,7 +504,6 @@ export function LabMapa() {
             </button>
           )}
         </div>
-
 
         <div className={legendOpen ? 'lmap-legend is-open' : 'lmap-legend'}>
           <button type="button" className="lmap-legend-h" onClick={() => setLegendOpen(v => !v)}>
@@ -724,35 +666,19 @@ export function LabMapa() {
           ))}
         </div>
 
-        <div className="lmap-zoom">
-          {/* Priblíženie: tlačidlá pre presný krok, posuvník pre rozsah.
-              Posuvník naraz ukáže, kde v rozsahu som — číslo „zoom 8,3" to
-              nepovie — a jedným ťahom sa dá prejsť celý rozsah. */}
-          <div className="lmap-zoom-box">
-            <button type="button" onClick={() => zoomBy(1)} aria-label="Priblížiť">+</button>
-            <input
-              className="lmap-zoom-slider"
-              type="range"
-              min={MIN_Z} max={MAX_Z} step={0.1}
-              value={zoom}
-              onChange={e => mapRef.current?.easeTo({ zoom: Number(e.target.value), duration: 0 })}
-              aria-label="Priblíženie mapy"
-            />
-            <button type="button" onClick={() => zoomBy(-1)} aria-label="Oddialiť">−</button>
-            <button type="button" onClick={reset} aria-label="Celé Slovensko" className="lmap-zoom-reset">⤢</button>
-          </div>
-          <div className="lmap-scale" aria-label={`Merítko ${bar.label}`}>
-            <span className="lmap-scale-bar" style={{ width: bar.px }} />
-            <span className="lmap-scale-l">{bar.label}</span>
-          </div>
+        {/* HUD — technické popisky, nezachytávajú kliknutia. */}
+        <div className="lmap-hud lmap-hud-tl" aria-hidden="true">
+          <span>{deg(center.lat, 'N', 'S')}</span><span className="lmap-plus">+</span><span>{deg(center.lng, 'E', 'W')}</span>
+        </div>
+        <div className="lmap-hud lmap-hud-tr" aria-hidden="true">
+          <span>Reliéf · Copernicus DEM 30 m</span><span className="lmap-sq" />
+        </div>
+        <div className="lmap-hud lmap-hud-bl" aria-hidden="true">
+          <span className="lmap-count">{String(locs.length).padStart(2, '0')}</span>
+          <span className="lmap-count-l">Zmapované<br />lokality</span>
         </div>
 
-      </div>
-      </div>
-
-      {/* Pás pod mapou: navigátor a uvedenie zdrojov. Na plátne prekrývali
-          lokality, v paneli sa nezmestili — panel má výšku podľa mapy. */}
-      <div className="lmap-foot">
+        <div className="lmap-zoom">
           {/* Navigátor — kde v rámci Slovenska práve som. Klik prenesie pohľad,
               krížik posúva o tretinu obrazovky. Bez toho sa v priblíženom
               reliéfe bez popisov nedá zorientovať. */}
@@ -774,9 +700,18 @@ export function LabMapa() {
             <button type="button" className="lmap-pad-r" onClick={() => pan(1, 0)} aria-label="Posunúť vpravo">▶</button>
             <button type="button" className="lmap-pad-d" onClick={() => pan(0, 1)} aria-label="Posunúť dole">▼</button>
           </div>
-        <p className="lmap-attrib">
+
+          <div className="lmap-zoom-box">
+            <button type="button" onClick={() => zoomBy(1)} aria-label="Priblížiť">+</button>
+            <button type="button" onClick={() => zoomBy(-1)} aria-label="Oddialiť">−</button>
+            <button type="button" onClick={reset} aria-label="Celé Slovensko" className="lmap-zoom-reset">1:1</button>
+          </div>
+          <span className="lmap-zoom-v">zoom {(zoom).toFixed(1)}</span>
+        </div>
+
+        <div className="lmap-attrib">
           Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
-        </p>
+        </div>
       </div>
     </section>
   );

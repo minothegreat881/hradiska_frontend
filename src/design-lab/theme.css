@@ -2262,17 +2262,18 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 .lmap { --mono: 'IBM Plex Mono', ui-monospace, monospace; }
 /* Displej: rozšírený rez, ako to chce handoff. */
-.lmap .lmap-title, .lmap .lmap-sub, .lmap .lmap-watermark {
+.lmap .lmap-title, .lmap .lmap-sub, .lmap .lmap-count, .lmap .lmap-watermark {
   font-family: 'Archivo', ui-sans-serif, sans-serif !important;
   font-stretch: 112%;
 }
 .lmap .lmap-title { font-weight: 700; letter-spacing: -.015em; }
 .lmap .lmap-sub { font-weight: 500; letter-spacing: .02em; }
+.lmap .lmap-count { font-weight: 700; }
 .lmap .lmap-watermark { font-weight: 700; }
 
 /* ── Ľavý panel ────────────────────────────────────────────────────────── */
 .lmap-side {
-  flex: none; align-self: stretch; overflow-y: auto; width: clamp(320px, 25vw, 400px);
+  flex: none; align-self: stretch; width: clamp(320px, 25vw, 400px);
   display: flex; flex-direction: column; justify-content: space-between;
   padding: 56px 44px;
   background: var(--l-dark);
@@ -2480,6 +2481,21 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   background: var(--l-card); border-right: 1px solid rgba(20,18,15,.16); border-bottom: 1px solid rgba(20,18,15,.16);
 }
 
+/* ── HUD ───────────────────────────────────────────────────────────────── */
+.lmap-hud {
+  position: absolute; display: flex; align-items: center; gap: 10px; pointer-events: none;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .2em; color: rgba(20,18,15,.55);
+}
+.lmap-hud-tl { top: 32px; left: 40px; }
+.lmap-hud-tr { top: 32px; right: 40px; letter-spacing: .18em; text-transform: uppercase; }
+.lmap-hud-bl { bottom: 34px; left: 40px; align-items: flex-end; gap: 12px; }
+.lmap-plus { color: var(--l-second); }
+.lmap-sq { width: 8px; height: 8px; background: var(--l-second); }
+.lmap-count {
+  font-family: 'Fraunces', Georgia, serif; font-size: 44px; font-weight: 700; line-height: .85;
+  letter-spacing: -.02em; color: rgba(20,18,15,.85);
+}
+.lmap-count-l { font-size: 10.5px; line-height: 1.4; letter-spacing: .18em; text-transform: uppercase; }
 
 /* ── Ovládanie ─────────────────────────────────────────────────────────── */
 .lmap-zoom { position: absolute; right: 40px; bottom: 34px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 4; }
@@ -2495,12 +2511,13 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   transition: background .14s ease;
 }
 .lmap-zoom-box button:last-child { border-bottom: 0; }
-.lmap-zoom-reset { border-top: 1px solid rgba(20,18,15,.15); }
 .lmap-zoom-box button:hover { background: rgba(20,18,15,.07); }
 .lmap-zoom-reset { font-family: var(--mono) !important; font-size: 12px !important; }
 .lmap-zoom-v { font-family: var(--mono); font-size: 11px; color: rgba(20,18,15,.55); }
-/* Povinné uvedenie zdrojov — pod mapou, nie na nej. */
-.lmap-attrib { margin: 0 0 0 auto; color: var(--l-on-dark-3); font-size: 11px; text-align: right; }
+.lmap-attrib {
+  position: absolute; left: 40px; bottom: 12px; pointer-events: none;
+  font-size: 10px; color: rgba(20,18,15,.4);
+}
 
 /* ── Užšie okná ────────────────────────────────────────────────────────────
    Handoff je pevných 1720 × 1000 a mobil nerieši. Panel 400 px sa na telefón
@@ -2518,10 +2535,14 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lmap-legend.is-open .lmap-legend-body { display: flex; }
   .lmap-canvas { aspect-ratio: auto; height: 68vh; min-height: 420px; max-height: none; }
   .lmap-watermark { top: 8px; right: -24px; }
+  .lmap-hud-tl, .lmap-hud-tr { top: 14px; font-size: 10px; letter-spacing: .14em; }
+  .lmap-hud-tl { left: 16px; }
+  .lmap-hud-tr { right: 16px; }
+  .lmap-hud-bl { left: 16px; bottom: 16px; }
+  .lmap-count { font-size: 32px; }
   .lmap-zoom { right: 16px; bottom: 16px; }
   .lmap-zoom-box button { width: 44px; height: 44px; }
-  .lmap-foot { flex-wrap: wrap; padding: 10px 16px; gap: 12px; }
-  .lmap-attrib { margin: 0; width: 100%; font-size: 10px; text-align: left; }
+  .lmap-attrib { left: 16px; bottom: 2px; font-size: 9px; max-width: 60%; }
   /* Karta by na úzkom okne vytŕčala mimo plátno. */
   .lmap-card { width: min(260px, 76vw); }
 }
@@ -2571,38 +2592,31 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    Reliéf nemá popisy miest, takže v priblíženom pohľade nie je podľa čoho sa
    zorientovať. Obrys s obdĺžnikom pohľadu to povie na jeden pohľad; klik doň
    pohľad prenesie a krížik posúva po tretinách obrazovky (presnejšie než ťah). */
-/* Pás pod mapou. Navigátor na plátne prekrýval lokality, v ľavom paneli sa
-   nezmestil (panel má výšku podľa mapy) — tu netlačí ani jedno. */
-.lmap-foot {
-  display: flex; align-items: center; gap: 16px;
-  padding: 10px 22px; background: var(--l-dark);
-  border-top: 1px solid var(--l-on-dark-line);
-}
 .lmap-locator {
-  position: relative; flex: none; width: 132px; aspect-ratio: 1000 / 485;
-  background: rgba(255, 255, 255, .06); border: 1px solid var(--l-on-dark-line);
-  border-radius: 8px; overflow: hidden; cursor: crosshair;
+  position: relative; width: 148px; aspect-ratio: 1000 / 485;
+  background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
+  border-radius: 10px; overflow: hidden; cursor: crosshair;
+  box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
 }
 .lmap-locator svg { position: absolute; inset: 0; width: 100%; height: 100%; padding: 6px; box-sizing: border-box; }
-.lmap-locator path { fill: rgba(255, 255, 255, .08); stroke: var(--l-on-dark-3); stroke-width: 4; vector-effect: non-scaling-stroke; }
+.lmap-locator path { fill: rgba(20, 18, 15, .1); stroke: rgba(20, 18, 15, .55); stroke-width: 4; vector-effect: non-scaling-stroke; }
 .lmap-locator-view {
   position: absolute; pointer-events: none;
-  border: 1.5px solid var(--l-second); background: rgba(201, 72, 58, .2);
+  border: 1.5px solid var(--l-second); background: rgba(201, 72, 58, .12);
   border-radius: 2px; min-width: 3px; min-height: 3px;
 }
 
 .lmap-pad {
-  flex: none;
-  display: grid; grid-template-columns: repeat(3, 30px); grid-template-rows: repeat(3, 26px);
-  background: rgba(255, 255, 255, .06); border: 1px solid var(--l-on-dark-line);
-  border-radius: 8px; overflow: hidden;
+  display: grid; grid-template-columns: repeat(3, 34px); grid-template-rows: repeat(3, 28px);
+  background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
+  border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
 }
 .lmap-pad button {
   display: grid; place-items: center; background: none; border: 0; cursor: pointer;
-  color: var(--l-on-dark-3); font-size: 10px; font-family: inherit;
+  color: rgba(20, 18, 15, .7); font-size: 10px; font-family: inherit;
   transition: background .14s ease, color .14s ease;
 }
-.lmap-pad button:hover { background: rgba(255, 255, 255, .1); color: var(--l-on-dark-2); }
+.lmap-pad button:hover { background: rgba(20, 18, 15, .07); color: #14120F; }
 .lmap-pad-u { grid-area: 1 / 2; }
 .lmap-pad-l { grid-area: 2 / 1; }
 .lmap-pad-c { grid-area: 2 / 2; color: var(--l-second) !important; font-size: 13px; }
@@ -2646,68 +2660,3 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   color: var(--l-card);
 }
 .lmap-glass { transition: background .16s ease, border-color .16s ease, color .16s ease; }
-
-/* ── Priblíženie: tlačidlá + posuvník ──────────────────────────────────────
-   Samotné „+/−" nepovedia, kde v rozsahu človek je, a pri siedmich stupňoch
-   reliéfu je to rozdiel medzi orientáciou a hádaním. Posuvník to ukáže
-   naraz a jedným ťahom prejde celý rozsah; tlačidlá ostávajú na presný krok. */
-.lmap-zoom-slider {
-  writing-mode: vertical-lr; direction: rtl;   /* zvislý, hore = bližšie */
-  width: 42px; height: 108px; margin: 0; padding: 0;
-  background: none; border: 0; border-bottom: 1px solid rgba(20, 18, 15, .15);
-  appearance: none; -webkit-appearance: none; cursor: ns-resize;
-}
-.lmap-zoom-slider::-webkit-slider-runnable-track {
-  width: 3px; border-radius: 999px; background: rgba(20, 18, 15, .22);
-}
-.lmap-zoom-slider::-moz-range-track {
-  width: 3px; border-radius: 999px; background: rgba(20, 18, 15, .22);
-}
-.lmap-zoom-slider::-webkit-slider-thumb {
-  appearance: none; -webkit-appearance: none;
-  width: 15px; height: 15px; border-radius: 50%;
-  background: var(--l-second); border: 2px solid rgba(255, 255, 255, .9);
-  box-shadow: 0 2px 6px rgba(20, 18, 15, .35);
-  margin-left: -6px;
-}
-.lmap-zoom-slider::-moz-range-thumb {
-  width: 15px; height: 15px; border-radius: 50%;
-  background: var(--l-second); border: 2px solid rgba(255, 255, 255, .9);
-  box-shadow: 0 2px 6px rgba(20, 18, 15, .35);
-}
-.lmap-zoom-slider:focus-visible { outline: 2px solid var(--l-second); outline-offset: -2px; }
-
-/* ── Merítko ───────────────────────────────────────────────────────────────
-   Nahrádza text „zoom 1.0×". Reliéf nemá popisy, takže vzdialenosť je jediná
-   vec, podľa ktorej sa dá odhadnúť, na čo sa človek pozerá. */
-.lmap-scale { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
-.lmap-scale-bar {
-  height: 6px; min-width: 24px;
-  border: 1px solid rgba(20, 18, 15, .55); border-top: 0;
-  background: linear-gradient(90deg, rgba(20, 18, 15, .12), transparent);
-  transition: width .12s linear;
-}
-.lmap-scale-l {
-  font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
-  color: rgba(20, 18, 15, .62); font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 900px) {
-  /* Na dotyku posúva mapu až druhý prst, takže krížik šípok je tu
-     užitočnejší než na počítači — dostáva plné palcové ciele. */
-  .lmap-zoom-box button { width: 44px; height: 44px; font-size: 20px; }
-  .lmap-zoom-slider { width: 44px; height: 128px; }
-  .lmap-zoom-slider::-webkit-slider-thumb { width: 20px; height: 20px; margin-left: -8px; }
-  .lmap-zoom-slider::-moz-range-thumb { width: 20px; height: 20px; }
-  .lmap-scale-bar { height: 5px; }
-  .lmap-scale-l { font-size: 10px; }
-  .lmap-zoom { bottom: calc(16px + env(safe-area-inset-bottom)); }
-}
-
-/* Nápoveda dvoch prstov od MapLibre — do šatu, nie do jeho predvoleného vzhľadu. */
-.lmap .maplibregl-cooperative-gesture-screen {
-  background: rgba(20, 18, 15, .55);
-  font-family: 'Archivo', 'Inter', sans-serif;
-  font-size: 15px; letter-spacing: .01em;
-  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
-}
