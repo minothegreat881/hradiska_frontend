@@ -400,13 +400,20 @@ export function LabMapa() {
       }));
     });
 
-    /* Klik: bod otvorí kartu (a na dotyku je to jediná cesta), zhluk priblíži,
-       prázdna mapa zavrie. */
+    /* Klik: bod otvorí kartu (a na dotyku je to jediná cesta), prázdna mapa
+       zavrie.
+
+       ZHLUK SEM NEPATRÍ, hoci to tak dlho bolo. Zhluk je skutočné tlačidlo
+       (kvôli `:hover`) a jeho stlačenie preposielam plátnu, aby sa dala mapa
+       ťahať aj z neho — lenže MapLibre z toho spraví vlastný klik. Priblíženie
+       sa preto spúšťalo DVAKRÁT na jedno kliknutie: dve animácie naraz, každá
+       z iného priblíženia. To bol ten zásek pri hlbšom klikaní do zhlukov
+       a aj dôvod, prečo „1:1" vyzeralo, že nič nerobí — jeho animáciu tie
+       dve prepísali. */
     map.on('click', (ev) => {
       const n = at(ev.originalEvent.clientX, ev.originalEvent.clientY);
       if (!n) { setSelected(null); setSpider(null); setHoverId(null); return; }
       if (n.kind === 'one') setSelected(prev => (prev === n.loc.id ? null : n.loc.id));
-      else clusterRef.current?.(n);
     });
 
     map.on('load', () => { setReady(true); });
@@ -500,12 +507,20 @@ export function LabMapa() {
     return () => { map.off('dragstart', clear); map.off('zoomstart', clear); };
   }, [ready]);
 
+  /* Každý pohyb kamery najprv zastaví ten predošlý. Bez toho sa animácie
+     skladali na seba a posledná vyhrala až po tom, čo predošlé doblikali. */
   const zoomBy = (f: number) => {
     const map = mapRef.current;
     if (!map) return;
+    map.stop();
     map.easeTo({ zoom: Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() + f)), duration: 260 });
   };
-  const reset = () => mapRef.current?.fitBounds(SK, { padding: 0, duration: 420 });
+  const reset = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.stop();
+    map.fitBounds(SK, { padding: 0, duration: 420 });
+  };
 
   /** Posun o tretinu obrazovky — šípky sú presnejšie než ťahanie prstom. */
   const pan = (dx: number, dy: number) => {
@@ -533,6 +548,7 @@ export function LabMapa() {
   const openCluster = (n: Extract<Node, { kind: 'many' }>) => {
     const map = mapRef.current;
     if (!map) return;
+    map.stop();
     // Najvacsi odstup clenov v obrazovkovych bodoch pri SUCASNOM priblizeni;
     // pri kazdom dalsom stupni sa zdvojnasobi. Ked ani na maxime nebudu od
     // seba aspon 46 px, zoom ich neoddeli a otvara sa vejar.
