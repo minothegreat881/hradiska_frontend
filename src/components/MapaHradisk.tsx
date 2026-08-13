@@ -247,6 +247,10 @@ export function MapaHradisk() {
   /** Rozbalený vejár: body na (takmer) rovnakom mieste, ktoré zoom neoddelí. */
   const [spider, setSpider] = useState<{ ids: string[]; x: number; y: number } | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
+  /** Mapa na celú obrazovku — len na dotyku. Vložená mapa uprostred stránky
+      sa nikdy neovláda pohodlne: buď berie prst stránke, alebo ho musí pustiť
+      a potom sa v nej nedá hýbať. Na celej obrazovke odpadá oboje. */
+  const [full, setFull] = useState(false);
   /** Uzol pod kurzorom (id bodu alebo kľúč zhluku) — nahrádza `:hover`,
       lebo body samy myš už nezachytávajú. */
   const [hotKey, setHotKey] = useState<string | null>(null);
@@ -743,6 +747,24 @@ export function MapaHradisk() {
   useEffect(() => { clusterRef.current = openCluster; });
   useEffect(() => { fitRef.current = fitCountry; }, [fitCountry]);
 
+  /* Kým je mapa cez celú obrazovku, stránka pod ňou sa nesmie posúvať a mapa
+     smie brať jeden prst — nie je čo prelistovať. */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (full) {
+      document.body.style.overflow = 'hidden';
+      map.cooperativeGestures?.disable();
+    } else {
+      document.body.style.overflow = '';
+      if (isTouch()) map.cooperativeGestures?.enable();
+    }
+    /* Plátno zmenilo rozmer — mapa o tom musí vedieť a dosadnúť nanovo. */
+    const t = window.setTimeout(() => { map.resize(); fitRef.current?.(0); }, 60);
+    return () => window.clearTimeout(t);
+  }, [full]);
+  useEffect(() => () => { document.body.style.overflow = ''; }, []);
+
   const showPills = zoom >= PILL_ZOOM;
   /* Kliknutý bod má prednosť pred tým pod kurzorom — inak by zvýraznenie
      odskočilo hneď, ako sa myš pohne preč. */
@@ -752,7 +774,7 @@ export function MapaHradisk() {
   useEffect(() => { nodesRef.current = [...nodes, ...spiderNodes]; }, [nodes, spiderNodes]);
 
   return (
-    <section className="lmap">
+    <section className={full ? 'lmap is-full' : 'lmap'}>
       {/* ── Ľavý panel ─────────────────────────────────────────────────── */}
       <div className="lmap-side">
         <div className="lmap-head">
@@ -802,6 +824,21 @@ export function MapaHradisk() {
         <div className="lmap-watermark" aria-hidden="true">SK</div>
 
         <div ref={hostRef} className="lmap-gl" />
+
+        {/* Náhľad na telefóne: mapa sa neovláda, otvára sa. Tlačidlo leží cez
+            celé plátno, takže netreba trafiť nič drobné. */}
+        {!full && (
+          <button type="button" className="lmap-open" onClick={() => setFull(true)}>
+            <span>Otvoriť mapu na celú obrazovku</span>
+          </button>
+        )}
+        {full && (
+          <button type="button" className="lmap-close" onClick={() => setFull(false)} aria-label="Zavrieť mapu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        )}
 
         {/* Body a zhluky — v obrazovkových súradniciach nad plátnom mapy. */}
         <div className="lmap-overlay">
