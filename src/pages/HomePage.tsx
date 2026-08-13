@@ -12,11 +12,11 @@ import { hradiskaCategories, variant } from '../data/categories';
 import { InkEffect } from '../components/InkEffect';
 import { ScrollReveal } from '../components/ScrollReveal';
 
-// PERF: 3D mapa (Three.js + R3F + custom GLSL shader + SRTM) je najťažší bundle (~500KB) a najťažšia
-// scene na GPU. Lazy-load + Suspense ju načítajú až keď sa skutočne potrebuje. Pôvodne bol klasický
-// import na vrchu súboru — pre obnovu vráť statický `import Slovakia3DReliefMap from '...'` a odstráň
-// lazy/Suspense wrapper.
-const Slovakia3DReliefMap = lazy(() => import('../components/Slovakia3DReliefMap'));
+// Reliéfna mapa lokalít. Nahradila 3D scénu v Three.js (samostatný balík
+// 851 kB + náročné vykresľovanie na GPU) — reliéf je teraz hotový raster
+// v dlaždiciach a mapu kreslí MapLibre, ktorý na stránke aj tak je.
+// Pôvodná scéna ostáva v `components/Slovakia3DReliefMap.tsx`.
+const MapaHradisk = lazy(() => import('../components/MapaHradisk'));
 
 export function HomePage() {
   // Základ Strapi. Vo vývoji ide prehliadač priamo na 1337, v produkcii cez
@@ -85,37 +85,23 @@ export function HomePage() {
           v2: logo + pripnutý zápis, pás CELEJ kroniky s časovou osou, fotogaléria. */}
       <AktualityFeed />
 
-      {/* Interactive Map Section - Full Width */}
-      <section
-        className="relative"
-        style={{
-          zIndex: 5, // pod hero (z:30) aby search dropdown bol nad mapou
-          background: 'var(--hr-frame)',
-          // Plynulý prechod z krémovej do tmavej – tenká gold hairline + jemný shadow falloff
-          boxShadow: 'inset 0 1px 0 rgba(196, 165, 116, 0.45), inset 0 -1px 0 rgba(196, 165, 116, 0.45), 0 -8px 16px -8px rgba(125, 79, 29, 0.18)',
-        }}
-      >
+      {/* Mapa lokalít — plná šírka. Farby si nesie sama, preto tu už netreba
+          podfarbenie ani zlaté vlásky po okrajoch. */}
+      <section className="relative" style={{ zIndex: 5 }}>
         <Suspense
           fallback={
             <div
               style={{
-                width: '100%',
-                height: 600,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--hr-line-quiet)',
-                fontFamily: 'Georgia, "Times New Roman", serif',
-                fontSize: 14,
-                letterSpacing: '0.1em',
-                background: 'var(--hr-dark-4)',
+                width: '100%', height: 520, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'rgba(243,237,225,.6)', fontFamily: 'Georgia, "Times New Roman", serif',
+                fontSize: 14, letterSpacing: '0.1em', background: '#191c24',
               }}
             >
               ✦ Načítavam mapu...
             </div>
           }
         >
-          <Slovakia3DReliefMap />
+          <MapaHradisk />
         </Suspense>
       </section>
 

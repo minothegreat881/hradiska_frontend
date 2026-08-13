@@ -56,9 +56,8 @@ export function LabHome() {
 
       <LabAktuality />
 
-      {/* Mapa — nová (reliéfne dlaždice + MapLibre) namiesto 3D scény
-          v Three.js. Produkčná `Slovakia3DReliefMap` ostáva nedotknutá
-          a téma „Pôvodná" ju naďalej vykresľuje, nech sa dá porovnať. */}
+      {/* Mapa. Tá istá, aká beží v produkcii — po odsúhlasení nahradila 3D
+          scénu v Three.js aj na ostrej domovskej. */}
       <section className="relative" style={{ zIndex: 5 }}>
         <LabMapa />
       </section>
