@@ -349,20 +349,10 @@
   .lmap-legend-h span { display: block; font-size: 16px; color: var(--l-second); }
   .lmap-legend-body { display: none; padding-top: 12px; }
   .lmap-legend.is-open .lmap-legend-body { display: flex; }
-  /* Plátno vypĺňa mapa (viď `fitCountry`), takže výška môže byť pohodlná —
-     mŕtve pásy nad krajinou a pod ňou už nevznikajú. */
-  .lmap-canvas { aspect-ratio: auto; height: 72vh; min-height: 420px; max-height: none; }
+  .lmap-canvas { aspect-ratio: auto; height: 68vh; min-height: 420px; max-height: none; }
   .lmap-watermark { top: 8px; right: -24px; }
-  /* NA TELEFÓNE OVLÁDAJÚ MAPU PRSTY: ťahanie posúva, štipnutie približuje,
-     dvojťuk priblíži, ťuknutie otvorí kartu. Tlačidlá + / − sú tým zbytočné
-     a na malom plátne zaberali roh, kde sú lokality. Ostáva jediné — návrat
-     na celé Slovensko, lebo z priblíženia niet inej cesty späť. */
-  .lmap-zoom { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); gap: 8px; }
-  .lmap-zoom-box { border-radius: 999px; }
-  .lmap-zoom-box button:not(.lmap-zoom-reset) { display: none; }
-  .lmap-zoom-box .lmap-zoom-reset {
-    width: 46px; height: 46px; border-top: 0; font-size: 12px;
-  }
+  .lmap-zoom { right: 16px; bottom: 16px; }
+  .lmap-zoom-box button { width: 44px; height: 44px; }
   .lmap-attrib { padding: 8px 16px; font-size: 10px; text-align: left; }
   /* Karta by na úzkom okne vytŕčala mimo plátno. */
   .lmap-card { width: min(260px, 76vw); }
@@ -482,13 +472,3 @@
   color: var(--l-card);
 }
 .lmap-glass { transition: background .16s ease, border-color .16s ease, color .16s ease; }
-
-/* ── Dotyk: mapu má dostať prst, nie značky ───────────────────────────────
-   Zhluk je na počítači tlačidlo, aby fungovalo sfarbenie pri prejdení myšou.
-   Na telefóne `hover` neexistuje, takže z toho ostáva len škoda: prst pri
-   ťahaní pristane na zhluku, mapa o stlačení nevie a nedá sa posunúť —
-   a pri priblížení, kde je zhlukov veľa, sa nedalo hýbať skoro vôbec.
-   Na dotyku preto zhluk prst nezachytáva a otvára ho klik do mapy. */
-@media (hover: none) {
-  .lmap-cluster { pointer-events: none; }
-}
