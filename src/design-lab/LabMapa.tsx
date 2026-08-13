@@ -113,6 +113,12 @@ export function LabMapa() {
      raz a citaju z refov, nie zo zavretej premennej. */
   const nodesRef = useRef<Node[]>([]);
   const draggingRef = useRef(false);
+  /** Mapa je v pohybe — vrátane vlastnej animácie po kliknutí na zhluk. */
+  const movingRef = useRef(false);
+  /** Posledná poloha kurzora, aby sa po dosadnutí dala vyhodnotiť znova. */
+  const lastPointer = useRef<{ x: number; y: number } | null>(null);
+  /** Otvorený bod — číta ho dopočítavanie, ktoré beží mimo vykreslenia. */
+  const hoverIdRef = useRef<string | null>(null);
   const moveCleanup = useRef<(() => void) | null>(null);
   const openHoverRef = useRef<((id: string, cat: string) => void) | null>(null);
   const closeHoverRef = useRef<(() => void) | null>(null);
@@ -237,15 +243,25 @@ export function LabMapa() {
       let best: Node | null = null, bestD = Infinity;
       for (const n of nodesRef.current) {
         const d = Math.hypot(n.x - x, n.y - y);
-        if (d < hitR(n) && d < bestD) { best = n; bestD = d; }
+        /* Otvorený bod si drží dosah o osem bodov väčší. Bez toho kurzor na
+           hranici dosahu kartu striedavo otvára a zatvára — druhá polovica
+           toho zásekU. */
+        const r2 = hitR(n) + (n.kind === 'one' && n.loc.id === hoverIdRef.current ? 8 : 0);
+        if (d < r2 && d < bestD) { best = n; bestD = d; }
       }
       return best;
     };
 
     const onMove = (e: MouseEvent) => {
-      if (draggingRef.current) return;
+      /* Kým sa mapa hýbe (aj vlastnou animáciou po kliknutí na zhluk), body
+         pod kurzorom sa menia každý snímok — a s nimi aj karta, ktorá sa
+         otvára a zatvára. To je ten zásek. Počas pohybu sa preto nehľadá
+         nič; hneď po dosadnutí sa dopočíta poloha kurzora nanovo. */
+      if (draggingRef.current || movingRef.current) return;
       const n = at(e.clientX, e.clientY);
+      lastPointer.current = { x: e.clientX, y: e.clientY };
       if (!n) { setHotKey(null); closeHoverRef.current?.(); el.style.cursor = ''; return; }
+      lastPointer.current = { x: e.clientX, y: e.clientY };
       el.style.cursor = n.kind === 'one' ? 'pointer' : 'zoom-in';
       setHotKey(keyOf(n));
       if (n.kind === 'one') openHoverRef.current?.(n.loc.id, n.loc.cat);
@@ -261,6 +277,15 @@ export function LabMapa() {
 
     map.on('dragstart', () => { draggingRef.current = true; });
     map.on('dragend', () => { draggingRef.current = false; });
+    map.on('movestart', () => { movingRef.current = true; });
+    map.on('moveend', () => {
+      movingRef.current = false;
+      /* Po dosadnutí sa kurzor nehýbe, ale svet pod ním áno — inak by bod
+         pod kurzorom ostal nezvýraznený, kým človek nehne myšou. */
+      if (lastPointer.current) onMove(new MouseEvent('mousemove', {
+        clientX: lastPointer.current.x, clientY: lastPointer.current.y,
+      }));
+    });
 
     /* Klik: bod otvorí kartu (a na dotyku je to jediná cesta), zhluk priblíži,
        prázdna mapa zavrie. */
@@ -474,6 +499,7 @@ export function LabMapa() {
   /* Handlery na plátne su zavesene raz pri vzniku mapy, tak citaju funkcie
      cez refy — inak by drzali prvu verziu so starymi datami. */
   useEffect(() => { nodesRef.current = nodes; }, [nodes]);
+  useEffect(() => { hoverIdRef.current = hoverId; }, [hoverId]);
   useEffect(() => { openHoverRef.current = openHover; closeHoverRef.current = closeHoverSoon; });
   useEffect(() => { clusterRef.current = openCluster; });
 
