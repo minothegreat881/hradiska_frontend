@@ -231,6 +231,7 @@ export function MapaHradisk() {
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
   const settleCleanup = useRef<(() => void) | null>(null);
   const resizeCleanup = useRef<(() => void) | null>(null);
+  const touchCleanup = useRef<(() => void) | null>(null);
   const fitRef = useRef<((d?: number) => void) | null>(null);
   /** Otvorený bod — číta ho dopočítavanie, ktoré beží mimo vykreslenia. */
   const hoverIdRef = useRef<string | null>(null);
@@ -455,6 +456,47 @@ export function MapaHradisk() {
       if (isTouch()) clusterRef.current?.(n);
     });
 
+    /* DVOJŤUK A POTIAHNUTIE = PLYNULÉ PRIBLIŽOVANIE (len dotyk).
+       Štipnutie potrebuje dva prsty a obe ruky; toto zvládne palec jednej.
+       Druhé ťuknutie sa nezdvihne a ťahom hore/dole sa približuje — presne
+       ako v mapách, ktoré ľudia poznajú. Bežný dvojťuk (bez ťahania) ostáva
+       na MapLibre. */
+    if (isTouch()) {
+      let lastTapEnd = 0;
+      let dz: { y0: number; z0: number; around: maplibregl.LngLat } | null = null;
+      const onTouchStart = (e: TouchEvent) => {
+        if (e.touches.length !== 1) { dz = null; return; }
+        if (Date.now() - lastTapEnd > 300) return;
+        const t = e.touches[0];
+        const r = el.getBoundingClientRect();
+        dz = {
+          y0: t.clientY,
+          z0: map.getZoom(),
+          around: map.unproject([t.clientX - r.left, t.clientY - r.top]),
+        };
+        e.preventDefault();
+      };
+      const onTouchMove = (e: TouchEvent) => {
+        if (!dz || e.touches.length !== 1) return;
+        e.preventDefault();
+        const dy = dz.y0 - e.touches[0].clientY;
+        map.easeTo({
+          zoom: Math.min(MAX_Z, Math.max(MIN_Z, dz.z0 + dy * 0.012)),
+          around: dz.around,
+          duration: 0,
+        });
+      };
+      const onTouchEnd = () => { dz = null; lastTapEnd = Date.now(); };
+      el.addEventListener('touchstart', onTouchStart, { passive: false });
+      el.addEventListener('touchmove', onTouchMove, { passive: false });
+      el.addEventListener('touchend', onTouchEnd);
+      touchCleanup.current = () => {
+        el.removeEventListener('touchstart', onTouchStart);
+        el.removeEventListener('touchmove', onTouchMove);
+        el.removeEventListener('touchend', onTouchEnd);
+      };
+    }
+
     map.on('load', () => { setReady(true); fitRef.current?.(0); });
 
     /* Plátno mení rozmer aj bez okna — na telefóne pri skrytí lišty
@@ -464,7 +506,7 @@ export function MapaHradisk() {
     ro.observe(hostRef.current!);
     resizeCleanup.current = () => ro.disconnect();
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); settleCleanup.current?.(); resizeCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); settleCleanup.current?.(); resizeCleanup.current?.(); touchCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
@@ -578,13 +620,12 @@ export function MapaHradisk() {
     map.stop();
     const cam = map.cameraForBounds(new maplibregl.LngLatBounds(SK[0], SK[1]), { padding: 0 });
     if (!cam) { map.fitBounds(SK, { padding: 0, duration }); return; }
-    let zoom = cam.zoom ?? MIN_Z;
-    if (isTouch()) {
-      const { width, height } = map.getCanvas().getBoundingClientRect();
-      const canvasAspect = width / Math.max(1, height);
-      if (canvasAspect < COUNTRY_ASPECT) zoom += Math.log2(COUNTRY_ASPECT / canvasAspect);
-    }
-    map.easeTo({ center: cam.center, zoom: Math.min(MAX_Z, zoom), duration });
+    /* Vždy sa VMESTIŤ, nikdy nevypĺňať. Vypĺňanie plátna síce odstránilo
+       pásy, ale na telefóne pri tom orezalo východ aj západ a ostala len
+       stredná časť krajiny. Pásy sa preto riešia inak: plátno je na telefóne
+       nižšie (viď `mapa.css`), takže na ne ostane len málo miesta — a to
+       málo je papier s mriežkou, teda časť návrhu. */
+    map.easeTo({ center: cam.center, zoom: Math.min(MAX_Z, cam.zoom ?? MIN_Z), duration });
   }, []);
   const reset = () => fitCountry(420);
 

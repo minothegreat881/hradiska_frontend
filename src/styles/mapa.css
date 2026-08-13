@@ -354,7 +354,10 @@
   .lmap-legend-h span { display: block; font-size: 16px; color: var(--l-second); }
   .lmap-legend-body { display: none; padding-top: 12px; }
   .lmap-legend.is-open .lmap-legend-body { display: flex; }
-  .lmap-canvas { aspect-ratio: auto; height: 68vh; min-height: 420px; max-height: none; }
+  /* Nižšie plátno = menej prázdna nad krajinou a pod ňou. Krajina je široká
+     2 : 1, plátno na výšku by z nej urobilo prúžok uprostred prázdna; pri
+     pomere 1,4 ostane po stranách len úzky pás papiera s mriežkou. */
+  .lmap-canvas { aspect-ratio: 1.4; height: auto; min-height: 260px; max-height: 60vh; }
   .lmap-watermark { top: 8px; right: -24px; }
   .lmap-zoom { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
   /* Palcove ciele + `manipulation`, aby prehliadac na tuknutie necakal, ci
