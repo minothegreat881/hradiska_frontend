@@ -130,6 +130,7 @@ export function LabMapa() {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const wheelCleanup = useRef<(() => void) | null>(null);
+  const resizeCleanup = useRef<(() => void) | null>(null);
   /* Uzly a stav tahania pre trafenie bodu — handlery na plátne su zavesene
      raz a citaju z refov, nie zo zavretej premennej. */
   const nodesRef = useRef<Node[]>([]);
@@ -316,8 +317,18 @@ export function LabMapa() {
     });
 
     map.on('load', () => { setReady(true); });
+
+    /* PLÁTNO SI MENÍ ROZMER SO STRÁNKOU, nie s oknom. Jeho výšku určuje pomer
+       krajiny a šírku zvyšok riadka, takže sa zmení aj vtedy, keď sa okno
+       nehýbe (iná šírka panela, pribudnutý pás pod mapou, načítané písmo).
+       MapLibre o tom sám nevie a kreslí do starých rozmerov — mapa potom
+       ostane v ľavom hornom rohu a zvyšok plátna zíva. */
+    const ro = new ResizeObserver(() => { map.resize(); });
+    ro.observe(hostRef.current!);
+    resizeCleanup.current = () => ro.disconnect();
+
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); resizeCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
