@@ -442,7 +442,12 @@ export function LabMapa() {
     });
   }, [spider, locs]);
 
-  const canvasW = mapRef.current?.getCanvas().getBoundingClientRect().width ?? 1200;
+  const canvasBox = mapRef.current?.getCanvas().getBoundingClientRect();
+  const canvasW = canvasBox?.width ?? 1200;
+  const canvasH = canvasBox?.height ?? 700;
+  /** Priblizna vyska karty (fotka 130 + telo). Podla nej sa rozhoduje, na
+      ktoru stranu bodu sa otvori, aby ju platno neorezalo. */
+  const CARD_H = 300;
   /** Klik mimo bodu, karty a ovládania = zavrieť. */
   const closeOnOutside = (e: React.MouseEvent) => {
     const t = e.target as HTMLElement;
@@ -611,7 +616,13 @@ export function LabMapa() {
                    platno orezalo (a nad platnom je hlavicka stranky), tak sa
                    preklopi pod bod; pri okrajoch sa posunie dovnutra. */
                 <div
-                  className={'lmap-card' + (n.y < 200 ? ' is-below' : '') + (n.x < 150 ? ' is-right' : n.x > canvasW - 150 ? ' is-left' : '')}
+                  className={'lmap-card'
+                    /* Nad bodom karta potrebuje CARD_H + odstup. Ked sa tam
+                       nezmesti a dole je viac miesta, preklopi sa pod bod —
+                       inak by ju platno (`overflow: hidden`) orezalo. Prah
+                       bol predtym 200 px, teda menej, nez je karta vysoka. */
+                    + (n.y < CARD_H + 48 && (canvasH - n.y) > n.y ? ' is-below' : '')
+                    + (n.x < 140 ? ' is-right' : n.x > canvasW - 140 ? ' is-left' : '')}
                   onClick={e => e.stopPropagation()}
                   onMouseEnter={() => openHover(n.loc.id, n.loc.cat)}
                   onMouseLeave={closeHoverSoon}
