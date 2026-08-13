@@ -51,7 +51,9 @@ const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 
  */
 const isTouch = () =>
   typeof window !== 'undefined' &&
-  window.matchMedia('(pointer: coarse), (hover: none)').matches;
+  (window.matchMedia('(pointer: coarse), (hover: none)').matches ||
+    /* Ďalšia poistka: úzke okno je na tomto webe vždy telefón. */
+    window.matchMedia('(max-width: 900px)').matches);
 /** Pomer strán krajiny v Mercatore — podľa neho sa na telefóne dopočítava,
     o koľko treba pridať, aby krajina plátno vyplnila. */
 const COUNTRY_ASPECT = 2.0113;
@@ -270,9 +272,6 @@ export function MapaHradisk() {
   /* DOČASNÁ DIAGNOSTIKA. Zapína sa `?debug=1` v adrese a vypíše priamo na
      mapu, čo sa pri ťuknutí naozaj deje — bez konzoly sa to z telefónu inak
      zistiť nedá. Až sa príčina nájde, ide to preč. */
-  const [dbg, setDbg] = useState<string[]>([]);
-  const debugOn = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
-  const log = (m: string) => setDbg(d => [...d.slice(-5), m]);
   /** Uzol pod kurzorom (id bodu alebo kľúč zhluku) — nahrádza `:hover`,
       lebo body samy myš už nezachytávajú. */
   const [hotKey, setHotKey] = useState<string | null>(null);
@@ -818,6 +817,58 @@ export function MapaHradisk() {
     return () => window.clearTimeout(t);
   }, [full]);
 
+  /* Otvorenie na telefóne. Poslucháč je natívny a v ZACHYTÁVACEJ fáze na
+     koreni sekcie: spustí sa skôr, než sa udalosť dostane k čomukoľvek
+     vnútri — k plátnu MapLibre, k bodom aj k prekrytiu. Nemá ho čo „zjesť"
+     a nezávisí ani na vrstvách, ani na tom, kam presne prst dopadne. Náhľad
+     sa tým celý mení na obrázok, ktorý sa ťuknutím otvorí.
+
+     Predošlé pokusy viedli cez React a cez jeden prvok navrchu — a práve to
+     zlyhávalo. */
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || !touch || full) return;
+    const open = (e: Event) => {
+      e.stopPropagation();
+      /* Ak prehliadač vie skutočný celoobrazovkový režim, využijeme ho —
+         schová aj lištu prehliadača. Keď nie (iPhone), ostáva presun pod
+         `body` a pevná poloha. */
+      el.requestFullscreen?.().catch(() => {});
+      setFull(true);
+    };
+    el.addEventListener('pointerdown', open, true);
+    el.addEventListener('touchstart', open, true);
+    el.addEventListener('click', open, true);
+    return () => {
+      el.removeEventListener('pointerdown', open, true);
+      el.removeEventListener('touchstart', open, true);
+      el.removeEventListener('click', open, true);
+    };
+  }, [touch, full]);
+
+  /* Náhľad na telefóne sa neovláda — ovládanie mapy je zapnuté až na celej
+     obrazovke. Inak by prst zároveň otváral aj posúval. Počítača sa to
+     netýka. */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !touch) return;
+    const h = [map.dragPan, map.scrollZoom, map.touchZoomRotate, map.doubleClickZoom, map.keyboard];
+    if (full) {
+      h.forEach(x => x?.enable());
+      /* Na celej obrazovke posúva aj jeden prst — dva už netreba. */
+      map.cooperativeGestures?.disable?.();
+    } else {
+      h.forEach(x => x?.disable());
+    }
+  }, [touch, full, ready]);
+
+  /* Odchod z celoobrazovkového režimu tlačidlom „späť" prehliadača. */
+  useEffect(() => {
+    const onFs = () => { if (!document.fullscreenElement && full) setFull(false); };
+    document.addEventListener('fullscreenchange', onFs);
+    return () => document.removeEventListener('fullscreenchange', onFs);
+  }, [full]);
+
   /* Keby stránka zmizla otvorená: vrátiť posúvanie tela a sekciu na jej
      pôvodné miesto — inak by ju React hľadal tam, kde už nie je. */
   useEffect(() => () => {
@@ -903,47 +954,26 @@ export function MapaHradisk() {
             kliknutie a tlačidlo nereagovalo. Ťuknutie preto obsluhujem
             priamo, a `touchend` sa navyše zastaví, aby ho už nikto nedostal. */}
         {touch && !full && (
+          /* Iba nápoveda. Ťuknutie obsluhuje poslucháč na koreni sekcie,
+             nie tento prvok — preto nechytá udalosti. */
           <div
             className="lmap-open"
-            role="button"
-            tabIndex={0}
-            /* Kľúčové vlastnosti sú inline zámerne. Cez CSS to zlyhávalo a
-               z telefónu sa nedalo zistiť prečo — inline štýl neprebije
-               medzidotaz, poradie súborov ani cudzie `!important`. */
+            aria-hidden="true"
             style={{
               position: 'absolute', inset: 0, zIndex: 900,
               display: 'grid', placeItems: 'end center', paddingBottom: 16,
-              pointerEvents: 'auto', touchAction: 'manipulation',
-              background: 'transparent', border: 0, cursor: 'pointer',
+              pointerEvents: 'none', background: 'transparent',
             }}
-            /* `pointerdown` chytí prst, pero aj myš a príde skôr, než sa
-               k udalosti dostane plátno mapy. */
-            onPointerDown={e => {
-              e.preventDefault(); e.stopPropagation();
-              if (debugOn) log('pointerdown → setFull(true)');
-              setFull(true);
-            }}
-            onTouchStart={() => debugOn && log('touchstart')}
-            onTouchEnd={e => { if (debugOn) log('touchend'); e.preventDefault(); setFull(true); }}
-            onClick={() => { if (debugOn) log('click'); setFull(true); }}
-            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setFull(true); }}
           >
-            <span>Otvoriť mapu na celú obrazovku</span>
+            <span>Ťuknutím otvoríte mapu na celú obrazovku</span>
           </div>
         )}
-        {debugOn && (
-          <div className="lmap-dbg">
-            <div>touch={String(touch)} full={String(full)}</div>
-            <div>coarse={String(window.matchMedia('(pointer: coarse)').matches)} hoverNone={String(window.matchMedia('(hover: none)').matches)}</div>
-            <div>pos={typeof document !== 'undefined' ? getComputedStyle(document.querySelector('.lmap') as Element).position : '?'}</div>
-            {dbg.map((m, i) => <div key={i}>· {m}</div>)}
-          </div>
-        )}
-        {touch && full && (
+
+                {touch && full && (
           <button
             type="button"
             className="lmap-close"
-            onPointerDown={() => setFull(false)}
+            onPointerDown={() => { document.exitFullscreen?.().catch(() => {}); setFull(false); }}
             aria-label="Zavrieť mapu"
             style={{
               position: 'absolute', zIndex: 4100,
