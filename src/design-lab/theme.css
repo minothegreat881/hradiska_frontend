@@ -2361,7 +2361,13 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    cez `left/top` prepocitavalo rozvrh vsetkych bodov pri kazdom snimku
    posuvania; transform sa len skladá. */
 .lmap-node { position: absolute; left: 0; top: 0; will-change: transform; }
-.lmap-pin-wrap { transform: translate(-50%, -50%); display: flex; align-items: center; gap: 8px; }
+/* SAMOTNÝ BOD, nič viac. Predtým to bol pružný riadok „bod + menovka"
+   vycentrovaný ako celok — keď menovka pri otvorení karty zmizla, riadok sa
+   zúžil a bod sa posunul nabok. Ak sa pritom dostal spod kurzora, karta sa
+   zavrela, menovka sa vrátila, bod sa vrátil pod kurzor a otvorila sa znova:
+   nekonečné blikanie. Menovka je preto odteraz odsadená absolútne a na
+   polohu bodu nemá vplyv. */
+.lmap-pin-wrap { position: relative; width: 30px; height: 30px; transform: translate(-50%, -50%); }
 .lmap-pin {
   position: relative; width: 30px; height: 30px; flex: none; border-radius: 50%;
   display: grid; place-items: center; color: #2A251F;
@@ -2397,6 +2403,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 /* Menovka — až od istého priblíženia, inak by sa prekrývali. */
 .lmap-pill {
+  position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%);
   display: flex; flex-direction: column; pointer-events: none;
   background: rgba(245,241,233,.96); border: 1px solid rgba(20,18,15,.14);
   border-radius: 999px; padding: 4px 13px; box-shadow: 0 3px 10px rgba(20,18,15,.14);
