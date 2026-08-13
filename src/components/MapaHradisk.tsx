@@ -40,9 +40,18 @@ const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49
    nechávalo nad Slovenskom a pod ním pás navyše. Pomer 2,011 : 1 sedí
    s pomerom plátna. */
 const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 49.6138]];
-/** Dotykové zariadenie — `hover` na ňom neexistuje. Rozhoduje IBA o správaní
-    na dotyku; na počítači sa vďaka nemu nemení nič. */
-const isTouch = () => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
+/**
+ * Dotykové zariadenie. Rozhoduje IBA o správaní na dotyku; na počítači sa
+ * vďaka nemu nemení nič.
+ *
+ * Testuje sa `pointer: coarse` AJ `hover: none`. Samotné `hover: none`
+ * nestačí — časť Androidov hlási `hover: hover`, hoci myš nemajú, a na
+ * takom telefóne by celá dotyková vetva ostala vypnutá (mapa by sa neotvorila
+ * na celú obrazovku a nefungovalo by nič z toho, čo je pre prst).
+ */
+const isTouch = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(pointer: coarse), (hover: none)').matches;
 /** Pomer strán krajiny v Mercatore — podľa neho sa na telefóne dopočítava,
     o koľko treba pridať, aby krajina plátno vyplnila. */
 const COUNTRY_ASPECT = 2.0113;

@@ -486,7 +486,7 @@
 /* ══════════════════════════════════════════════════════════════════════════
    DOTYK — platí len pre zariadenia bez myši, počítača sa to netýka
    ══════════════════════════════════════════════════════════════════════════ */
-@media (hover: none) {
+@media (pointer: coarse), (hover: none) {
   /* Zhluk je na počítači tlačidlo (kvôli sfarbeniu pri prejdení myšou). Na
      telefóne z toho ostáva len škoda: prst pri ťahaní pristane na zhluku,
      mapa o ňom nevie a neposunie sa — a v priblížení, kde je zhlukov veľa,
@@ -515,7 +515,7 @@
    ══════════════════════════════════════════════════════════════════════════ */
 .lmap-open, .lmap-close { display: none; }
 
-@media (hover: none) {
+@media (pointer: coarse), (hover: none) {
   .lmap-open {
     display: grid; place-items: end center;
     position: absolute; inset: 0; z-index: 6;
