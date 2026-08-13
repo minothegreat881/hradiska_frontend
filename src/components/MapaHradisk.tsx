@@ -40,6 +40,8 @@ const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49
    nechávalo nad Slovenskom a pod ním pás navyše. Pomer 2,011 : 1 sedí
    s pomerom plátna. */
 const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 49.6138]];
+/** Pomer strán krajiny v Mercatore — podľa neho sa dopočítava vyplnenie. */
+const COUNTRY_ASPECT = 2.0113;
 /* Výrez POHYBU. Reliéf končí na štátnej hranici, ale štrnásť lokalít leží za
    ňou (Mikulčice, Pohansko, Zalavár, Visegrád, Gars-Thunau, Arkona…). Tie sa
    kreslia ako body na papieri mimo krajiny — preto sa mapa dá odtiahnuť až
@@ -224,6 +226,8 @@ export function MapaHradisk() {
   /** Posledná poloha kurzora, aby sa po dosadnutí dala vyhodnotiť znova. */
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
   const settleCleanup = useRef<(() => void) | null>(null);
+  const resizeCleanup = useRef<(() => void) | null>(null);
+  const fitCountryRef = useRef<((d?: number) => void) | null>(null);
   /** Otvorený bod — číta ho dopočítavanie, ktoré beží mimo vykreslenia. */
   const hoverIdRef = useRef<string | null>(null);
   const moveCleanup = useRef<(() => void) | null>(null);
@@ -301,7 +305,7 @@ export function MapaHradisk() {
         ],
       },
       bounds: SK,
-      fitBoundsOptions: { padding: 0 },
+      fitBoundsOptions: { padding: 0 },  // predbezne, po nacitani doladi `fitCountry`
       minZoom: MIN_Z,
       maxZoom: MAX_Z,
       maxBounds: ROAM,
@@ -430,9 +434,16 @@ export function MapaHradisk() {
       if (n.kind === 'one') setSelected(prev => (prev === n.loc.id ? null : n.loc.id));
     });
 
-    map.on('load', () => { setReady(true); });
+    map.on('load', () => { setReady(true); fitCountryRef.current?.(0); });
+
+    /* Plátno mení rozmer aj bez okna (skladá sa panel, načíta sa písmo,
+       na telefóne sa skryje lišta prehliadača). MapLibre o tom sám nevie
+       a kreslil by do starých rozmerov — mapa by ostala v rohu. */
+    const ro = new ResizeObserver(() => map.resize());
+    ro.observe(hostRef.current!);
+    resizeCleanup.current = () => ro.disconnect();
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); settleCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); settleCleanup.current?.(); resizeCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
@@ -529,12 +540,29 @@ export function MapaHradisk() {
     map.stop();
     map.easeTo({ zoom: Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() + f)), duration: 260 });
   };
-  const reset = () => {
+  /**
+   * Dosadnutie na Slovensko tak, aby krajina PLÁTNO VYPLNILA, nie sa doň
+   * vmestila. `fitBounds` vmestí — a keď je plátno vyššie než pomer krajiny
+   * (na telefóne vždy), ostane nad ňou a pod ňou mŕtvy pás. Tu sa preto
+   * k dosadeniu pridá toľko priblíženia, koľko treba na vyplnenie; do strán
+   * krajina prečnieva a prstom sa dá posunúť.
+   */
+  const fitCountry = useCallback((duration = 0) => {
     const map = mapRef.current;
     if (!map) return;
+    const cam = map.cameraForBounds(new maplibregl.LngLatBounds(SK[0], SK[1]), { padding: 0 });
+    if (!cam) return;
+    const { width, height } = map.getCanvas().getBoundingClientRect();
+    const canvasAspect = width / Math.max(1, height);
+    const extra = canvasAspect < COUNTRY_ASPECT ? Math.log2(COUNTRY_ASPECT / canvasAspect) : 0;
     map.stop();
-    map.fitBounds(SK, { padding: 0, duration: 420 });
-  };
+    map.easeTo({
+      center: cam.center,
+      zoom: Math.min(MAX_Z, (cam.zoom ?? MIN_Z) + extra),
+      duration,
+    });
+  }, []);
+  const reset = () => fitCountry(420);
 
   /** Posun o tretinu obrazovky — šípky sú presnejšie než ťahanie prstom. */
   const pan = (dx: number, dy: number) => {
@@ -648,6 +676,7 @@ export function MapaHradisk() {
   useEffect(() => { hoverIdRef.current = hoverId; }, [hoverId]);
   useEffect(() => { openHoverRef.current = openHover; closeHoverRef.current = closeHoverSoon; });
   useEffect(() => { clusterRef.current = openCluster; });
+  useEffect(() => { fitCountryRef.current = fitCountry; }, [fitCountry]);
 
   const showPills = zoom >= PILL_ZOOM;
   /* Kliknutý bod má prednosť pred tým pod kurzorom — inak by zvýraznenie
