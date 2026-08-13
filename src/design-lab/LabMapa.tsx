@@ -558,6 +558,13 @@ export function LabMapa() {
               type="button"
               className={hotKey === 'c-' + n.members.map(m => m.id).join('|') ? 'lmap-cluster is-hot' : 'lmap-cluster'}
               style={{ ['--core' as any]: `${30 + Math.min(n.members.length, 14) * 1.1}px` }}
+              /* Zhluk zachytava mys kvoli `:hover`. Aby sa z neho dala mapa
+                 aj tahat, stlacenie sa preposle platnu mapy. */
+              onMouseDown={e => {
+                mapRef.current?.getCanvas().dispatchEvent(new MouseEvent('mousedown', {
+                  clientX: e.clientX, clientY: e.clientY, bubbles: true, cancelable: true, button: 0, buttons: 1,
+                }));
+              }}
               onClick={() => openCluster(n)}
               aria-label={`Zhluk ${n.members.length} lokalít — priblížiť`}
             >

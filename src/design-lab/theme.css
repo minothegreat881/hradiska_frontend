@@ -2408,9 +2408,10 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-cluster {
   transform: translate(-50%, -50%);
   width: calc(var(--core) + 26px); height: calc(var(--core) + 26px);
-  background: none; border: 0; padding: 0; pointer-events: none;
+  background: none; border: 0; padding: 0; pointer-events: auto; cursor: zoom-in;
   transition: transform .18s ease;
 }
+.lmap-cluster:hover,
 .lmap-cluster.is-hot { transform: translate(-50%, -50%) scale(1.08) rotate(6deg); }
 
 .lmap-cluster:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; border-radius: 50%; }
@@ -2634,12 +2635,14 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    Bod pri nabehnutí sčervenie, zhluk nie — a pritom je to to isté gesto.
    Teraz sčervenie jadro aj prerušovaný prstenec okolo neho. */
 /* Farba AZ pri nabehnuti — v pokoji je zhluk sklo ako bod. */
+.lmap-cluster:hover .lmap-cluster-core,
 .lmap-cluster.is-hot .lmap-cluster-core {
   background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
   color: var(--l-card);
   border-color: rgba(255, 255, 255, .6);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, .35), 0 6px 16px rgba(20, 18, 15, .35);
 }
+.lmap-cluster:hover .lmap-cluster-halo,
 .lmap-cluster.is-hot .lmap-cluster-halo { border-color: var(--l-second); }
 .lmap-cluster-core, .lmap-cluster-halo { transition: background .18s ease, color .18s ease, border-color .18s ease; }
 
