@@ -30,6 +30,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { SK_OUTLINE, SK_OUTLINE_BOX, SK_OUTLINE_RANGE } from './skOutline';
 
 /* Výrez RENDERU — musí sedieť s BOUNDS_4326 v build_relief.py. Na tento
    výrez sa mapa otvára. */
@@ -97,6 +98,9 @@ const Icon = ({ path, size = 13, w = 2.2 }: { path: string; size?: number; w?: n
   </svg>
 );
 
+/** Mercator y v stupňoch — tá istá projekcia, v akej je obrys navigátora. */
+const mercY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2)) * 180 / Math.PI;
+
 /**
  * Merítko: koľko metrov je jeden bod obrazovky. Číslo „zoom 8,3" nepovie
  * návštevníkovi nič — pruh s „20 km" povie všetko, a na reliéfe bez popisov
@@ -154,6 +158,8 @@ export function LabMapa() {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const hoverTimer = useRef<number | null>(null);
   const [center, setCenter] = useState<{ lat: number; lng: number }>({ lat: 48.67, lng: 19.70 });
+  /** Obdĺžnik aktuálneho pohľadu v súradniciach navigátora (0–100 %). */
+  const [view, setView] = useState({ l: 0, t: 0, w: 100, h: 100 });
 
   /* ── Dáta ────────────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -326,6 +332,19 @@ export function LabMapa() {
     const c = map.getCenter();
     setCenter({ lat: c.lat, lng: c.lng });
 
+    /* Navigátor: kam sa pozerám v rámci Slovenska. Rovnaká projekcia ako
+       obrys, takže stačí lineárny prepočet rozsahu. */
+    const b = map.getBounds();
+    const R = SK_OUTLINE_RANGE;
+    const fx = (lng: number) => ((lng - R.x0) / (R.x1 - R.x0)) * 100;
+    const fy = (lat: number) => ((R.y1 - mercY(lat)) / (R.y1 - R.y0)) * 100;
+    const l = fx(b.getWest()), r = fx(b.getEast());
+    const t = fy(b.getNorth()), bo = fy(b.getSouth());
+    setView({
+      l: Math.max(-40, l), t: Math.max(-40, t),
+      w: Math.min(180, r - l), h: Math.min(180, bo - t),
+    });
+
     const skip = new Set(spider ? spider.ids : []);
     const pts = locs
       .filter(l => !skip.has(l.id))
@@ -394,6 +413,25 @@ export function LabMapa() {
   };
   const reset = () => mapRef.current?.fitBounds(SK, { padding: 0, duration: 420 });
 
+  /** Posun o tretinu obrazovky — šípky sú presnejšie než ťahanie prstom. */
+  const pan = (dx: number, dy: number) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const { width, height } = map.getCanvas().getBoundingClientRect();
+    map.panBy([dx * width * 0.34, dy * height * 0.34], { duration: 280 });
+  };
+
+  /** Klik do navigátora prenesie pohľad na to miesto. */
+  const jump = (e: React.MouseEvent<HTMLDivElement>) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const R = SK_OUTLINE_RANGE;
+    const lng = R.x0 + ((e.clientX - r.left) / r.width) * (R.x1 - R.x0);
+    const my = R.y1 - ((e.clientY - r.top) / r.height) * (R.y1 - R.y0);
+    const lat = (2 * Math.atan(Math.exp(my * Math.PI / 180)) - Math.PI / 2) * 180 / Math.PI;
+    map.easeTo({ center: [lng, lat], duration: 420 });
+  };
 
   /** Klik na zhluk: priblížiť. Keď ani najväčšie priblíženie body neoddelí
       (sedia prakticky na sebe), rozbalí sa vejár — inak by sa doň nedalo
@@ -494,6 +532,7 @@ export function LabMapa() {
 
   return (
     <section className="lmap">
+      <div className="lmap-row">
       {/* ── Ľavý panel ─────────────────────────────────────────────────── */}
       <div className="lmap-side">
         <div className="lmap-head">
@@ -510,6 +549,32 @@ export function LabMapa() {
               <span>{outside}</span> lokalít leží za hranicami — ukázať
             </button>
           )}
+        </div>
+
+        {/* Navigátor patrí do panela, nie na mapu — na plátne zaberal roh
+            a prekrýval lokality, kvôli ktorým tam mapa je. */}
+        <div className="lmap-nav">
+        {/* Navigátor — kde v rámci Slovenska práve som. Klik prenesie pohľad,
+            krížik posúva o tretinu obrazovky. Bez toho sa v priblíženom
+            reliéfe bez popisov nedá zorientovať. */}
+        <div className="lmap-locator" onClick={jump} title="Kliknutím presuniete pohľad">
+          <svg viewBox={`0 0 ${SK_OUTLINE_BOX.w} ${SK_OUTLINE_BOX.h}`} aria-hidden="true">
+            <path d={SK_OUTLINE} />
+          </svg>
+          <span
+            className="lmap-locator-view"
+            style={{ left: `${view.l}%`, top: `${view.t}%`, width: `${view.w}%`, height: `${view.h}%` }}
+            aria-hidden="true"
+          />
+        </div>
+
+        <div className="lmap-pad">
+          <button type="button" className="lmap-pad-u" onClick={() => pan(0, -1)} aria-label="Posunúť hore">▲</button>
+          <button type="button" className="lmap-pad-l" onClick={() => pan(-1, 0)} aria-label="Posunúť vľavo">◀</button>
+          <button type="button" className="lmap-pad-c" onClick={reset} aria-label="Celé Slovensko">✛</button>
+          <button type="button" className="lmap-pad-r" onClick={() => pan(1, 0)} aria-label="Posunúť vpravo">▶</button>
+          <button type="button" className="lmap-pad-d" onClick={() => pan(0, 1)} aria-label="Posunúť dole">▼</button>
+        </div>
         </div>
 
         <div className={legendOpen ? 'lmap-legend is-open' : 'lmap-legend'}>
@@ -673,19 +738,10 @@ export function LabMapa() {
           ))}
         </div>
 
-        {/* HUD — technické popisky, nezachytávajú kliknutia. */}
-        <div className="lmap-hud lmap-hud-tl" aria-hidden="true">
-          <span>{deg(center.lat, 'N', 'S')}</span><span className="lmap-plus">+</span><span>{deg(center.lng, 'E', 'W')}</span>
-        </div>
-        <div className="lmap-hud lmap-hud-tr" aria-hidden="true">
-          <span>Reliéf · Copernicus DEM 30 m</span><span className="lmap-sq" />
-        </div>
-        <div className="lmap-hud lmap-hud-bl" aria-hidden="true">
-          <span className="lmap-count">{String(locs.length).padStart(2, '0')}</span>
-          <span className="lmap-count-l">Zmapované<br />lokality</span>
-        </div>
-
         <div className="lmap-zoom">
+          {/* Priblíženie: tlačidlá pre presný krok, posuvník pre rozsah.
+              Posuvník naraz ukáže, kde v rozsahu som — číslo „zoom 8,3" to
+              nepovie — a jedným ťahom sa dá prejsť celý rozsah. */}
           <div className="lmap-zoom-box">
             <button type="button" onClick={() => zoomBy(1)} aria-label="Priblížiť">+</button>
             <input
@@ -705,10 +761,14 @@ export function LabMapa() {
           </div>
         </div>
 
-        <div className="lmap-attrib">
-          Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
-        </div>
       </div>
+      </div>
+
+      {/* Povinné uvedenie zdrojov. Pod mapou, nie na nej — na plátne to bol
+          text cez krajinu. */}
+      <p className="lmap-attrib">
+        Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
+      </p>
     </section>
   );
 }
