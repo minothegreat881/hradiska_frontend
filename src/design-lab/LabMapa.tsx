@@ -108,6 +108,7 @@ const strapiBase = () =>
 export function LabMapa() {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const wheelCleanup = useRef<(() => void) | null>(null);
   /* Uzly a stav tahania pre trafenie bodu — handlery na plátne su zavesene
      raz a citaju z refov, nie zo zavretej premennej. */
   const nodesRef = useRef<Node[]>([]);
@@ -192,25 +193,6 @@ export function LabMapa() {
       maxZoom: MAX_Z,
       maxBounds: ROAM,
       attributionControl: false,
-      /* MAPA SA NEBIJE S POSÚVANÍM STRÁNKY. Sedí uprostred dlhej domovskej;
-         keby brala koliesko (alebo na telefóne jeden prst), návštevník by sa
-         cez ňu nedostal ďalej — každé posunutie by skončilo v mape.
-
-           koliesko            → posúva STRÁNKU
-           Ctrl/⌘ + koliesko   → približuje mapu
-           ťahanie myšou       → posúva mapu (bez zmeny)
-           jeden prst          → posúva stránku
-           dva prsty           → posúvajú mapu, štipnutie približuje
-
-         Mapa to sama povie nápovedou vo chvíli, keď to niekto skúsi inak —
-         nie je to teda skryté gesto. Tlačidlá + / − a dvojklik ostávajú pre
-         tých, čo modifikátor hľadať nechcú. */
-      cooperativeGestures: true,
-      locale: {
-        'CooperativeGesturesHandler.MobileHelpText': 'Mapu posuniete dvoma prstami',
-        'CooperativeGesturesHandler.WindowsHelpText': 'Priblížite kolieskom s Ctrl',
-        'CooperativeGesturesHandler.MacHelpText': 'Priblížite kolieskom s ⌘',
-      },
       /* Bez `alpha` vycisti MapLibre platno do CIERNEJ — odtial cierne okraje
          okolo krajiny. S nim je platno priehladne a presvita cezen papier,
          bodkova mriezka aj vodoznak „SK", presne ako to chce handoff (a ako
@@ -226,7 +208,23 @@ export function LabMapa() {
        reliefe je castejsie treba posunut nabok nez zoomovat, a dvoma prstami
        na trackpade je posun prirodzeny pohyb. Koliesko preto POSUVA (aj
        doprava/dolava cez `deltaX` alebo Shift), priblizuje az Ctrl/⌘. */
+    map.scrollZoom.disable();
     const el = map.getCanvasContainer();
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (e.ctrlKey || e.metaKey) {
+        map.zoomTo(
+          Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() - e.deltaY * 0.01)),
+          { around: map.unproject([e.offsetX, e.offsetY]), duration: 0 }
+        );
+        return;
+      }
+      const dx = e.shiftKey ? e.deltaY : e.deltaX;
+      const dy = e.shiftKey ? 0 : e.deltaY;
+      map.panBy([dx, dy], { duration: 0 }, { originalEvent: e });
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    wheelCleanup.current = () => el.removeEventListener('wheel', onWheel);
 
     /* KTO JE POD KURZOROM sa dopočíta z polôh uzlov, body samy myš
        nezachytávajú. Dovtedy platilo opačné: bod bol tlačidlo, takže mapa
@@ -275,7 +273,7 @@ export function LabMapa() {
 
     map.on('load', () => { setReady(true); });
     mapRef.current = map;
-    return () => { moveCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────

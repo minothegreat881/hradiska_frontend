@@ -2660,31 +2660,3 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   color: var(--l-card);
 }
 .lmap-glass { transition: background .16s ease, border-color .16s ease, color .16s ease; }
-
-/* Nápoveda „dvoma prstami" od MapLibre — do šatu, nie do jeho predvoleného
-   vzhľadu. Ukáže sa len na dotyku a len vtedy, keď to niekto skúsi jedným. */
-.lmap .maplibregl-cooperative-gesture-screen {
-  background: rgba(20, 18, 15, .55);
-  font-family: 'Archivo', 'Inter', ui-sans-serif, sans-serif;
-  font-size: 15px; letter-spacing: .01em;
-  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
-}
-
-/* ── Priepustnosť kliknutí ────────────────────────────────────────────────
-   `globals.css` má pravidlo nazvané „NUCLEAR OPTION": `pointer-events: auto
-   !important` na KAŽDÝ `div`. Prekrytia mapy sú divy, takže ich to zapne —
-   a keďže ležia nad plátnom, prehltnú každý klik aj ťahanie. Najhorší je
-   `div`, ktorý si MapLibre vytvorí pre nápovedu k dvom prstom: má
-   `z-index: 99999` a je cez celú mapu, takže po zapnutí spolupracujúcich
-   gest zmizla možnosť kliknúť na čokoľvek — na bod, na tlačidlá, na
-   navigátor.
-
-   Vraciame teda vlastný zámer, tou istou zbraňou. Klikať majú len tie
-   prvky, ktoré na to sú: karta, zhluk a krížik vejára. */
-.lmap .maplibregl-cooperative-gesture-screen { pointer-events: none !important; }
-.lmap-overlay,
-.lmap-node,
-.lmap-grid,
-.lmap-watermark,
-.lmap-hud { pointer-events: none !important; }
-.lmap-card { pointer-events: auto !important; }
