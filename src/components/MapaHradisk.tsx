@@ -762,9 +762,18 @@ export function MapaHradisk() {
       document.body.style.overflow = 'hidden';
       /* Na celej obrazovke posúva jeden prst — nie je čo prelistovať. */
       map.cooperativeGestures?.disable();
+      /* Otáčanie dvoma prstami len prekáža — mapa má sever hore. Štipnutie
+         (dnu = bližšie, von = ďalej) ostáva. */
+      map.touchZoomRotate?.disableRotation?.();
+      /* Bez tohto sa mapa do strán posúvať NEDÁ. Výrez pohybu je zhruba taký
+         široký ako to, čo je pri oddialení vidieť — a keď sa pohľad do
+         medzí nezmestí, MapLibre posun jednoducho zamkne. Na celej
+         obrazovke preto medze púšťame; návrat zariadi „vyplnenie". */
+      map.setMaxBounds(null);
     } else {
       document.body.style.overflow = '';
       if (isTouch()) map.cooperativeGestures?.enable();
+      map.setMaxBounds(new maplibregl.LngLatBounds(ROAM[0], ROAM[1]));
     }
     /* Plátno zmenilo rozmer — mapa o tom musí vedieť a dosadnúť nanovo. */
     const t = window.setTimeout(() => { map.resize(); fitRef.current?.(0); }, 60);
@@ -1069,6 +1078,17 @@ export function MapaHradisk() {
               border: '1px solid rgba(255,255,255,.25)', pointerEvents: 'auto',
             }}
           >
+            {/* Posuvník: koľko z rozsahu je za tebou a koľko pred tebou, na
+                jeden pohľad — a jedným ťahom prejde celý rozsah. */}
+            <input
+              className="lmap-fz-slider"
+              type="range"
+              min={MIN_Z} max={MAX_Z} step={0.05}
+              value={zoom}
+              aria-label="Priblíženie"
+              onChange={e => { mapRef.current?.stop(); mapRef.current?.setZoom(Number(e.target.value)); }}
+              onPointerDown={e => e.stopPropagation()}
+            />
             {([['+', 0.9], ['−', -0.9]] as [string, number][]).map(([sign, d]) => (
               <button
                 key={sign}

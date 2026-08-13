@@ -581,15 +581,8 @@
   background: var(--l-paper, #F5F1E9);
 }
 .lmap.is-full > *:not(.lmap-canvas) { display: none !important; }
-/* Uvedenie zdrojov ostáva — na dlaždice sa viaže licencia. Len sa zmenší
-   a posadí do rohu plátna, aby mapu nekrájalo. */
-.lmap.is-full > .lmap-attrib {
-  display: block !important;
-  position: absolute; z-index: 4300; margin: 0;
-  left: 8px; bottom: calc(2px + env(safe-area-inset-bottom));
-  font-size: 9px; line-height: 1.3; max-width: 62vw;
-  color: rgba(20, 18, 15, .55); text-shadow: 0 1px 2px rgba(245, 241, 233, .9);
-}
+/* Uvedenie zdrojov sa na celej obrazovke NEZOBRAZUJE — má tam byť mapa a nič
+   iné. Na stránke pod mapou ostáva, takže licencia dlaždíc je uvedená. */
 .lmap.is-full .lmap-canvas {
   flex: 1 1 auto; width: 100%; height: 100%;
   min-height: 0; max-height: none; aspect-ratio: auto;
@@ -614,3 +607,31 @@
 .lmap-sheet .lmap-card-photo { width: 38%; min-width: 116px; height: auto; }
 .lmap-sheet .lmap-card-body { flex: 1; min-width: 0; }
 .lmap-sheet .lmap-card-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Bez tohto sa mapa prstom neposúva. MapLibre nastavuje v režime dvoch
+   prstov plátnu `touch-action: pan-x pan-y`, čím ťah spracuje PREHLIADAČ
+   (ako scroll) a k mape sa vôbec nedostane. Na celej obrazovke niet čo
+   scrollovať, tak berieme všetky dotyky. */
+.lmap.is-full .maplibregl-canvas-container,
+.lmap.is-full .maplibregl-canvas-container .maplibregl-canvas { touch-action: none !important; }
+.lmap.is-full .lmap-attrib { display: none !important; }
+
+/* Posuvník priblíženia — zvislý, hore = bližšie. Tlačidlá dávajú krok,
+   posuvník ukáže, kde v rozsahu si, a prejde ho jedným ťahom. */
+.lmap-fz-slider {
+  writing-mode: vertical-lr; direction: rtl;
+  width: 48px; height: 132px; margin: 0; padding: 0;
+  background: rgba(20, 18, 15, .85); border: 0;
+  appearance: none; -webkit-appearance: none; touch-action: none;
+}
+.lmap-fz-slider::-webkit-slider-runnable-track { width: 3px; border-radius: 999px; background: rgba(243, 237, 225, .35); }
+.lmap-fz-slider::-moz-range-track { width: 3px; border-radius: 999px; background: rgba(243, 237, 225, .35); }
+.lmap-fz-slider::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none;
+  width: 22px; height: 22px; border-radius: 50%; margin-left: -10px;
+  background: var(--l-second, #C9483A); border: 2px solid rgba(255, 255, 255, .9);
+}
+.lmap-fz-slider::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--l-second, #C9483A); border: 2px solid rgba(255, 255, 255, .9);
+}
