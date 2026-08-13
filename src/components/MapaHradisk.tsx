@@ -812,20 +812,28 @@ export function MapaHradisk() {
     if (!el) return;
     if (!full) { document.body.style.overflow = ''; return; }
 
-    const back: { el: HTMLElement; transform: string; filter: string; backdrop: string; perspective: string; contain: string }[] = [];
+    const back: { el: HTMLElement; transform: string; filter: string; backdrop: string; perspective: string; contain: string; zIndex: string; isolation: string }[] = [];
     for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
       const cs = getComputedStyle(p);
-      if (cs.transform === 'none' && cs.filter === 'none' && cs.backdropFilter === 'none'
-          && cs.perspective === 'none' && (cs.contain === 'none' || !cs.contain)) continue;
+      const boxed = cs.transform !== 'none' || cs.filter !== 'none' || cs.backdropFilter !== 'none'
+        || cs.perspective !== 'none' || (cs.contain !== 'none' && !!cs.contain);
+      /* Vlastná vrstva rodiča je rovnako zradná: mapa by v nej ostala
+         uväznená a skončila by ZA neskoršími časťami stránky — presne to sa
+         stalo, keď mapa zmizla za dlaždicami kategórií. */
+      const layered = cs.zIndex !== 'auto' || cs.isolation === 'isolate' || cs.mixBlendMode !== 'normal';
+      if (!boxed && !layered) continue;
       back.push({
         el: p, transform: p.style.transform, filter: p.style.filter,
-        backdrop: p.style.backdropFilter, perspective: p.style.perspective, contain: p.style.contain,
+        backdrop: p.style.backdropFilter, perspective: p.style.perspective,
+        contain: p.style.contain, zIndex: p.style.zIndex, isolation: p.style.isolation,
       });
       p.style.transform = 'none';
       p.style.filter = 'none';
       p.style.backdropFilter = 'none';
       p.style.perspective = 'none';
       p.style.contain = 'none';
+      p.style.zIndex = 'auto';
+      p.style.isolation = 'auto';
     }
     document.body.style.overflow = 'hidden';
     /* Plátno má iný rozmer, MapLibre to samo nezistí. */
@@ -839,6 +847,8 @@ export function MapaHradisk() {
         b.el.style.backdropFilter = b.backdrop;
         b.el.style.perspective = b.perspective;
         b.el.style.contain = b.contain;
+        b.el.style.zIndex = b.zIndex;
+        b.el.style.isolation = b.isolation;
       });
       document.body.style.overflow = '';
       window.setTimeout(() => mapRef.current?.resize(), 60);
@@ -856,11 +866,8 @@ export function MapaHradisk() {
   useEffect(() => {
     const el = rootRef.current;
     if (!el || !touch || full) return;
-    const open = (e: Event) => {
-      e.stopPropagation();
-      /* Ak prehliadač vie skutočný celoobrazovkový režim, využijeme ho —
-         schová aj lištu prehliadača. Keď nie (iPhone), ostáva presun pod
-         `body` a pevná poloha. */
+
+    const open = () => {
       /* Mapa je na šírku — na výšku sa z nej vidí pás. Po prechode do
          celoobrazovkového režimu si preto vypýtame otočenie displeja.
          Prehliadač to nemusí povoliť (iPhone to nevie vôbec); vtedy sa nič
@@ -870,13 +877,41 @@ export function MapaHradisk() {
         .catch(() => {});
       setFull(true);
     };
-    el.addEventListener('pointerdown', open, true);
-    el.addEventListener('touchstart', open, true);
-    el.addEventListener('click', open, true);
+
+    /* Otvára ŤUKNUTIE, nie akýkoľvek dotyk. Prst, ktorý sa po mape posunie,
+       stránku scrolluje — a to musí ostať. Preto si zapamätám, kde a kedy
+       dotyk začal, a otvorím až vtedy, keď skončí na tom istom mieste.
+
+       Prečo nestačí `click`: plátno MapLibre volá na dotyku `preventDefault`,
+       čím sa ťuknutie nemusí na klik vôbec preložiť. A prečo v ZACHYTÁVACEJ
+       fáze: takto sa poslucháč spustí skôr, než sa udalosť dostane
+       k čomukoľvek vnútri, takže ho nemá čo pohltiť. */
+    let t0 = 0, x0 = 0, y0 = 0, moved = false;
+    const onStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) { moved = true; return; }
+      t0 = e.timeStamp; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; moved = false;
+    };
+    const onMove = (e: TouchEvent) => {
+      if (moved || !e.touches.length) return;
+      if (Math.abs(e.touches[0].clientX - x0) > 12 || Math.abs(e.touches[0].clientY - y0) > 12) moved = true;
+    };
+    const onEnd = (e: TouchEvent) => {
+      if (moved || e.timeStamp - t0 > 700) return;
+      e.stopPropagation();
+      open();
+    };
+    /* Myš na úzkom okne — tam žiadne rozlišovanie netreba. */
+    const onClick = (e: Event) => { e.stopPropagation(); open(); };
+
+    el.addEventListener('touchstart', onStart, true);
+    el.addEventListener('touchmove', onMove, true);
+    el.addEventListener('touchend', onEnd, true);
+    el.addEventListener('click', onClick, true);
     return () => {
-      el.removeEventListener('pointerdown', open, true);
-      el.removeEventListener('touchstart', open, true);
-      el.removeEventListener('click', open, true);
+      el.removeEventListener('touchstart', onStart, true);
+      el.removeEventListener('touchmove', onMove, true);
+      el.removeEventListener('touchend', onEnd, true);
+      el.removeEventListener('click', onClick, true);
     };
   }, [touch, full]);
 

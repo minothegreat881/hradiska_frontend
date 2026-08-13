@@ -560,3 +560,13 @@
 .lmap-open { display: grid; place-items: end center; }
 .lmap-close { display: grid; place-items: center; }
 
+
+/* Náhľad na telefóne sa neovláda, iba otvára — a musí sa cezeň dať
+   scrollovať stránka. MapLibre si na svojom plátne nastavuje
+   `touch-action: none`, čím prst nad mapou stránku prestane posúvať; tu mu
+   to vraciame. Na celej obrazovke (`is-full`) mapa ovládanie preberá späť. */
+@media (pointer: coarse), (hover: none), (max-width: 900px) {
+  .lmap:not(.is-full) .lmap-gl,
+  .lmap:not(.is-full) .lmap-gl canvas,
+  .lmap:not(.is-full) .maplibregl-canvas-container { touch-action: pan-y !important; }
+}
