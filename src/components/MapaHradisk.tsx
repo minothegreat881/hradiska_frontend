@@ -350,18 +350,12 @@ export function MapaHradisk() {
       maxZoom: MAX_Z,
       maxBounds: ROAM,
       attributionControl: false,
-      /* NA TELEFÓNE: JEDEN PRST POSÚVA STRÁNKU, DVA MAPU, DVOJŤUK PRIBLÍŽI.
-         Mapa sedí uprostred dlhej domovskej — keď brala jeden prst, cez ňu
-         sa nedalo prelistovať ďalej a zakaždým človek skončil v mape.
-         Prehliadač na to sám ukáže nápovedu, keď to niekto skúsi jedným.
-         NA POČÍTAČI JE TO VYPNUTÉ — tam ostáva koliesko aj ťahanie tak,
-         ako doteraz. */
-      cooperativeGestures: isTouch(),
-      locale: {
-        'CooperativeGesturesHandler.MobileHelpText': 'Mapu posuniete dvoma prstami',
-        'CooperativeGesturesHandler.WindowsHelpText': 'Priblížite kolieskom s Ctrl',
-        'CooperativeGesturesHandler.MacHelpText': 'Priblížite kolieskom s ⌘',
-      },
+      /* Režim dvoch prstov (`cooperativeGestures`) je PREČ. Bol to on, čo
+         držal jednoprstové posúvanie zamknuté: MapLibre pri ňom prvý prst
+         zahodí a čaká na druhý. Na celej obrazovke sa mapa má správať ako
+         v mapách, ktoré ľudia poznajú — prst posúva, štipnutie približuje.
+         Náhľad na stránke rieši priehľadný štít nad plátnom (nižšie), nie
+         okliešťovanie mapy; vypínať a zapínať ovládače sa neosvedčilo. */
       /* Bez `alpha` vycisti MapLibre platno do CIERNEJ — odtial cierne okraje
          okolo krajiny. S nim je platno priehladne a presvita cezen papier,
          bodkova mriezka aj vodoznak „SK", presne ako to chce handoff (a ako
@@ -760,8 +754,6 @@ export function MapaHradisk() {
     fullRef.current = full;
     if (full) {
       document.body.style.overflow = 'hidden';
-      /* Na celej obrazovke posúva jeden prst — nie je čo prelistovať. */
-      map.cooperativeGestures?.disable();
       /* Otáčanie dvoma prstami len prekáža — mapa má sever hore. Štipnutie
          (dnu = bližšie, von = ďalej) ostáva. */
       map.touchZoomRotate?.disableRotation?.();
@@ -772,7 +764,6 @@ export function MapaHradisk() {
       map.setMaxBounds(null);
     } else {
       document.body.style.overflow = '';
-      if (isTouch()) map.cooperativeGestures?.enable();
       map.setMaxBounds(new maplibregl.LngLatBounds(ROAM[0], ROAM[1]));
     }
     /* Plátno zmenilo rozmer — mapa o tom musí vedieť a dosadnúť nanovo. */
@@ -1020,6 +1011,15 @@ export function MapaHradisk() {
             predvolenému správaniu — ťuknutie sa tak nemuselo preložiť na
             kliknutie a tlačidlo nereagovalo. Ťuknutie preto obsluhujem
             priamo, a `touchend` sa navyše zastaví, aby ho už nikto nedostal. */}
+        {touch && !full && (
+          /* Štít. Náhľad na stránke sa neovláda — je to obrázok, ktorý sa
+             ťuknutím otvorí. Štít pohltí dotyky skôr, než sa dostanú
+             k mape, a `touch-action: pan-y` necháva zvislý ťah stránke,
+             takže sa cez mapu dá normálne prelistovať. Ťuknutie chytá
+             poslucháč na koreni sekcie. */
+          <div className="lmap-shield" aria-hidden="true" />
+        )}
+
         {touch && !full && (
           /* Iba nápoveda. Ťuknutie obsluhuje poslucháč na koreni sekcie,
              nie tento prvok — preto nechytá udalosti. */
