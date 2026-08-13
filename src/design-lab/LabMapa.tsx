@@ -40,10 +40,6 @@ const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49
    nechávalo nad Slovenskom a pod ním pás navyše. Pomer 2,011 : 1 sedí
    s pomerom plátna. */
 const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 49.6138]];
-/** Dotykové zariadenie — `hover` na ňom neexistuje. Rozhoduje o tom, či mapa
-    berie jeden prst, alebo až dva. */
-const isTouch = () => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
-
 /* Výrez POHYBU. Reliéf končí na štátnej hranici, ale štrnásť lokalít leží za
    ňou (Mikulčice, Pohansko, Zalavár, Visegrád, Gars-Thunau, Arkona…). Tie sa
    kreslia ako body na papieri mimo krajiny — preto sa mapa dá odtiahnuť až
@@ -112,7 +108,6 @@ const strapiBase = () =>
 export function LabMapa() {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const wheelCleanup = useRef<(() => void) | null>(null);
   /* Uzly a stav tahania pre trafenie bodu — handlery na plátne su zavesene
      raz a citaju z refov, nie zo zavretej premennej. */
   const nodesRef = useRef<Node[]>([]);
@@ -197,12 +192,20 @@ export function LabMapa() {
       maxZoom: MAX_Z,
       maxBounds: ROAM,
       attributionControl: false,
-      /* NA TELEFÓNE JEDEN PRST POSÚVA STRÁNKU, DVA MAPU. Mapa je uprostred
-         dlhej stránky; keď brala jeden prst, návštevník sa cez ňu nedostal
-         ďalej — každé potiahnutie skončilo v mape. Prehliadač na to ukáže
-         nápovedu presne vtedy, keď to niekto skúsi jedným prstom.
-         Na počítači zostáva vypnuté: tam je koliesko aj ťahanie jednoznačné. */
-      cooperativeGestures: isTouch(),
+      /* MAPA SA NEBIJE S POSÚVANÍM STRÁNKY. Sedí uprostred dlhej domovskej;
+         keby brala koliesko (alebo na telefóne jeden prst), návštevník by sa
+         cez ňu nedostal ďalej — každé posunutie by skončilo v mape.
+
+           koliesko            → posúva STRÁNKU
+           Ctrl/⌘ + koliesko   → približuje mapu
+           ťahanie myšou       → posúva mapu (bez zmeny)
+           jeden prst          → posúva stránku
+           dva prsty           → posúvajú mapu, štipnutie približuje
+
+         Mapa to sama povie nápovedou vo chvíli, keď to niekto skúsi inak —
+         nie je to teda skryté gesto. Tlačidlá + / − a dvojklik ostávajú pre
+         tých, čo modifikátor hľadať nechcú. */
+      cooperativeGestures: true,
       locale: {
         'CooperativeGesturesHandler.MobileHelpText': 'Mapu posuniete dvoma prstami',
         'CooperativeGesturesHandler.WindowsHelpText': 'Priblížite kolieskom s Ctrl',
@@ -223,40 +226,7 @@ export function LabMapa() {
        reliefe je castejsie treba posunut nabok nez zoomovat, a dvoma prstami
        na trackpade je posun prirodzeny pohyb. Koliesko preto POSUVA (aj
        doprava/dolava cez `deltaX` alebo Shift), priblizuje az Ctrl/⌘. */
-    map.scrollZoom.disable();
     const el = map.getCanvasContainer();
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      /* KOLIESKO ROBÍ TO, ČO ČLOVEK ČAKÁ OD SVOJHO ZARIADENIA.
-         Doteraz vždy posúvalo a približovalo až s Ctrl — to sedelo trackpadu,
-         ale kto má myš, čaká od kolieska priblíženie (tak to má každá mapa
-         na internete) a naša mu pripadala pokazená. Zariadenie sa dá rozoznať
-         priamo z udalosti:
-
-           myš        veľké skokové `deltaY` (alebo `deltaMode` v riadkoch)
-                      a žiadna vodorovná zložka        → PRIBLÍŽENIE KU KURZORU
-           trackpad   drobné spojité delty, často `deltaX` → POSUN
-           štipnutie  prehliadač posiela `ctrlKey`         → PRIBLÍŽENIE
-
-         Trackpad si tým zachová dnešné správanie, myš dostane to svoje. */
-      const pinch = e.ctrlKey || e.metaKey;
-      const wheelish = e.deltaMode !== 0 || (Math.abs(e.deltaY) >= 50 && e.deltaX === 0);
-      if (pinch || wheelish) {
-        const r = el.getBoundingClientRect();
-        const step = pinch ? -e.deltaY * 0.01 : -Math.sign(e.deltaY) * 0.6;
-        map.easeTo({
-          zoom: Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() + step)),
-          around: map.unproject([e.clientX - r.left, e.clientY - r.top]),
-          duration: pinch ? 0 : 150,
-        });
-        return;
-      }
-      const dx = e.shiftKey ? e.deltaY : e.deltaX;
-      const dy = e.shiftKey ? 0 : e.deltaY;
-      map.panBy([dx, dy], { duration: 0 }, { originalEvent: e });
-    };
-    el.addEventListener('wheel', onWheel, { passive: false });
-    wheelCleanup.current = () => el.removeEventListener('wheel', onWheel);
 
     /* KTO JE POD KURZOROM sa dopočíta z polôh uzlov, body samy myš
        nezachytávajú. Dovtedy platilo opačné: bod bol tlačidlo, takže mapa
@@ -305,7 +275,7 @@ export function LabMapa() {
 
     map.on('load', () => { setReady(true); });
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { moveCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
