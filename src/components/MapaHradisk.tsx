@@ -260,6 +260,10 @@ export function MapaHradisk() {
       sa nikdy neovláda pohodlne: buď berie prst stránke, alebo ho musí pustiť
       a potom sa v nej nedá hýbať. Na celej obrazovke odpadá oboje. */
   const [full, setFull] = useState(false);
+  /* Či je to dotykové zariadenie, sa rozhoduje TU a nikde inde. Doteraz to
+     hovoril aj kód, aj medzidotaz v CSS — a keď sa nezhodli (Android, ktorý
+     tvrdí, že má myš), prekrytie sa nevykreslilo, hoci kód s dotykom rátal. */
+  const [touch] = useState(isTouch);
   /** Uzol pod kurzorom (id bodu alebo kľúč zhluku) — nahrádza `:hover`,
       lebo body samy myš už nezachytávajú. */
   const [hotKey, setHotKey] = useState<string | null>(null);
@@ -842,20 +846,22 @@ export function MapaHradisk() {
             predvolenému správaniu — ťuknutie sa tak nemuselo preložiť na
             kliknutie a tlačidlo nereagovalo. Ťuknutie preto obsluhujem
             priamo, a `touchend` sa navyše zastaví, aby ho už nikto nedostal. */}
-        {!full && (
+        {touch && !full && (
           <div
             className="lmap-open"
             role="button"
             tabIndex={0}
+            /* `pointerdown` chytí prst, pero aj myš a príde skôr, než sa
+               k udalosti dostane plátno mapy. */
+            onPointerDown={e => { e.preventDefault(); e.stopPropagation(); setFull(true); }}
             onClick={() => setFull(true)}
-            onTouchEnd={e => { e.preventDefault(); e.stopPropagation(); setFull(true); }}
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setFull(true); }}
           >
             <span>Otvoriť mapu na celú obrazovku</span>
           </div>
         )}
-        {full && (
-          <button type="button" className="lmap-close" onClick={() => setFull(false)} aria-label="Zavrieť mapu">
+        {touch && full && (
+          <button type="button" className="lmap-close" onPointerDown={() => setFull(false)} aria-label="Zavrieť mapu">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>

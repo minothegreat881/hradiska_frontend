@@ -513,11 +513,9 @@
    sa preto ťuknutím otvorí na celú obrazovku, kde mapa smie brať jeden prst
    a ovládanie má miesto.
    ══════════════════════════════════════════════════════════════════════════ */
-.lmap-open, .lmap-close { display: none; }
 
 @media (pointer: coarse), (hover: none) {
   .lmap-open {
-    display: grid; place-items: end center;
     /* Nad všetkým, čo je na plátne — vrátane vrstvy bodov a otvorenej karty
        (uzol s ňou má 30). V náhľade sa aj tak s ničím z toho nepracuje. */
     position: absolute; inset: 0; z-index: 50;
@@ -547,7 +545,6 @@
     display: flex; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom));
   }
   .lmap-close {
-    display: grid; place-items: center;
     position: absolute; z-index: 8;
     top: calc(12px + env(safe-area-inset-top)); right: 12px;
     width: 44px; height: 44px; border-radius: 50%;
@@ -556,3 +553,9 @@
     touch-action: manipulation;
   }
 }
+
+/* Prekrytie náhľadu a krížik vykresľuje KÓD (len na dotyku), nie medzidotaz
+   v CSS — tie dva sa vedeli nezhodnúť a prekrytie potom chýbalo. Tu je už
+   len vzhľad. */
+.lmap-open { display: grid; place-items: end center; }
+.lmap-close { display: grid; place-items: center; }
