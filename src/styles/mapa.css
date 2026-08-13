@@ -559,3 +559,11 @@
    len vzhľad. */
 .lmap-open { display: grid; place-items: end center; }
 .lmap-close { display: grid; place-items: center; }
+
+/* Dočasný výpis pri ladení (`?debug=1`). Ide preč, len čo sa príčina nájde. */
+.lmap-dbg {
+  position: absolute; left: 8px; top: 8px; z-index: 60; pointer-events: none;
+  max-width: 78%; padding: 8px 10px; border-radius: 8px;
+  background: rgba(20, 18, 15, .85); color: #f3ede1;
+  font-family: ui-monospace, monospace; font-size: 11px; line-height: 1.5;
+}

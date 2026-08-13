@@ -264,6 +264,12 @@ export function MapaHradisk() {
      hovoril aj kód, aj medzidotaz v CSS — a keď sa nezhodli (Android, ktorý
      tvrdí, že má myš), prekrytie sa nevykreslilo, hoci kód s dotykom rátal. */
   const [touch] = useState(isTouch);
+  /* DOČASNÁ DIAGNOSTIKA. Zapína sa `?debug=1` v adrese a vypíše priamo na
+     mapu, čo sa pri ťuknutí naozaj deje — bez konzoly sa to z telefónu inak
+     zistiť nedá. Až sa príčina nájde, ide to preč. */
+  const [dbg, setDbg] = useState<string[]>([]);
+  const debugOn = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
+  const log = (m: string) => setDbg(d => [...d.slice(-5), m]);
   /** Uzol pod kurzorom (id bodu alebo kľúč zhluku) — nahrádza `:hover`,
       lebo body samy myš už nezachytávajú. */
   const [hotKey, setHotKey] = useState<string | null>(null);
@@ -853,11 +859,25 @@ export function MapaHradisk() {
             tabIndex={0}
             /* `pointerdown` chytí prst, pero aj myš a príde skôr, než sa
                k udalosti dostane plátno mapy. */
-            onPointerDown={e => { e.preventDefault(); e.stopPropagation(); setFull(true); }}
-            onClick={() => setFull(true)}
+            onPointerDown={e => {
+              e.preventDefault(); e.stopPropagation();
+              if (debugOn) log('pointerdown → setFull(true)');
+              setFull(true);
+            }}
+            onTouchStart={() => debugOn && log('touchstart')}
+            onTouchEnd={e => { if (debugOn) log('touchend'); e.preventDefault(); setFull(true); }}
+            onClick={() => { if (debugOn) log('click'); setFull(true); }}
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setFull(true); }}
           >
             <span>Otvoriť mapu na celú obrazovku</span>
+          </div>
+        )}
+        {debugOn && (
+          <div className="lmap-dbg">
+            <div>touch={String(touch)} full={String(full)}</div>
+            <div>coarse={String(window.matchMedia('(pointer: coarse)').matches)} hoverNone={String(window.matchMedia('(hover: none)').matches)}</div>
+            <div>pos={typeof document !== 'undefined' ? getComputedStyle(document.querySelector('.lmap') as Element).position : '?'}</div>
+            {dbg.map((m, i) => <div key={i}>· {m}</div>)}
           </div>
         )}
         {touch && full && (
