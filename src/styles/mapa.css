@@ -570,3 +570,43 @@
   .lmap:not(.is-full) .lmap-gl canvas,
   .lmap:not(.is-full) .maplibregl-canvas-container { touch-action: pan-y !important; }
 }
+
+/* ── Celá obrazovka na telefóne ────────────────────────────────────────────
+   Tu má byť vidieť MAPU a nič iné. Všetko ostatné z rozloženia — hlavička,
+   legenda, bočný panel s navigátorom aj jeho vlastné „+/−" — sa skrýva;
+   ovládanie preberajú prsty a jediná dvojica krokov vpravo dole. Bez toho
+   ostávali okolo mapy tmavé pásy a vľavo prázdny prúžok po paneli. */
+.lmap.is-full {
+  padding: 0 !important; gap: 0 !important; border-radius: 0;
+  background: var(--l-paper, #F5F1E9);
+}
+.lmap.is-full > *:not(.lmap-canvas) { display: none !important; }
+/* Uvedenie zdrojov ostáva — na dlaždice sa viaže licencia. Len sa zmenší
+   a posadí do rohu plátna, aby mapu nekrájalo. */
+.lmap.is-full > .lmap-attrib {
+  display: block !important;
+  position: absolute; z-index: 4300; margin: 0;
+  left: 8px; bottom: calc(2px + env(safe-area-inset-bottom));
+  font-size: 9px; line-height: 1.3; max-width: 62vw;
+  color: rgba(20, 18, 15, .55); text-shadow: 0 1px 2px rgba(245, 241, 233, .9);
+}
+.lmap.is-full .lmap-canvas {
+  flex: 1 1 auto; width: 100%; height: 100%;
+  min-height: 0; max-height: none; aspect-ratio: auto;
+  margin: 0; border-radius: 0; border: 0;
+}
+.lmap.is-full .lmap-zoom { display: none !important; }
+
+/* Karta lokality ako spodný pás. Doteraz visela nad bodom a pri okrajoch ju
+   plátno orezalo — na telefóne je bodov pri kraji väčšina. Takto sa nemá kde
+   orezať a je pod palcom. */
+.lmap.is-full .lmap-card {
+  position: fixed; z-index: 4200;
+  left: 10px; right: 10px; top: auto; width: auto; max-width: none;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  transform: none !important;
+}
+.lmap.is-full .lmap-card.is-below { display: block; }
+.lmap.is-full .lmap-card-arrow { display: none; }
+.lmap.is-full .lmap-card-in { flex-direction: row; }
+.lmap.is-full .lmap-card-photo { width: 38%; min-width: 120px; }

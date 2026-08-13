@@ -245,6 +245,9 @@ export function MapaHradisk() {
   const resizeCleanup = useRef<(() => void) | null>(null);
   const touchCleanup = useRef<(() => void) | null>(null);
   const fitRef = useRef<((d?: number) => void) | null>(null);
+  /* `fitCountry` sa vytvára raz, ale musí vedieť, či je mapa na celej
+     obrazovke — cez ref, nech si nezoberie starú hodnotu. */
+  const fullRef = useRef(false);
   /** Otvorený bod — číta ho dopočítavanie, ktoré beží mimo vykreslenia. */
   const hoverIdRef = useRef<string | null>(null);
   const moveCleanup = useRef<(() => void) | null>(null);
@@ -648,7 +651,16 @@ export function MapaHradisk() {
        stredná časť krajiny. Pásy sa preto riešia inak: plátno je na telefóne
        nižšie (viď `mapa.css`), takže na ne ostane len málo miesta — a to
        málo je papier s mriežkou, teda časť návrhu. */
-    map.easeTo({ center: cam.center, zoom: Math.min(MAX_Z, cam.zoom ?? MIN_Z), duration });
+    let zoom = cam.zoom ?? MIN_Z;
+    /* Na celej obrazovke sa naopak VYPĹŇA. Tam je mapa jediné, čo je vidieť,
+       takže pásy okolo nej sú len prázdno; radšej krajina prečnieva do strán
+       a posúva sa prstom. (V náhľade a na počítači ostáva vmestenie — pásy
+       sú tam papier s mriežkou, teda časť návrhu.) */
+    if (fullRef.current) {
+      const b = map.getCanvas().getBoundingClientRect();
+      if (b.width && b.height) zoom += Math.abs(Math.log2((b.width / b.height) / COUNTRY_ASPECT));
+    }
+    map.easeTo({ center: cam.center, zoom: Math.min(MAX_Z, zoom), duration });
   }, []);
   const reset = () => fitCountry(420);
 
@@ -771,8 +783,10 @@ export function MapaHradisk() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    fullRef.current = full;
     if (full) {
       document.body.style.overflow = 'hidden';
+      /* Na celej obrazovke posúva jeden prst — nie je čo prelistovať. */
       map.cooperativeGestures?.disable();
     } else {
       document.body.style.overflow = '';
@@ -1079,7 +1093,7 @@ export function MapaHradisk() {
               border: '1px solid rgba(255,255,255,.25)', pointerEvents: 'auto',
             }}
           >
-            {([['+', 1], ['−', -1]] as [string, number][]).map(([sign, d]) => (
+            {([['+', 0.9], ['−', -0.9]] as [string, number][]).map(([sign, d]) => (
               <button
                 key={sign}
                 type="button"
