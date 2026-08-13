@@ -2223,8 +2223,10 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    mrtve pasy. Vysku teraz urcuje platno svojim pomerom a lavy panel sa don
    roztiahne. */
 .lmap {
-  display: flex; align-items: stretch;
-  min-height: 520px;
+  /* `stretch` by prebilo `aspect-ratio` platna (roztiahnutie vyhrava nad
+     pomerom), takze by si vysku nedrzalo. Vysku urcuje platno, panel sa
+     don roztiahne sam. */
+  display: flex; align-items: flex-start;
   background: var(--l-dark);
   font-family: 'Archivo', 'Inter', ui-sans-serif, sans-serif;
   font-stretch: 100%;
@@ -2271,7 +2273,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 /* ── Ľavý panel ────────────────────────────────────────────────────────── */
 .lmap-side {
-  flex: none; width: clamp(320px, 25vw, 400px);
+  flex: none; align-self: stretch; width: clamp(320px, 25vw, 400px);
   display: flex; flex-direction: column; justify-content: space-between;
   padding: 56px 44px;
   background: var(--l-dark);
@@ -2336,7 +2338,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-canvas {
   position: relative; flex: 1; min-width: 0; overflow: hidden;
   background: var(--l-paper-2);
-  aspect-ratio: 2.01; max-height: 90vh;
+  aspect-ratio: 2.011; max-height: 88vh;
 }
 .lmap-grid {
   position: absolute; inset: 0; pointer-events: none;
@@ -2521,7 +2523,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    nezmestí, tak sa z neho stane hlavička nad mapou a legenda sa zbalí pod
    tlačidlo — mapa musí dostať výšku, nie zoznam kategórií. */
 @media (max-width: 900px) {
-  .lmap { flex-direction: column; min-height: 0; }
+  .lmap { flex-direction: column; align-items: stretch; }
   .lmap-side { width: auto; padding: 30px 20px 22px; border-right: 0; border-bottom: 1px solid var(--l-on-dark-line); gap: 20px; }
   .lmap-head { gap: 12px; }
   .lmap-lead { max-width: none; font-size: 14.5px; }

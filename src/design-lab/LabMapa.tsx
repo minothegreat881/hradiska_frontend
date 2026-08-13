@@ -35,6 +35,11 @@ import { SK_OUTLINE, SK_OUTLINE_BOX, SK_OUTLINE_RANGE } from './skOutline';
 /* Výrez RENDERU — musí sedieť s BOUNDS_4326 v build_relief.py. Na tento
    výrez sa mapa otvára. */
 const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49.65]];
+/* Skutočný rozsah KRAJINY (z `sk_boundary.geojson`). Mapa dosadá na tento,
+   nie na výrez renderu — ten má okolo krajiny rezervu, takže dosadnutie naň
+   nechávalo nad Slovenskom a pod ním pás navyše. Pomer 2,011 : 1 sedí
+   s pomerom plátna. */
+const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 49.6138]];
 /* Výrez POHYBU. Reliéf končí na štátnej hranici, ale štrnásť lokalít leží za
    ňou (Mikulčice, Pohansko, Zalavár, Visegrád, Gars-Thunau, Arkona…). Tie sa
    kreslia ako body na papieri mimo krajiny — preto sa mapa dá odtiahnuť až
@@ -182,8 +187,8 @@ export function LabMapa() {
           { id: 'relief', type: 'raster', source: 'relief', paint: { 'raster-fade-duration': 120 } },
         ],
       },
-      bounds: BOUNDS,
-      fitBoundsOptions: { padding: 10 },
+      bounds: SK,
+      fitBoundsOptions: { padding: 8 },
       minZoom: MIN_Z,
       maxZoom: MAX_Z,
       maxBounds: ROAM,
@@ -362,7 +367,7 @@ export function LabMapa() {
     if (!map) return;
     map.easeTo({ zoom: Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() + f)), duration: 260 });
   };
-  const reset = () => mapRef.current?.fitBounds(BOUNDS, { padding: 24, duration: 420 });
+  const reset = () => mapRef.current?.fitBounds(SK, { padding: 8, duration: 420 });
 
   /** Posun o tretinu obrazovky — šípky sú presnejšie než ťahanie prstom. */
   const pan = (dx: number, dy: number) => {
