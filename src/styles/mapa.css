@@ -686,36 +686,40 @@
    Nižšie sú preto všetky vrstvy, ktoré majú byť pre prst a myš priehľadné,
    uvedené znova a s dôrazom. Prvky, ktoré sa naopak klikať MAJÚ, si ho
    vracajú — dieťa smie `pointer-events` znovu zapnúť. */
-/* Aj s `!important` to nestačilo: pri súboji dvoch `!important` rozhoduje
-   špecifickosť, a `div:not(.pointer-events-none):not([class*=…])` má vyššiu
-   než jedna trieda. Overené meraním — pod prstom bola `.lmap-overlay`
-   s `pointer-events: auto`, hoci sme jej to `!important` zakazovali.
+/* ── Kto smie chytať prst a myš ────────────────────────────────────────────
+   `globals.css` má dve pravidlá, ktoré tomu bránia:
 
-   Preto tie vrstvy nesú v značke priamo triedu `pointer-events-none`: to je
-   výnimka, ktorú si `globals.css` sám vyhradzuje, takže pravidlo ich už
-   nechytí. Tu ostáva len zvýšená špecifickosť ako poistka. */
+     div:not(.pointer-events-none)…            { pointer-events: auto !important }
+     .parchment *:not(.pointer-events-none)    { pointer-events: auto }
+
+   Prvé prebije aj naše `!important` (pri dvoch `!important` rozhoduje
+   špecifickosť a `:not(.trieda)` sa do nej počíta). Druhé zapne dotyk
+   každému potomkovi — teda aj tlačidlu bodu a `svg` s ikonou v ňom.
+   Meraním sa to ukázalo v troch krokoch: pod kurzorom bola najprv celá
+   vrstva `.lmap-overlay`, po jej oprave `svg`, po jej oprave `button`.
+
+   Preto sa to rieši raz a plošne: celá vrstva s bodmi VRÁTANE všetkého
+   vnútri je pre prst a myš priehľadná, a čo sa klikať má, si to vyslovene
+   pýta späť. Vrstvy nesú aj triedu `pointer-events-none` — výnimku, ktorú
+   si `globals.css` sám vyhradzuje. */
 .lmap .lmap-canvas .lmap-overlay,
-.lmap .lmap-canvas .lmap-node,
-.lmap .lmap-canvas .lmap-pin-wrap,
-.lmap .lmap-canvas .lmap-pill,
+.lmap .lmap-canvas .lmap-overlay *,
 .lmap .lmap-canvas .lmap-grid,
 .lmap .lmap-canvas .lmap-watermark,
-.lmap .lmap-canvas .lmap-spider-line,
-.lmap .lmap-side .lmap-locator-view,
-.lmap .lmap-canvas .lmap-open { pointer-events: none !important; }
+.lmap .lmap-canvas .lmap-open,
+.lmap .lmap-canvas .lmap-open *,
+.lmap .lmap-side .lmap-locator-view { pointer-events: none !important; }
 
-/* Aj VNÚTRO bodu musí byť priehľadné. `globals.css` má ešte jedno pravidlo,
-   `.parchment *:not(.pointer-events-none) { pointer-events: auto }`, ktoré
-   zapne dotyk každému potomkovi — vrátane `svg` s ikonou v bode. Meranie to
-   ukázalo priamo: pod kurzorom nebolo plátno mapy, ale `svg`. Bod tak
-   pohlcoval pohyb myši a karta sa neotvorila. Vnútro zhluku je na tom
-   rovnako; samotné tlačidlo zhluku klikateľné ostáva. */
-.lmap .lmap-canvas .lmap-pin *,
-.lmap .lmap-canvas .lmap-pill *,
-.lmap .lmap-canvas .lmap-cluster *,
-.lmap .lmap-canvas .lmap-open * { pointer-events: none !important; }
-
+.lmap .lmap-canvas .lmap-cluster,
+.lmap .lmap-canvas .lmap-spider-x,
 .lmap .lmap-canvas .lmap-card,
+.lmap .lmap-canvas .lmap-card *,
 .lmap .lmap-canvas .lmap-sheet,
-.lmap .lmap-canvas .lmap-sheet-x,
+.lmap .lmap-canvas .lmap-sheet *,
 .lmap .lmap-canvas .lmap-shield { pointer-events: auto !important; }
+
+/* Na dotyku zhluk prst nechytá — inak by sa cezeň nedala mapa ťahať.
+   Otvorí ho klik do mapy (dopočíta sa z polohy). */
+@media (pointer: coarse), (hover: none), (max-width: 900px) {
+  .lmap .lmap-canvas .lmap-cluster { pointer-events: none !important; }
+}
