@@ -183,7 +183,7 @@ export function LabMapa() {
         ],
       },
       bounds: BOUNDS,
-      fitBoundsOptions: { padding: 24 },
+      fitBoundsOptions: { padding: 10 },
       minZoom: MIN_Z,
       maxZoom: MAX_Z,
       maxBounds: ROAM,

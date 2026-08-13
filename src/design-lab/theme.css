@@ -2218,9 +2218,13 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    Farby kategórií zámerne NIE SÚ — kategórie rozlišuje ikona, tak to chce
    handoff a tak to zostáva, kým sa nerozhodne inak.
    ══════════════════════════════════════════════════════════════════════════ */
+/* VYSKA PODLA KRAJINY, nie podla obrazovky. Slovensko ma v Mercatore pomer
+   2,01 : 1; ked malo platno vlastnu vysku, ostavali nad krajinou a pod nou
+   mrtve pasy. Vysku teraz urcuje platno svojim pomerom a lavy panel sa don
+   roztiahne. */
 .lmap {
-  display: flex;
-  height: min(86vh, 940px);
+  display: flex; align-items: stretch;
+  min-height: 520px;
   background: var(--l-dark);
   font-family: 'Archivo', 'Inter', ui-sans-serif, sans-serif;
   font-stretch: 100%;
@@ -2329,7 +2333,11 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lmap-glass-n { font-family: var(--mono); font-size: 10px; }
 
 /* ── Plátno ────────────────────────────────────────────────────────────── */
-.lmap-canvas { position: relative; flex: 1; min-width: 0; background: var(--l-paper-2); overflow: hidden; }
+.lmap-canvas {
+  position: relative; flex: 1; min-width: 0; overflow: hidden;
+  background: var(--l-paper-2);
+  aspect-ratio: 2.01; max-height: 90vh;
+}
 .lmap-grid {
   position: absolute; inset: 0; pointer-events: none;
   background-image: radial-gradient(circle, rgba(20,18,15,.16) 1px, transparent 1px);
@@ -2513,7 +2521,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    nezmestí, tak sa z neho stane hlavička nad mapou a legenda sa zbalí pod
    tlačidlo — mapa musí dostať výšku, nie zoznam kategórií. */
 @media (max-width: 900px) {
-  .lmap { flex-direction: column; height: auto; }
+  .lmap { flex-direction: column; min-height: 0; }
   .lmap-side { width: auto; padding: 30px 20px 22px; border-right: 0; border-bottom: 1px solid var(--l-on-dark-line); gap: 20px; }
   .lmap-head { gap: 12px; }
   .lmap-lead { max-width: none; font-size: 14.5px; }
@@ -2522,7 +2530,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lmap-legend-h span { display: block; font-size: 16px; color: var(--l-second); }
   .lmap-legend-body { display: none; padding-top: 12px; }
   .lmap-legend.is-open .lmap-legend-body { display: flex; }
-  .lmap-canvas { height: 68vh; min-height: 420px; }
+  .lmap-canvas { aspect-ratio: auto; height: 68vh; min-height: 420px; max-height: none; }
   .lmap-watermark { top: 8px; right: -24px; }
   .lmap-hud-tl, .lmap-hud-tr { top: 14px; font-size: 10px; letter-spacing: .14em; }
   .lmap-hud-tl { left: 16px; }
