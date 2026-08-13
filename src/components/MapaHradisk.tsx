@@ -768,17 +768,9 @@ export function MapaHradisk() {
           ))}
         </div>
 
-        {/* HUD — technické popisky, nezachytávajú kliknutia. */}
-        <div className="lmap-hud lmap-hud-tl" aria-hidden="true">
-          <span>{deg(center.lat, 'N', 'S')}</span><span className="lmap-plus">+</span><span>{deg(center.lng, 'E', 'W')}</span>
-        </div>
-        <div className="lmap-hud lmap-hud-tr" aria-hidden="true">
-          <span>Reliéf · Copernicus DEM 30 m</span><span className="lmap-sq" />
-        </div>
-        <div className="lmap-hud lmap-hud-bl" aria-hidden="true">
-          <span className="lmap-count">{String(locs.length).padStart(2, '0')}</span>
-          <span className="lmap-count-l">Zmapované<br />lokality</span>
-        </div>
+        {/* Popisky z plátna sú preč — súradnice stredu, „Reliéf · Copernicus
+            DEM 30 m" aj počítadlo lokalít ležali cez krajinu. Uvedenie
+            zdrojov je pod mapou, nie na nej. */}
 
         <div className="lmap-zoom">
           {/* Navigátor — kde v rámci Slovenska práve som. Klik prenesie pohľad,
@@ -808,13 +800,14 @@ export function MapaHradisk() {
             <button type="button" onClick={() => zoomBy(-1)} aria-label="Oddialiť">−</button>
             <button type="button" onClick={reset} aria-label="Celé Slovensko" className="lmap-zoom-reset">1:1</button>
           </div>
-          <span className="lmap-zoom-v">zoom {(zoom).toFixed(1)}</span>
-        </div>
-
-        <div className="lmap-attrib">
-          Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
         </div>
       </div>
+
+      {/* Uvedenie zdrojov je licenčná povinnosť, ale nepatrí cez krajinu —
+          pod mapou je to poznámka pod obrázkom. */}
+      <p className="lmap-attrib">
+        Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
+      </p>
     </section>
   );
 }
