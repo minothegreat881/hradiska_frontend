@@ -42,6 +42,8 @@ const BOUNDS: [[number, number], [number, number]] = [[16.79, 47.70], [22.60, 49
 const SK: [[number, number], [number, number]] = [[16.8332, 47.7314], [22.5657, 49.6138]];
 /** Pomer strán krajiny v Mercatore — podľa neho sa dopočítava vyplnenie. */
 const COUNTRY_ASPECT = 2.0113;
+/** Dotykové zariadenie — `hover` na ňom neexistuje. */
+const isTouch = () => typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
 /* Výrez POHYBU. Reliéf končí na štátnej hranici, ale štrnásť lokalít leží za
    ňou (Mikulčice, Pohansko, Zalavár, Visegrád, Gars-Thunau, Arkona…). Tie sa
    kreslia ako body na papieri mimo krajiny — preto sa mapa dá odtiahnuť až
@@ -431,7 +433,11 @@ export function MapaHradisk() {
     map.on('click', (ev) => {
       const n = at(ev.originalEvent.clientX, ev.originalEvent.clientY);
       if (!n) { setSelected(null); setSpider(null); setHoverId(null); return; }
-      if (n.kind === 'one') setSelected(prev => (prev === n.loc.id ? null : n.loc.id));
+      if (n.kind === 'one') { setSelected(prev => (prev === n.loc.id ? null : n.loc.id)); return; }
+      /* Na dotyku zhluk nezachytáva prst (viď `mapa.css`), tak ho otvorí až
+         mapa. Na počítači to má na starosti samotné tlačidlo zhluku — keby
+         sa priblížilo aj odtiaľto, spustili by sa dve animácie naraz. */
+      if (isTouch()) clusterRef.current?.(n);
     });
 
     map.on('load', () => { setReady(true); fitCountryRef.current?.(0); });

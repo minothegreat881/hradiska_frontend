@@ -482,3 +482,13 @@
   color: var(--l-card);
 }
 .lmap-glass { transition: background .16s ease, border-color .16s ease, color .16s ease; }
+
+/* ── Dotyk: mapu má dostať prst, nie značky ───────────────────────────────
+   Zhluk je na počítači tlačidlo, aby fungovalo sfarbenie pri prejdení myšou.
+   Na telefóne `hover` neexistuje, takže z toho ostáva len škoda: prst pri
+   ťahaní pristane na zhluku, mapa o stlačení nevie a nedá sa posunúť —
+   a pri priblížení, kde je zhlukov veľa, sa nedalo hýbať skoro vôbec.
+   Na dotyku preto zhluk prst nezachytáva a otvára ho klik do mapy. */
+@media (hover: none) {
+  .lmap-cluster { pointer-events: none; }
+}
