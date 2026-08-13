@@ -671,3 +671,32 @@
   background: transparent; pointer-events: auto;
   touch-action: pan-y;
 }
+
+/* ── TOTO JE DÔVOD, PREČO SA MAPA NEDALA POSÚVAŤ ───────────────────────────
+   `globals.css` má pravidlo:
+
+     div:not(.pointer-events-none)… { pointer-events: auto !important; }
+
+   Vrstva s bodmi (`.lmap-overlay`) je `div` roztiahnutý cez CELÉ plátno.
+   Naše `pointer-events: none` je bežná deklarácia, a tú `!important` prebije
+   bez ohľadu na špecifickosť — vrstva teda pohlcovala každý dotyk aj každé
+   stlačenie myši a k mape sa ťah nikdy nedostal. Zoom prežil, lebo ten
+   nejde cez ťahanie.
+
+   Nižšie sú preto všetky vrstvy, ktoré majú byť pre prst a myš priehľadné,
+   uvedené znova a s dôrazom. Prvky, ktoré sa naopak klikať MAJÚ, si ho
+   vracajú — dieťa smie `pointer-events` znovu zapnúť. */
+.lmap-overlay,
+.lmap-node,
+.lmap-pin-wrap,
+.lmap-pill,
+.lmap-grid,
+.lmap-watermark,
+.lmap-spider-line,
+.lmap-locator-view,
+.lmap-open { pointer-events: none !important; }
+
+.lmap-card,
+.lmap-sheet,
+.lmap-sheet-x,
+.lmap-shield { pointer-events: auto !important; }
