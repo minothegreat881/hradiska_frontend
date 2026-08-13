@@ -182,14 +182,14 @@ const PinNode = memo(function PinNode({
   onClose: () => void;
 }) {
   return (
-      <div className="lmap-node"
+      <div className="lmap-node pointer-events-none"
            /* Uzol s otvorenou kartou musí ísť nad ostatné. `transform`
               na uzle vytvára vlastný kontext vrstiev, takže z-index
               karty vnútri sa voči susedným bodom neuplatní — rozhoduje
               z-index uzla. Doteraz stúpal len po kliknutí, takže cez
               kartu otvorenú prejdením presvitali okolité body. */
            style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: openCard ? 30 : 3 }}>
-      <div className="lmap-pin-wrap">
+      <div className="lmap-pin-wrap pointer-events-none">
         <button
           type="button"
           className={(openCard || hot) ? 'lmap-pin is-hot' : 'lmap-pin'}
@@ -206,7 +206,7 @@ const PinNode = memo(function PinNode({
         </button>
 
         {showPill && !openCard && (
-          <span className="lmap-pill">
+          <span className="lmap-pill pointer-events-none">
             <span className="lmap-pill-n">{n.loc.name}</span>
             <span className="lmap-pill-c">{(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}</span>
           </span>
@@ -998,8 +998,8 @@ export function MapaHradisk() {
         onClickCapture={closeOnOutside}
         style={full ? { flex: 1, width: '100%', height: 'auto', aspectRatio: 'auto', maxHeight: 'none', minHeight: 0 } : undefined}
       >
-        <div className="lmap-grid" aria-hidden="true" />
-        <div className="lmap-watermark" aria-hidden="true">SK</div>
+        <div className="lmap-grid pointer-events-none" aria-hidden="true" />
+        <div className="lmap-watermark pointer-events-none" aria-hidden="true">SK</div>
 
         <div ref={hostRef} className="lmap-gl" />
 
@@ -1024,7 +1024,7 @@ export function MapaHradisk() {
           /* Iba nápoveda. Ťuknutie obsluhuje poslucháč na koreni sekcie,
              nie tento prvok — preto nechytá udalosti. */
           <div
-            className="lmap-open"
+            className="lmap-open pointer-events-none"
             aria-hidden="true"
             style={{
               position: 'absolute', inset: 0, zIndex: 900,
@@ -1123,13 +1123,13 @@ export function MapaHradisk() {
         })()}
 
         {/* Body a zhluky — v obrazovkových súradniciach nad plátnom mapy. */}
-        <div className="lmap-overlay">
+        <div className="lmap-overlay pointer-events-none">
           {spider && (
             <>
               {spiderNodes.map(n => (
                 <span
                   key={'line-' + n.loc.id}
-                  className="lmap-spider-line"
+                  className="lmap-spider-line pointer-events-none"
                   style={{
                     width: Math.hypot(n.x - spider.x, n.y - spider.y),
                     transform: `translate3d(${spider.x}px, ${spider.y}px, 0) rotate(${Math.atan2(n.y - spider.y, n.x - spider.x)}rad)`,
@@ -1142,7 +1142,7 @@ export function MapaHradisk() {
           )}
 
           {all.map(n => n.kind === 'many' ? (
-            <div key={'c-' + n.members.map(m => m.id).join('|')} className="lmap-node"
+            <div key={'c-' + n.members.map(m => m.id).join('|')} className="lmap-node pointer-events-none"
                  style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)` }}>
             <button
               type="button"
