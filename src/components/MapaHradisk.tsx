@@ -230,8 +230,6 @@ const PinNode = memo(function PinNode({
 
 export function MapaHradisk() {
   const rootRef = useRef<HTMLElement | null>(null);
-  /* Kam sa sekcia po zavreti vrati. */
-  const homeRef = useRef<{ parent: Node | null; next: Node | null }>({ parent: null, next: null });
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const wheelCleanup = useRef<(() => void) | null>(null);
@@ -794,27 +792,57 @@ export function MapaHradisk() {
   /* Body rozbaleneho vejara sa daju trafit rovnako ako ostatne. */
   useEffect(() => { nodesRef.current = [...nodes, ...spiderNodes]; }, [nodes, spiderNodes]);
 
-  /* Celá obrazovka: sekciu fyzicky presuniem pod `<body>`.
-     `position: fixed` sa totiž nemeria voči okну prehliadača, ale voči
-     najbližšiemu rodičovi s `transform`, `filter` alebo `backdrop-filter` —
-     a takých má stránka niekoľko (atramentová vrstva, karty). Mapa sa preto
-     „roztiahla" iba na svojho rodiča a navonok to vyzeralo, akoby ťuknutie
-     nespravilo nič. Mimo stránky nemá čo prekážať. */
+  /* Celá obrazovka.
+
+     `position: fixed` sa nemeria voči oknu prehliadača, ale voči najbližšiemu
+     rodičovi s `transform`, `filter`, `backdrop-filter`, `perspective`
+     alebo `contain` — a takých má stránka niekoľko (atramentová vrstva,
+     karty). Mapa sa preto roztiahla len na svojho rodiča a navonok to
+     vyzeralo, akoby ťuknutie nespravilo nič.
+
+     Prvý pokus to riešil presunom sekcie pod `<body>`. Lenže tým sa dostala
+     MIMO koreňa Reactu — a React počúva udalosti na ňom, takže vnútri mapy
+     prestali fungovať všetky obsluhy: krížik, priblíženie, karty bodov.
+     (Ťuknutie na otvorenie prežilo len preto, že je natívne.)
+
+     Sekcia preto ostáva tam, kde je, a na čas otvorenia sa tie vlastnosti
+     rodičom dočasne vypnú. Po zavretí sa vrátia presne tak, ako boli. */
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
-    if (full) {
-      homeRef.current = { parent: el.parentNode, next: el.nextSibling };
-      document.body.appendChild(el);
-      document.body.style.overflow = 'hidden';
-    } else if (homeRef.current.parent) {
-      (homeRef.current.parent as Node).insertBefore(el, homeRef.current.next);
-      homeRef.current = { parent: null, next: null };
-      document.body.style.overflow = '';
+    if (!full) { document.body.style.overflow = ''; return; }
+
+    const back: { el: HTMLElement; transform: string; filter: string; backdrop: string; perspective: string; contain: string }[] = [];
+    for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (cs.transform === 'none' && cs.filter === 'none' && cs.backdropFilter === 'none'
+          && cs.perspective === 'none' && (cs.contain === 'none' || !cs.contain)) continue;
+      back.push({
+        el: p, transform: p.style.transform, filter: p.style.filter,
+        backdrop: p.style.backdropFilter, perspective: p.style.perspective, contain: p.style.contain,
+      });
+      p.style.transform = 'none';
+      p.style.filter = 'none';
+      p.style.backdropFilter = 'none';
+      p.style.perspective = 'none';
+      p.style.contain = 'none';
     }
-    /* Plátno má po presune iný rozmer, MapLibre to samo nezistí. */
+    document.body.style.overflow = 'hidden';
+    /* Plátno má iný rozmer, MapLibre to samo nezistí. */
     const t = window.setTimeout(() => mapRef.current?.resize(), 60);
-    return () => window.clearTimeout(t);
+
+    return () => {
+      window.clearTimeout(t);
+      back.forEach(b => {
+        b.el.style.transform = b.transform;
+        b.el.style.filter = b.filter;
+        b.el.style.backdropFilter = b.backdrop;
+        b.el.style.perspective = b.perspective;
+        b.el.style.contain = b.contain;
+      });
+      document.body.style.overflow = '';
+      window.setTimeout(() => mapRef.current?.resize(), 60);
+    };
   }, [full]);
 
   /* Otvorenie na telefóne. Poslucháč je natívny a v ZACHYTÁVACEJ fáze na
@@ -833,7 +861,13 @@ export function MapaHradisk() {
       /* Ak prehliadač vie skutočný celoobrazovkový režim, využijeme ho —
          schová aj lištu prehliadača. Keď nie (iPhone), ostáva presun pod
          `body` a pevná poloha. */
-      el.requestFullscreen?.().catch(() => {});
+      /* Mapa je na šírku — na výšku sa z nej vidí pás. Po prechode do
+         celoobrazovkového režimu si preto vypýtame otočenie displeja.
+         Prehliadač to nemusí povoliť (iPhone to nevie vôbec); vtedy sa nič
+         nestane a mapa ostane na výšku. */
+      el.requestFullscreen?.()
+        .then(() => (screen.orientation as { lock?: (o: string) => Promise<void> })?.lock?.('landscape'))
+        .catch(() => {});
       setFull(true);
     };
     el.addEventListener('pointerdown', open, true);
@@ -862,6 +896,21 @@ export function MapaHradisk() {
     }
   }, [touch, full, ready]);
 
+  const closeFull = useCallback(() => {
+    (screen.orientation as { unlock?: () => void })?.unlock?.();
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    setFull(false);
+  }, []);
+
+  /* Priblíženie na celej obrazovke. Bočný panel je tam skrytý (zaberal by
+     mapu), takže krok musí byť po ruke inde. */
+  const stepZoom = useCallback((d: number) => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.stop();
+    map.easeTo({ zoom: Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() + d)), duration: 240 });
+  }, []);
+
   /* Odchod z celoobrazovkového režimu tlačidlom „späť" prehliadača. */
   useEffect(() => {
     const onFs = () => { if (!document.fullscreenElement && full) setFull(false); };
@@ -869,15 +918,8 @@ export function MapaHradisk() {
     return () => document.removeEventListener('fullscreenchange', onFs);
   }, [full]);
 
-  /* Keby stránka zmizla otvorená: vrátiť posúvanie tela a sekciu na jej
-     pôvodné miesto — inak by ju React hľadal tam, kde už nie je. */
-  useEffect(() => () => {
-    document.body.style.overflow = '';
-    const el = rootRef.current, home = homeRef.current;
-    if (el && home.parent && el.parentNode === document.body) {
-      try { (home.parent as Node).insertBefore(el, home.next); } catch { /* rodič už zanikol */ }
-    }
-  }, []);
+  /* Keby stránka zmizla otvorená, posúvanie tela musí ostať funkčné. */
+  useEffect(() => () => { document.body.style.overflow = ''; }, []);
 
   return (
     <section
@@ -973,7 +1015,7 @@ export function MapaHradisk() {
           <button
             type="button"
             className="lmap-close"
-            onPointerDown={() => { document.exitFullscreen?.().catch(() => {}); setFull(false); }}
+            onPointerDown={closeFull}
             aria-label="Zavrieť mapu"
             style={{
               position: 'absolute', zIndex: 4100,
@@ -988,6 +1030,37 @@ export function MapaHradisk() {
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
           </button>
+        )}
+
+        {touch && full && (
+          /* Štipnutie dvoma prstami funguje, ale jednou rukou sa robí zle —
+             preto sú tu aj kroky pod palcom. */
+          <div
+            style={{
+              position: 'absolute', zIndex: 4100,
+              right: 12, bottom: 'calc(16px + env(safe-area-inset-bottom))',
+              display: 'flex', flexDirection: 'column', gap: 1,
+              borderRadius: 12, overflow: 'hidden',
+              border: '1px solid rgba(255,255,255,.25)', pointerEvents: 'auto',
+            }}
+          >
+            {([['+', 1], ['−', -1]] as [string, number][]).map(([sign, d]) => (
+              <button
+                key={sign}
+                type="button"
+                aria-label={d > 0 ? 'Priblížiť' : 'Oddialiť'}
+                onPointerDown={e => { e.preventDefault(); stepZoom(d); }}
+                style={{
+                  width: 48, height: 48, display: 'grid', placeItems: 'center',
+                  background: 'rgba(20,18,15,.85)', color: '#f3ede1',
+                  border: 0, font: '600 22px/1 system-ui, sans-serif',
+                  touchAction: 'manipulation', cursor: 'pointer',
+                }}
+              >
+                {sign}
+              </button>
+            ))}
+          </div>
         )}
 
         {/* Body a zhluky — v obrazovkových súradniciach nad plátnom mapy. */}
