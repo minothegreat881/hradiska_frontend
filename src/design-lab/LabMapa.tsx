@@ -223,6 +223,7 @@ export function LabMapa() {
   const movingRef = useRef(false);
   /** Posledná poloha kurzora, aby sa po dosadnutí dala vyhodnotiť znova. */
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
+  const settleCleanup = useRef<(() => void) | null>(null);
   /** Otvorený bod — číta ho dopočítavanie, ktoré beží mimo vykreslenia. */
   const hoverIdRef = useRef<string | null>(null);
   const moveCleanup = useRef<(() => void) | null>(null);
@@ -390,15 +391,28 @@ export function LabMapa() {
 
     map.on('dragstart', () => { draggingRef.current = true; });
     map.on('dragend', () => { draggingRef.current = false; });
-    map.on('movestart', () => { movingRef.current = true; });
+    /* Po dosadnutí sa kurzor nehýbe, ale svet pod ním áno — bod pod ním treba
+       vyhodnotiť znova. NIE HNEĎ: `map.stop()` pred každou novou animáciou
+       ohlási `moveend`, takže sa medzi dvoma pohybmi kamery na okamih otvorila
+       karta a hneď zmizla. Práve to blikanie bolo vidieť pri klikaní do
+       zhlukov. Vyhodnotenie sa preto odloží a nový pohyb ho zruší. */
+    let settle = 0;
+    map.on('movestart', () => {
+      movingRef.current = true;
+      if (settle) { window.clearTimeout(settle); settle = 0; }
+    });
     map.on('moveend', () => {
       movingRef.current = false;
-      /* Po dosadnutí sa kurzor nehýbe, ale svet pod ním áno — inak by bod
-         pod kurzorom ostal nezvýraznený, kým človek nehne myšou. */
-      if (lastPointer.current) onMove(new MouseEvent('mousemove', {
-        clientX: lastPointer.current.x, clientY: lastPointer.current.y,
-      }));
+      if (settle) window.clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        settle = 0;
+        if (movingRef.current || !lastPointer.current) return;
+        onMove(new MouseEvent('mousemove', {
+          clientX: lastPointer.current.x, clientY: lastPointer.current.y,
+        }));
+      }, 90);
     });
+    settleCleanup.current = () => { if (settle) window.clearTimeout(settle); };
 
     /* Klik: bod otvorí kartu (a na dotyku je to jediná cesta), prázdna mapa
        zavrie.
@@ -418,7 +432,7 @@ export function LabMapa() {
 
     map.on('load', () => { setReady(true); });
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); settleCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
