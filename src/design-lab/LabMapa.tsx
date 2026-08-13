@@ -551,31 +551,6 @@ export function LabMapa() {
           )}
         </div>
 
-        {/* Navigátor patrí do panela, nie na mapu — na plátne zaberal roh
-            a prekrýval lokality, kvôli ktorým tam mapa je. */}
-        <div className="lmap-nav">
-        {/* Navigátor — kde v rámci Slovenska práve som. Klik prenesie pohľad,
-            krížik posúva o tretinu obrazovky. Bez toho sa v priblíženom
-            reliéfe bez popisov nedá zorientovať. */}
-        <div className="lmap-locator" onClick={jump} title="Kliknutím presuniete pohľad">
-          <svg viewBox={`0 0 ${SK_OUTLINE_BOX.w} ${SK_OUTLINE_BOX.h}`} aria-hidden="true">
-            <path d={SK_OUTLINE} />
-          </svg>
-          <span
-            className="lmap-locator-view"
-            style={{ left: `${view.l}%`, top: `${view.t}%`, width: `${view.w}%`, height: `${view.h}%` }}
-            aria-hidden="true"
-          />
-        </div>
-
-        <div className="lmap-pad">
-          <button type="button" className="lmap-pad-u" onClick={() => pan(0, -1)} aria-label="Posunúť hore">▲</button>
-          <button type="button" className="lmap-pad-l" onClick={() => pan(-1, 0)} aria-label="Posunúť vľavo">◀</button>
-          <button type="button" className="lmap-pad-c" onClick={reset} aria-label="Celé Slovensko">✛</button>
-          <button type="button" className="lmap-pad-r" onClick={() => pan(1, 0)} aria-label="Posunúť vpravo">▶</button>
-          <button type="button" className="lmap-pad-d" onClick={() => pan(0, 1)} aria-label="Posunúť dole">▼</button>
-        </div>
-        </div>
 
         <div className={legendOpen ? 'lmap-legend is-open' : 'lmap-legend'}>
           <button type="button" className="lmap-legend-h" onClick={() => setLegendOpen(v => !v)}>
@@ -764,11 +739,34 @@ export function LabMapa() {
       </div>
       </div>
 
-      {/* Povinné uvedenie zdrojov. Pod mapou, nie na nej — na plátne to bol
-          text cez krajinu. */}
-      <p className="lmap-attrib">
-        Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
-      </p>
+      {/* Pás pod mapou: navigátor a uvedenie zdrojov. Na plátne prekrývali
+          lokality, v paneli sa nezmestili — panel má výšku podľa mapy. */}
+      <div className="lmap-foot">
+          {/* Navigátor — kde v rámci Slovenska práve som. Klik prenesie pohľad,
+              krížik posúva o tretinu obrazovky. Bez toho sa v priblíženom
+              reliéfe bez popisov nedá zorientovať. */}
+          <div className="lmap-locator" onClick={jump} title="Kliknutím presuniete pohľad">
+            <svg viewBox={`0 0 ${SK_OUTLINE_BOX.w} ${SK_OUTLINE_BOX.h}`} aria-hidden="true">
+              <path d={SK_OUTLINE} />
+            </svg>
+            <span
+              className="lmap-locator-view"
+              style={{ left: `${view.l}%`, top: `${view.t}%`, width: `${view.w}%`, height: `${view.h}%` }}
+              aria-hidden="true"
+            />
+          </div>
+
+          <div className="lmap-pad">
+            <button type="button" className="lmap-pad-u" onClick={() => pan(0, -1)} aria-label="Posunúť hore">▲</button>
+            <button type="button" className="lmap-pad-l" onClick={() => pan(-1, 0)} aria-label="Posunúť vľavo">◀</button>
+            <button type="button" className="lmap-pad-c" onClick={reset} aria-label="Celé Slovensko">✛</button>
+            <button type="button" className="lmap-pad-r" onClick={() => pan(1, 0)} aria-label="Posunúť vpravo">▶</button>
+            <button type="button" className="lmap-pad-d" onClick={() => pan(0, 1)} aria-label="Posunúť dole">▼</button>
+          </div>
+        <p className="lmap-attrib">
+          Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
+        </p>
+      </div>
     </section>
   );
 }
