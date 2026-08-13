@@ -356,8 +356,10 @@
   .lmap-legend.is-open .lmap-legend-body { display: flex; }
   .lmap-canvas { aspect-ratio: auto; height: 68vh; min-height: 420px; max-height: none; }
   .lmap-watermark { top: 8px; right: -24px; }
-  .lmap-zoom { right: 16px; bottom: 16px; }
-  .lmap-zoom-box button { width: 44px; height: 44px; }
+  .lmap-zoom { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
+  /* Palcove ciele + `manipulation`, aby prehliadac na tuknutie necakal, ci
+     nepride dvojtuk (tych 300 ms bolo cítiť ako „tlacidlo nereaguje"). */
+  .lmap-zoom-box button { width: 46px; height: 46px; font-size: 19px; touch-action: manipulation; }
   .lmap-attrib { padding: 8px 16px; font-size: 10px; text-align: left; }
   /* Karta by na úzkom okne vytŕčala mimo plátno. */
   .lmap-card { width: min(260px, 76vw); }
