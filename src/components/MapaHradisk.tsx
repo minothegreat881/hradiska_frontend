@@ -912,21 +912,12 @@ export function MapaHradisk() {
     };
   }, [touch, full]);
 
-  /* Náhľad na telefóne sa neovláda — ovládanie mapy je zapnuté až na celej
-     obrazovke. Inak by prst zároveň otváral aj posúval. Počítača sa to
-     netýka. */
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !touch) return;
-    const h = [map.dragPan, map.scrollZoom, map.touchZoomRotate, map.doubleClickZoom, map.keyboard];
-    if (full) {
-      h.forEach(x => x?.enable());
-      /* Na celej obrazovke posúva aj jeden prst — dva už netreba. */
-      map.cooperativeGestures?.disable?.();
-    } else {
-      h.forEach(x => x?.disable());
-    }
-  }, [touch, full, ready]);
+  /* Ovládače mapy zámerne NEZAPÍNAME ani NEVYPÍNAME. Skúsil som to a bola
+     to presne tá zmena, po ktorej sa mapa prestala dať posúvať prstom:
+     `dragPan` sa po vypnutí a opätovnom zapnutí nevrátil do pôvodného stavu.
+     Náhľad si vystačí s režimom dvoch prstov (jeden prst listuje stránku),
+     a na celej obrazovke sa ten režim vypne — viac netreba. */
+
 
   const closeCard = useCallback(() => setSelected(null), []);
 
@@ -1119,6 +1110,14 @@ export function MapaHradisk() {
               <div className="lmap-card">
                 <CardIn loc={loc} onClose={closeCard} />
               </div>
+              {/* Krížik patrí rohu KARTY. V rámci karty sedí vo fotke, a tá
+                  je tu len úzky ľavý stĺpec — tam by prekážal fotke aj
+                  palcu. */}
+              <button type="button" className="lmap-sheet-x" onClick={closeCard} aria-label="Zavrieť">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
             </div>
           ) : null;
         })()}

@@ -590,10 +590,14 @@
 }
 .lmap.is-full .lmap-zoom { display: none !important; }
 
-/* Karta lokality ako spodný pás. Doteraz visela nad bodom a plátno ju pri
-   okrajoch orezalo — a na telefóne je bodov pri kraji väčšina. Pás stojí
-   mimo bodu (bod je umiestnený cez `transform`, ktorý by mu obmedzil šírku)
-   a je pod palcom. */
+/* ── Karta lokality na telefóne ────────────────────────────────────────────
+   Spodný pás cez šírku obrazovky. Nad bodom ju plátno pri okrajoch orezalo
+   a na telefóne je bodov pri kraji väčšina. Skladba je na ležato: fotka
+   vľavo ako pevný stĺpec, text vpravo — na výšku by z toho bola dlhá
+   nudľa cez pol obrazovky.
+
+   Fotka MUSÍ mať výšku od mriežky (`stretch`), lebo obrázok v nej leží
+   absolútne; bez toho sa stĺpec zloží na nulu a fotka zmizne. */
 .lmap-sheet {
   position: absolute; z-index: 4200;
   left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
@@ -601,12 +605,34 @@
 }
 .lmap-sheet .lmap-card {
   position: static; width: auto; max-width: none; transform: none;
-  bottom: auto; left: auto;
+  filter: drop-shadow(0 12px 26px rgba(20, 18, 15, .4));
 }
-.lmap-sheet .lmap-card-in { flex-direction: row; }
-.lmap-sheet .lmap-card-photo { width: 38%; min-width: 116px; height: auto; }
-.lmap-sheet .lmap-card-body { flex: 1; min-width: 0; }
-.lmap-sheet .lmap-card-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lmap-sheet .lmap-card-in {
+  display: grid; grid-template-columns: 122px minmax(0, 1fr);
+  align-items: stretch; border-radius: 16px;
+}
+.lmap-sheet .lmap-card-photo { height: auto; min-height: 138px; }
+/* Závoj sprava, nie zhora — fotka teraz susedí s textom, nie s popisom. */
+.lmap-sheet .lmap-card-veil { background: linear-gradient(90deg, rgba(20, 18, 15, .3), transparent 55%); }
+.lmap-sheet .lmap-card-cat {
+  top: auto; bottom: 8px; left: 8px; right: 8px;
+  justify-content: center; padding: 4px 6px; font-size: 8px; letter-spacing: .12em;
+}
+/* Krížik z fotky je preč — má vlastný, na rohu karty. */
+.lmap-sheet .lmap-card-x { display: none; }
+.lmap-sheet-x {
+  position: absolute; z-index: 2; top: -10px; right: -10px;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer;
+  background: rgba(20, 18, 15, .9); color: #F3EDE1;
+  border: 1px solid rgba(255, 255, 255, .3);
+  box-shadow: 0 4px 10px rgba(20, 18, 15, .35);
+  touch-action: manipulation;
+}
+.lmap-sheet .lmap-card-body { padding: 12px 14px 13px; gap: 5px; justify-content: center; }
+.lmap-sheet .lmap-card-name { font-size: 14px; line-height: 1.25; }
+.lmap-sheet .lmap-card-desc { font-size: 11.5px; line-height: 1.5; -webkit-line-clamp: 2; }
+.lmap-sheet .lmap-card-cta { margin-top: 2px; padding-top: 8px; font-size: 11px; }
 
 /* Bez tohto sa mapa prstom neposúva. MapLibre nastavuje v režime dvoch
    prstov plátnu `touch-action: pan-x pan-y`, čím ťah spracuje PREHLIADAČ
