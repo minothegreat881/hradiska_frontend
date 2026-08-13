@@ -597,16 +597,20 @@
 }
 .lmap.is-full .lmap-zoom { display: none !important; }
 
-/* Karta lokality ako spodný pás. Doteraz visela nad bodom a pri okrajoch ju
-   plátno orezalo — na telefóne je bodov pri kraji väčšina. Takto sa nemá kde
-   orezať a je pod palcom. */
-.lmap.is-full .lmap-card {
-  position: fixed; z-index: 4200;
-  left: 10px; right: 10px; top: auto; width: auto; max-width: none;
-  bottom: calc(10px + env(safe-area-inset-bottom));
-  transform: none !important;
+/* Karta lokality ako spodný pás. Doteraz visela nad bodom a plátno ju pri
+   okrajoch orezalo — a na telefóne je bodov pri kraji väčšina. Pás stojí
+   mimo bodu (bod je umiestnený cez `transform`, ktorý by mu obmedzil šírku)
+   a je pod palcom. */
+.lmap-sheet {
+  position: absolute; z-index: 4200;
+  left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
+  pointer-events: auto;
 }
-.lmap.is-full .lmap-card.is-below { display: block; }
-.lmap.is-full .lmap-card-arrow { display: none; }
-.lmap.is-full .lmap-card-in { flex-direction: row; }
-.lmap.is-full .lmap-card-photo { width: 38%; min-width: 120px; }
+.lmap-sheet .lmap-card {
+  position: static; width: auto; max-width: none; transform: none;
+  bottom: auto; left: auto;
+}
+.lmap-sheet .lmap-card-in { flex-direction: row; }
+.lmap-sheet .lmap-card-photo { width: 38%; min-width: 116px; height: auto; }
+.lmap-sheet .lmap-card-body { flex: 1; min-width: 0; }
+.lmap-sheet .lmap-card-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

@@ -132,15 +132,54 @@ const strapiBase = () =>
  * naraz — a to bolo to sekanie. Takto sa prekreslia len tie dva, ktorým sa
  * stav naozaj zmenil.
  */
+/** Vnútro karty lokality. Kreslí sa na dvoch miestach — nad bodom (počítač)
+    a ako spodný pás na celej obrazovke (telefón) — preto stojí samostatne. */
+function CardIn({ loc, onClose }: { loc: Loc; onClose: () => void }) {
+  return (
+  <div className="lmap-card-in">
+    <div className="lmap-card-photo">
+      {/* Skutocny <img>, nie pozadie: pozadie sa da prebit
+          skratkou `background` v kaskade a chybu nie je ako
+          zachytit. Takto sa da aj lazy-loadovat. */}
+      {loc.cover && (
+        <img
+          className="lmap-card-img"
+          src={`${strapiBase()}${loc.cover}`}
+          alt=""
+          loading="eager"
+          decoding="async"
+          onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+        />
+      )}
+      <span className="lmap-card-veil" aria-hidden="true" />
+      <span className="lmap-card-cat">
+        <Icon path={(CAT_BY_SLUG[loc.cat] || CATS[0]).icon} size={11} w={2.4} />
+        {(CAT_BY_SLUG[loc.cat] || CATS[0]).label}
+      </span>
+      <button type="button" className="lmap-card-x" onClick={onClose} aria-label="Zavrieť">×</button>
+    </div>
+    <div className="lmap-card-body">
+      <span className="lmap-card-name">{loc.name}</span>
+      <span className="lmap-card-coords">{deg(loc.lat, 'N', 'S')} · {deg(loc.lng, 'E', 'W')}</span>
+      {loc.excerpt && <p className="lmap-card-desc">{loc.excerpt}</p>}
+      <a className="lmap-card-cta" href={`/blog/${loc.slug}`}>
+        Čítať článok <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+  );
+}
+
 const PinNode = memo(function PinNode({
-  n, hot, openCard, showPill, canvasW, canvasH, onEnter, onLeave, onToggle,
+  n, hot, openCard, sheet, showPill, canvasW, canvasH, onEnter, onLeave, onToggle, onClose,
 }: {
   n: Extract<Node, { kind: 'one' }>;
-  hot: boolean; openCard: boolean; showPill: boolean;
+  hot: boolean; openCard: boolean; sheet: boolean; showPill: boolean;
   canvasW: number; canvasH: number;
   onEnter: (id: string, cat: string) => void;
   onLeave: () => void;
   onToggle: (id: string) => void;
+  onClose: () => void;
 }) {
   return (
       <div className="lmap-node"
@@ -173,7 +212,7 @@ const PinNode = memo(function PinNode({
           </span>
         )}
 
-        {openCard && (
+        {openCard && !sheet && (
           /* Karta sa otvara nad bodom. Pri bodoch pri hornej hrane by ju
              platno orezalo (a nad platnom je hlavicka stranky), tak sa
              preklopi pod bod; pri okrajoch sa posunie dovnutra. */
@@ -189,37 +228,7 @@ const PinNode = memo(function PinNode({
             onMouseEnter={() => onEnter(n.loc.id, n.loc.cat)}
             onMouseLeave={onLeave}
           >
-            <div className="lmap-card-in">
-              <div className="lmap-card-photo">
-                {/* Skutocny <img>, nie pozadie: pozadie sa da prebit
-                    skratkou `background` v kaskade a chybu nie je ako
-                    zachytit. Takto sa da aj lazy-loadovat. */}
-                {n.loc.cover && (
-                  <img
-                    className="lmap-card-img"
-                    src={`${strapiBase()}${n.loc.cover}`}
-                    alt=""
-                    loading="eager"
-                    decoding="async"
-                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                  />
-                )}
-                <span className="lmap-card-veil" aria-hidden="true" />
-                <span className="lmap-card-cat">
-                  <Icon path={(CAT_BY_SLUG[n.loc.cat] || CATS[0]).icon} size={11} w={2.4} />
-                  {(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}
-                </span>
-                <button type="button" className="lmap-card-x" onClick={() => setSelected(null)} aria-label="Zavrieť">×</button>
-              </div>
-              <div className="lmap-card-body">
-                <span className="lmap-card-name">{n.loc.name}</span>
-                <span className="lmap-card-coords">{deg(n.loc.lat, 'N', 'S')} · {deg(n.loc.lng, 'E', 'W')}</span>
-                {n.loc.excerpt && <p className="lmap-card-desc">{n.loc.excerpt}</p>}
-                <a className="lmap-card-cta" href={`/blog/${n.loc.slug}`}>
-                  Čítať článok <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </div>
+            <CardIn loc={n.loc} onClose={onClose} />
             <span className="lmap-card-arrow" aria-hidden="true" />
           </div>
         )}
@@ -482,46 +491,11 @@ export function MapaHradisk() {
       if (isTouch()) clusterRef.current?.(n);
     });
 
-    /* DVOJŤUK A POTIAHNUTIE = PLYNULÉ PRIBLIŽOVANIE (len dotyk).
-       Štipnutie potrebuje dva prsty a obe ruky; toto zvládne palec jednej.
-       Druhé ťuknutie sa nezdvihne a ťahom hore/dole sa približuje — presne
-       ako v mapách, ktoré ľudia poznajú. Bežný dvojťuk (bez ťahania) ostáva
-       na MapLibre. */
-    if (isTouch()) {
-      let lastTapEnd = 0;
-      let dz: { y0: number; z0: number; around: maplibregl.LngLat } | null = null;
-      const onTouchStart = (e: TouchEvent) => {
-        if (e.touches.length !== 1) { dz = null; return; }
-        if (Date.now() - lastTapEnd > 300) return;
-        const t = e.touches[0];
-        const r = el.getBoundingClientRect();
-        dz = {
-          y0: t.clientY,
-          z0: map.getZoom(),
-          around: map.unproject([t.clientX - r.left, t.clientY - r.top]),
-        };
-        e.preventDefault();
-      };
-      const onTouchMove = (e: TouchEvent) => {
-        if (!dz || e.touches.length !== 1) return;
-        e.preventDefault();
-        const dy = dz.y0 - e.touches[0].clientY;
-        map.easeTo({
-          zoom: Math.min(MAX_Z, Math.max(MIN_Z, dz.z0 + dy * 0.012)),
-          around: dz.around,
-          duration: 0,
-        });
-      };
-      const onTouchEnd = () => { dz = null; lastTapEnd = Date.now(); };
-      el.addEventListener('touchstart', onTouchStart, { passive: false });
-      el.addEventListener('touchmove', onTouchMove, { passive: false });
-      el.addEventListener('touchend', onTouchEnd);
-      touchCleanup.current = () => {
-        el.removeEventListener('touchstart', onTouchStart);
-        el.removeEventListener('touchmove', onTouchMove);
-        el.removeEventListener('touchend', onTouchEnd);
-      };
-    }
+    /* Gesto „dvojťuk a potiahnutie = približovanie" je preč. Znelo dobre,
+       ale bralo si ťah, ktorý začal do 300 ms po predošlom zdvihnutí prsta —
+       teda každý druhý ťah pri posúvaní mapy. Namiesto posunu sa priblížilo
+       a mapa pôsobila, že sa do strán hýbať nedá. Priblíženie majú na
+       starosti štipnutie dvoma prstami a kroky „+/−".  */
 
     map.on('load', () => { setReady(true); fitRef.current?.(0); });
 
@@ -945,6 +919,8 @@ export function MapaHradisk() {
     }
   }, [touch, full, ready]);
 
+  const closeCard = useCallback(() => setSelected(null), []);
+
   const closeFull = useCallback(() => {
     (screen.orientation as { unlock?: () => void })?.unlock?.();
     if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
@@ -1112,6 +1088,21 @@ export function MapaHradisk() {
           </div>
         )}
 
+        {touch && full && selected && (() => {
+          const loc = locs.find(l => l.id === selected);
+          /* Karta stojí MIMO bodu. V bode je umiestnená cez `transform`,
+             a ten z bodu robí rám pre pevnú polohu — karta by z neho dostala
+             šírku tridsiatich bodov a zvisla by ako úzky biely prúžok.
+             Ako súrodenec plátna sa nemá o čo oprieť a nemá sa kde orezať. */
+          return loc ? (
+            <div className="lmap-sheet" onClick={e => e.stopPropagation()}>
+              <div className="lmap-card">
+                <CardIn loc={loc} onClose={closeCard} />
+              </div>
+            </div>
+          ) : null;
+        })()}
+
         {/* Body a zhluky — v obrazovkových súradniciach nad plátnom mapy. */}
         <div className="lmap-overlay">
           {spider && (
@@ -1161,6 +1152,8 @@ export function MapaHradisk() {
               n={n}
               hot={hotKey === n.loc.id}
               openCard={selected === n.loc.id || hoverId === n.loc.id}
+              sheet={touch && full}
+              onClose={closeCard}
               showPill={showPills && !spider}
               canvasW={canvasW}
               canvasH={canvasH}
