@@ -834,12 +834,25 @@ export function MapaHradisk() {
 
         <div ref={hostRef} className="lmap-gl" />
 
-        {/* Náhľad na telefóne: mapa sa neovláda, otvára sa. Tlačidlo leží cez
-            celé plátno, takže netreba trafiť nič drobné. */}
+        {/* Náhľad na telefóne: mapa sa neovláda, otvára sa. Prekrytie leží cez
+            celé plátno, takže netreba trafiť nič drobné.
+
+            Prečo `div` a nie `button` a prečo aj `onTouchEnd`: pod prekrytím
+            je plátno MapLibre, ktoré si na dotyku berie udalosti a bráni
+            predvolenému správaniu — ťuknutie sa tak nemuselo preložiť na
+            kliknutie a tlačidlo nereagovalo. Ťuknutie preto obsluhujem
+            priamo, a `touchend` sa navyše zastaví, aby ho už nikto nedostal. */}
         {!full && (
-          <button type="button" className="lmap-open" onClick={() => setFull(true)}>
+          <div
+            className="lmap-open"
+            role="button"
+            tabIndex={0}
+            onClick={() => setFull(true)}
+            onTouchEnd={e => { e.preventDefault(); e.stopPropagation(); setFull(true); }}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setFull(true); }}
+          >
             <span>Otvoriť mapu na celú obrazovku</span>
-          </button>
+          </div>
         )}
         {full && (
           <button type="button" className="lmap-close" onClick={() => setFull(false)} aria-label="Zavrieť mapu">
