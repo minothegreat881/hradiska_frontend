@@ -38,3 +38,8 @@ pnpm-lock.yaml
 nul
 
 .vercel
+
+# nastroje agentovych skillov — nepatria do repa
+.agents/
+.playwright-cli/
+skills-lock.json
