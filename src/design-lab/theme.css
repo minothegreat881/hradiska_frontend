@@ -2554,3 +2554,71 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lgal-plat:hover { transform: none; }
   .lgal-kostra { animation: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   KARTA ČLÁNKU
+   Karta má fotku ako podklad; keď fotka chýba alebo sa ešte nestiahla, svieti
+   náhradná plocha. Tá bola HNEDÁ (#3a2a1e) zo starej palety a v zozname
+   kategórie, kde je kariet dvanásť, prebila celý šat — stránka pôsobila
+   staro, hoci značky aj písmo už boli pečatné.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lab {
+  --card-img-fallback: var(--l-ink);
+  --card-scrim: linear-gradient(
+    180deg,
+    rgba(20, 22, 29, 0) 34%,
+    rgba(20, 22, 29, .48) 58%,
+    rgba(20, 22, 29, .84) 82%,
+    rgba(20, 22, 29, .95) 100%
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   KRONIKA ZDRUŽENIA (aktuality)
+   Tá istá reč ako podkategórie: hlavička, potom mriežka tých istých kariet.
+   Jediný rozdiel je členenie po rokoch — pri kronike je rok vecný údaj.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lakt { background: var(--l-paper); min-height: 100vh; }
+.lakt-in { padding: 30px 0 90px; max-width: 1280px; }
+
+.lakt-hlava { max-width: 60ch; margin-bottom: 40px; }
+.lakt-znacka {
+  display: inline-block; margin-bottom: 14px;
+  padding: 5px 13px; border-radius: 999px;
+  background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
+  color: var(--l-card);
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase;
+}
+.lakt-titul {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+  font-size: clamp(36px, 5vw, 60px); line-height: 1; letter-spacing: -.02em;
+  color: var(--l-ink); margin: 0; text-wrap: balance;
+}
+.lakt-lead {
+  font-family: 'Inter', sans-serif; font-size: 17px; line-height: 1.6;
+  color: var(--l-body); margin: 14px 0 0;
+}
+.lakt-suhrn {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em;
+  color: var(--l-muted); margin: 10px 0 0; font-variant-numeric: tabular-nums;
+}
+.lakt-suhrn b { color: var(--l-ink); font-weight: 600; }
+
+.lakt-rok { margin-bottom: 54px; }
+.lakt-rok-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }
+.lakt-rok-h h2 {
+  font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+  font-size: clamp(26px, 3vw, 38px); line-height: 1; color: var(--l-ink); margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.lakt-rok-n {
+  font-family: var(--mono); font-size: 12px; color: var(--l-muted);
+  font-variant-numeric: tabular-nums; flex: none;
+}
+.lakt-rok-ciara { flex: 1; height: 1px; background: linear-gradient(90deg, var(--l-line), transparent); }
+
+.lakt-mriezka {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+@media (max-width: 700px) { .lakt-mriezka { grid-template-columns: 1fr; } }

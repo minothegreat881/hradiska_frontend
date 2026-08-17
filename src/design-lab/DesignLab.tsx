@@ -30,6 +30,7 @@ const GalleryPage = lazy(() => import('../pages/GalleryPage').then(m => ({ defau
 const LabGaleria = lazy(() => import('./LabGaleria'));
 const CategoryPage = lazy(() => import('../pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
 const AktualityPage = lazy(() => import('../pages/AktualityPage').then(m => ({ default: m.AktualityPage })));
+const LabAktualityStranka = lazy(() => import('./LabAktualityStranka'));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -168,7 +169,8 @@ export default function DesignLab() {
           </Suspense>
         ) : podstranka === 'aktuality' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
-            <AktualityPage />
+            {/* `povodna` ukáže doterajšiu nástenku, aby bolo vidieť rozdiel. */}
+            {theme === 'povodna' ? <AktualityPage /> : <LabAktualityStranka />}
           </Suspense>
         ) : podstranka === 'galeria' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
