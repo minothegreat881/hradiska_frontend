@@ -455,7 +455,16 @@ export function MapaHradisk() {
       if (n.kind === 'one') openHoverRef.current?.(n.loc.id, n.loc.cat);
       else closeHoverRef.current?.();
     };
-    const onLeave = () => { setHotKey(null); closeHoverRef.current?.(); };
+    /* Karta leží MIMO plátna (je vo vrstve s bodmi), takže presun kurzora
+       z bodu na kartu znamená pre plátno „odchod myši" — a karta sa zavrela
+       skôr, než sa dalo kliknúť na „Čítať článok". Odchod NA KARTU sa preto
+       za odchod nepočíta. */
+    const onLeave = (e: MouseEvent) => {
+      const kam = e.relatedTarget as Element | null;
+      if (kam && typeof kam.closest === 'function' && kam.closest('.lmap-card, .lmap-sheet')) return;
+      setHotKey(null);
+      closeHoverRef.current?.();
+    };
     el.addEventListener('mousemove', onMove);
     el.addEventListener('mouseleave', onLeave);
     moveCleanup.current = () => {
