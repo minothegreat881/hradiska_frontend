@@ -26,7 +26,7 @@
  * mapa (107 v hraniciach SR). Žiadny nový endpoint.
  */
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '../styles/mapa.css';
@@ -101,9 +101,12 @@ interface Loc {
 }
 
 /** Bod alebo zhluk v obrazovkových súradniciach. */
+/* `x`,`y` su obrazovkove suradnice pre prve vykreslenie, `lng`,`lat`
+   zemepisne — podla nich sa poloha dopocitava v KAZDOM snimku mapy, aby
+   znacka pri priblizovani nezaostavala za platnom. */
 type Node =
-  | { kind: 'one'; x: number; y: number; loc: Loc }
-  | { kind: 'many'; x: number; y: number; members: Loc[] };
+  | { kind: 'one'; x: number; y: number; lng?: number; lat?: number; loc: Loc }
+  | { kind: 'many'; x: number; y: number; lng?: number; lat?: number; members: Loc[] };
 
 /** Kľúč uzla — bod má id článku, zhluk zoznam svojich členov. */
 const keyOf = (n: Node) => n.kind === 'one' ? n.loc.id : 'c-' + n.members.map(m => m.id).join('|');
@@ -185,6 +188,7 @@ const PinNode = memo(function PinNode({
 }) {
   return (
       <div className="lmap-node pointer-events-none"
+           data-lng={n.lng} data-lat={n.lat}
            /* Uzol s otvorenou kartou musí ísť nad ostatné. `transform`
               na uzle vytvára vlastný kontext vrstiev, takže z-index
               karty vnútri sa voči susedným bodom neuplatní — rozhoduje
@@ -267,7 +271,7 @@ export function MapaHradisk() {
   const [ready, setReady] = useState(false);
   /* Názvy miest v obrazovkových súradniciach — reliéf sám nemá popisy, takže
      bez nich sa v ňom nedá zorientovať. */
-  const [mesta, setMesta] = useState<{ id: number; n: string; x: number; y: number; r: number }[]>([]);
+  const [mesta, setMesta] = useState<{ id: number; n: string; x: number; y: number; lng: number; lat: number; r: number }[]>([]);
   /* Podklad: kresba reliéfu alebo satelitná snímka. */
   const [podklad, setPodklad] = useState<'relief' | 'satelit'>('relief');
   const [zoom, setZoom] = useState(MIN_Z);
@@ -572,8 +576,16 @@ export function MapaHradisk() {
     const out: Node[] = [];
     for (const g of groups) {
       if (g.x < -60 || g.y < -60 || g.x > width + 60 || g.y > height + 60) continue;
-      if (g.members.length === 1) out.push({ kind: 'one', x: g.members[0].x, y: g.members[0].y, loc: g.members[0].loc });
-      else out.push({ kind: 'many', x: g.x, y: g.y, members: g.members.map(m => m.loc) });
+      if (g.members.length === 1) {
+        const m = g.members[0];
+        out.push({ kind: 'one', x: m.x, y: m.y, lng: m.loc.lng, lat: m.loc.lat, loc: m.loc });
+      } else {
+        /* Zhluk drží zemepisný stred svojich členov. Obrazovkové ťažisko by
+           sa pri priblížení menilo a zhluk by sa plazil po mape. */
+        const lng = g.members.reduce((s, m) => s + m.loc.lng, 0) / g.members.length;
+        const lat = g.members.reduce((s, m) => s + m.loc.lat, 0) / g.members.length;
+        out.push({ kind: 'many', x: g.x, y: g.y, lng, lat, members: g.members.map(m => m.loc) });
+      }
     }
     setNodes(out);
 
@@ -598,7 +610,7 @@ export function MapaHradisk() {
          oboch brehoch Dunaja), React by ich považoval za jeden a ten istý
          prvok — a staré popisy pri posune mapy nezmizli, len sa hromadili.
          Tak vzniklo pätnásť Komárn roztrúsených po mape. */
-      .map(({ m, i }) => { const p = map.project([m.x, m.y]); return { id: i, n: m.n, x: p.x, y: p.y, r: m.r }; })
+      .map(({ m, i }) => { const p = map.project([m.x, m.y]); return { id: i, n: m.n, x: p.x, y: p.y, lng: m.x, lat: m.y, r: m.r }; })
       .filter(m => m.x > 4 && m.y > 4 && m.x < width - 4 && m.y < height - 4)
       .sort((a, b) => a.r - b.r);
 
@@ -771,6 +783,10 @@ export function MapaHradisk() {
     if (!spider) return [];
     const members = locs.filter(l => spider.ids.includes(l.id));
     const r = 58 + members.length * 4;
+    /* Body vejára stoja na VYMYSLENÝCH miestach — rozostupujú sa do kruhu,
+       aby sa dali trafiť. Zemepisnú polohu preto zámerne nedostávajú a
+       dopočet v každom snímku sa ich netýka; inak by vejár skolaboval späť
+       do jedného bodu. */
     return members.map((loc, i) => {
       const a = (i / members.length) * Math.PI * 2 - Math.PI / 2;
       return { kind: 'one' as const, x: spider.x + Math.cos(a) * r, y: spider.y + Math.sin(a) * r, loc };
@@ -842,6 +858,40 @@ export function MapaHradisk() {
     return () => window.clearTimeout(t);
   }, [full]);
   useEffect(() => () => { document.body.style.overflow = ''; }, []);
+
+  /* ── Značky sa nesmú triasť ───────────────────────────────────────────
+     Body aj názvy sú HTML nad plátnom. Ich polohu doteraz prepočítaval React
+     na `move`, teda AŽ POTOM, čo mapa vykreslila snímok — značky tak boli
+     stále o jeden snímok pozadu a pri plynulom priblížení to bolo vidieť ako
+     chvenie a poskakovanie.
+
+     Teraz sa poloha prepisuje priamo do prvkov v obsluhe `render`, ktorú
+     MapLibre volá pre KAŽDÝ snímok. Značka tým sedí na tom istom mieste ako
+     to, čo je pod ňou. React ostáva na to, KTORÉ značky existujú (zhlukovanie),
+     nie na to, kde sú.
+
+     `useLayoutEffect` pri zmene zoznamu dorovná polohu ešte pred vykreslením
+     — inak by nový bod na jeden snímok blikol tam, kde bol pri prepočte. */
+  const platnoRef = useRef<HTMLDivElement>(null);
+  const zosuladPolohy = useCallback(() => {
+    const map = mapRef.current, host = platnoRef.current;
+    if (!map || !host) return;
+    const uzly = host.querySelectorAll<HTMLElement>('.lmap-node[data-lng], .lmap-mesto[data-lng]');
+    for (const el of uzly) {
+      const lng = +el.dataset.lng!, lat = +el.dataset.lat!;
+      const p = map.project([lng, lat]);
+      el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
+    }
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    map.on('render', zosuladPolohy);
+    return () => { map.off('render', zosuladPolohy); };
+  }, [ready, zosuladPolohy]);
+
+  useLayoutEffect(zosuladPolohy, [nodes, spiderNodes, mesta, zosuladPolohy]);
 
   /* Prepnutie podkladu. Satelit má dlaždice do väčšej hĺbky než náš reliéf
      (ten končí na 12), takže sa pri ňom púšťa aj bližšie priblíženie —
@@ -1241,13 +1291,14 @@ export function MapaHradisk() {
         })()}
 
         {/* Body a zhluky — v obrazovkových súradniciach nad plátnom mapy. */}
-        <div className="lmap-overlay pointer-events-none">
+        <div className="lmap-overlay pointer-events-none" ref={platnoRef}>
           {/* Názvy miest. Kreslia sa PRED bodmi, takže bod ich vždy prekryje —
               mapa je o lokalitách, mestá sú len pomôcka na zorientovanie. */}
           {mesta.map(m => (
             <span
               key={m.id}
               className={m.r === 0 ? 'lmap-mesto is-velke' : 'lmap-mesto'}
+              data-lng={m.lng} data-lat={m.lat}
               style={{ transform: `translate3d(${m.x}px, ${m.y}px, 0)` }}
             >
               <i className="lmap-mesto-b" aria-hidden="true" />
@@ -1273,6 +1324,7 @@ export function MapaHradisk() {
 
           {all.map(n => n.kind === 'many' ? (
             <div key={'c-' + n.members.map(m => m.id).join('|')} className="lmap-node pointer-events-none"
+              data-lng={n.lng} data-lat={n.lat}
                  style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)` }}>
             <button
               type="button"
