@@ -35,6 +35,8 @@ const SearchResultsPage = lazy(() => import('../pages/SearchResultsPage').then(m
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 const PrivacyPage = lazy(() => import('../pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('../pages/TermsPage').then(m => ({ default: m.TermsPage })));
+const AccountPage = lazy(() => import('../pages/AccountPage').then(m => ({ default: m.AccountPage })));
+const ProfilePage = lazy(() => import('../pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -77,6 +79,8 @@ export default function DesignLab() {
     : path.startsWith('/design/404') ? 'notfound'
     : path.startsWith('/design/zasady') ? 'zasady'
     : path.startsWith('/design/podmienky') ? 'podmienky'
+    : path.startsWith('/design/prihlasenie') ? 'ucet'
+    : path.startsWith('/design/profil') ? 'profil'
     : null;
   /* Kategória a podkategória sú tá istá stránka, líšia sa len slugom. */
   const kategoriaSlug = path.startsWith('/design/category/')
@@ -185,6 +189,10 @@ export default function DesignLab() {
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><PrivacyPage /></Suspense>
         ) : podstranka === 'podmienky' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><TermsPage /></Suspense>
+        ) : podstranka === 'ucet' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><AccountPage mode="login" /></Suspense>
+        ) : podstranka === 'profil' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><ProfilePage /></Suspense>
         ) : podstranka === 'aktuality' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
             {/* `povodna` ukáže doterajšiu nástenku, aby bolo vidieť rozdiel. */}
