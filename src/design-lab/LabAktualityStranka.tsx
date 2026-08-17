@@ -95,7 +95,7 @@ export function LabAktualityStranka() {
           <span className="lakt-znacka">Kronika</span>
           <h1 className="lakt-titul">Zo života združenia</h1>
           <p className="lakt-lead">
-            Výpravy, obnovy tabúľ, prednášky a nálezy — zápisy v poradí, v akom sa stali.
+            Výpravy, obnovy tabúľ, prednášky a nálezy.
           </p>
           {zaznamy.length > 0 && (
             <p className="lakt-suhrn">

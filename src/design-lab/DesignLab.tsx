@@ -31,6 +31,10 @@ const LabGaleria = lazy(() => import('./LabGaleria'));
 const CategoryPage = lazy(() => import('../pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
 const AktualityPage = lazy(() => import('../pages/AktualityPage').then(m => ({ default: m.AktualityPage })));
 const LabAktualityStranka = lazy(() => import('./LabAktualityStranka'));
+const SearchResultsPage = lazy(() => import('../pages/SearchResultsPage').then(m => ({ default: m.SearchResultsPage })));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
+const PrivacyPage = lazy(() => import('../pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import('../pages/TermsPage').then(m => ({ default: m.TermsPage })));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -69,6 +73,10 @@ export default function DesignLab() {
      Laboratórium je tu na to, aby sa dali pozrieť pred nasadením. */
   const podstranka = path.startsWith('/design/galeria') ? 'galeria'
     : path.startsWith('/design/aktuality') ? 'aktuality'
+    : path.startsWith('/design/hladat') ? 'hladat'
+    : path.startsWith('/design/404') ? 'notfound'
+    : path.startsWith('/design/zasady') ? 'zasady'
+    : path.startsWith('/design/podmienky') ? 'podmienky'
     : null;
   /* Kategória a podkategória sú tá istá stránka, líšia sa len slugom. */
   const kategoriaSlug = path.startsWith('/design/category/')
@@ -167,6 +175,16 @@ export default function DesignLab() {
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
             <CategoryPage categorySlug={kategoriaSlug} />
           </Suspense>
+        ) : podstranka === 'hladat' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            <SearchResultsPage query={new URLSearchParams(window.location.search).get('q') || 'hradisko'} />
+          </Suspense>
+        ) : podstranka === 'notfound' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><NotFoundPage /></Suspense>
+        ) : podstranka === 'zasady' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><PrivacyPage /></Suspense>
+        ) : podstranka === 'podmienky' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><TermsPage /></Suspense>
         ) : podstranka === 'aktuality' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
             {/* `povodna` ukáže doterajšiu nástenku, aby bolo vidieť rozdiel. */}
