@@ -27,6 +27,7 @@ import { LabJoinUs } from './LabJoinUs';
 import { LabCategories } from './LabCategories';
 import { LabFooter } from './LabFooter';
 const GalleryPage = lazy(() => import('../pages/GalleryPage').then(m => ({ default: m.GalleryPage })));
+const LabGaleria = lazy(() => import('./LabGaleria'));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -155,7 +156,8 @@ export default function DesignLab() {
         <div id="lab-obsah" tabIndex={-1}>
         {podstranka === 'galeria' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
-            <GalleryPage />
+            {/* `povodna` ukáže dnešnú galériu, aby sa dali postaviť vedľa seba. */}
+            {theme === 'povodna' ? <GalleryPage /> : <LabGaleria />}
           </Suspense>
         ) : articleSlug ? (
           /* Stránka článku. `povodna` ukáže produkčnú, aby sa dali postaviť
