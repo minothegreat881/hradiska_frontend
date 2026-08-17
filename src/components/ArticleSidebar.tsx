@@ -53,6 +53,19 @@ function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; ln
 
     // Create map with satellite style - SAME as main MapLibreMap
     map.current = new maplibregl.Map({
+      /* MapLibre pomenúva plátno aj ovládanie po anglicky. Na slovenskej
+         stránke to čítačka ohlási v cudzom jazyku. */
+      locale: {
+        'Map.Title': 'Mapa lokality',
+        'NavigationControl.ZoomIn': 'Priblížiť',
+        'NavigationControl.ZoomOut': 'Oddialiť',
+        'NavigationControl.ResetBearing': 'Otočiť na sever',
+        'FullscreenControl.Enter': 'Na celú obrazovku',
+        'FullscreenControl.Exit': 'Zavrieť celú obrazovku',
+        'Marker.Title': 'Značka lokality',
+        'ScaleControl.Meters': 'm',
+        'ScaleControl.Kilometers': 'km',
+      },
       container: mapContainer.current,
       style: {
         version: 8 as const,

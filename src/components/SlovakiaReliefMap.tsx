@@ -76,6 +76,19 @@ const SlovakiaReliefMap = () => {
     if (!mapContainer.current || map.current) return;
 
     map.current = new maplibregl.Map({
+      /* MapLibre pomenúva plátno aj ovládanie po anglicky. Na slovenskej
+         stránke to čítačka ohlási v cudzom jazyku. */
+      locale: {
+        'Map.Title': 'Mapa Slovenska',
+        'NavigationControl.ZoomIn': 'Priblížiť',
+        'NavigationControl.ZoomOut': 'Oddialiť',
+        'NavigationControl.ResetBearing': 'Otočiť na sever',
+        'FullscreenControl.Enter': 'Na celú obrazovku',
+        'FullscreenControl.Exit': 'Zavrieť celú obrazovku',
+        'Marker.Title': 'Značka lokality',
+        'ScaleControl.Meters': 'm',
+        'ScaleControl.Kilometers': 'km',
+      },
       container: mapContainer.current,
       style: MAP_STYLES.customTerrain,
       center: [19.5, 48.7],

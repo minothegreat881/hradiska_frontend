@@ -796,8 +796,19 @@
 }
 
 /* Plátno mapy je fokusovateľné (`tabindex="0"`), ale nedávalo o tom vedieť —
-   pri prechode tabulátorom nebolo vidieť, že sa zameranie ocitlo v mape. */
+   pri prechode tabulátorom nebolo vidieť, že sa zameranie ocitlo v mape.
+
+   Rám musí byť DVOJFAREBNÝ. Jedna farba tu nestačí: pod plátnom nie je
+   jednotná plocha, ale reliéf, ktorý je raz papierovo svetlý a raz tmavý od
+   tieňovania kopcov. Merané na skutočných dlaždiciach — samotná pečatná
+   červená dáva 4,22:1 nad najsvetlejším terénom, ale len 1,64:1 nad
+   najtmavším, čiže na tieni zmizne.
+
+   Preto červený pás pri hrane (identita šatu) a hneď vnútri svetlý: nad
+   tieňom nesie čitateľnosť svetlý, nad papierom červený, a aspoň jeden je
+   vidieť vždy. */
 .lmap .maplibregl-canvas:focus-visible {
   outline: 3px solid var(--l-second);
   outline-offset: -3px;
+  box-shadow: inset 0 0 0 6px rgba(243, 237, 225, .95);
 }
