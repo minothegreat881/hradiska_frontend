@@ -187,7 +187,15 @@ function CommentItem({
                 gap: 6,
                 background: 'transparent',
                 border: 0,
-                padding: 0,
+                /* Cieľ pre prst má mať 44 px. Tlačidlo malo 28×18, čo je pod
+                   polovicou. Odsadenie ho zväčší a záporný okraj vráti späť
+                   rozloženie, takže vyzerá presne ako predtým — mení sa len
+                   plocha, ktorá reaguje na dotyk. */
+                minHeight: 44,
+                minWidth: 44,
+                justifyContent: 'center',
+                padding: '13px 10px',
+                margin: '-13px -10px',
                 cursor: 'pointer',
                 fontFamily: 'Georgia, serif',
                 fontSize: 12,

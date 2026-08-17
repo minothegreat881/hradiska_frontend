@@ -355,7 +355,7 @@ export function NavBar() {
                 type="button"
                 onClick={() => setMobileMenuOpen((o) => !o)}
                 className="lg:hidden"
-                aria-label="Menu"
+                aria-label="Hlavná ponuka"
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-nav-menu"
                 style={{

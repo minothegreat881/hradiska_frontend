@@ -397,6 +397,10 @@ export function MapaHradisk() {
          okolo krajiny. S nim je platno priehladne a presvita cezen papier,
          bodkova mriezka aj vodoznak „SK", presne ako to chce handoff (a ako
          to potrebuju priehladne dlazdice). */
+      /* MapLibre pomenúva plátno po anglicky („Map"), hoci stránka je
+         slovenská. Čítačka to ohlási v cudzom jazyku uprostred slovenského
+         dokumentu. */
+      locale: { 'Map.Title': 'Mapa hradísk' },
       canvasContextAttributes: { alpha: true, antialias: true },
       dragRotate: false,
       pitchWithRotate: false,
