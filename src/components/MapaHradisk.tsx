@@ -32,6 +32,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '../styles/mapa.css';
 import { SK_OUTLINE, SK_OUTLINE_BOX, SK_OUTLINE_RANGE } from './mapaObrys';
 import { MESTA, MAPA_MESTA_ZOOM } from './mapaMesta';
+import { HRANICA_SK } from './mapaHranica';
 
 /* Výrez RENDERU — musí sedieť s BOUNDS_4326 v build_relief.py. Na tento
    výrez sa mapa otvára. */
@@ -242,7 +243,6 @@ export function MapaHradisk() {
   const rootRef = useRef<HTMLElement | null>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const wheelCleanup = useRef<(() => void) | null>(null);
   /* Uzly a stav tahania pre trafenie bodu — handlery na plátne su zavesene
      raz a citaju z refov, nie zo zavretej premennej. */
   const nodesRef = useRef<Node[]>([]);
@@ -354,11 +354,27 @@ export function MapaHradisk() {
             maxzoom: 18,
             attribution: 'Satelitné snímky: Esri, Maxar, Earthstar Geographics',
           },
+          /* Štátna hranica. Na reliéfe ju povie sama kresba — dlaždice končia
+             na hranici — ale na snímke nie je vidieť, kde krajina končí. */
+          hranica: { type: 'geojson', data: HRANICA_SK },
         },
         layers: [
           { id: 'bg', type: 'background', paint: { 'background-color': 'rgba(0,0,0,0)' } },
           { id: 'relief', type: 'raster', source: 'relief', paint: { 'raster-fade-duration': 120 } },
           { id: 'satelit', type: 'raster', source: 'satelit', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 120 } },
+          /* Dve čiary na sebe: tmavá spodná drží čitateľnosť nad svetlými
+             poľami, svetlá vrchná nad lesmi. Jedna by sa vždy niekde
+             stratila. */
+          {
+            id: 'hranica-tien', type: 'line', source: 'hranica',
+            layout: { visibility: 'none', 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': 'rgba(0,0,0,.55)', 'line-width': 3.4, 'line-blur': 1.2 },
+          },
+          {
+            id: 'hranica', type: 'line', source: 'hranica',
+            layout: { visibility: 'none', 'line-join': 'round', 'line-cap': 'round' },
+            paint: { 'line-color': 'rgba(255,255,255,.92)', 'line-width': 1.3, 'line-dasharray': [4, 2.4] },
+          },
         ],
       },
       bounds: SK,
@@ -388,23 +404,10 @@ export function MapaHradisk() {
        reliefe je castejsie treba posunut nabok nez zoomovat, a dvoma prstami
        na trackpade je posun prirodzeny pohyb. Koliesko preto POSUVA (aj
        doprava/dolava cez `deltaX` alebo Shift), priblizuje az Ctrl/⌘. */
-    map.scrollZoom.disable();
+    /* KOLIESKO PRIBLIŽUJE — tak, ako to človek od mapy čaká.
+       Chvíľu tu bolo naopak (koliesko posúvalo, priblíženie chcelo Ctrl),
+       čo bola zbytočná zvláštnosť. Posúvanie má ťahanie myšou. */
     const el = map.getCanvasContainer();
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      if (e.ctrlKey || e.metaKey) {
-        map.zoomTo(
-          Math.min(MAX_Z, Math.max(MIN_Z, map.getZoom() - e.deltaY * 0.01)),
-          { around: map.unproject([e.offsetX, e.offsetY]), duration: 0 }
-        );
-        return;
-      }
-      const dx = e.shiftKey ? e.deltaY : e.deltaX;
-      const dy = e.shiftKey ? 0 : e.deltaY;
-      map.panBy([dx, dy], { duration: 0 }, { originalEvent: e });
-    };
-    el.addEventListener('wheel', onWheel, { passive: false });
-    wheelCleanup.current = () => el.removeEventListener('wheel', onWheel);
 
     /* KTO JE POD KURZOROM sa dopočíta z polôh uzlov, body samy myš
        nezachytávajú. Dovtedy platilo opačné: bod bol tlačidlo, takže mapa
@@ -517,7 +520,7 @@ export function MapaHradisk() {
     ro.observe(hostRef.current!);
     resizeCleanup.current = () => ro.disconnect();
     mapRef.current = map;
-    return () => { wheelCleanup.current?.(); moveCleanup.current?.(); settleCleanup.current?.(); resizeCleanup.current?.(); touchCleanup.current?.(); map.remove(); mapRef.current = null; };
+    return () => { moveCleanup.current?.(); settleCleanup.current?.(); resizeCleanup.current?.(); touchCleanup.current?.(); map.remove(); mapRef.current = null; };
   }, []);
 
   /* ── Zhlukovanie ──────────────────────────────────────────────────────
@@ -840,8 +843,11 @@ export function MapaHradisk() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
-    map.setLayoutProperty('relief', 'visibility', podklad === 'relief' ? 'visible' : 'none');
-    map.setLayoutProperty('satelit', 'visibility', podklad === 'satelit' ? 'visible' : 'none');
+    const sat = podklad === 'satelit';
+    map.setLayoutProperty('relief', 'visibility', sat ? 'none' : 'visible');
+    map.setLayoutProperty('satelit', 'visibility', sat ? 'visible' : 'none');
+    map.setLayoutProperty('hranica-tien', 'visibility', sat ? 'visible' : 'none');
+    map.setLayoutProperty('hranica', 'visibility', sat ? 'visible' : 'none');
     map.setMaxZoom(podklad === 'satelit' ? 16 : MAX_Z);
   }, [podklad, ready]);
 
@@ -1029,7 +1035,7 @@ export function MapaHradisk() {
           <h2 className="lmap-title">Hradiská</h2>
           <div className="lmap-sub">Slovenska</div>
           <p className="lmap-lead">
-            Interaktívna mapa lokalít. Skrolovaním približujete, ťahaním posúvate —
+            Interaktívna mapa lokalít. Kolieskom približujete, ťahaním posúvate —
             zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode
             otvoríte kartu lokality, klikom do mapy ju zavriete.
           </p>
@@ -1340,7 +1346,7 @@ export function MapaHradisk() {
           pod mapou je to poznámka pod obrázkom. */}
       <p className="lmap-attrib">
         {podklad === 'satelit'
-          ? 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap'
+          ? 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'
           : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'}
       </p>
     </section>
