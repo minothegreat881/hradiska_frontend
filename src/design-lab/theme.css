@@ -2315,7 +2315,12 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    (Prvý pokus mieril na `.lnav-link`, čo bol môj omyl — meranie ukázalo, že
    krátke ciele sú inde: v pätičke, v odkazoch „celá kronika/galéria"
    a v prihlasovaní.) */
-@media (pointer: coarse), (hover: none) {
+/* `any-pointer` je tu zámerne popri `pointer`. Hybridný notebook s myšou
+   aj dotykovým displejom hlási `pointer: fine` (myš je hlavný ukazovateľ)
+   a dotyk prizná len cez `any-pointer: coarse` — bez neho by mu ciele
+   ostali malé, hoci sa ich niekto dotýka prstom. Šírka okna sa tu
+   nepoužíva vôbec: tablet v šírke desktopu je stále tablet. */
+@media (pointer: coarse), (any-pointer: coarse), (hover: none) {
   .lnav-link,
   .lnav-brand,
   .lnav-right button,
@@ -2339,4 +2344,29 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
     display: flex; align-items: center; justify-content: flex-start;
     width: fit-content; min-width: 44px; min-height: 44px;
   }
+}
+
+/* ── Fokusový rám tam, kde ho nikto nedal ──────────────────────────────────
+   Rám musí byť VIDNO — nestačí, že existuje. Omrvinky v článku dostávali
+   predvolený rám prehliadača, ktorý mal voči svojmu podkladu kontrast
+   1,03:1, teda žiadny. Meranie ho pritom hlásilo ako „rám je", lebo naň
+   pozeralo len ako na prítomnosť vlastnosti.
+
+   Toto je záchranná sieť pre všetko v labe, čo si rám nedefinuje samo.
+   Vlastné pravidlá komponentov majú vyššiu špecifickosť, takže ostávajú
+   nedotknuté. */
+.lab a:focus-visible,
+.lab button:focus-visible,
+.lab summary:focus-visible,
+.lab [tabindex]:focus-visible {
+  outline: 2px solid var(--l-second);
+  outline-offset: 3px;
+}
+
+/* Lišta laboratória (prepínač šiat) je nástroj, nie súčasť šatu — ale
+   klávesnicou sa má dať ovládať tiež. Predvolený rám na nej mal 2,7:1. */
+.lab-toolbar button:focus-visible,
+.lab-toolbar a:focus-visible {
+  outline: 2px solid #f3ede1;
+  outline-offset: 2px;
 }

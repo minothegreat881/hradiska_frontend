@@ -103,8 +103,10 @@ export default function DesignLab() {
           panely. Vidno ho, až keď naň príde zameranie. */}
       <a className="lab-skip" href="#lab-obsah">Preskočiť na obsah</a>
 
-      {/* Prepínač — súčasť laboratória, nie návrhu. */}
-      <div style={{
+      {/* Prepínač — súčasť laboratória, nie návrhu. Trieda je tu kvôli
+          fokusovému rámu: predvolený rám prehliadača mal na čiernej lište
+          kontrast 2,7:1, teda pod normou. */}
+      <div className="lab-toolbar" style={{
         position: 'sticky', top: 0, zIndex: 200, background: '#111', color: '#fff',
         fontFamily: 'ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif',
       }}>
