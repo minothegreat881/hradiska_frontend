@@ -1149,6 +1149,16 @@ export function MapaHradisk() {
             </div>
           </div>
         </div>
+
+        {/* Uvedenie zdrojov je licenčná povinnosť. Patrí sem, do panela:
+            ako samostatný pruh cez celú šírku pod mapou z neho bola tmavá
+            lišta, ktorá k ničomu nesedela a mapa pri nej dole nekončila
+            zarovno s panelom. */}
+        <p className="lmap-attrib">
+          {podklad === 'satelit'
+            ? 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'
+            : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'}
+        </p>
       </div>
 
       {/* ── Plátno ─────────────────────────────────────────────────────── */}
@@ -1234,21 +1244,31 @@ export function MapaHradisk() {
             }}
           >
             {/* Podklad. Bočný panel je na celej obrazovke skrytý, takže
-                prepínač musí byť tu — jedným tlačidlom, nie dvoma. */}
-            <button
-              type="button"
-              aria-label={podklad === 'relief' ? 'Prepnúť na satelitnú snímku' : 'Prepnúť na reliéf'}
-              onPointerDown={e => { e.preventDefault(); setPodklad(p => (p === 'relief' ? 'satelit' : 'relief')); }}
-              style={{
-                width: 48, height: 48, display: 'grid', placeItems: 'center',
-                background: 'rgba(20,18,15,.85)', color: '#f3ede1',
-                border: 0, borderBottom: '1px solid rgba(243,237,225,.25)',
-                font: '600 9px/1.15 var(--mono, monospace)', letterSpacing: '.1em',
-                textTransform: 'uppercase', touchAction: 'manipulation', cursor: 'pointer',
-              }}
-            >
-              {podklad === 'relief' ? 'SAT' : 'REL'}
-            </button>
+                prepínač musí byť tu — a musí byť DVOJSTAVOVÝ. Jedno tlačidlo
+                ukazovalo, KAM sa prepne, nie kde si: po ťuknutí na „SAT" si
+                bol na satelite, ale nápis sa zmenil na „REL" a vyzeralo to,
+                akoby si bol na reliéfe. */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {([['relief', 'REL'], ['satelit', 'SAT']] as const).map(([k, l]) => (
+                <button
+                  key={k}
+                  type="button"
+                  aria-pressed={podklad === k}
+                  aria-label={k === 'relief' ? 'Zobraziť reliéf' : 'Zobraziť satelitnú snímku'}
+                  onPointerDown={e => { e.preventDefault(); setPodklad(k); }}
+                  style={{
+                    width: 48, height: 30, display: 'grid', placeItems: 'center',
+                    background: podklad === k ? 'var(--l-second)' : 'rgba(20,18,15,.85)',
+                    color: podklad === k ? '#fffcf6' : 'rgba(243,237,225,.55)',
+                    border: 0, borderBottom: '1px solid rgba(243,237,225,.18)',
+                    font: '600 9px/1 var(--mono, monospace)', letterSpacing: '.1em',
+                    touchAction: 'manipulation', cursor: 'pointer',
+                  }}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
 
             {/* Posuvník: koľko z rozsahu je za tebou a koľko pred tebou, na
                 jeden pohľad — a jedným ťahom prejde celý rozsah. */}
@@ -1413,13 +1433,6 @@ export function MapaHradisk() {
         </div>
       </div>
 
-      {/* Uvedenie zdrojov je licenčná povinnosť, ale nepatrí cez krajinu —
-          pod mapou je to poznámka pod obrázkom. */}
-      <p className="lmap-attrib">
-        {podklad === 'satelit'
-          ? 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'
-          : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'}
-      </p>
     </section>
   );
 }
