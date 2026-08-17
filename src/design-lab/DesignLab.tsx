@@ -28,6 +28,7 @@ import { LabCategories } from './LabCategories';
 import { LabFooter } from './LabFooter';
 const GalleryPage = lazy(() => import('../pages/GalleryPage').then(m => ({ default: m.GalleryPage })));
 const LabGaleria = lazy(() => import('./LabGaleria'));
+const CategoryPage = lazy(() => import('../pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -65,6 +66,10 @@ export default function DesignLab() {
      potokenizované, takže šat si nesú samy a netreba pre ne druhú verziu.
      Laboratórium je tu na to, aby sa dali pozrieť pred nasadením. */
   const podstranka = path.startsWith('/design/galeria') ? 'galeria' : null;
+  /* Kategória a podkategória sú tá istá stránka, líšia sa len slugom. */
+  const kategoriaSlug = path.startsWith('/design/category/')
+    ? decodeURIComponent(path.slice('/design/category/'.length).replace(/\/$/, ''))
+    : null;
 
   const pick = (id: string) => {
     setTheme(id);
@@ -154,7 +159,11 @@ export default function DesignLab() {
             programovo — bez neho skok presunie iba pohľad, nie zameranie,
             a ďalší tabulátor pokračuje zase od navigácie. */}
         <div id="lab-obsah" tabIndex={-1}>
-        {podstranka === 'galeria' ? (
+        {kategoriaSlug ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            <CategoryPage categorySlug={kategoriaSlug} />
+          </Suspense>
+        ) : podstranka === 'galeria' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
             {/* `povodna` ukáže dnešnú galériu, aby sa dali postaviť vedľa seba. */}
             {theme === 'povodna' ? <GalleryPage /> : <LabGaleria />}

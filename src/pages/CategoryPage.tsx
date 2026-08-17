@@ -81,19 +81,19 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
           >
             {/* Omrvinky (breadcrumbs): Domov › Kategória */}
             <nav aria-label="Omrvinky" style={{ marginBottom: 16 }}>
-              <ol style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '0.03em', color: '#7a6b56' }}>
+              <ol style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '0.03em', color: 'var(--hr-clear-text)' }}>
                 <li>
                   <a
                     href="/"
-                    style={{ color: '#9a5d1f', textDecoration: 'none', transition: 'color 150ms ease' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = '#c8862f'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = '#9a5d1f'; }}
+                    style={{ color: 'var(--hr-accent)', textDecoration: 'none', transition: 'color 150ms ease' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--hr-accent-soft)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hr-accent)'; }}
                   >
                     Domov
                   </a>
                 </li>
-                <li aria-hidden="true" style={{ color: '#c4a574' }}>›</li>
-                <li aria-current="page" style={{ color: '#5e4a2e' }}>{categoryName}</li>
+                <li aria-hidden="true" style={{ color: 'var(--hr-line-quiet)' }}>›</li>
+                <li aria-current="page" style={{ color: 'var(--hr-body-2)' }}>{categoryName}</li>
               </ol>
             </nav>
 
@@ -221,7 +221,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 4,
-                  color: '#e6c98a',
+                  color: 'var(--hr-on-photo-3)',
                 }}
               >
                 <span
@@ -324,7 +324,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     style={{
                       flex: 1,
                       height: 1,
-                      background: 'linear-gradient(90deg, #d8c49a, transparent)',
+                      background: 'linear-gradient(90deg, var(--hr-line-quiet), transparent)',
                     }}
                   />
                 </div>
@@ -359,7 +359,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   <div className="absolute inset-0 opacity-5">
                     <svg className="w-full h-full" viewBox="0 0 100 100">
                       <pattern id="empty-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                        <circle cx="10" cy="10" r="1" fill="#92400e" />
+                        <circle cx="10" cy="10" r="1" fill="var(--hr-accent-deep)" />
                       </pattern>
                       <rect width="100" height="100" fill="url(#empty-pattern)" />
                     </svg>

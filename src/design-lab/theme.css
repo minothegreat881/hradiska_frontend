@@ -78,6 +78,26 @@
   --hr-body-3: var(--l-muted);
   --hr-muted: var(--l-muted);
   --hr-muted-2: var(--l-muted-2);
+  /* ── Hlavička kategórie a zoznam článkov ──────────────────────────────
+     Stránka kategórie si drží vlastnú sadu premenných (`--ch-*`). Sú to
+     hodnoty pre TEXT NAD FOTOGRAFIOU v hlavičke, takže tu neplatí papierová
+     paleta — svetlé odtiene ostávajú svetlé, len sa zbavia zlatého nádychu
+     a preberú pečatnú červenú tam, kde bola zlatá. */
+  --ch-title: var(--l-on-dark-2);
+  --ch-sub: var(--l-on-dark);
+  --ch-meta: var(--l-on-dark-3);
+  --ch-border: var(--l-second-deep);
+  --ch-frame: rgba(243, 237, 225, .28);
+  --ch-fallback: var(--l-ink);
+  --ch-gold: var(--l-second-light);
+  --ch-chip-bg: rgba(143, 44, 34, .62);
+  --ch-chip-border: rgba(243, 237, 225, .5);
+  --ch-chip-text: var(--l-on-dark-2);
+  --ch-pill-bg: var(--l-second-light);
+  --ch-pill-text: var(--l-ink);
+  --clanky-title: var(--l-ink);
+  --clanky-subtitle: var(--l-muted);
+
   /* Chybové hlásenie v pečatnej reči: tá istá zemitá červená ako pečať,
      na svetlej papierovej ploche. */
   --hr-error-text: var(--l-second-deep);
