@@ -15,7 +15,7 @@
  * kategórie → text s formulárom. Nič sa nepresúva ani nenahrádza.
  */
 
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { HomePage } from '../pages/HomePage';
 import { ArticlePage } from '../pages/ArticlePage';
 import { LabArticle } from './LabArticle';
@@ -26,6 +26,17 @@ import { LabHome } from './LabHome';
 import { LabJoinUs } from './LabJoinUs';
 import { LabCategories } from './LabCategories';
 import { LabFooter } from './LabFooter';
+const GalleryPage = lazy(() => import('../pages/GalleryPage').then(m => ({ default: m.GalleryPage })));
+const LabGaleria = lazy(() => import('./LabGaleria'));
+const CategoryPage = lazy(() => import('../pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
+const AktualityPage = lazy(() => import('../pages/AktualityPage').then(m => ({ default: m.AktualityPage })));
+const LabAktualityStranka = lazy(() => import('./LabAktualityStranka'));
+const SearchResultsPage = lazy(() => import('../pages/SearchResultsPage').then(m => ({ default: m.SearchResultsPage })));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
+const PrivacyPage = lazy(() => import('../pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import('../pages/TermsPage').then(m => ({ default: m.TermsPage })));
+const AccountPage = lazy(() => import('../pages/AccountPage').then(m => ({ default: m.AccountPage })));
+const ProfilePage = lazy(() => import('../pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -58,6 +69,22 @@ export default function DesignLab() {
   const path = typeof window !== 'undefined' ? window.location.pathname : '/design';
   const articleSlug = path.startsWith('/design/blog/')
     ? decodeURIComponent(path.slice('/design/blog/'.length).replace(/\/$/, ''))
+    : null;
+  /* Ďalšie stránky webu v šate. Vykresľujú sa PRODUKČNÉ komponenty — tie sú
+     potokenizované, takže šat si nesú samy a netreba pre ne druhú verziu.
+     Laboratórium je tu na to, aby sa dali pozrieť pred nasadením. */
+  const podstranka = path.startsWith('/design/galeria') ? 'galeria'
+    : path.startsWith('/design/aktuality') ? 'aktuality'
+    : path.startsWith('/design/hladat') ? 'hladat'
+    : path.startsWith('/design/404') ? 'notfound'
+    : path.startsWith('/design/zasady') ? 'zasady'
+    : path.startsWith('/design/podmienky') ? 'podmienky'
+    : path.startsWith('/design/prihlasenie') ? 'ucet'
+    : path.startsWith('/design/profil') ? 'profil'
+    : null;
+  /* Kategória a podkategória sú tá istá stránka, líšia sa len slugom. */
+  const kategoriaSlug = path.startsWith('/design/category/')
+    ? decodeURIComponent(path.slice('/design/category/'.length).replace(/\/$/, ''))
     : null;
 
   const pick = (id: string) => {
@@ -148,7 +175,35 @@ export default function DesignLab() {
             programovo — bez neho skok presunie iba pohľad, nie zameranie,
             a ďalší tabulátor pokračuje zase od navigácie. */}
         <div id="lab-obsah" tabIndex={-1}>
-        {articleSlug ? (
+        {kategoriaSlug ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            <CategoryPage categorySlug={kategoriaSlug} />
+          </Suspense>
+        ) : podstranka === 'hladat' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            <SearchResultsPage query={new URLSearchParams(window.location.search).get('q') || 'hradisko'} />
+          </Suspense>
+        ) : podstranka === 'notfound' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><NotFoundPage /></Suspense>
+        ) : podstranka === 'zasady' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><PrivacyPage /></Suspense>
+        ) : podstranka === 'podmienky' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><TermsPage /></Suspense>
+        ) : podstranka === 'ucet' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><AccountPage mode="login" /></Suspense>
+        ) : podstranka === 'profil' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><ProfilePage /></Suspense>
+        ) : podstranka === 'aktuality' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            {/* `povodna` ukáže doterajšiu nástenku, aby bolo vidieť rozdiel. */}
+            {theme === 'povodna' ? <AktualityPage /> : <LabAktualityStranka />}
+          </Suspense>
+        ) : podstranka === 'galeria' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            {/* `povodna` ukáže dnešnú galériu, aby sa dali postaviť vedľa seba. */}
+            {theme === 'povodna' ? <GalleryPage /> : <LabGaleria />}
+          </Suspense>
+        ) : articleSlug ? (
           /* Stránka článku. `povodna` ukáže produkčnú, aby sa dali postaviť
              vedľa seba na tom istom článku. */
           theme === 'povodna' ? <ArticlePage articleSlug={articleSlug} /> : <LabArticle slug={articleSlug} />

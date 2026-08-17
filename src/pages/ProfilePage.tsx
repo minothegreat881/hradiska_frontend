@@ -53,8 +53,8 @@ function mediaUrl(m: { url: string; formats?: Record<string, { url: string }> } 
 
 /* ── farby (pergamen web) ── */
 const C = {
-  card: '#fdfaf1', border: '#ddcba0', amber: '#9a5d1f', amber2: '#c8862f',
-  ink: '#4a3f2e', muted: '#a8946c', bordo: '#7c1f24',
+  card: 'var(--hr-surface)', border: 'var(--hr-line-soft)', amber: 'var(--hr-accent)', amber2: 'var(--hr-accent-soft)',
+  ink: 'var(--hr-body)', muted: 'var(--hr-muted-2)', bordo: '#7c1f24',
 };
 
 export function ProfilePage() {
@@ -116,7 +116,7 @@ export function ProfilePage() {
       {/* ── HLAVIČKA ── */}
       <header style={{
         position: 'relative', overflow: 'hidden', borderRadius: 18, padding: '28px 32px',
-        background: 'linear-gradient(180deg,#2c2114,#1c1510)', border: '1px solid #6b4f2a',
+        background: 'linear-gradient(180deg,var(--hr-dark-3),var(--hr-dark-4))', border: '1px solid var(--hr-relief-edge)',
         display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap',
       }}>
         <div aria-hidden style={{
@@ -127,39 +127,39 @@ export function ProfilePage() {
         <div style={{ position: 'relative', flexShrink: 0 }}>
           {avatarSrc ? (
             <img src={avatarSrc} alt="" width={78} height={78}
-                 style={{ width: 78, height: 78, borderRadius: '50%', objectFit: 'cover', border: '2px solid #c8a15a' }} />
+                 style={{ width: 78, height: 78, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--hr-line-gold)' }} />
           ) : (
             <div style={{
-              width: 78, height: 78, borderRadius: '50%', border: '2px solid #c8a15a',
-              background: 'radial-gradient(circle at 36% 30%, #a5651f, #7c1f24)',
-              display: 'grid', placeItems: 'center', fontFamily: 'Cinzel, serif', fontSize: 28, color: '#f0d9a8',
+              width: 78, height: 78, borderRadius: '50%', border: '2px solid var(--hr-line-gold)',
+              background: 'radial-gradient(circle at 36% 30%, var(--hr-accent), #7c1f24)',
+              display: 'grid', placeItems: 'center', fontFamily: 'Cinzel, serif', fontSize: 28, color: 'var(--hr-line-soft)',
             }}>{initials(name)}</div>
           )}
         </div>
         {/* meno + meta + štatistiky */}
         <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 28, fontWeight: 700, color: '#f4ead4', margin: 0 }}>{name}</h1>
+            <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 28, fontWeight: 700, color: 'var(--hr-on-photo-2)', margin: 0 }}>{name}</h1>
             <span style={{
-              fontFamily: 'Cinzel, serif', fontSize: 12, color: '#f0d493', padding: '4px 12px', borderRadius: 999,
+              fontFamily: 'Cinzel, serif', fontSize: 12, color: 'var(--hr-mark-bg)', padding: '4px 12px', borderRadius: 999,
               background: 'rgba(122,31,36,.55)', border: '1px solid rgba(200,161,90,.55)',
             }}>{level(stats.comments)}</span>
           </div>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', color: '#a8946c', margin: '6px 0 14px' }}>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', color: 'var(--hr-muted-2)', margin: '6px 0 14px' }}>
             {profile ? joinedLabel(profile.joinedAt) : ''}
           </p>
           <div style={{ display: 'flex', gap: 28 }}>
             {[['komentárov', stats.comments], ['obľúbených', stats.favorites], ['zdieľaní', stats.shares]].map(([lbl, n]) => (
               <div key={lbl as string}>
-                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 24, color: '#e6c98a' }}>{n as number}</div>
-                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14, color: '#a8946c' }}>{lbl}</div>
+                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 24, color: 'var(--hr-on-photo-3)' }}>{n as number}</div>
+                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14, color: 'var(--hr-muted-2)' }}>{lbl}</div>
               </div>
             ))}
           </div>
         </div>
         <button onClick={() => setSettingsOpen(true)} style={{
           position: 'relative', alignSelf: 'flex-start', fontFamily: 'Cinzel, serif', fontSize: 12,
-          color: '#e6c98a', background: 'transparent', border: '1px solid #5a462c', borderRadius: 999,
+          color: 'var(--hr-on-photo-3)', background: 'transparent', border: '1px solid var(--hr-body-2)', borderRadius: 999,
           padding: '8px 16px', cursor: 'pointer',
         }}>⚙ Nastavenia</button>
       </header>
@@ -196,8 +196,8 @@ function Tab({ id, active, set, badge, children }: {
     <button role="tab" aria-selected={on} onClick={() => set(id)} style={{
       fontFamily: 'Cinzel, serif', fontSize: 12, letterSpacing: '.02em', cursor: 'pointer',
       padding: '9px 18px', borderRadius: 999, position: 'relative',
-      background: on ? 'linear-gradient(180deg,#c8862f,#9a5d1f)' : '#f8f1de',
-      color: on ? '#fbf6ea' : C.ink, border: on ? '1px solid #9a5d1f' : `1px solid #d9c69a`,
+      background: on ? 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))' : 'var(--hr-wash-1)',
+      color: on ? 'var(--hr-on-photo)' : C.ink, border: on ? '1px solid var(--hr-accent)' : `1px solid var(--hr-chip-border)`,
     }}>
       {children}
       {!on && !!badge && badge > 0 && (
@@ -233,8 +233,8 @@ function NotifCard({ n }: { n: NotificationItem }) {
   const unreadBar = !n.read && (n.type === 'reply' || n.type === 'like');
 
   const icon = { reply: '↩', like: '♥', warning: '⚠', post: '✦' }[n.type];
-  const iconBg = { reply: '#e6eddf', like: '#f2dfda', warning: '#f2d5cc', post: '#efe6cf' }[n.type];
-  const iconFg = { reply: '#5c7a52', like: '#7c1f24', warning: '#a04338', post: '#9a5d1f' }[n.type];
+  const iconBg = { reply: '#e6eddf', like: '#f2dfda', warning: '#f2d5cc', post: 'var(--hr-wash-2)' }[n.type];
+  const iconFg = { reply: '#5c7a52', like: '#7c1f24', warning: '#a04338', post: 'var(--hr-accent)' }[n.type];
 
   const many = n.aggregateCount > 1;
 
@@ -253,7 +253,7 @@ function NotifCard({ n }: { n: NotificationItem }) {
       display: 'flex', gap: 14, padding: '14px 16px', borderRadius: 12,
       background: isWarn ? '#f6e3dc' : C.card,
       border: `1px solid ${isWarn ? '#dcb3a4' : C.border}`,
-      borderLeft: isWarn ? '5px solid #a04338' : unreadBar ? '5px solid #c8862f' : `1px solid ${C.border}`,
+      borderLeft: isWarn ? '5px solid #a04338' : unreadBar ? '5px solid var(--hr-accent-soft)' : `1px solid ${C.border}`,
       position: 'relative',
     }}>
       <div aria-hidden style={{
@@ -266,16 +266,16 @@ function NotifCard({ n }: { n: NotificationItem }) {
         </p>
         {(n.type === 'reply' || n.type === 'warning') && n.text && (
           <div style={{
-            fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', color: '#7a6a52', fontSize: 15.5,
-            borderLeft: '3px solid #d8c8a4', padding: '4px 12px', margin: '8px 0 0',
+            fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', color: 'var(--hr-clear-text)', fontSize: 15.5,
+            borderLeft: '3px solid var(--hr-chip-border)', padding: '4px 12px', margin: '8px 0 0',
             background: 'rgba(255,251,240,.6)', borderRadius: '0 8px 8px 0',
           }}>{n.text}</div>
         )}
-        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 13, color: '#a89a7d', letterSpacing: '.04em', marginTop: 8 }}>
+        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 13, color: 'var(--hr-muted-2)', letterSpacing: '.04em', marginTop: 8 }}>
           {relTime(n.createdAt)}
         </div>
       </div>
-      {unreadBar && <span aria-hidden style={{ width: 9, height: 9, borderRadius: '50%', background: '#c8862f', flexShrink: 0, alignSelf: 'center' }} />}
+      {unreadBar && <span aria-hidden style={{ width: 9, height: 9, borderRadius: '50%', background: 'var(--hr-accent-soft)', flexShrink: 0, alignSelf: 'center' }} />}
     </div>
   );
 }
@@ -283,10 +283,10 @@ function NotifCard({ n }: { n: NotificationItem }) {
 /* ── MOJE KOMENTÁRE ── */
 const STATUS_CHIP: Record<string, { t: string; fg: string; bg: string; bd: string }> = {
   visible: { t: 'Zverejnený', fg: '#3d5c40', bg: '#e4ecdc', bd: '#c5d4b8' },
-  waiting: { t: 'Čaká na schválenie', fg: '#8a5316', bg: '#f6ead0', bd: '#e0cb95' },
+  waiting: { t: 'Čaká na schválenie', fg: 'var(--hr-accent-deep)', bg: 'var(--hr-wash-6)', bd: 'var(--hr-line-soft)' },
   reported: { t: 'Nahlásený', fg: '#a04338', bg: '#f6e3dc', bd: '#dcb3a4' },
-  hidden: { t: 'Skrytý', fg: '#7a6b56', bg: '#efe6d0', bd: '#d9c69a' },
-  spam: { t: 'Odstránený', fg: '#7a6b56', bg: '#efe6d0', bd: '#d9c69a' },
+  hidden: { t: 'Skrytý', fg: 'var(--hr-clear-text)', bg: 'var(--hr-wash-2)', bd: 'var(--hr-chip-border)' },
+  spam: { t: 'Odstránený', fg: 'var(--hr-clear-text)', bg: 'var(--hr-wash-2)', bd: 'var(--hr-chip-border)' },
 };
 
 function CommentsList({ items, token, onChange }: { items: MyComment[] | null; token: string; onChange: () => void }) {
@@ -336,14 +336,14 @@ function CommentCard({ c, token, onChange }: { c: MyComment; token: string; onCh
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontFamily: 'Cinzel, serif', fontSize: 11, padding: '3px 10px', borderRadius: 999, color: chip.fg, background: chip.bg, border: `1px solid ${chip.bd}` }}>{chip.t}</span>
-          <span style={{ fontFamily: 'Cinzel, serif', fontSize: 12, color: '#a89a7d' }}>{relTime(c.createdAt)}</span>
+          <span style={{ fontFamily: 'Cinzel, serif', fontSize: 12, color: 'var(--hr-muted-2)' }}>{relTime(c.createdAt)}</span>
         </div>
       </div>
       {editing ? (
         <div style={{ marginTop: 10 }}>
           <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} style={{
             width: '100%', fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: C.ink,
-            border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 12px', background: '#fffdf8', resize: 'vertical',
+            border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 12px', background: 'var(--hr-surface)', resize: 'vertical',
           }} />
           <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
             <button onClick={save} disabled={busy} style={btnPrimary}>Uložiť</button>
@@ -353,7 +353,7 @@ function CommentCard({ c, token, onChange }: { c: MyComment; token: string; onCh
       ) : (
         <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, color: C.ink, margin: '10px 0 0', lineHeight: 1.5 }}>{c.content}</p>
       )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 12, paddingTop: 10, borderTop: '1px solid #efe6d0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--hr-wash-2)' }}>
         <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14.5, color: C.muted }}>
           ♥ {c.likes} páči sa · ↩ {c.replyCount} {c.replyCount === 1 ? 'odpoveď' : 'odpovede'}
         </span>
@@ -400,7 +400,7 @@ function SavedGrid({ favorites, shares, likedPhotos }: { favorites: FavoritePost
                 display: 'flex', gap: 12, alignItems: 'center', background: C.card, border: `1px solid ${C.border}`,
                 borderRadius: 14, padding: 12, textDecoration: 'none', transition: 'transform .15s, box-shadow .15s',
               }}>
-                <div style={{ width: 74, height: 54, borderRadius: 9, border: '1px solid #d9c69a', flexShrink: 0, overflow: 'hidden', background: '#efe6d0' }}>
+                <div style={{ width: 74, height: 54, borderRadius: 9, border: '1px solid var(--hr-chip-border)', flexShrink: 0, overflow: 'hidden', background: 'var(--hr-wash-2)' }}>
                   {a.cover && <img src={a.cover} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -426,7 +426,7 @@ function SavedGrid({ favorites, shares, likedPhotos }: { favorites: FavoritePost
                 key={p.fileId}
                 href={p.post ? `/blog/${p.post.slug}?fotoFile=${p.fileId}` : '#'}
                 title={p.post?.title || 'Fotka'}
-                style={{ display: 'block', position: 'relative', borderRadius: 10, overflow: 'hidden', border: `1px solid ${C.border}`, background: '#efe6d0' }}
+                style={{ display: 'block', position: 'relative', borderRadius: 10, overflow: 'hidden', border: `1px solid ${C.border}`, background: 'var(--hr-wash-2)' }}
               >
                 <img src={`${STRAPI_URL}${p.thumb}`} alt={p.alt} style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', display: 'block' }} />
                 <span aria-hidden style={{ position: 'absolute', top: 6, right: 6, color: '#fff', fontSize: 13, textShadow: '0 1px 3px rgba(0,0,0,.6)' }}>♥</span>
@@ -478,7 +478,7 @@ function Settings({ profile, token, onClose, onSaved, onSignOut, onDeleted }: {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(28,21,16,.5)', display: 'grid', placeItems: 'center', zIndex: 50, padding: 16 }}>
       <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Nastavenia profilu" style={{
-        width: 'min(520px,100%)', maxHeight: '88vh', overflowY: 'auto', background: '#fffdf8',
+        width: 'min(520px,100%)', maxHeight: '88vh', overflowY: 'auto', background: 'var(--hr-surface)',
         border: `1px solid ${C.border}`, borderRadius: 16, padding: '26px 28px',
       }}>
         <h2 style={{ fontFamily: 'Cinzel, serif', fontSize: 20, color: C.ink, margin: '0 0 18px' }}>Nastavenia profilu</h2>
@@ -492,9 +492,9 @@ function Settings({ profile, token, onClose, onSaved, onSignOut, onDeleted }: {
             {mediaUrl(profile.avatar) ? (
               <img src={mediaUrl(profile.avatar)!} alt="" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: `1px solid ${C.border}` }} />
             ) : (
-              <div style={{ width: 56, height: 56, borderRadius: '50%', border: `1px solid ${C.border}`, background: 'radial-gradient(circle at 36% 30%, #a5651f, #7c1f24)', display: 'grid', placeItems: 'center', color: '#f0d9a8', fontFamily: 'Cinzel, serif', fontSize: 20 }}>{initials(profile.displayName || profile.username)}</div>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', border: `1px solid ${C.border}`, background: 'radial-gradient(circle at 36% 30%, var(--hr-accent), #7c1f24)', display: 'grid', placeItems: 'center', color: 'var(--hr-line-soft)', fontFamily: 'Cinzel, serif', fontSize: 20 }}>{initials(profile.displayName || profile.username)}</div>
             )}
-            <label style={{ cursor: busy ? 'default' : 'pointer', fontFamily: 'Cinzel, serif', fontSize: 12, color: C.amber, background: '#f8f1de', border: `1px solid ${C.border}`, borderRadius: 999, padding: '9px 16px', display: 'inline-flex', alignItems: 'center', gap: 8, opacity: busy ? 0.6 : 1 }}>
+            <label style={{ cursor: busy ? 'default' : 'pointer', fontFamily: 'Cinzel, serif', fontSize: 12, color: C.amber, background: 'var(--hr-wash-1)', border: `1px solid ${C.border}`, borderRadius: 999, padding: '9px 16px', display: 'inline-flex', alignItems: 'center', gap: 8, opacity: busy ? 0.6 : 1 }}>
               {busy ? 'Nahrávam…' : (mediaUrl(profile.avatar) ? 'Zmeniť obrázok' : 'Nahrať obrázok')}
               <input type="file" accept="image/*" disabled={busy} onChange={(e) => e.target.files?.[0] && onAvatar(e.target.files[0])} style={{ display: 'none' }} />
             </label>
@@ -537,7 +537,7 @@ function Settings({ profile, token, onClose, onSaved, onSignOut, onDeleted }: {
             <button onClick={() => setConfirmDel(true)} style={{ ...btnLink, color: '#a04338' }}>Zmazať účet</button>
           ) : (
             <div>
-              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#5d4a32', margin: '0 0 10px' }}>
+              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: 'var(--hr-body-2)', margin: '0 0 10px' }}>
                 Účet sa zmaže natrvalo. Komentáre zostanú ako <strong>Zmazaný účet</strong>. Nedá sa vrátiť.
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
@@ -556,9 +556,9 @@ function Settings({ profile, token, onClose, onSaved, onSignOut, onDeleted }: {
 }
 
 /* ── drobné ── */
-const btnPrimary: React.CSSProperties = { fontFamily: 'Cinzel, serif', fontSize: 13, padding: '9px 18px', borderRadius: 999, border: '1px solid #7c4a13', background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', color: '#fbf6ea', cursor: 'pointer' };
+const btnPrimary: React.CSSProperties = { fontFamily: 'Cinzel, serif', fontSize: 13, padding: '9px 18px', borderRadius: 999, border: '1px solid var(--hr-accent-deep)', background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))', color: 'var(--hr-on-photo)', cursor: 'pointer' };
 const btnLink: React.CSSProperties = { fontFamily: 'Cinzel, serif', fontSize: 13, background: 'none', border: 'none', color: C.amber, cursor: 'pointer', textDecoration: 'underline', padding: 0 };
-const input: React.CSSProperties = { width: '100%', height: 42, padding: '0 12px', background: '#fbf7ec', border: `1px solid ${C.border}`, borderRadius: 8, fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: C.ink, outline: 'none' };
+const input: React.CSSProperties = { width: '100%', height: 42, padding: '0 12px', background: 'var(--hr-surface)', border: `1px solid ${C.border}`, borderRadius: 8, fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: C.ink, outline: 'none' };
 const checkRow: React.CSSProperties = { display: 'flex', gap: 8, alignItems: 'center', fontFamily: 'Cormorant Garamond, serif', fontSize: 15.5, color: C.ink, padding: '4px 0' };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -569,6 +569,6 @@ function Empty({ children }: { children: React.ReactNode }) {
 }
 function Skeleton({ n }: { n: number }) {
   return <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>{Array.from({ length: n }).map((_, i) => (
-    <div key={i} style={{ height: 88, borderRadius: 12, background: 'linear-gradient(90deg,#f3ead4,#faf5e6,#f3ead4)', backgroundSize: '200% 100%', animation: 'shimmer 1.3s infinite' }} />
+    <div key={i} style={{ height: 88, borderRadius: 12, background: 'linear-gradient(90deg,var(--hr-wash-4),var(--hr-wash-1),var(--hr-wash-4))', backgroundSize: '200% 100%', animation: 'shimmer 1.3s infinite' }} />
   ))}<style>{`@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style></div>;
 }

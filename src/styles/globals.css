@@ -288,6 +288,11 @@ html, body, #root, main, article, section, div:not(.pointer-events-none):not([cl
   --hr-mark-text: #7a3d0a;
 
   /* Akcent */
+  /* Chybové hlásenie. Doteraz to bola trojica farieb napísaná natvrdo
+     v každej stránke zvlášť — a v novom šate sa nemala ako prefarbiť. */
+  --hr-error-text: #8a2f22;
+  --hr-error-bg: #fbeae8;
+  --hr-error-line: #e8c4bf;
   --hr-accent: #9a5d1f;          /* hlavný akcent */
   --hr-accent-soft: #c8862f;     /* svetlejší akcent, prechody */
   --hr-accent-deep: #7d4f1d;     /* tmavší akcent, hover */

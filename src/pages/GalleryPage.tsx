@@ -106,14 +106,14 @@ export function GalleryPage() {
       <style>{`
         .gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
         .gal-tile { position: relative; display: block; padding: 0; border: none; cursor: pointer;
-                    border-radius: 18px; overflow: hidden; aspect-ratio: 4 / 3; background: #ece0c4;
+                    border-radius: 18px; overflow: hidden; aspect-ratio: 4 / 3; background: var(--hr-wash-5);
                     box-shadow: 0 12px 28px -18px rgba(40,26,10,.5); transition: transform .2s ease; }
         .gal-tile:hover { transform: translateY(-4px); }
         .gal-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
         .gal-tile:hover img { transform: scale(1.05); }
         .gal-cap { position: absolute; left: 10px; right: 10px; bottom: 10px; text-align: left;
-                   font-family: ui-monospace, monospace; font-size: 11px; color: #f4ead4;
-                   background: rgba(28,21,16,.55); border-radius: 8px; padding: 4px 9px;
+                   font-family: ui-monospace, monospace; font-size: 11px; color: var(--hr-on-photo-2);
+                   background: var(--hr-glass); border-radius: 8px; padding: 4px 9px;
                    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         @media (prefers-reduced-motion: reduce) {
           .gal-tile, .gal-tile img { transition: none; }
@@ -125,24 +125,24 @@ export function GalleryPage() {
       <div className="container" style={{ paddingTop: 34, paddingBottom: 64, maxWidth: 1240 }}>
         {/* Omrvinky */}
         <nav aria-label="Omrvinky" style={{ marginBottom: 16 }}>
-          <ol style={{ display: 'flex', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '.03em', color: '#7a6b56' }}>
-            <li><a href="/" style={{ color: '#9a5d1f', textDecoration: 'none' }}>Domov</a></li>
+          <ol style={{ display: 'flex', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '.03em', color: 'var(--hr-clear-text)' }}>
+            <li><a href="/" style={{ color: 'var(--hr-accent)', textDecoration: 'none' }}>Domov</a></li>
             <li aria-hidden="true">›</li>
             <li>Fotogaléria</li>
           </ol>
         </nav>
 
         <header style={{ marginBottom: 28 }}>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 3.6vw, 40px)', fontWeight: 600, letterSpacing: '.06em', color: '#2d1810', margin: 0 }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 3.6vw, 40px)', fontWeight: 600, letterSpacing: '.06em', color: 'var(--hr-ink)', margin: 0 }}>
             Fotogaléria
           </h1>
-          <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontStyle: 'italic', color: '#6f5f47', margin: '10px 0 0' }}>
+          <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontStyle: 'italic', color: 'var(--hr-body-3)', margin: '10px 0 0' }}>
             Fotografie z hradísk, výprav a nálezov.
           </p>
         </header>
 
         {error && (
-          <div role="alert" style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: '#8a2f22', background: '#fbeae8', border: '1px solid #e8c4bf', borderRadius: 12, padding: '12px 16px', marginBottom: 20 }}>
+          <div role="alert" style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--hr-error-text)', background: 'var(--hr-error-bg)', border: '1px solid var(--hr-error-line)', borderRadius: 12, padding: '12px 16px', marginBottom: 20 }}>
             {error}
           </div>
         )}
@@ -167,7 +167,7 @@ export function GalleryPage() {
 
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30 }}>
           {busy && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-serif)', fontSize: 15, color: '#8a795e' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--hr-muted)' }}>
               <Loader2 className="w-4 h-4 animate-spin" /> Načítavam fotky…
             </span>
           )}
@@ -175,13 +175,13 @@ export function GalleryPage() {
             <button
               type="button"
               onClick={loadMore}
-              style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.1em', color: '#fbf6ea', background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', border: 'none', borderRadius: 999, padding: '13px 30px', cursor: 'pointer', boxShadow: '0 10px 24px -10px rgba(154,93,31,.7)' }}
+              style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.1em', color: 'var(--hr-on-photo)', background: 'linear-gradient(180deg, var(--hr-accent-soft), var(--hr-accent))', border: 'none', borderRadius: 999, padding: '13px 30px', cursor: 'pointer', boxShadow: '0 10px 24px -10px rgba(154,93,31,.7)' }}
             >
               NAČÍTAŤ ĎALŠIE
             </button>
           )}
           {!busy && !hasMore && photos.length > 0 && (
-            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontStyle: 'italic', color: '#a89f8f' }}>
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontStyle: 'italic', color: 'var(--hr-muted-2)' }}>
               To je celá galéria — {photos.length} fotografií.
             </span>
           )}

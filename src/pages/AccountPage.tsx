@@ -15,35 +15,35 @@ const wrap: React.CSSProperties = {
   padding: '48px 20px',
 };
 const card: React.CSSProperties = {
-  width: 'min(440px, 100%)', background: '#fffdf8', borderRadius: 16,
+  width: 'min(440px, 100%)', background: 'var(--hr-surface)', borderRadius: 16,
   border: '1px solid rgba(196,165,116,0.4)',
   boxShadow: '0 20px 50px -30px rgba(60,40,15,.4)', padding: '34px 32px',
 };
 const label: React.CSSProperties = {
   display: 'block', fontFamily: 'Georgia, serif', fontSize: 13.5,
-  fontWeight: 500, color: '#3d3528', marginBottom: 6,
+  fontWeight: 500, color: 'var(--hr-ink-2)', marginBottom: 6,
 };
 const field: React.CSSProperties = {
-  width: '100%', height: 44, padding: '0 14px', background: '#fbf7ec',
-  border: '1px solid #d8c8a4', borderRadius: 9, fontFamily: 'Georgia, serif',
-  fontSize: 15, color: '#2d1810', outline: 'none', marginBottom: 16,
+  width: '100%', height: 44, padding: '0 14px', background: 'var(--hr-surface)',
+  border: '1px solid var(--hr-chip-border)', borderRadius: 9, fontFamily: 'Georgia, serif',
+  fontSize: 15, color: 'var(--hr-ink)', outline: 'none', marginBottom: 16,
 };
 const primaryBtn: React.CSSProperties = {
-  width: '100%', height: 46, borderRadius: 999, border: '1px solid #7c4a13',
-  background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
+  width: '100%', height: 46, borderRadius: 999, border: '1px solid var(--hr-accent-deep)',
+  background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent-deep))', color: 'var(--hr-on-photo)',
   fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 600, cursor: 'pointer',
 };
 const linkBtn: React.CSSProperties = {
-  background: 'none', border: 'none', color: '#9a5d1f', cursor: 'pointer',
+  background: 'none', border: 'none', color: 'var(--hr-accent)', cursor: 'pointer',
   fontFamily: 'Georgia, serif', fontSize: 14, textDecoration: 'underline', padding: 0,
 };
 const H1: React.CSSProperties = {
   fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 26, fontWeight: 600,
-  color: '#2d1810', margin: '0 0 6px', textAlign: 'center',
+  color: 'var(--hr-ink)', margin: '0 0 6px', textAlign: 'center',
 };
 const sub: React.CSSProperties = {
   fontFamily: 'Georgia, serif', fontSize: 14.5, fontStyle: 'italic',
-  color: '#8a795e', textAlign: 'center', margin: '0 0 24px',
+  color: 'var(--hr-muted)', textAlign: 'center', margin: '0 0 24px',
 };
 
 function Notice({ tone, children }: { tone: 'ok' | 'err'; children: React.ReactNode }) {
@@ -51,9 +51,9 @@ function Notice({ tone, children }: { tone: 'ok' | 'err'; children: React.ReactN
     <div role="alert" style={{
       fontFamily: 'Georgia, serif', fontSize: 13.5, lineHeight: 1.5, borderRadius: 9,
       padding: '10px 13px', marginBottom: 16,
-      background: tone === 'ok' ? '#e4ecdc' : '#fbeae8',
+      background: tone === 'ok' ? '#e4ecdc' : 'var(--hr-error-bg)',
       color: tone === 'ok' ? '#3d5c40' : '#a04338',
-      border: `1px solid ${tone === 'ok' ? '#c5d4b8' : '#e8c4bf'}`,
+      border: `1px solid ${tone === 'ok' ? '#c5d4b8' : 'var(--hr-error-line)'}`,
     }}>
       {children}
     </div>
@@ -172,7 +172,7 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
         )}
 
         {mode === 'register' && (
-          <label style={{ display: 'flex', gap: 9, alignItems: 'flex-start', marginBottom: 16, cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, color: '#5d4a32', lineHeight: 1.5 }}>
+          <label style={{ display: 'flex', gap: 9, alignItems: 'flex-start', marginBottom: 16, cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, color: 'var(--hr-body-2)', lineHeight: 1.5 }}>
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3 }} />
             <span>
               Súhlasím so spracovaním e-mailu na účely účtu a diskusie. Údaje neposkytujeme
@@ -193,14 +193,14 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
         <div style={{ textAlign: 'center', marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {mode === 'login' && (
             <>
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: '#7a6b56' }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: 'var(--hr-clear-text)' }}>
                 Nemáte účet? <button type="button" style={linkBtn} onClick={() => go('/registracia')}>Zaregistrujte sa</button>
               </span>
               <button type="button" style={linkBtn} onClick={() => go('/zabudnute-heslo')}>Zabudli ste heslo?</button>
             </>
           )}
           {mode === 'register' && (
-            <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: '#7a6b56' }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: 'var(--hr-clear-text)' }}>
               Už máte účet? <button type="button" style={linkBtn} onClick={() => go('/prihlasenie')}>Prihláste sa</button>
             </span>
           )}

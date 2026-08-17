@@ -35,27 +35,27 @@ export function NotFoundPage() {
   };
 
   return (
-    <div id="main-content" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#faf7ef', padding: '48px 20px' }}>
+    <div id="main-content" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--hr-surface)', padding: '48px 20px' }}>
       <div style={{ maxWidth: 560, textAlign: 'center', fontFamily: 'var(--font-serif, Georgia, serif)' }}>
-        <div style={{ fontSize: 84, fontWeight: 700, color: '#c8a15a', lineHeight: 1, fontFamily: 'var(--font-heading, Cinzel, serif)' }}>404</div>
-        <h1 style={{ fontSize: 28, fontWeight: 600, color: '#2e2213', margin: '14px 0 10px' }}>
+        <div style={{ fontSize: 84, fontWeight: 700, color: 'var(--hr-accent)', lineHeight: 1, fontFamily: 'var(--font-heading, Cinzel, serif)' }}>404</div>
+        <h1 style={{ fontSize: 28, fontWeight: 600, color: 'var(--hr-ink-3)', margin: '14px 0 10px' }}>
           Táto stránka sa nenašla
         </h1>
-        <p style={{ fontSize: 16, color: '#7a6a52', lineHeight: 1.6, margin: '0 0 28px' }}>
+        <p style={{ fontSize: 16, color: 'var(--hr-clear-text)', lineHeight: 1.6, margin: '0 0 28px' }}>
           Odkaz je možno starý alebo neúplný. Skúste hľadať konkrétne hradisko,
           alebo sa vráťte na úvod.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/" onClick={(e) => { e.preventDefault(); go('/'); }}
-             style={{ ...btn, background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2', border: '1px solid #7c4a13' }}>
+             style={{ ...btn, background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent-deep))', color: 'var(--hr-on-photo)', border: '1px solid var(--hr-accent-deep)' }}>
             <Home style={{ width: 17, height: 17 }} /> Na úvod
           </a>
           <a href="/hladat" onClick={(e) => { e.preventDefault(); go('/hladat'); }}
-             style={{ ...btn, background: 'transparent', color: '#9a5d1f', border: '1px solid #d9c69a' }}>
+             style={{ ...btn, background: 'transparent', color: 'var(--hr-accent)', border: '1px solid var(--hr-chip-border)' }}>
             <Search style={{ width: 17, height: 17 }} /> Vyhľadávanie
           </a>
           <a href="/hradiska" onClick={(e) => { e.preventDefault(); go('/hradiska'); }}
-             style={{ ...btn, background: 'transparent', color: '#9a5d1f', border: '1px solid #d9c69a' }}>
+             style={{ ...btn, background: 'transparent', color: 'var(--hr-accent)', border: '1px solid var(--hr-chip-border)' }}>
             <Compass style={{ width: 17, height: 17 }} /> Hradiská
           </a>
         </div>

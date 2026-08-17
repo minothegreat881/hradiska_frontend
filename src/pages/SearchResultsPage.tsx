@@ -7,14 +7,14 @@ import {
 } from '../lib/searchIndex';
 
 const T = {
-  bg: '#faf7ef',
-  panelBg: '#fffdf8',
+  bg: 'var(--hr-surface)',
+  panelBg: 'var(--hr-surface)',
   border: 'rgba(196,165,116,0.4)',
-  amber: '#9a5d1f',
-  amberSoft: '#c8862f',
-  textMain: '#2e2213',
-  textSub: '#8a795e',
-  markText: '#7a3d0a',
+  amber: 'var(--hr-accent)',
+  amberSoft: 'var(--hr-accent-soft)',
+  textMain: 'var(--hr-ink-3)',
+  textSub: 'var(--hr-muted)',
+  markText: 'var(--hr-mark-text)',
 } as const;
 
 interface SearchResultsPageProps {
@@ -38,8 +38,8 @@ function Row({ hit, query }: { hit: SearchHit; query: string }) {
     >
       <span
         style={{
-          flexShrink: 0, width: 92, height: 68, borderRadius: 8, backgroundColor: '#efe2c0',
-          backgroundImage: thumb ? `url(${thumb})` : 'repeating-linear-gradient(135deg,#e3d3a8 0 6px,#efe2c0 6px 12px)',
+          flexShrink: 0, width: 92, height: 68, borderRadius: 8, backgroundColor: 'var(--hr-chip-bg)',
+          backgroundImage: thumb ? `url(${thumb})` : 'repeating-linear-gradient(135deg,var(--hr-line-strong) 0 6px,var(--hr-chip-bg) 6px 12px)',
           backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${T.border}`,
         }}
       />

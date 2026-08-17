@@ -26,7 +26,11 @@ if (BASE.includes('localhost')) {
 }
 
 let zleSpolu = 0;
-for (const [n, cesta] of [['domovska','/design?t=pecat'], ['clanok','/design/blog/mikulcice-kopcany?t=pecat']]) {
+/* Routy sa dajú zadať aj zvonku: node audit/kontrast-over.mjs <URL> <cesta…> */
+const ROUTY = process.argv.length > 3
+  ? process.argv.slice(3).map(c => [c.replace(/[^\w]+/g, '-').replace(/^-|-$/g, ''), c])
+  : [['domovska','/design?t=pecat'], ['clanok','/design/blog/mikulcice-kopcany?t=pecat']];
+for (const [n, cesta] of ROUTY) {
   await p.goto(BASE + cesta, { waitUntil: 'domcontentloaded' });
   for (let i=0;i<3;i++){const x=p.locator('.ck-btn-primary').first();
     if(await x.count()&&await x.isVisible()){await x.click({force:true});await p.waitForTimeout(300);}else break;}

@@ -1,4 +1,10 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+/* Šat Pečať sa sťahuje až pri zapnutí — kým je vypnutý, nikoho nestojí nič.
+   Platí len tam, kde je trieda `.lab`, teda v laboratóriu a tu po `?sat=pecat`. */
+const SatPecat = lazy(() => import('./design-lab/satPecat'));
+/* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
+   skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
+const ArticlePagePecat = lazy(() => import('./design-lab/LabArticle'));
 import { NavBar } from './components/NavBar';
 import { HomePage } from './pages/HomePage';
 import { SiteDetailPage } from './pages/SiteDetailPage';
@@ -195,6 +201,15 @@ function App() {
     };
   }, [route]);
 
+  /* Voľba šatu prežije preklik na ďalšiu stránku — `?sat=` sa zapamätá.
+     Kým sa nezapne, nikto na webe nič nespozoruje. */
+  const satZapnuty = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const chce = new URLSearchParams(window.location.search).get('sat');
+    if (chce === 'pecat') { try { localStorage.setItem('sat', 'pecat'); } catch { /* súkromný režim */ } return true; }
+    if (chce === 'povodna') { try { localStorage.removeItem('sat'); } catch { /* súkromný režim */ } return false; }
+    try { return localStorage.getItem('sat') === 'pecat'; } catch { return false; }
+  }, [pathname]);
 
   // Laboratórium má vlastný rám — prepínač tém je nad stránkou.
   if (route === 'design') {
@@ -221,7 +236,19 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen">
+    /* ── ŠAT PEČAŤ NA OSTREJ STRÁNKE ────────────────────────────────────
+       Šat žije v `design-lab/theme.css` a je zapuzdrený pod `.lab`. Aby
+       platil aj tu, stačí ostrej stránke dať tú istú triedu — žiadne
+       pravidlo sa neprepisuje a laboratórium ostáva nedotknuté.
+
+       Zapína sa VÝSLOVNE, aby sa dal skúšať na ostrej adrese bez toho, aby
+       ho videl každý návštevník:
+         ?sat=pecat    zapne a zapamätá
+         ?sat=povodna  vypne a zapamätä
+       Predvolene je vypnutý. Prepínač je pri `satZapnuty` nižšie. */
+    <div className={satZapnuty ? 'min-h-screen lab' : 'min-h-screen'}
+         data-theme={satZapnuty ? 'pecat' : undefined}>
+      {satZapnuty && <Suspense fallback={null}><SatPecat /></Suspense>}
       <NavBar />
 
       <Suspense fallback={
@@ -236,7 +263,9 @@ function App() {
         {route === 'terms' && <TermsPage />}
         {route === 'site' && <SiteDetailPage siteSlug={params.slug} />}
         {route === 'category' && <CategoryPage categorySlug={params.slug} />}
-        {route === 'article' && <ArticlePage articleSlug={params.slug} />}
+        {route === 'article' && (satZapnuty
+          ? <ArticlePagePecat slug={params.slug} />
+          : <ArticlePage articleSlug={params.slug} />)}
         {route === 'about' && <AboutPage />}
         {route === 'account' && <AccountPage mode={accountMode} />}
         {route === 'hladat' && <SearchResultsPage query={params.q} />}

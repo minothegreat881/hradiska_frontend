@@ -1,8 +1,8 @@
 'use client';
 
-const H2: React.CSSProperties = { fontSize: 18, fontWeight: 600, color: '#2d1810', marginBottom: 8 };
+const H2: React.CSSProperties = { fontSize: 18, fontWeight: 600, color: 'var(--hr-ink)', marginBottom: 8 };
 const UL: React.CSSProperties = { paddingLeft: 20, marginTop: 8 };
-const LINK: React.CSSProperties = { color: '#7d4f1d', textDecoration: 'underline' };
+const LINK: React.CSSProperties = { color: 'var(--hr-accent-deep)', textDecoration: 'underline' };
 
 export function TermsPage() {
   return (
@@ -17,17 +17,17 @@ export function TermsPage() {
       <div className="container mx-auto px-4 max-w-3xl py-12 md:py-16">
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-2 mb-3 opacity-60" aria-hidden="true">
-            <span className="h-px w-16" style={{ background: 'linear-gradient(90deg, transparent, #c4a574)' }} />
-            <span style={{ color: '#c4a574', fontSize: 14, lineHeight: 1 }}>⚜</span>
-            <span className="h-px w-16" style={{ background: 'linear-gradient(90deg, #c4a574, transparent)' }} />
+            <span className="h-px w-16" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-line-quiet))' }} />
+            <span style={{ color: 'var(--hr-line-quiet)', fontSize: 14, lineHeight: 1 }}>⚜</span>
+            <span className="h-px w-16" style={{ background: 'linear-gradient(90deg, var(--hr-line-quiet), transparent)' }} />
           </div>
           <h1
             className="font-semibold tracking-wide"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 'clamp(28px, 4vw, 40px)', color: '#2d1810', letterSpacing: '0.04em' }}
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 'clamp(28px, 4vw, 40px)', color: 'var(--hr-ink)', letterSpacing: '0.04em' }}
           >
             Podmienky používania
           </h1>
-          <p className="mt-3 text-sm" style={{ color: '#7a6b56', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+          <p className="mt-3 text-sm" style={{ color: 'var(--hr-clear-text)', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
             Posledná aktualizácia: 22. júla 2026
           </p>
         </div>
@@ -35,13 +35,13 @@ export function TermsPage() {
         <div
           className="prose-content space-y-5"
           style={{
-            background: '#fffdf8',
-            border: '1px solid rgba(196,165,116,0.4)',
+            background: 'var(--hr-surface)',
+            border: '1px solid var(--hr-line)',
             borderRadius: 12,
             padding: '32px',
-            boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
-            color: '#4a3f35',
-            fontFamily: 'Georgia, serif',
+            boxShadow: 'var(--hr-shadow-sm)',
+            color: 'var(--hr-body)',
+            fontFamily: 'var(--font-serif, Georgia, serif)',
             fontSize: 15,
             lineHeight: 1.7,
           }}
