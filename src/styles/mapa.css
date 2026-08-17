@@ -165,7 +165,15 @@
 .lmap-canvas {
   position: relative; flex: 1; min-width: 0; overflow: hidden;
   background: var(--l-paper-2);
-  aspect-ratio: 2.0113; max-height: 88vh;
+  /* `stretch` dorovná plátno k panelu. Bez neho bol panel vyšší (má dlhý
+     zoznam kategórií), plátno si držalo pomer 2:1 a POD NÍM ostával tmavý
+     pás — mapa dole nekončila zarovno s panelom. Pomer ostáva ako najmenšia
+     výška pre prípad, že by panel bol raz kratší. */
+  align-self: stretch;
+  min-height: min(88vh, 49vw);
+  /* ŽIADNY `max-height`: strop 88vh bránil plátnu dorovnať sa panelu
+     a nechával pod ním pás. Na užších oknách si výšku určuje mobilné
+     pravidlo nižšie, kde je plátno jediné, čo v pruhu je. */
 }
 .lmap-grid {
   position: absolute; inset: 0; pointer-events: none;
@@ -332,12 +340,16 @@
 .lmap-zoom-box button:last-child { border-bottom: 0; }
 .lmap-zoom-box button:hover { background: rgba(20,18,15,.07); }
 .lmap-zoom-reset { font-family: var(--mono) !important; font-size: 12px !important; }
-/* Uvedenie zdrojov — pod mapou, nie cez krajinu. */
+/* Uvedenie zdrojov — v ľavom paneli, na jeho spodku.
+   Predtým to bol samostatný pruh cez CELÚ šírku pod panelom aj plátnom, a keďže
+   mal tmavé pozadie, vyzeral ako lišta, ktorá k mape nepatrí — mapa pri nej
+   dole nekončila zarovno s panelom. V paneli je na tom istom mieste ako
+   ostatný text a obe strany končia spolu. */
 .lmap-attrib {
-  width: 100%;
-  margin: 0; padding: 9px 22px;
-  background: var(--l-dark); color: var(--l-on-dark-3);
-  font-size: 11px; text-align: right;
+  margin: 22px 0 0; padding: 14px 0 0;
+  border-top: 1px solid var(--l-on-dark-line);
+  color: var(--l-on-dark-3);
+  font-size: 10.5px; line-height: 1.5; text-align: left;
 }
 
 /* ── Užšie okná ────────────────────────────────────────────────────────────
@@ -363,7 +375,7 @@
   /* Palcove ciele + `manipulation`, aby prehliadac na tuknutie necakal, ci
      nepride dvojtuk (tych 300 ms bolo cítiť ako „tlacidlo nereaguje"). */
   .lmap-zoom-box button { width: 46px; height: 46px; font-size: 19px; touch-action: manipulation; }
-  .lmap-attrib { padding: 8px 16px; font-size: 10px; text-align: left; }
+  .lmap-attrib { margin-top: 14px; padding-top: 10px; font-size: 10px; }
   /* Karta by na úzkom okne vytŕčala mimo plátno. */
   .lmap-card { width: min(260px, 76vw); }
 }

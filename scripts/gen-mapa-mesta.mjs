@@ -14,20 +14,55 @@
  * Názov sa berie slovenský (`name:sk`), keď ho OSM pozná — Viedeň, Budapešť,
  * Krakov. Inak pôvodný.
  */
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync, existsSync } from 'node:fs';
 
-const OVERPASS = 'https://overpass-api.de/api/interpreter';
+/* Hranica Slovenska — podľa nej sa rozhoduje, čo je doma. Bez nej by sa do
+   výberu dostali aj poľské, maďarské a české mestá pri hranici, lebo obdĺžnik
+   okolo Slovenska ich nevyhnutne zahŕňa. */
+const HRANICA = 'C:/Users/milan/Desktop/Git-Projects/relief-mapa-sk/data/sk_boundary.geojson';
+const prstence = (() => {
+  if (!existsSync(HRANICA)) {
+    console.error('Nenašiel som hranicu:', HRANICA);
+    process.exit(1);
+  }
+  const g = JSON.parse(readFileSync(HRANICA, 'utf8'));
+  const f = (g.features || [g])[0];
+  const polygony = f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [f.geometry.coordinates];
+  return polygony.map(p => p[0]).filter(r => r.length > 40);
+})();
+
+/** Leží bod vnútri hranice? Vrhanie lúča cez všetky prstence. */
+const doma = (lng, lat) => {
+  for (const ring of prstence) {
+    let vnutri = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if ((yi > lat) !== (yj > lat) && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) vnutri = !vnutri;
+    }
+    if (vnutri) return true;
+  }
+  return false;
+};
+
+/* Overpass býva preťažený a vracia 504. Skúšame viac serverov a viac ráz;
+   keď nepochodí ani jeden, prefiltruje sa už stiahnutý zoznam podľa hranice
+   (bez siete) — to je presne to, čo tento beh potrebuje. */
+const OVERPASS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.osm.ch/api/interpreter',
+];
 
 /* Slovensko s malým presahom / celý výrez pohybu (juh, západ, sever, východ) */
 const SK = [47.6, 16.7, 49.7, 22.7];
 const OKOLIE = [45.0, 11.5, 55.6, 24.5];
 
+/* Sťahujú sa už len sídla z obdĺžnika okolo Slovenska; presné odsitovanie
+   robí hranica nižšie. Zahraničné mestá sa nesťahujú vôbec — na mape rušili
+   (Olomouc, Zlín, Užhorod, Miškovec, Bielsko-Biała) a k slovenským hradiskám
+   nič nehovoria. */
 const q = `[out:json][timeout:300];
-(
-  node["place"~"^(city|town|village)$"]["name"](${SK.join(',')});
-  node["place"="city"]["name"](${OKOLIE.join(',')});
-  node["place"="city"]["capital"="yes"]["name"](${OKOLIE.join(',')});
-);
+node["place"~"^(city|town|village)$"]["name"](${SK.join(',')});
 out body;`;
 
 const pop = (t) => {
@@ -37,16 +72,38 @@ const pop = (t) => {
 
 const run = async () => {
   console.log('sťahujem z OpenStreetMap…');
-  const res = await fetch(OVERPASS, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'hradiska.sk map labels generator (jednorazovo, kontakt cez hradiska.sk)',
-    },
-    body: 'data=' + encodeURIComponent(q),
-  });
-  if (!res.ok) throw new Error('Overpass: ' + res.status);
-  const json = await res.json();
+  let json = null;
+  for (const server of OVERPASS) {
+    for (let pokus = 1; pokus <= 2 && !json; pokus++) {
+      try {
+        const res = await fetch(server, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'hradiska.sk map labels generator (jednorazovo, kontakt cez hradiska.sk)',
+          },
+          body: 'data=' + encodeURIComponent(q),
+        });
+        if (res.ok) { json = await res.json(); break; }
+        console.log(`  ${server} → ${res.status}, skúšam ďalej`);
+      } catch (e) { console.log(`  ${server} → ${e.message}`); }
+      await new Promise(r => setTimeout(r, 4000));
+    }
+    if (json) break;
+  }
+
+  if (!json) {
+    /* Bez siete: prefiltrovať to, čo už v projekte je. */
+    console.log('Overpass nedostupný — filtrujem existujúci zoznam podľa hranice.');
+    const stary = readFileSync('src/components/mapaMesta.ts', 'utf8');
+    const zaciatok = stary.indexOf('MESTA: Mesto[] = ') + 'MESTA: Mesto[] = '.length;
+    const surove = stary.slice(zaciatok).trim().replace(/;$/, '');
+    const pole = JSON.parse(surove.replace(/,\s*\]$/, ']'));
+    const ostava = pole.filter(m => doma(m.x, m.y));
+    console.log(`  ${pole.length} → ${ostava.length} (zahraničné preč)`);
+    zapis(ostava);
+    return;
+  }
   console.log('uzlov:', json.elements.length);
 
   const inSK = (lat, lng) => lat > SK[0] && lat < SK[2] && lng > SK[1] && lng < SK[3];
@@ -57,29 +114,18 @@ const run = async () => {
     const name = t['name:sk'] || t.name;
     if (!name) continue;
     const p = pop(t);
-    const doma = inSK(e.lat, e.lon);
+    /* Nie obdĺžnik, ale skutočná hranica. */
+    if (!doma(e.lon, e.lat)) continue;
     const hlavne = t.capital === 'yes';
 
-    /* Zo zahraničia len to, čo naozaj pomôže zorientovať sa: hlavné mestá
-       a veľkomestá. Inak by bola mapa okolo Slovenska hustejšia než ono. */
-    if (!doma && !hlavne && p < 150000) continue;
-    /* Obce sa berú len z domu a len tie, ktoré niečo znamenajú v teréne —
-       zvyšok by pri priblížení mapu zaplavil. */
-    if (doma && t.place === 'village' && p < 700) continue;
+    /* Obce len tie, ktoré niečo znamenajú v teréne — zvyšok by pri
+       priblížení mapu zaplavil. */
+    if (t.place === 'village' && p < 700) continue;
 
-    rows.push({ name, povodny: t.name, lat: +e.lat.toFixed(4), lng: +e.lon.toFixed(4), pop: p, doma, hlavne });
+    rows.push({ name, lat: +e.lat.toFixed(4), lng: +e.lon.toFixed(4), pop: p, doma, hlavne });
   }
 
-  /* ── Dvojníci ─────────────────────────────────────────────────────────
-     Slovenský názov cudzieho mesta sa vie zhodovať s naším. Chemnitz má
-     v OSM `name:sk` = Kamenica, čo je to isté ako dve slovenské obce, a na
-     mape by z toho boli tri Kamenice. V takom prípade dostane cudzie mesto
-     späť svoj pôvodný názov — Slovák hľadá Chemnitz. */
-  const domace = new Set(rows.filter(r => r.doma).map(r => r.name));
-  for (const r of rows) {
-    if (!r.doma && r.povodny && r.povodny !== r.name && domace.has(r.name)) r.name = r.povodny;
-  }
-
+  /* ── Dvojníci ───────────────────────────────────────────────────────── */
   /* Ten istý názov kúsok od seba = jedno miesto zapísané dvakrát. Typicky
      dvojmestá cez rieku: Komárno a maďarský Komárom, ktorý sa po slovensky
      tiež volá Komárno — na mape z toho boli dva popisy vedľa seba. Ostane
@@ -115,6 +161,12 @@ const run = async () => {
   const pocty = [0, 1, 2, 3, 4, 5].map(s => out.filter(o => o.r === s).length);
   console.log('miest:', out.length, '· po stupňoch:', pocty.join(' / '));
 
+  zapis(out);
+};
+
+function zapis(out) {
+  const pocty = [0, 1, 2, 3, 4, 5].map(s => out.filter(o => o.r === s).length);
+  console.log('miest:', out.length, '· po stupňoch:', pocty.join(' / '));
   const file = `/* VYGENEROVANÉ — needituj ručne.
  * Zdroj: OpenStreetMap (Overpass), © prispievatelia OpenStreetMap, ODbL.
  * Pregeneruje: node scripts/gen-mapa-mesta.mjs
@@ -134,6 +186,6 @@ export const MESTA: Mesto[] = ${JSON.stringify(out)
 `;
   writeFileSync('src/components/mapaMesta.ts', file, 'utf8');
   console.log('zapísané do src/components/mapaMesta.ts');
-};
+}
 
 run().catch(e => { console.error('ZLYHALO:', e.message); process.exit(1); });
