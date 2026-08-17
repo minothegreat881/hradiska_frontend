@@ -31,6 +31,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '../styles/mapa.css';
 import { SK_OUTLINE, SK_OUTLINE_BOX, SK_OUTLINE_RANGE } from './mapaObrys';
+import { MESTA, MAPA_MESTA_ZOOM } from './mapaMesta';
 
 /* Výrez RENDERU — musí sedieť s BOUNDS_4326 v build_relief.py. Na tento
    výrez sa mapa otvára. */
@@ -264,6 +265,11 @@ export function MapaHradisk() {
   const closeHoverRef = useRef<(() => void) | null>(null);
   const clusterRef = useRef<((n: Extract<Node, { kind: 'many' }>) => void) | null>(null);
   const [ready, setReady] = useState(false);
+  /* Názvy miest v obrazovkových súradniciach — reliéf sám nemá popisy, takže
+     bez nich sa v ňom nedá zorientovať. */
+  const [mesta, setMesta] = useState<{ n: string; x: number; y: number; r: number }[]>([]);
+  /* Podklad: kresba reliéfu alebo satelitná snímka. */
+  const [podklad, setPodklad] = useState<'relief' | 'satelit'>('relief');
   const [zoom, setZoom] = useState(MIN_Z);
   const [locs, setLocs] = useState<Loc[]>([]);
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -338,10 +344,21 @@ export function MapaHradisk() {
             bounds: [BOUNDS[0][0], BOUNDS[0][1], BOUNDS[1][0], BOUNDS[1][1]],
             attribution: 'Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries',
           },
+          /* Satelitná snímka ako druhý podklad. Reliéf ukáže tvar terénu —
+             prečo hradisko stojí práve tam — ale nepovie, čo je na tom
+             mieste dnes. Snímka to doplní; prepína sa medzi nimi. */
+          satelit: {
+            type: 'raster',
+            tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+            tileSize: 256,
+            maxzoom: 18,
+            attribution: 'Satelitné snímky: Esri, Maxar, Earthstar Geographics',
+          },
         },
         layers: [
           { id: 'bg', type: 'background', paint: { 'background-color': 'rgba(0,0,0,0)' } },
           { id: 'relief', type: 'raster', source: 'relief', paint: { 'raster-fade-duration': 120 } },
+          { id: 'satelit', type: 'raster', source: 'satelit', layout: { visibility: 'none' }, paint: { 'raster-fade-duration': 120 } },
         ],
       },
       bounds: SK,
@@ -556,6 +573,51 @@ export function MapaHradisk() {
       else out.push({ kind: 'many', x: g.x, y: g.y, members: g.members.map(m => m.loc) });
     }
     setNodes(out);
+
+    /* ── Názvy miest ──────────────────────────────────────────────────
+       Kreslia sa ako HTML nad plátnom, rovnako ako body. Dôvod: písmo je
+       potom to isté, aké nesie zvyšok šatu, a nepotrebujeme k mape dodávať
+       osobitné znakové sady (MapLibre by ich na vlastné popisy chcel).
+
+       Poradie je podľa veľkosti mesta a názov sa vykreslí len vtedy, keď
+       sa nebije s už vykresleným ani so značkou lokality — tie majú
+       prednosť, mapa je predsa o nich. */
+    const z = map.getZoom();
+    /* Najprv hrubé sito podľa výrezu — premietať vyše dvetisíc obcí pri
+       každom posune mapy by bola zbytočná práca; porovnanie dvoch čísel
+       je o rád lacnejšie. */
+    const w0 = b.getWest(), e0 = b.getEast(), s0 = b.getSouth(), n0 = b.getNorth();
+    const kandidati = MESTA
+      .filter(m => m.x > w0 && m.x < e0 && m.y > s0 && m.y < n0)
+      .map(m => { const p = map.project([m.x, m.y]); return { n: m.n, x: p.x, y: p.y, r: m.r }; })
+      .filter(m => m.x > 4 && m.y > 4 && m.x < width - 4 && m.y < height - 4)
+      .sort((a, b) => a.r - b.r);
+
+    const zabrane: { x: number; y: number; w: number; h: number }[] = out.map(n => ({
+      x: n.x - 21, y: n.y - 21, w: 42, h: 42,
+    }));
+    /* Veľkosť mesta určuje PORADIE, nie zákaz. Keby menšie mestá naskakovali
+       až od daného priblíženia, v horách by pri priblížení nezostal na mape
+       jediný názov — a práve tam sa človek stratí najviac. Preto: kým ich je
+       na obrazovke málo, berie sa aj to menšie. */
+    const DOST = 9, NAJVIAC = 34;
+    const popisy: typeof kandidati = [];
+    for (const m of kandidati) {
+      if (popisy.length >= NAJVIAC) break;
+      /* Mesto pod svojím priblížením sa pustí len vtedy, keď je mapa
+         prázdna — inak by pri pohľade na celú krajinu bola nečitateľná. */
+      if (z < (MAPA_MESTA_ZOOM[m.r] ?? 99) && popisy.length >= DOST) continue;
+      /* Odhad šírky textu: presné meranie by si vyžiadalo prekreslenie
+         každého názvu, a to pri každom posune mapy. Na rozostup stačí. */
+      const w = 9 + m.n.length * (m.r === 0 ? 6.6 : 5.6);
+      const box = { x: m.x - 4, y: m.y - 8, w, h: 16 };
+      const bije = zabrane.some(b =>
+        box.x < b.x + b.w && box.x + box.w > b.x && box.y < b.y + b.h && box.y + box.h > b.y);
+      if (bije) continue;
+      zabrane.push(box);
+      popisy.push(m);
+    }
+    setMesta(popisy);
   }, [locs, spider]);
 
   useEffect(() => {
@@ -772,6 +834,17 @@ export function MapaHradisk() {
   }, [full]);
   useEffect(() => () => { document.body.style.overflow = ''; }, []);
 
+  /* Prepnutie podkladu. Satelit má dlaždice do väčšej hĺbky než náš reliéf
+     (ten končí na 12), takže sa pri ňom púšťa aj bližšie priblíženie —
+     inak by snímka nemala prečo byť. */
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    map.setLayoutProperty('relief', 'visibility', podklad === 'relief' ? 'visible' : 'none');
+    map.setLayoutProperty('satelit', 'visibility', podklad === 'satelit' ? 'visible' : 'none');
+    map.setMaxZoom(podklad === 'satelit' ? 16 : MAX_Z);
+  }, [podklad, ready]);
+
   const showPills = zoom >= PILL_ZOOM;
   /* Kliknutý bod má prednosť pred tým pod kurzorom — inak by zvýraznenie
      odskočilo hneď, ako sa myš pohne preč. */
@@ -940,7 +1013,7 @@ export function MapaHradisk() {
   return (
     <section
       ref={rootRef as React.RefObject<HTMLElement>}
-      className={full ? 'lmap is-full' : 'lmap'}
+      className={['lmap', full && 'is-full', podklad === 'satelit' && 'is-satelit'].filter(Boolean).join(' ')}
       /* To isté pre celú obrazovku: `position: fixed` v inline štýle sa
          uplatní bez ohľadu na to, či sa medzidotaz na danom telefóne trafí. */
       style={full ? {
@@ -965,6 +1038,22 @@ export function MapaHradisk() {
               <span>{outside}</span> lokalít leží za hranicami — ukázať
             </button>
           )}
+        </div>
+
+        {/* Podklad. Reliéf ukáže, PREČO hradisko stojí práve tam — ostrožnu,
+            sútok, prevýšenie. Snímka ukáže, ČO je na tom mieste dnes. */}
+        <div className="lmap-podklad" role="group" aria-label="Podklad mapy">
+          {([['relief', 'Reliéf'], ['satelit', 'Satelit']] as const).map(([k, l]) => (
+            <button
+              key={k}
+              type="button"
+              className={podklad === k ? 'is-on' : undefined}
+              aria-pressed={podklad === k}
+              onClick={() => setPodklad(k)}
+            >
+              {l}
+            </button>
+          ))}
         </div>
 
         <div className={legendOpen ? 'lmap-legend is-open' : 'lmap-legend'}>
@@ -1069,6 +1158,23 @@ export function MapaHradisk() {
               border: '1px solid rgba(255,255,255,.25)', pointerEvents: 'auto',
             }}
           >
+            {/* Podklad. Bočný panel je na celej obrazovke skrytý, takže
+                prepínač musí byť tu — jedným tlačidlom, nie dvoma. */}
+            <button
+              type="button"
+              aria-label={podklad === 'relief' ? 'Prepnúť na satelitnú snímku' : 'Prepnúť na reliéf'}
+              onPointerDown={e => { e.preventDefault(); setPodklad(p => (p === 'relief' ? 'satelit' : 'relief')); }}
+              style={{
+                width: 48, height: 48, display: 'grid', placeItems: 'center',
+                background: 'rgba(20,18,15,.85)', color: '#f3ede1',
+                border: 0, borderBottom: '1px solid rgba(243,237,225,.25)',
+                font: '600 9px/1.15 var(--mono, monospace)', letterSpacing: '.1em',
+                textTransform: 'uppercase', touchAction: 'manipulation', cursor: 'pointer',
+              }}
+            >
+              {podklad === 'relief' ? 'SAT' : 'REL'}
+            </button>
+
             {/* Posuvník: koľko z rozsahu je za tebou a koľko pred tebou, na
                 jeden pohľad — a jedným ťahom prejde celý rozsah. */}
             <input
@@ -1124,6 +1230,18 @@ export function MapaHradisk() {
 
         {/* Body a zhluky — v obrazovkových súradniciach nad plátnom mapy. */}
         <div className="lmap-overlay pointer-events-none">
+          {/* Názvy miest. Kreslia sa PRED bodmi, takže bod ich vždy prekryje —
+              mapa je o lokalitách, mestá sú len pomôcka na zorientovanie. */}
+          {mesta.map(m => (
+            <span
+              key={m.n}
+              className={m.r === 0 ? 'lmap-mesto is-velke' : 'lmap-mesto'}
+              style={{ transform: `translate3d(${m.x}px, ${m.y}px, 0)` }}
+            >
+              <i className="lmap-mesto-b" aria-hidden="true" />
+              <b className="lmap-mesto-n">{m.n}</b>
+            </span>
+          ))}
           {spider && (
             <>
               {spiderNodes.map(n => (
@@ -1221,7 +1339,9 @@ export function MapaHradisk() {
       {/* Uvedenie zdrojov je licenčná povinnosť, ale nepatrí cez krajinu —
           pod mapou je to poznámka pod obrázkom. */}
       <p className="lmap-attrib">
-        Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries
+        {podklad === 'satelit'
+          ? 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap'
+          : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'}
       </p>
     </section>
   );

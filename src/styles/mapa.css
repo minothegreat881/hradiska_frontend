@@ -723,3 +723,58 @@
 @media (pointer: coarse), (hover: none), (max-width: 900px) {
   .lmap .lmap-canvas .lmap-cluster { pointer-events: none !important; }
 }
+
+/* ── Názvy miest ───────────────────────────────────────────────────────────
+   Reliéf zámerne nemá popisy — je to kresba terénu. Bez jediného názvu sa
+   v ňom ale nedá zorientovať, tak sem názvy pribudli ako HTML nad plátnom
+   (rovnako ako body). Vďaka tomu nesú to isté písmo ako zvyšok šatu a mapa
+   nepotrebuje osobitné znakové sady.
+
+   Držia sa vzadu: tenké, tiché, s papierovým obrysom, aby sa dali čítať aj
+   cez tieňovanie kopcov. Značky lokalít ich vždy prekryjú. */
+.lmap-mesto { position: absolute; left: 0; top: 0; will-change: transform; }
+.lmap-mesto-b {
+  position: absolute; left: -2px; top: -2px; width: 4px; height: 4px;
+  border-radius: 50%; background: rgba(20, 18, 15, .45);
+}
+.lmap-mesto-n {
+  position: absolute; left: 7px; top: -7px;
+  font-family: var(--mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: .13em; text-transform: uppercase; white-space: nowrap;
+  color: rgba(20, 18, 15, .7);
+  text-shadow: 0 0 3px var(--l-paper), 0 0 3px var(--l-paper), 0 0 7px var(--l-paper), 0 0 10px var(--l-paper);
+}
+.lmap-mesto.is-velke .lmap-mesto-b { width: 5px; height: 5px; background: rgba(20, 18, 15, .62); }
+.lmap-mesto.is-velke .lmap-mesto-n { font-size: 10.5px; font-weight: 600; color: rgba(20, 18, 15, .78); }
+
+/* Na snímke je pod textom fotografia, nie papier — obrys sa preto obracia. */
+.lmap.is-satelit .lmap-mesto-b { background: rgba(255, 255, 255, .9); box-shadow: 0 0 2px rgba(0, 0, 0, .8); }
+.lmap.is-satelit .lmap-mesto-n {
+  color: rgba(255, 255, 255, .96);
+  text-shadow: 0 0 3px rgba(0, 0, 0, .85), 0 0 6px rgba(0, 0, 0, .7), 0 1px 2px rgba(0, 0, 0, .9);
+}
+/* Papier a mriežka pod snímkou nemajú čo presvitať. */
+.lmap.is-satelit .lmap-grid,
+.lmap.is-satelit .lmap-watermark { opacity: 0; }
+
+/* ── Prepínač podkladu ─────────────────────────────────────────────────── */
+/* Panel je tmavý, takže nečinná polovica musí byť tiež tmavá — inak
+   vyzerajú obe ako zapnuté. */
+.lmap-podklad {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  margin: 0 0 14px; padding: 2px; border-radius: 10px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .16);
+}
+.lmap-podklad button {
+  padding: 8px 6px; border: 0; cursor: pointer;
+  background: transparent; color: rgba(243, 237, 225, .55);
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em;
+  text-transform: uppercase; border-radius: 8px;
+  transition: background .16s ease, color .16s ease;
+}
+.lmap-podklad button:hover { color: rgba(243, 237, 225, .9); background: rgba(255, 255, 255, .07); }
+.lmap-podklad button.is-on {
+  background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
+  color: var(--l-card);
+}
