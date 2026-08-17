@@ -1,0 +1,4065 @@
+{
+ "domovska-desktop": {
+  "lang": "sk",
+  "kontrast": [
+   {
+    "el": "span.lnav-count",
+    "text": "6",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.lnav-rowlabel",
+    "text": "Ďalší obsah",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "⚜",
+    "pomer": 1.59,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "a.lakv-more",
+    "text": "CELÁ KRONIKA →",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span",
+    "text": "→",
+    "pomer": 1,
+    "min": 4.5,
+    "px": 15
+   },
+   {
+    "el": "span.lakv-hint",
+    "text": "listujte šípkami alebo potiahnit",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 14
+   },
+   {
+    "el": "span.lakv-date",
+    "text": "15. júna 2026 · 1 min",
+    "pomer": 1.79,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "Oblík – výskum kultovej hory",
+    "pomer": 1.17,
+    "min": 3,
+    "px": 19
+   },
+   {
+    "el": "span.lakv-year.lakv-year-old",
+    "text": "2013",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "span.lakv-place",
+    "text": "◍ Bojná — Valy",
+    "pomer": 1.17,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "7",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "button.lmap-pad-c",
+    "text": "✛",
+    "pomer": 4.17,
+    "min": 4.5,
+    "px": 10
+   },
+   {
+    "el": "p.lcat-intro",
+    "text": "Hradiská triedime podľa toho, čo",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 17
+   },
+   {
+    "el": "span.ljoin-eyebrow",
+    "text": "Buďme hrdí na naše dejiny",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.ljoin-mail-lbl",
+    "text": "Pošlite fotky na",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span",
+    "text": "Čo pomôže najviac",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.lfoot-tag",
+    "text": "Slovanské hradiská",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 11
+   }
+  ],
+  "ciele": [
+   {
+    "el": "button",
+    "w": 78,
+    "h": 33,
+    "text": "Pôvodná"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Uhlie"
+   },
+   {
+    "el": "button",
+    "w": 64,
+    "h": 33,
+    "text": "Patina"
+   },
+   {
+    "el": "button",
+    "w": 70,
+    "h": 33,
+    "text": "Bridlica"
+   },
+   {
+    "el": "button",
+    "w": 60,
+    "h": 33,
+    "text": "Mach"
+   },
+   {
+    "el": "button",
+    "w": 61,
+    "h": 33,
+    "text": "Pečať"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Hlina"
+   },
+   {
+    "el": "button",
+    "w": 56,
+    "h": 33,
+    "text": "Okra"
+   },
+   {
+    "el": "button",
+    "w": 77,
+    "h": 33,
+    "text": "Terakota"
+   },
+   {
+    "el": "a",
+    "w": 106,
+    "h": 18,
+    "text": "← na web (starý šat)"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 134,
+    "h": 33,
+    "text": "Kniežacie sídla6"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 158,
+    "h": 33,
+    "text": "Mocenské centrá29"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 146,
+    "h": 33,
+    "text": "Strážna funkcia41"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 93,
+    "h": 33,
+    "text": "Refugiá13"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 144,
+    "h": 33,
+    "text": "Staroveké sídla38"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 118,
+    "h": 33,
+    "text": "Všeobecne21"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 92,
+    "h": 32,
+    "text": "Svätyne14"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 83,
+    "h": 32,
+    "text": "Tabule13"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 87,
+    "h": 32,
+    "text": "Povesti15"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 151,
+    "h": 32,
+    "text": "Listiny a pramene21"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 131,
+    "h": 32,
+    "text": "Odborné texty21"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 109,
+    "h": 32,
+    "text": "3D modely51"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 96,
+    "h": 32,
+    "text": "Aktuality80"
+   },
+   {
+    "el": "a.lnav-link",
+    "w": 47,
+    "h": 21,
+    "text": "Galéria"
+   },
+   {
+    "el": "a.lnav-link",
+    "w": 59,
+    "h": 21,
+    "text": "Aktuality"
+   },
+   {
+    "el": "button",
+    "w": 126,
+    "h": 39,
+    "text": "Prihlásiť sa"
+   },
+   {
+    "el": "input.flex-1.min-w-0",
+    "w": 1276,
+    "h": 32,
+    "text": "Vyhľadávanie lokalít a člá"
+   },
+   {
+    "el": "a.lakv-more",
+    "w": 101,
+    "h": 23,
+    "text": "CELÁ KRONIKA →"
+   },
+   {
+    "el": "button.lakv-step",
+    "w": 38,
+    "h": 38,
+    "text": "Novšie zápisy"
+   },
+   {
+    "el": "button.lakv-step",
+    "w": 38,
+    "h": 38,
+    "text": "Staršie zápisy"
+   },
+   {
+    "el": "a.lakv-more",
+    "w": 98,
+    "h": 23,
+    "text": "CELÁ GALÉRIA →"
+   },
+   {
+    "el": "button.lmap-outside",
+    "w": 202,
+    "h": 30,
+    "text": "7 lokalít leží za hranicam"
+   },
+   {
+    "el": "button.is-on",
+    "w": 132,
+    "h": 31,
+    "text": "Reliéf"
+   },
+   {
+    "el": "button",
+    "w": 132,
+    "h": 31,
+    "text": "Satelit"
+   },
+   {
+    "el": "button.lmap-legend-h",
+    "w": 271,
+    "h": 29,
+    "text": "Kategórie lokalít +"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Staré Město - Velehrad"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Bíňa"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Břeclav - Pohansko"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Chotěbuz - Podobora"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Zemplín"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Zvolen-Môťová, hrádok Prie"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Šarišské Sokolovce"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Majcichov"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Dreveník"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Obišovce - Stráža"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Kamenec pod Vtáčnikom/Byst"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Podtureň"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Pružina - Mesciská"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Starý Koňuš"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Zámčisko - Nová Baňa"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Mužla - Čenkov"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Kusín"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Lipt. Štiavnica - Lúčny Hr"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Brekov"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Detva - Kalamárka"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Sitno"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Vráble-Fidvár - mesto z do"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Unín - Zámčisko"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Turčianska Blatnica – Pleš"
+   },
+   {
+    "el": "button.lmap-pad-u",
+    "w": 34,
+    "h": 28,
+    "text": "▲"
+   },
+   {
+    "el": "button.lmap-pad-l",
+    "w": 34,
+    "h": 28,
+    "text": "◀"
+   },
+   {
+    "el": "button.lmap-pad-c",
+    "w": 34,
+    "h": 28,
+    "text": "✛"
+   },
+   {
+    "el": "button.lmap-pad-r",
+    "w": 34,
+    "h": 28,
+    "text": "▶"
+   },
+   {
+    "el": "button.lmap-pad-d",
+    "w": 34,
+    "h": 28,
+    "text": "▼"
+   },
+   {
+    "el": "button",
+    "w": 42,
+    "h": 40,
+    "text": "+"
+   },
+   {
+    "el": "button",
+    "w": 42,
+    "h": 40,
+    "text": "−"
+   },
+   {
+    "el": "button.lmap-zoom-reset",
+    "w": 42,
+    "h": 40,
+    "text": "1:1"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Facebook"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Instagram"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "YouTube"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "E-mail"
+   },
+   {
+    "el": "a",
+    "w": 105,
+    "h": 32,
+    "text": "Kniežacie sídla"
+   },
+   {
+    "el": "a",
+    "w": 122,
+    "h": 32,
+    "text": "Mocenské centrá"
+   },
+   {
+    "el": "a",
+    "w": 57,
+    "h": 32,
+    "text": "Svätyne"
+   },
+   {
+    "el": "a",
+    "w": 174,
+    "h": 32,
+    "text": "Všeobecne o hradiskách"
+   },
+   {
+    "el": "a",
+    "w": 52,
+    "h": 32,
+    "text": "Povesti"
+   },
+   {
+    "el": "a",
+    "w": 125,
+    "h": 32,
+    "text": "Listiny a pramene"
+   },
+   {
+    "el": "a",
+    "w": 102,
+    "h": 32,
+    "text": "Odborné texty"
+   },
+   {
+    "el": "a",
+    "w": 77,
+    "h": 32,
+    "text": "3D modely"
+   },
+   {
+    "el": "a",
+    "w": 62,
+    "h": 32,
+    "text": "Aktuality"
+   },
+   {
+    "el": "a",
+    "w": 41,
+    "h": 32,
+    "text": "O nás"
+   },
+   {
+    "el": "a",
+    "w": 26,
+    "h": 32,
+    "text": "Tím"
+   },
+   {
+    "el": "a",
+    "w": 54,
+    "h": 32,
+    "text": "Kontakt"
+   },
+   {
+    "el": "a",
+    "w": 95,
+    "h": 32,
+    "text": "Podporte nás"
+   },
+   {
+    "el": "a",
+    "w": 166,
+    "h": 20,
+    "text": "Ochrana osobných údajov"
+   },
+   {
+    "el": "a",
+    "w": 143,
+    "h": 20,
+    "text": "Podmienky používania"
+   },
+   {
+    "el": "button",
+    "w": 159,
+    "h": 20,
+    "text": "Zvyky hradiska (cookies)"
+   },
+   {
+    "el": "button.lfoot-up",
+    "w": 38,
+    "h": 38,
+    "text": "Späť hore"
+   }
+  ],
+  "obrazky": [
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_full.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_14030839_171692423253423_14130616",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Mapa_200_a9dd1593d9.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_ortofoto_iza_1950_24985008af.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_danuvina_alacris_f3481493e1.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Greek_Galleys_ed6d09d796.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_242886386_980833445800560_1941272",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_309485061_526211152670207_6989409",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_dron_2_f911c4c569.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Uvodna_fotka_Gdansk_Keltasek_4dfb",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_dunaujvaros_32_b879b08ce5.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_23_e34d202a93.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_IMG_20210624_092657_be61af7547.jp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Obal_396e3d04b6.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Symbol_Furiorix_26839a81ad.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "l243174_3a097b2861.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "V_C3_A9_DY_092257a7b4.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_keltsky_mec_puchovska_skala_1302f",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_24883120_394503297639000_16119390",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_digi_Hradiska_1_16c2d0f44f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_RR_e44c6d69b1.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_21994206_1973656746243155_8864288",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_img229_06167aa9c0.jpeg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "geocache_2_C_ke_C5_A1ka_skr_C3_BD_C5_A1_",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_IMG_8191_bf613f6267.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_C5_A1imunky_z_kr_C3_A1pky_zima_C5",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_0001_76b613342f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_IMG_5540_37a52be9e3.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_11402843_901453983253979_54332565",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "cvengros_bbb8c3c953.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_11061992_10153051302257347_589850",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_10410432_4354161550062_3482341036",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "zakaz_detektorov_3a271b8638.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_podmevon2_584c1f8b46.png",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_b3_b837210975.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_994808_10200648811247210_19308865",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_1_908a5e40fe.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mapa_VM_47fab93b65.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "bojna-cover.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medailon-bojna.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "bojna-od-vychodu.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "brana.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "bojna-09-reconstruction.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "large_Mikulcice_letecka_rekonstrukcia_hr",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Demian_861010d38f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Pla_CC_81nik_6643c66390.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_L_C2_A3u_CC_88ny_hr_C2_B0b_od_Z_17",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Zlato_1_cc7b1d89aa.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_lupis2_cd92eedea0.png",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_fortificationfinaledit_9865a40e30.",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_geograf_vyznaceni_merhanos_a55eccd",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_vs_CC_8_Cetky_3_typy_f6a4871986.jp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Obr01_Salkovsky2_3956177981.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_voj_map_5246864271.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Mapa_200_a9dd1593d9.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   }
+  ],
+  "mena": [
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   },
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   },
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   },
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   }
+  ],
+  "vstupy": [],
+  "nadpisy": [
+   2,
+   2,
+   2,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   2,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3
+  ],
+  "skip": null,
+  "zaostrenie": {
+   "spolu": 26,
+   "bezRamu": []
+  }
+ },
+ "clanok-desktop": {
+  "lang": "sk",
+  "kontrast": [
+   {
+    "el": "span.lnav-count",
+    "text": "6",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.lnav-rowlabel",
+    "text": "Ďalší obsah",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "Zdieľať článok",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "h3",
+    "text": "Lokalita",
+    "pomer": 2.34,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "p",
+    "text": "48.8081° N · 17.0871° E",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "div",
+    "text": "1",
+    "pomer": 3.58,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "div",
+    "text": "Územie bolo osídlené už v 7. sto",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "p.lart-more-s",
+    "text": "Vybrali sme články súvisiace s t",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 16
+   },
+   {
+    "el": "span",
+    "text": "Odborné texty",
+    "pomer": 1.1,
+    "min": 4.5,
+    "px": 10
+   },
+   {
+    "el": "h3",
+    "text": "P. Šalkovský: Náčelníci, kniežat",
+    "pomer": 1.19,
+    "min": 3,
+    "px": 24
+   },
+   {
+    "el": "p",
+    "text": "Migrácie slovanských kmeňov na z",
+    "pomer": 1.22,
+    "min": 4.5,
+    "px": 16
+   },
+   {
+    "el": "span",
+    "text": "11. 5. 2020",
+    "pomer": 1.59,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span.lfoot-tag",
+    "text": "Slovanské hradiská",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 11
+   }
+  ],
+  "ciele": [
+   {
+    "el": "button",
+    "w": 78,
+    "h": 33,
+    "text": "Pôvodná"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Uhlie"
+   },
+   {
+    "el": "button",
+    "w": 64,
+    "h": 33,
+    "text": "Patina"
+   },
+   {
+    "el": "button",
+    "w": 70,
+    "h": 33,
+    "text": "Bridlica"
+   },
+   {
+    "el": "button",
+    "w": 60,
+    "h": 33,
+    "text": "Mach"
+   },
+   {
+    "el": "button",
+    "w": 61,
+    "h": 33,
+    "text": "Pečať"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Hlina"
+   },
+   {
+    "el": "button",
+    "w": 56,
+    "h": 33,
+    "text": "Okra"
+   },
+   {
+    "el": "button",
+    "w": 77,
+    "h": 33,
+    "text": "Terakota"
+   },
+   {
+    "el": "a",
+    "w": 106,
+    "h": 18,
+    "text": "← na web (starý šat)"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 134,
+    "h": 33,
+    "text": "Kniežacie sídla6"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 158,
+    "h": 33,
+    "text": "Mocenské centrá29"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 146,
+    "h": 33,
+    "text": "Strážna funkcia41"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 93,
+    "h": 33,
+    "text": "Refugiá13"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 144,
+    "h": 33,
+    "text": "Staroveké sídla38"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 118,
+    "h": 33,
+    "text": "Všeobecne21"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 92,
+    "h": 32,
+    "text": "Svätyne14"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 83,
+    "h": 32,
+    "text": "Tabule13"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 87,
+    "h": 32,
+    "text": "Povesti15"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 151,
+    "h": 32,
+    "text": "Listiny a pramene21"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 131,
+    "h": 32,
+    "text": "Odborné texty21"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 109,
+    "h": 32,
+    "text": "3D modely51"
+   },
+   {
+    "el": "button.lnav-cat-btn",
+    "w": 96,
+    "h": 32,
+    "text": "Aktuality80"
+   },
+   {
+    "el": "a.lnav-link",
+    "w": 47,
+    "h": 21,
+    "text": "Galéria"
+   },
+   {
+    "el": "a.lnav-link",
+    "w": 59,
+    "h": 21,
+    "text": "Aktuality"
+   },
+   {
+    "el": "button",
+    "w": 126,
+    "h": 39,
+    "text": "Prihlásiť sa"
+   },
+   {
+    "el": "a",
+    "w": 43,
+    "h": 20,
+    "text": "Domov"
+   },
+   {
+    "el": "a",
+    "w": 91,
+    "h": 20,
+    "text": "Kniežacie sídla"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na Facebook"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na WhatsApp"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na Instagram"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na YouTube"
+   },
+   {
+    "el": "button",
+    "w": 40,
+    "h": 40,
+    "text": "Kopírovať odkaz"
+   },
+   {
+    "el": "a.text-amber-700.dark:text-amber-400",
+    "w": 269,
+    "h": 20,
+    "text": "Kostolom sv. Margity Antio"
+   },
+   {
+    "el": "a.text-amber-700.dark:text-amber-400",
+    "w": 152,
+    "h": 20,
+    "text": "Bohatstvo Slovenov"
+   },
+   {
+    "el": "a.text-amber-700.hover:text-amber-900",
+    "w": 292,
+    "h": 24,
+    "text": "http://www.cea.livinghisto"
+   },
+   {
+    "el": "a.text-amber-700.hover:text-amber-900",
+    "w": 279,
+    "h": 24,
+    "text": "http://staramorava.euweb.c"
+   },
+   {
+    "el": "a.text-amber-700.hover:text-amber-900",
+    "w": 513,
+    "h": 24,
+    "text": "http://www.kopcany.sk/show"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na Facebook"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na WhatsApp"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na Instagram"
+   },
+   {
+    "el": "a",
+    "w": 40,
+    "h": 40,
+    "text": "Zdieľať na YouTube"
+   },
+   {
+    "el": "button",
+    "w": 40,
+    "h": 40,
+    "text": "Kopírovať odkaz"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 18,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 83,
+    "h": 18,
+    "text": "Odpovedať"
+   },
+   {
+    "el": "button",
+    "w": 117,
+    "h": 41,
+    "text": "Prihlásiť sa"
+   },
+   {
+    "el": "button",
+    "w": 149,
+    "h": 41,
+    "text": "Zaregistrovať sa"
+   },
+   {
+    "el": "div.marker.maplibregl-marker",
+    "w": 32,
+    "h": 42,
+    "text": ""
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-in",
+    "w": 29,
+    "h": 29,
+    "text": "Zoom in"
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-out",
+    "w": 29,
+    "h": 29,
+    "text": "Zoom out"
+   },
+   {
+    "el": "button.maplibregl-ctrl-compass",
+    "w": 29,
+    "h": 29,
+    "text": "Reset bearing to north"
+   },
+   {
+    "el": "button.maplibregl-ctrl-fullscreen",
+    "w": 29,
+    "h": 29,
+    "text": "Enter fullscreen"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Facebook"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Instagram"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "YouTube"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "E-mail"
+   },
+   {
+    "el": "a",
+    "w": 105,
+    "h": 32,
+    "text": "Kniežacie sídla"
+   },
+   {
+    "el": "a",
+    "w": 122,
+    "h": 32,
+    "text": "Mocenské centrá"
+   },
+   {
+    "el": "a",
+    "w": 57,
+    "h": 32,
+    "text": "Svätyne"
+   },
+   {
+    "el": "a",
+    "w": 174,
+    "h": 32,
+    "text": "Všeobecne o hradiskách"
+   },
+   {
+    "el": "a",
+    "w": 52,
+    "h": 32,
+    "text": "Povesti"
+   },
+   {
+    "el": "a",
+    "w": 125,
+    "h": 32,
+    "text": "Listiny a pramene"
+   },
+   {
+    "el": "a",
+    "w": 102,
+    "h": 32,
+    "text": "Odborné texty"
+   },
+   {
+    "el": "a",
+    "w": 77,
+    "h": 32,
+    "text": "3D modely"
+   },
+   {
+    "el": "a",
+    "w": 62,
+    "h": 32,
+    "text": "Aktuality"
+   },
+   {
+    "el": "a",
+    "w": 41,
+    "h": 32,
+    "text": "O nás"
+   },
+   {
+    "el": "a",
+    "w": 26,
+    "h": 32,
+    "text": "Tím"
+   },
+   {
+    "el": "a",
+    "w": 54,
+    "h": 32,
+    "text": "Kontakt"
+   },
+   {
+    "el": "a",
+    "w": 95,
+    "h": 32,
+    "text": "Podporte nás"
+   },
+   {
+    "el": "a",
+    "w": 166,
+    "h": 20,
+    "text": "Ochrana osobných údajov"
+   },
+   {
+    "el": "a",
+    "w": 143,
+    "h": 20,
+    "text": "Podmienky používania"
+   },
+   {
+    "el": "button",
+    "w": 159,
+    "h": 20,
+    "text": "Zvyky hradiska (cookies)"
+   },
+   {
+    "el": "button.lfoot-up",
+    "w": 38,
+    "h": 38,
+    "text": "Späť hore"
+   }
+  ],
+  "obrazky": [
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikulcice_letecka_rekonstrukcia_hradiska",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_C4_8_Dice_52656c814a.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "most_d9c5d0c343.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikul_C4_8_Dice_mapa_1ec1966f70.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_pal_C3_A1c_dc357b3884.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "palacmikulcice_c3bf096828.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_most_34bc745f1b.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6291532_d1a0354b49.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_C4_8_Dice_52656c814a.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "most_d9c5d0c343.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikul_C4_8_Dice_mapa_1ec1966f70.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_pal_C3_A1c_dc357b3884.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "palacmikulcice_c3bf096828.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_most_34bc745f1b.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6291532_d1a0354b49.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikul_rekon_C5_A1t_5258dd794b.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "kostolmikulcice_55587bb60f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mik_rotunda_3ab74a9928.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "vnutri2_ac7b8de450.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "val_235f0ae568.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6261425_9d894898b5.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6261426_2a4fcaeb54.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6281523_f997f187af.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6291527_853ecd2344.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2186_1_53d0ae8fb8.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2190_1_ef5449c9bc.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2191_1_4f6ea2e3e8.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2217_1_da1a9b309a.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2220_1_85e311da45.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2225_1_c9f5a039dd.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Obr01_c18e9ec59c.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "thumbnail_kop_C4_8_Dany_rekon_C5_A1trukc",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Sken_47_41fff85bbe.jpeg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Nitra_Neutra_Nyitra_Nitriansko_2b7",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Fredegar_47383a78e9.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   }
+  ],
+  "mena": [],
+  "vstupy": [],
+  "nadpisy": [
+   1,
+   2,
+   2,
+   2,
+   2,
+   3,
+   3,
+   2,
+   2,
+   3,
+   3,
+   4,
+   3,
+   3,
+   3,
+   4,
+   4,
+   4,
+   4,
+   4,
+   2,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3
+  ],
+  "skip": null,
+  "zaostrenie": {
+   "spolu": 26,
+   "bezRamu": []
+  }
+ },
+ "domovska-mobil": {
+  "lang": "sk",
+  "kontrast": [
+   {
+    "el": "span",
+    "text": "⚜",
+    "pomer": 1.59,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "a.lakv-more",
+    "text": "CELÁ KRONIKA →",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span",
+    "text": "→",
+    "pomer": 1,
+    "min": 4.5,
+    "px": 15
+   },
+   {
+    "el": "span.lakv-date",
+    "text": "15. júna 2026 · 1 min",
+    "pomer": 1.79,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "Oblík – výskum kultovej hory",
+    "pomer": 1.17,
+    "min": 3,
+    "px": 19
+   },
+   {
+    "el": "span.lakv-year.lakv-year-old",
+    "text": "2013",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.lakv-place",
+    "text": "◍ Bojná — Valy",
+    "pomer": 1.17,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "div.lmap-sub",
+    "text": "Slovenska",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 20
+   },
+   {
+    "el": "span",
+    "text": "7",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "span",
+    "text": "Ťuknutím otvoríte mapu na celú o",
+    "pomer": 1.13,
+    "min": 4.5,
+    "px": 14
+   },
+   {
+    "el": "p.lcat-intro",
+    "text": "Hradiská triedime podľa toho, čo",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 17
+   },
+   {
+    "el": "span.ljoin-eyebrow",
+    "text": "Buďme hrdí na naše dejiny",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.ljoin-mail-lbl",
+    "text": "Pošlite fotky na",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span",
+    "text": "Čo pomôže najviac",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.lfoot-tag",
+    "text": "Slovanské hradiská",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 11
+   }
+  ],
+  "ciele": [
+   {
+    "el": "button",
+    "w": 78,
+    "h": 33,
+    "text": "Pôvodná"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Uhlie"
+   },
+   {
+    "el": "button",
+    "w": 64,
+    "h": 33,
+    "text": "Patina"
+   },
+   {
+    "el": "button",
+    "w": 70,
+    "h": 33,
+    "text": "Bridlica"
+   },
+   {
+    "el": "button",
+    "w": 60,
+    "h": 33,
+    "text": "Mach"
+   },
+   {
+    "el": "button",
+    "w": 61,
+    "h": 33,
+    "text": "Pečať"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Hlina"
+   },
+   {
+    "el": "button",
+    "w": 56,
+    "h": 33,
+    "text": "Okra"
+   },
+   {
+    "el": "button",
+    "w": 77,
+    "h": 33,
+    "text": "Terakota"
+   },
+   {
+    "el": "a",
+    "w": 106,
+    "h": 18,
+    "text": "← na web (starý šat)"
+   },
+   {
+    "el": "a.lnav-brand",
+    "w": 124,
+    "h": 38,
+    "text": "Hradiská"
+   },
+   {
+    "el": "button",
+    "w": 46,
+    "h": 30,
+    "text": "Prihlásiť sa"
+   },
+   {
+    "el": "input.flex-1.min-w-0",
+    "w": 258,
+    "h": 32,
+    "text": "Vyhľadávanie lokalít a člá"
+   },
+   {
+    "el": "a.lakv-more",
+    "w": 101,
+    "h": 23,
+    "text": "CELÁ KRONIKA →"
+   },
+   {
+    "el": "a.lakv-more",
+    "w": 98,
+    "h": 23,
+    "text": "CELÁ GALÉRIA →"
+   },
+   {
+    "el": "button.lmap-outside",
+    "w": 202,
+    "h": 30,
+    "text": "7 lokalít leží za hranicam"
+   },
+   {
+    "el": "button.is-on",
+    "w": 171,
+    "h": 31,
+    "text": "Reliéf"
+   },
+   {
+    "el": "button",
+    "w": 171,
+    "h": 31,
+    "text": "Satelit"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Chotěbuz - Podobora"
+   },
+   {
+    "el": "button.lmap-pin",
+    "w": 30,
+    "h": 30,
+    "text": "Zemplín"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Facebook"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Instagram"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "YouTube"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "E-mail"
+   },
+   {
+    "el": "a",
+    "w": 105,
+    "h": 32,
+    "text": "Kniežacie sídla"
+   },
+   {
+    "el": "a",
+    "w": 122,
+    "h": 32,
+    "text": "Mocenské centrá"
+   },
+   {
+    "el": "a",
+    "w": 57,
+    "h": 32,
+    "text": "Svätyne"
+   },
+   {
+    "el": "a",
+    "w": 52,
+    "h": 32,
+    "text": "Povesti"
+   },
+   {
+    "el": "a",
+    "w": 125,
+    "h": 32,
+    "text": "Listiny a pramene"
+   },
+   {
+    "el": "a",
+    "w": 102,
+    "h": 32,
+    "text": "Odborné texty"
+   },
+   {
+    "el": "a",
+    "w": 77,
+    "h": 32,
+    "text": "3D modely"
+   },
+   {
+    "el": "a",
+    "w": 62,
+    "h": 32,
+    "text": "Aktuality"
+   },
+   {
+    "el": "a",
+    "w": 41,
+    "h": 32,
+    "text": "O nás"
+   },
+   {
+    "el": "a",
+    "w": 26,
+    "h": 32,
+    "text": "Tím"
+   },
+   {
+    "el": "a",
+    "w": 54,
+    "h": 32,
+    "text": "Kontakt"
+   },
+   {
+    "el": "a",
+    "w": 95,
+    "h": 32,
+    "text": "Podporte nás"
+   },
+   {
+    "el": "a",
+    "w": 166,
+    "h": 20,
+    "text": "Ochrana osobných údajov"
+   },
+   {
+    "el": "a",
+    "w": 143,
+    "h": 20,
+    "text": "Podmienky používania"
+   },
+   {
+    "el": "button",
+    "w": 159,
+    "h": 20,
+    "text": "Zvyky hradiska (cookies)"
+   },
+   {
+    "el": "button.lfoot-install",
+    "w": 122,
+    "h": 20,
+    "text": "Nainštalovať appku"
+   },
+   {
+    "el": "button.lfoot-up",
+    "w": 38,
+    "h": 38,
+    "text": "Späť hore"
+   }
+  ],
+  "obrazky": [
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_full.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_14030839_171692423253423_14130616",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Mapa_200_a9dd1593d9.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_ortofoto_iza_1950_24985008af.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_danuvina_alacris_f3481493e1.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Greek_Galleys_ed6d09d796.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_242886386_980833445800560_1941272",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_309485061_526211152670207_6989409",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_dron_2_f911c4c569.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Uvodna_fotka_Gdansk_Keltasek_4dfb",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_dunaujvaros_32_b879b08ce5.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_23_e34d202a93.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_IMG_20210624_092657_be61af7547.jp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Obal_396e3d04b6.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Symbol_Furiorix_26839a81ad.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "l243174_3a097b2861.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "V_C3_A9_DY_092257a7b4.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_keltsky_mec_puchovska_skala_1302f",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_24883120_394503297639000_16119390",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_digi_Hradiska_1_16c2d0f44f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_RR_e44c6d69b1.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_21994206_1973656746243155_8864288",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_img229_06167aa9c0.jpeg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "geocache_2_C_ke_C5_A1ka_skr_C3_BD_C5_A1_",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_IMG_8191_bf613f6267.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_C5_A1imunky_z_kr_C3_A1pky_zima_C5",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_0001_76b613342f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_IMG_5540_37a52be9e3.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_11402843_901453983253979_54332565",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "cvengros_bbb8c3c953.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_11061992_10153051302257347_589850",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_10410432_4354161550062_3482341036",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "zakaz_detektorov_3a271b8638.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_podmevon2_584c1f8b46.png",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_b3_b837210975.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_994808_10200648811247210_19308865",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_1_908a5e40fe.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mapa_VM_47fab93b65.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "bojna-cover.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medailon-bojna.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "bojna-od-vychodu.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "brana.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "bojna-09-reconstruction.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "medium_Mikulcice_letecka_rekonstrukcia_h",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Demian_861010d38f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Pla_CC_81nik_6643c66390.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_L_C2_A3u_CC_88ny_hr_C2_B0b_od_Z_17",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Zlato_1_cc7b1d89aa.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_lupis2_cd92eedea0.png",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_fortificationfinaledit_9865a40e30.",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_geograf_vyznaceni_merhanos_a55eccd",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_vs_CC_8_Cetky_3_typy_f6a4871986.jp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Obr01_Salkovsky2_3956177981.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_voj_map_5246864271.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Mapa_200_a9dd1593d9.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   }
+  ],
+  "mena": [
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   },
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   },
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   },
+   {
+    "el": "a.lakv-tile",
+    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
+   }
+  ],
+  "vstupy": [],
+  "nadpisy": [
+   2,
+   2,
+   2,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   2,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3
+  ],
+  "skip": null,
+  "zaostrenie": {
+   "spolu": 26,
+   "bezRamu": [
+    "input.flex-1.min-w-0 · Vyhľadávanie lokalít a č"
+   ]
+  }
+ },
+ "clanok-mobil": {
+  "lang": "sk",
+  "kontrast": [
+   {
+    "el": "a",
+    "text": "Domov",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "span",
+    "text": "›",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "span",
+    "text": "Zdieľať článok",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "h3",
+    "text": "Kľúčové fakty",
+    "pomer": 2.99,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "h3",
+    "text": "Lokalita",
+    "pomer": 2.34,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "p",
+    "text": "48.8081° N · 17.0871° E",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "p.lart-more-s",
+    "text": "Vybrali sme články súvisiace s t",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 16
+   },
+   {
+    "el": "span",
+    "text": "Odborné texty",
+    "pomer": 1.1,
+    "min": 4.5,
+    "px": 10
+   },
+   {
+    "el": "h3",
+    "text": "P. Šalkovský: Náčelníci, kniežat",
+    "pomer": 1.19,
+    "min": 3,
+    "px": 24
+   },
+   {
+    "el": "p",
+    "text": "Migrácie slovanských kmeňov na z",
+    "pomer": 1.22,
+    "min": 4.5,
+    "px": 16
+   },
+   {
+    "el": "span",
+    "text": "11. 5. 2020",
+    "pomer": 1.59,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span.lfoot-tag",
+    "text": "Slovanské hradiská",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 11
+   }
+  ],
+  "ciele": [
+   {
+    "el": "button",
+    "w": 78,
+    "h": 33,
+    "text": "Pôvodná"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Uhlie"
+   },
+   {
+    "el": "button",
+    "w": 64,
+    "h": 33,
+    "text": "Patina"
+   },
+   {
+    "el": "button",
+    "w": 70,
+    "h": 33,
+    "text": "Bridlica"
+   },
+   {
+    "el": "button",
+    "w": 60,
+    "h": 33,
+    "text": "Mach"
+   },
+   {
+    "el": "button",
+    "w": 61,
+    "h": 33,
+    "text": "Pečať"
+   },
+   {
+    "el": "button",
+    "w": 58,
+    "h": 33,
+    "text": "Hlina"
+   },
+   {
+    "el": "button",
+    "w": 56,
+    "h": 33,
+    "text": "Okra"
+   },
+   {
+    "el": "button",
+    "w": 77,
+    "h": 33,
+    "text": "Terakota"
+   },
+   {
+    "el": "a",
+    "w": 106,
+    "h": 18,
+    "text": "← na web (starý šat)"
+   },
+   {
+    "el": "a.lnav-brand",
+    "w": 124,
+    "h": 38,
+    "text": "Hradiská"
+   },
+   {
+    "el": "button",
+    "w": 46,
+    "h": 30,
+    "text": "Prihlásiť sa"
+   },
+   {
+    "el": "a",
+    "w": 43,
+    "h": 20,
+    "text": "Domov"
+   },
+   {
+    "el": "a",
+    "w": 91,
+    "h": 20,
+    "text": "Kniežacie sídla"
+   },
+   {
+    "el": "button",
+    "w": 40,
+    "h": 44,
+    "text": "Kopírovať odkaz"
+   },
+   {
+    "el": "a.text-amber-700.hover:text-amber-900",
+    "w": 263,
+    "h": 21,
+    "text": "http://www.cea.livinghisto"
+   },
+   {
+    "el": "a.text-amber-700.hover:text-amber-900",
+    "w": 251,
+    "h": 21,
+    "text": "http://staramorava.euweb.c"
+   },
+   {
+    "el": "button",
+    "w": 40,
+    "h": 44,
+    "text": "Kopírovať odkaz"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "button",
+    "w": 28,
+    "h": 44,
+    "text": "0"
+   },
+   {
+    "el": "div.marker.maplibregl-marker",
+    "w": 32,
+    "h": 42,
+    "text": ""
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-in",
+    "w": 29,
+    "h": 44,
+    "text": "Zoom in"
+   },
+   {
+    "el": "button.maplibregl-ctrl-zoom-out",
+    "w": 29,
+    "h": 44,
+    "text": "Zoom out"
+   },
+   {
+    "el": "button.maplibregl-ctrl-compass",
+    "w": 29,
+    "h": 44,
+    "text": "Reset bearing to north"
+   },
+   {
+    "el": "button.maplibregl-ctrl-fullscreen",
+    "w": 29,
+    "h": 44,
+    "text": "Enter fullscreen"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Facebook"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "Instagram"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "YouTube"
+   },
+   {
+    "el": "a",
+    "w": 38,
+    "h": 38,
+    "text": "E-mail"
+   },
+   {
+    "el": "a",
+    "w": 105,
+    "h": 32,
+    "text": "Kniežacie sídla"
+   },
+   {
+    "el": "a",
+    "w": 122,
+    "h": 32,
+    "text": "Mocenské centrá"
+   },
+   {
+    "el": "a",
+    "w": 57,
+    "h": 32,
+    "text": "Svätyne"
+   },
+   {
+    "el": "a",
+    "w": 52,
+    "h": 32,
+    "text": "Povesti"
+   },
+   {
+    "el": "a",
+    "w": 125,
+    "h": 32,
+    "text": "Listiny a pramene"
+   },
+   {
+    "el": "a",
+    "w": 102,
+    "h": 32,
+    "text": "Odborné texty"
+   },
+   {
+    "el": "a",
+    "w": 77,
+    "h": 32,
+    "text": "3D modely"
+   },
+   {
+    "el": "a",
+    "w": 62,
+    "h": 32,
+    "text": "Aktuality"
+   },
+   {
+    "el": "a",
+    "w": 41,
+    "h": 32,
+    "text": "O nás"
+   },
+   {
+    "el": "a",
+    "w": 26,
+    "h": 32,
+    "text": "Tím"
+   },
+   {
+    "el": "a",
+    "w": 54,
+    "h": 32,
+    "text": "Kontakt"
+   },
+   {
+    "el": "a",
+    "w": 95,
+    "h": 32,
+    "text": "Podporte nás"
+   },
+   {
+    "el": "a",
+    "w": 166,
+    "h": 20,
+    "text": "Ochrana osobných údajov"
+   },
+   {
+    "el": "a",
+    "w": 143,
+    "h": 20,
+    "text": "Podmienky používania"
+   },
+   {
+    "el": "button",
+    "w": 159,
+    "h": 20,
+    "text": "Zvyky hradiska (cookies)"
+   },
+   {
+    "el": "button.lfoot-install",
+    "w": 122,
+    "h": 20,
+    "text": "Nainštalovať appku"
+   },
+   {
+    "el": "button.lfoot-up",
+    "w": 38,
+    "h": 38,
+    "text": "Späť hore"
+   }
+  ],
+  "obrazky": [
+   {
+    "src": "logo_hradiska_small.webp",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikulcice_letecka_rekonstrukcia_hradiska",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_C4_8_Dice_52656c814a.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "most_d9c5d0c343.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikul_C4_8_Dice_mapa_1ec1966f70.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_pal_C3_A1c_dc357b3884.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "palacmikulcice_c3bf096828.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_most_34bc745f1b.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6291532_d1a0354b49.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_C4_8_Dice_52656c814a.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "most_d9c5d0c343.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikul_C4_8_Dice_mapa_1ec1966f70.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_pal_C3_A1c_dc357b3884.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "palacmikulcice_c3bf096828.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mikul_most_34bc745f1b.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6291532_d1a0354b49.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "Mikul_rekon_C5_A1t_5258dd794b.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "kostolmikulcice_55587bb60f.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "mik_rotunda_3ab74a9928.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "vnutri2_ac7b8de450.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "val_235f0ae568.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6261425_9d894898b5.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6261426_2a4fcaeb54.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6281523_f997f187af.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "P6291527_853ecd2344.JPG",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2186_1_53d0ae8fb8.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2190_1_ef5449c9bc.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2191_1_4f6ea2e3e8.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2217_1_da1a9b309a.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2220_1_85e311da45.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "IMG_2225_1_c9f5a039dd.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Obr01_c18e9ec59c.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "thumbnail_kop_C4_8_Dany_rekon_C5_A1trukc",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Sken_47_41fff85bbe.jpeg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Nitra_Neutra_Nyitra_Nitriansko_2b7",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "small_Fredegar_47383a78e9.jpg",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   }
+  ],
+  "mena": [],
+  "vstupy": [],
+  "nadpisy": [
+   1,
+   2,
+   2,
+   2,
+   2,
+   3,
+   3,
+   2,
+   2,
+   3,
+   3,
+   4,
+   3,
+   3,
+   3,
+   4,
+   4,
+   4,
+   4,
+   4,
+   2,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3,
+   3
+  ],
+  "skip": null,
+  "zaostrenie": {
+   "spolu": 26,
+   "bezRamu": []
+  }
+ }
+}

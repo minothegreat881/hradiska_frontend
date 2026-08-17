@@ -1,0 +1,224 @@
+{
+ "domovska": {
+  "merane": [
+   {
+    "el": "span.lnav-count",
+    "text": "6",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.lnav-rowlabel",
+    "text": "Ďalší obsah",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "p.lcat-intro",
+    "text": "Hradiská triedime podľa toho, čomu",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 17
+   },
+   {
+    "el": "span.ljoin-eyebrow",
+    "text": "Buďme hrdí na naše dejiny",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.ljoin-mail-lbl",
+    "text": "Pošlite fotky na",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span",
+    "text": "Čo pomôže najviac",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   }
+  ],
+  "fotka": [
+   {
+    "el": "span",
+    "text": "⚜",
+    "pomer": 1.59,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "a.lakv-more",
+    "text": "CELÁ KRONIKA →",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span",
+    "text": "→",
+    "pomer": 1,
+    "min": 4.5,
+    "px": 15
+   },
+   {
+    "el": "span.lakv-hint",
+    "text": "listujte šípkami alebo potiahnite ",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 14
+   },
+   {
+    "el": "span.lakv-date",
+    "text": "15. júna 2026 · 1 min",
+    "pomer": 1.79,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "Oblík – výskum kultovej hory",
+    "pomer": 1.17,
+    "min": 3,
+    "px": 19
+   },
+   {
+    "el": "span.lakv-year.lakv-year-old",
+    "text": "2013",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "span.lakv-place",
+    "text": "◍ Bojná — Valy",
+    "pomer": 1.17,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "7",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "button.lmap-pad-c",
+    "text": "✛",
+    "pomer": 4.17,
+    "min": 4.5,
+    "px": 10
+   },
+   {
+    "el": "span.lfoot-tag",
+    "text": "Slovanské hradiská",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 11
+   }
+  ]
+ },
+ "clanok": {
+  "merane": [
+   {
+    "el": "span.lnav-count",
+    "text": "6",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "span.lnav-rowlabel",
+    "text": "Ďalší obsah",
+    "pomer": 4.31,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "span",
+    "text": "Zdieľať článok",
+    "pomer": 2.63,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "h3",
+    "text": "Lokalita",
+    "pomer": 2.34,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "p",
+    "text": "48.8081° N · 17.0871° E",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 13
+   },
+   {
+    "el": "div",
+    "text": "1",
+    "pomer": 3.58,
+    "min": 4.5,
+    "px": 11
+   },
+   {
+    "el": "div",
+    "text": "Územie bolo osídlené už v 7. storo",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 12
+   },
+   {
+    "el": "p.lart-more-s",
+    "text": "Vybrali sme články súvisiace s tou",
+    "pomer": 3.83,
+    "min": 4.5,
+    "px": 16
+   },
+   {
+    "el": "span",
+    "text": "Odborné texty",
+    "pomer": 1.1,
+    "min": 4.5,
+    "px": 10
+   },
+   {
+    "el": "h3",
+    "text": "P. Šalkovský: Náčelníci, kniežatá ",
+    "pomer": 1.19,
+    "min": 3,
+    "px": 24
+   },
+   {
+    "el": "p",
+    "text": "Migrácie slovanských kmeňov na záp",
+    "pomer": 1.22,
+    "min": 4.5,
+    "px": 16
+   },
+   {
+    "el": "span",
+    "text": "11. 5. 2020",
+    "pomer": 1.59,
+    "min": 4.5,
+    "px": 11
+   }
+  ],
+  "fotka": [
+   {
+    "el": "span.lfoot-tag",
+    "text": "Slovanské hradiská",
+    "pomer": 3.63,
+    "min": 4.5,
+    "px": 11
+   }
+  ]
+ }
+}

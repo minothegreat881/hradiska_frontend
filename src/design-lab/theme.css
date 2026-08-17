@@ -542,7 +542,19 @@ body[data-lab-theme='mach'] {
 .lab[data-theme='pecat'],
 body[data-lab-theme='pecat'] {
   --l-paper: #f3ede1; --l-paper-2: #e8e0cf; --l-card: #fffcf6;
-  --l-ink: #14161d; --l-body: #3e414a; --l-muted: #6d6f74; --l-muted-2: #96938c;
+  /* Tiché odtiene sú rozdelené podľa PODKLADU, nie jednou hodnotou. Merané:
+     token sedí na troch plochách — karte #fffcf6, papieri #f3ede1 a tmavšom
+     papieri #e8e0cf — a jediná hodnota by sa musela riadiť tou najhoršou,
+     teda by zbytočne stmavila aj 74 výskytov na karte, ktoré normou
+     prechádzajú už dnes. Tu je hodnota pre papier a kartu; pre tmavší papier
+     je nižšie prepis na tých plochách, kde naozaj leží.
+
+     Prečo práve tieto čísla: je to najmenšia hodnota, ktorá prejde, plus
+     rezerva ~0,2. Ide o text 11–13 px, kde vyhladzovanie ťahy stenčuje
+     a nameraný pomer je optimistickejší než to, čo oko naozaj vidí. */
+  --l-ink: #14161d; --l-body: #3e414a;
+  --l-muted: #67696e;    /* 4,71:1 na papieri · 5,36:1 na karte (bolo #6d6f74 = 4,31:1) */
+  --l-muted-2: #6b6860;  /* 4,77:1 na papieri · 5,43:1 na karte (bolo #96938c = 2,63:1) */
   --l-line: #ded5c2; --l-line-2: #c8bda7;
   --l-accent: #1c1f28; --l-accent-soft: #343949; --l-accent-deep: #10131a;
   --l-accent-glow: rgba(28,31,40,.12);
@@ -1108,6 +1120,17 @@ body[data-lab-theme='pecat'] {
 .ljoin {
   position: relative; overflow: hidden;
   background: var(--l-paper-2); border-top: 1px solid var(--l-line);
+}
+/* ── Tiché odtiene na tmavšom papieri ─────────────────────────────────────
+   Plochy s podkladom `--l-paper-2` (#e8e0cf) potrebujú o stupeň tmavší text:
+   základná hodnota tam dáva 4,18:1, čo je pod normou. Píše sa to na nádobu,
+   nie na jednotlivé prvky — vlastnosť sa dedí, takže všetkých 20 výskytov
+   vnútri sa opraví naraz a v komponentoch netreba meniť nič. */
+.ljoin,
+.lart-side,
+.lart-more {
+  --l-muted: #606166;    /* 4,71:1 na #e8e0cf */
+  --l-muted-2: #636058;  /* 4,78:1 na #e8e0cf */
 }
 /* Vrstevnice v prázdne naľavo od textu (ten istý motív ako v pätičke).
    Na úzkom okne by liezli pod text, tak sa zhasnú. */
