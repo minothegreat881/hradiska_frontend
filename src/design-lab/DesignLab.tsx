@@ -98,6 +98,11 @@ export default function DesignLab() {
 
   return (
     <>
+      {/* Prvý fokusovateľný prvok na stránke. Bez neho vedie ku obsahu vyše
+          dvadsať krokov tabulátorom — cez celú navigáciu a jej rozbaľovacie
+          panely. Vidno ho, až keď naň príde zameranie. */}
+      <a className="lab-skip" href="#lab-obsah">Preskočiť na obsah</a>
+
       {/* Prepínač — súčasť laboratória, nie návrhu. */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 200, background: '#111', color: '#fff',
@@ -137,6 +142,10 @@ export default function DesignLab() {
       >
         {theme === 'povodna' ? <NavBar /> : <LabNav />}
 
+        {/* Cieľ preskočenia. `tabIndex={-1}` je nutný, aby sa dal zamerať
+            programovo — bez neho skok presunie iba pohľad, nie zameranie,
+            a ďalší tabulátor pokračuje zase od navigácie. */}
+        <div id="lab-obsah" tabIndex={-1}>
         {articleSlug ? (
           /* Stránka článku. `povodna` ukáže produkčnú, aby sa dali postaviť
              vedľa seba na tom istom článku. */
@@ -152,6 +161,8 @@ export default function DesignLab() {
             {theme !== 'povodna' && <LabJoinUs />}
           </>
         )}
+
+        </div>
 
         {/* To isté pre pätičku — v téme ide nová, `povodna` ukáže produkčnú. */}
         {theme === 'povodna' ? <Footer /> : <LabFooter />}

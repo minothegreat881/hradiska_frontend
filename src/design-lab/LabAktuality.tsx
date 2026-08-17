@@ -385,6 +385,11 @@ export default function LabAktuality() {
               key={g.src}
               href="/galeria"
               className="lakv-tile"
+              /* Meno odkazu nesie popis fotografie. Keď ho v Strapi niekto
+                 nevyplnil, odkaz ostával bez mena a čítačka ohlásila iba
+                 „odkaz" — štyri razy za sebou. Vtedy nastúpi popis miesta,
+                 a keď nie je ani ten, aspoň názov cieľa. */
+              aria-label={g.alt ? undefined : (g.place ? `Fotogaléria — ${g.place}` : 'Fotogaléria')}
               style={{ position: 'relative', display: 'block', borderRadius: i === 0 ? 26 : 20, overflow: 'hidden', gridColumn: i === 0 ? 'span 2' : undefined, gridRow: i === 0 ? 'span 2' : undefined }}
             >
               <img src={g.src} alt={g.alt} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />

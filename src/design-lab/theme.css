@@ -2257,3 +2257,41 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 /* Mapa má vlastný súbor (`styles/mapa.css`) a nesie si aj farby — v labe aj
    v produkcii vyzerá rovnako. Komponent si ho importuje sám. */
+
+/* ── Prístupnosť: preskočenie, skrytý nadpis, zameranie hľadania ──────────── */
+
+/* Preskočiť na obsah. Leží mimo obrazovky a vysunie sa, až keď naň príde
+   zameranie — inak by to bol prvý prvok, ktorý vidí každý návštevník. */
+.lab-skip {
+  position: fixed; top: 0; left: 50%; z-index: 2147483000;
+  transform: translate(-50%, -120%);
+  padding: 12px 22px; border-radius: 0 0 12px 12px;
+  background: var(--l-ink); color: var(--l-on-dark-2);
+  font-family: var(--font-heading); font-size: 13px; letter-spacing: .1em;
+  text-transform: uppercase; text-decoration: none;
+  box-shadow: 0 6px 20px rgba(20, 18, 15, .35);
+  transition: transform .18s ease;
+}
+.lab-skip:focus-visible {
+  transform: translate(-50%, 0);
+  outline: 2px solid var(--l-second); outline-offset: -4px;
+}
+/* Cieľ preskočenia nemá po zameraní kresliť rám cez celú stránku. */
+#lab-obsah:focus { outline: none; }
+#lab-obsah:focus-visible { outline: none; }
+
+/* Nadpis len pre čítačku — v osnove dokumentu je, na obrazovke nie.
+   `clip-path` namiesto `display: none`, ktoré by ho skrylo aj čítačke. */
+.lab-only-reader {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* Pole hľadania sa doteraz pri zameraní spoliehalo len na farbu rámu. Vidno
+   ho bolo, ale slabšie než čokoľvek iné v labe — a na mobile ho meranie
+   označilo za jediný prvok bez viditeľného zamerania. */
+.lab #site-search:focus-visible {
+  outline: 2px solid var(--l-second);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

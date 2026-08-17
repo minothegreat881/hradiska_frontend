@@ -3,20 +3,6 @@
   "lang": "sk",
   "kontrast": [
    {
-    "el": "span.lnav-count",
-    "text": "6",
-    "pomer": 2.63,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span.lnav-rowlabel",
-    "text": "Ďalší obsah",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 11
-   },
-   {
     "el": "span",
     "text": "⚜",
     "pomer": 1.59,
@@ -24,25 +10,11 @@
     "px": 13
    },
    {
-    "el": "a.lakv-more",
-    "text": "CELÁ KRONIKA →",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 12
-   },
-   {
     "el": "span",
     "text": "→",
     "pomer": 1,
     "min": 4.5,
     "px": 15
-   },
-   {
-    "el": "span.lakv-hint",
-    "text": "listujte šípkami alebo potiahnit",
-    "pomer": 2.63,
-    "min": 4.5,
-    "px": 14
    },
    {
     "el": "span.lakv-date",
@@ -57,13 +29,6 @@
     "pomer": 1.17,
     "min": 3,
     "px": 19
-   },
-   {
-    "el": "span.lakv-year.lakv-year-old",
-    "text": "2013",
-    "pomer": 2.63,
-    "min": 4.5,
-    "px": 13
    },
    {
     "el": "span.lakv-place",
@@ -85,44 +50,15 @@
     "pomer": 4.17,
     "min": 4.5,
     "px": 10
-   },
-   {
-    "el": "p.lcat-intro",
-    "text": "Hradiská triedime podľa toho, čo",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 17
-   },
-   {
-    "el": "span.ljoin-eyebrow",
-    "text": "Buďme hrdí na naše dejiny",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span.ljoin-mail-lbl",
-    "text": "Pošlite fotky na",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span",
-    "text": "Čo pomôže najviac",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span.lfoot-tag",
-    "text": "Slovanské hradiská",
-    "pomer": 3.63,
-    "min": 4.5,
-    "px": 11
    }
   ],
   "ciele": [
+   {
+    "el": "a.lab-skip",
+    "w": 209,
+    "h": 44,
+    "text": "Preskočiť na obsah"
+   },
    {
     "el": "button",
     "w": 78,
@@ -1242,26 +1178,10 @@
     ]
    }
   ],
-  "mena": [
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   },
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   },
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   },
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   }
-  ],
+  "mena": [],
   "vstupy": [],
   "nadpisy": [
+   1,
    2,
    2,
    2,
@@ -1286,7 +1206,7 @@
    3,
    3
   ],
-  "skip": null,
+  "skip": "Preskočiť na obsah",
   "zaostrenie": {
    "spolu": 26,
    "bezRamu": []
@@ -1295,62 +1215,6 @@
  "clanok-desktop": {
   "lang": "sk",
   "kontrast": [
-   {
-    "el": "span.lnav-count",
-    "text": "6",
-    "pomer": 2.63,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span.lnav-rowlabel",
-    "text": "Ďalší obsah",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "span",
-    "text": "Zdieľať článok",
-    "pomer": 2.63,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "h3",
-    "text": "Lokalita",
-    "pomer": 2.34,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "p",
-    "text": "48.8081° N · 17.0871° E",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 13
-   },
-   {
-    "el": "div",
-    "text": "1",
-    "pomer": 3.58,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "div",
-    "text": "Územie bolo osídlené už v 7. sto",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "p.lart-more-s",
-    "text": "Vybrali sme články súvisiace s t",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 16
-   },
    {
     "el": "span",
     "text": "Odborné texty",
@@ -1378,16 +1242,15 @@
     "pomer": 1.59,
     "min": 4.5,
     "px": 11
-   },
-   {
-    "el": "span.lfoot-tag",
-    "text": "Slovanské hradiská",
-    "pomer": 3.63,
-    "min": 4.5,
-    "px": 11
    }
   ],
   "ciele": [
+   {
+    "el": "a.lab-skip",
+    "w": 209,
+    "h": 44,
+    "text": "Preskočiť na obsah"
+   },
    {
     "el": "button",
     "w": 78,
@@ -2081,61 +1944,19 @@
     ]
    },
    {
-    "src": "mikul_C4_8_Dice_52656c814a.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "most_d9c5d0c343.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "Mikul_C4_8_Dice_mapa_1ec1966f70.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "mikul_pal_C3_A1c_dc357b3884.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "palacmikulcice_c3bf096828.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "mikul_most_34bc745f1b.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "P6291532_d1a0354b49.JPG",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "mikul_C4_8_Dice_52656c814a.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "most_d9c5d0c343.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "Mikul_C4_8_Dice_mapa_1ec1966f70.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
@@ -2165,91 +1986,133 @@
     ]
    },
    {
-    "src": "Mikul_rekon_C5_A1t_5258dd794b.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "kostolmikulcice_55587bb60f.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "mik_rotunda_3ab74a9928.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "vnutri2_ac7b8de450.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "val_235f0ae568.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6261425_9d894898b5.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6261426_2a4fcaeb54.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6281523_f997f187af.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6291527_853ecd2344.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2186_1_53d0ae8fb8.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2190_1_ef5449c9bc.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2191_1_4f6ea2e3e8.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2217_1_da1a9b309a.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2220_1_85e311da45.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2225_1_c9f5a039dd.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
@@ -2319,7 +2182,7 @@
    3,
    3
   ],
-  "skip": null,
+  "skip": "Preskočiť na obsah",
   "zaostrenie": {
    "spolu": 26,
    "bezRamu": []
@@ -2334,13 +2197,6 @@
     "pomer": 1.59,
     "min": 4.5,
     "px": 13
-   },
-   {
-    "el": "a.lakv-more",
-    "text": "CELÁ KRONIKA →",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 12
    },
    {
     "el": "span",
@@ -2362,13 +2218,6 @@
     "pomer": 1.17,
     "min": 3,
     "px": 19
-   },
-   {
-    "el": "span.lakv-year.lakv-year-old",
-    "text": "2013",
-    "pomer": 2.63,
-    "min": 4.5,
-    "px": 12
    },
    {
     "el": "span.lakv-place",
@@ -2397,41 +2246,6 @@
     "pomer": 1.13,
     "min": 4.5,
     "px": 14
-   },
-   {
-    "el": "p.lcat-intro",
-    "text": "Hradiská triedime podľa toho, čo",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 17
-   },
-   {
-    "el": "span.ljoin-eyebrow",
-    "text": "Buďme hrdí na naše dejiny",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span.ljoin-mail-lbl",
-    "text": "Pošlite fotky na",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span",
-    "text": "Čo pomôže najviac",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 12
-   },
-   {
-    "el": "span.lfoot-tag",
-    "text": "Slovanské hradiská",
-    "pomer": 3.63,
-    "min": 4.5,
-    "px": 11
    }
   ],
   "ciele": [
@@ -3272,26 +3086,10 @@
     ]
    }
   ],
-  "mena": [
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   },
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   },
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   },
-   {
-    "el": "a.lakv-tile",
-    "html": "<a href=\"/galeria\" class=\"lakv-tile\" style=\"position: relative; displa"
-   }
-  ],
+  "mena": [],
   "vstupy": [],
   "nadpisy": [
+   1,
    2,
    2,
    2,
@@ -3316,66 +3114,15 @@
    3,
    3
   ],
-  "skip": null,
+  "skip": "Preskočiť na obsah",
   "zaostrenie": {
    "spolu": 26,
-   "bezRamu": [
-    "input.flex-1.min-w-0 · Vyhľadávanie lokalít a č"
-   ]
+   "bezRamu": []
   }
  },
  "clanok-mobil": {
   "lang": "sk",
   "kontrast": [
-   {
-    "el": "a",
-    "text": "Domov",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 13
-   },
-   {
-    "el": "span",
-    "text": "›",
-    "pomer": 4.31,
-    "min": 4.5,
-    "px": 13
-   },
-   {
-    "el": "span",
-    "text": "Zdieľať článok",
-    "pomer": 2.63,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "h3",
-    "text": "Kľúčové fakty",
-    "pomer": 2.99,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "h3",
-    "text": "Lokalita",
-    "pomer": 2.34,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "p",
-    "text": "48.8081° N · 17.0871° E",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 13
-   },
-   {
-    "el": "p.lart-more-s",
-    "text": "Vybrali sme články súvisiace s t",
-    "pomer": 3.83,
-    "min": 4.5,
-    "px": 16
-   },
    {
     "el": "span",
     "text": "Odborné texty",
@@ -3401,13 +3148,6 @@
     "el": "span",
     "text": "11. 5. 2020",
     "pomer": 1.59,
-    "min": 4.5,
-    "px": 11
-   },
-   {
-    "el": "span.lfoot-tag",
-    "text": "Slovanské hradiská",
-    "pomer": 3.63,
     "min": 4.5,
     "px": 11
    }
@@ -3818,55 +3558,13 @@
     ]
    },
    {
-    "src": "mikul_C4_8_Dice_52656c814a.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "most_d9c5d0c343.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "Mikul_C4_8_Dice_mapa_1ec1966f70.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "mikul_pal_C3_A1c_dc357b3884.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "palacmikulcice_c3bf096828.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "mikul_most_34bc745f1b.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "P6291532_d1a0354b49.JPG",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "mikul_C4_8_Dice_52656c814a.jpg",
-    "chyba": [
-     "bez rozmerov"
-    ]
-   },
-   {
-    "src": "most_d9c5d0c343.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
@@ -3902,91 +3600,133 @@
     ]
    },
    {
-    "src": "Mikul_rekon_C5_A1t_5258dd794b.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "kostolmikulcice_55587bb60f.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "mik_rotunda_3ab74a9928.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "vnutri2_ac7b8de450.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "val_235f0ae568.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6261425_9d894898b5.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6261426_2a4fcaeb54.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6281523_f997f187af.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "P6291527_853ecd2344.JPG",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2186_1_53d0ae8fb8.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2190_1_ef5449c9bc.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2191_1_4f6ea2e3e8.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2217_1_da1a9b309a.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2220_1_85e311da45.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
    },
    {
-    "src": "IMG_2225_1_c9f5a039dd.jpg",
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
+    "chyba": [
+     "bez rozmerov"
+    ]
+   },
+   {
+    "src": "svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhla",
     "chyba": [
      "bez rozmerov"
     ]
@@ -4056,7 +3796,7 @@
    3,
    3
   ],
-  "skip": null,
+  "skip": "Preskočiť na obsah",
   "zaostrenie": {
    "spolu": 26,
    "bezRamu": []

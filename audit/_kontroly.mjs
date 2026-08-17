@@ -1,7 +1,14 @@
-/* Merateľné kontroly nad laboratóriom. Výstup na disk (audit/nalezy.json). */
+/* Merateľné kontroly nad laboratóriom. Výstup na disk (audit/nalezy.json).
+ *
+ * POZOR: číslo „kontrast pod normou" z tohto skriptu NEPLATÍ — skladá pozadie
+ * naivne (prvý nepriehľadný predok) a hlási text nad fotografiou aj podklad
+ * v absolútne umiestnenom súrodencovi ako porušenie. V audite si na tom
+ * vyrobil 30 falošných nálezov. Na kontrast používaj `audit/kontrast-over.mjs`.
+ * Ostatné čísla (skip-link, mená, menovky, zameranie, nadpisy) sú v poriadku. */
 import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
 const BASE = process.argv[2] || 'https://webdesignforhradiskask.vercel.app';
+const ZDROJ = 'https://webdesignforhradiskask.vercel.app';
 
 const vPage = () => {
   const lum = (c) => { const s = c.map(v => { v /= 255; return v <= 0.03928 ? v/12.92 : ((v+0.055)/1.055)**2.4; }); return 0.2126*s[0]+0.7152*s[1]+0.0722*s[2]; };
@@ -78,6 +85,15 @@ const vysledok = {};
 for (const [meno, w, h, mob] of [['desktop',1440,900,false], ['mobil',390,844,true]]) {
   const ctx = await b.newContext({ viewport:{width:w,height:h}, isMobile:mob, hasTouch:mob });
   const p = await ctx.newPage();
+  /* Lokálny build nemá pri sebe Strapi — volania na API vybavíme z nasadenej
+     stránky, inak je článok prázdny a merania z neho neplatia. */
+  if (BASE.includes('localhost')) await p.route('**/strapi/**', async (r) => {
+    const u = new URL(r.request().url());
+    try { const res = await fetch(ZDROJ + u.pathname + u.search, { headers: { accept: 'application/json' } });
+      r.fulfill({ status: res.status, body: Buffer.from(await res.arrayBuffer()),
+                  headers: { 'content-type': res.headers.get('content-type') || 'application/json' } });
+    } catch { r.abort(); }
+  });
   for (const [n, cesta] of [['domovska','/design?t=pecat'], ['clanok','/design/blog/mikulcice-kopcany?t=pecat']]) {
     await p.goto(BASE+cesta, { waitUntil:'domcontentloaded' });
     for (let i=0;i<3;i++){const x=p.locator('.ck-btn-primary').first();
