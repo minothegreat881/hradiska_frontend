@@ -72,6 +72,11 @@
   --hr-body-3: var(--l-muted);
   --hr-muted: var(--l-muted);
   --hr-muted-2: var(--l-muted-2);
+  /* Chybové hlásenie v pečatnej reči: tá istá zemitá červená ako pečať,
+     na svetlej papierovej ploche. */
+  --hr-error-text: var(--l-second-deep);
+  --hr-error-bg: var(--l-paper-2);
+  --hr-error-line: var(--l-second-light);
 
   --hr-line: var(--l-line);
   --hr-line-strong: var(--l-line);

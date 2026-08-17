@@ -15,7 +15,7 @@
  * kategórie → text s formulárom. Nič sa nepresúva ani nenahrádza.
  */
 
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { HomePage } from '../pages/HomePage';
 import { ArticlePage } from '../pages/ArticlePage';
 import { LabArticle } from './LabArticle';
@@ -26,6 +26,7 @@ import { LabHome } from './LabHome';
 import { LabJoinUs } from './LabJoinUs';
 import { LabCategories } from './LabCategories';
 import { LabFooter } from './LabFooter';
+const GalleryPage = lazy(() => import('../pages/GalleryPage').then(m => ({ default: m.GalleryPage })));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -59,6 +60,10 @@ export default function DesignLab() {
   const articleSlug = path.startsWith('/design/blog/')
     ? decodeURIComponent(path.slice('/design/blog/'.length).replace(/\/$/, ''))
     : null;
+  /* Ďalšie stránky webu v šate. Vykresľujú sa PRODUKČNÉ komponenty — tie sú
+     potokenizované, takže šat si nesú samy a netreba pre ne druhú verziu.
+     Laboratórium je tu na to, aby sa dali pozrieť pred nasadením. */
+  const podstranka = path.startsWith('/design/galeria') ? 'galeria' : null;
 
   const pick = (id: string) => {
     setTheme(id);
@@ -148,7 +153,11 @@ export default function DesignLab() {
             programovo — bez neho skok presunie iba pohľad, nie zameranie,
             a ďalší tabulátor pokračuje zase od navigácie. */}
         <div id="lab-obsah" tabIndex={-1}>
-        {articleSlug ? (
+        {podstranka === 'galeria' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            <GalleryPage />
+          </Suspense>
+        ) : articleSlug ? (
           /* Stránka článku. `povodna` ukáže produkčnú, aby sa dali postaviť
              vedľa seba na tom istom článku. */
           theme === 'povodna' ? <ArticlePage articleSlug={articleSlug} /> : <LabArticle slug={articleSlug} />
