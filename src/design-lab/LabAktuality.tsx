@@ -324,7 +324,10 @@ export default function LabAktuality() {
                 <span style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 40%, var(--hr-wash-4) 0%, var(--hr-wash-5) 55%, var(--hr-on-dark) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: 96 }}>
                   <picture style={{ display: 'contents' }}>
                     <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
-                    <img src="/logo_hradiska_small.png" alt="" aria-hidden="true" loading="lazy" decoding="async" style={{ width: '62%', maxHeight: '100%', objectFit: 'contain', opacity: 0.92 }} />
+                    {/* Rozmery sú tu preto, aby si prehliadač vedel miesto
+                        vyhradiť skôr, než sa obrázok stiahne — inak karta pri
+                        načítaní poskočí. Šírku aj tak určuje `style`. */}
+                    <img src="/logo_hradiska_small.png" alt="" aria-hidden="true" width={256} height={256} loading="lazy" decoding="async" style={{ width: '62%', maxHeight: '100%', objectFit: 'contain', opacity: 0.92 }} />
                   </picture>
                 </span>
               )}
@@ -368,7 +371,11 @@ export default function LabAktuality() {
           >
             <div className="lakv-fill" style={{ width: `${osFill}%` }} />
             <div className="lakv-knob" style={{ left: `${osFill}%` }}>
-              <span className="lakv-knob-year">{cursorYear}</span>
+              {/* Rok sa mení ťahaním alebo šípkami, ale čítačke o tom doteraz
+                  nikto nepovedal — kto nevidí os, nevedel, kam sa dostal.
+                  `polite` počká, kým hovorenie doznie, aby pri ťahaní
+                  neprekrikovalo samo seba. */}
+              <span className="lakv-knob-year" role="status" aria-live="polite">{cursorYear}</span>
             </div>
           </div>
           <span className="lakv-year lakv-year-old">{yearOldest}</span>
@@ -385,6 +392,11 @@ export default function LabAktuality() {
               key={g.src}
               href="/galeria"
               className="lakv-tile"
+              /* Meno odkazu nesie popis fotografie. Keď ho v Strapi niekto
+                 nevyplnil, odkaz ostával bez mena a čítačka ohlásila iba
+                 „odkaz" — štyri razy za sebou. Vtedy nastúpi popis miesta,
+                 a keď nie je ani ten, aspoň názov cieľa. */
+              aria-label={g.alt ? undefined : (g.place ? `Fotogaléria — ${g.place}` : 'Fotogaléria')}
               style={{ position: 'relative', display: 'block', borderRadius: i === 0 ? 26 : 20, overflow: 'hidden', gridColumn: i === 0 ? 'span 2' : undefined, gridRow: i === 0 ? 'span 2' : undefined }}
             >
               <img src={g.src} alt={g.alt} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />

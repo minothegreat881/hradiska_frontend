@@ -24,6 +24,11 @@ export function LabHome() {
     <div className="min-h-screen parchment relative">
       <InkEffect />
 
+      {/* Nadpis stránky. Vizuálne ho nesie titulná fotografia a názov
+          v navigácii, ale v osnove dokumentu chýbal — hierarchia začínala
+          na druhej úrovni a čítačka nemala čím stránku pomenovať. */}
+      <h1 className="lab-only-reader">Hradiská Slovenska</h1>
+
       {/* Hero */}
       <section className="relative" style={{ zIndex: 30 }}>
         <div className="container relative pt-8 md:pt-12 pb-8 md:pb-16">
