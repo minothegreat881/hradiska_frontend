@@ -2295,3 +2295,48 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* ── Dotykové ciele ────────────────────────────────────────────────────────
+   Norma je 44×44 px. Kde by zväčšenie rozhodilo skladbu, rastie len PLOCHA
+   citlivá na dotyk — odsadením a záporným okrajom. Vzhľad sa nemení. */
+
+/* Ikony sociálnych sietí v päte mali 38×38. */
+.lfoot-soc a { min-width: 44px; min-height: 44px; }
+
+/* Kruhové tlačidlo „Späť hore" malo tiež 38×38. */
+.lfoot-up { min-width: 44px; min-height: 44px; }
+
+/* Textové odkazy sú vysoké podľa písma — 18 až 23 px. Zväčšiť ich na 44 px
+   by roztiahlo pätičku aj lištu, tak rastie len plocha citlivá na dotyk:
+   odsadenie ju zväčší a záporný okraj vráti späť rozloženie. Deje sa to LEN
+   na dotykových zariadeniach; myš trafí aj 18 px a na počítači by tie
+   odsadenia zbytočne rozhádzali riadky.
+
+   (Prvý pokus mieril na `.lnav-link`, čo bol môj omyl — meranie ukázalo, že
+   krátke ciele sú inde: v pätičke, v odkazoch „celá kronika/galéria"
+   a v prihlasovaní.) */
+@media (pointer: coarse), (hover: none) {
+  .lnav-link,
+  .lnav-brand,
+  .lnav-right button,
+  .lakv-more,
+  .lfoot-legal a,
+  .lfoot-legal button,
+  .lfoot-install {
+    display: inline-flex; align-items: center;
+    min-height: 44px;
+    padding-block: 12px;
+    margin-block: -12px;
+  }
+
+  /* Odkazy v stĺpcoch pätičky stoja KAŽDÝ NA SVOJOM RIADKU, takže tu musí
+     byť `flex`, nie `inline-flex`. S `inline-flex` sa zaradili vedľa seba
+     („O nás Tím Kontakt" na jednom riadku, „3D modelyAktuality" zlepené) —
+     na snímke pred commitom to bolo vidieť okamžite.
+     `width: fit-content` drží plochu pri texte; `min-width` pokrýva krátke
+     slová ako „Tím", ktoré sú užšie než 44 px. */
+  .lfoot-col a {
+    display: flex; align-items: center; justify-content: flex-start;
+    width: fit-content; min-width: 44px; min-height: 44px;
+  }
+}

@@ -128,8 +128,11 @@ export function LabJoinUs() {
           {/* ── Vpravo: formulár ────────────────────────────────────────── */}
           <div className="ljoin-right">
             <div className="ljoin-card">
+              {/* Po odoslaní sa formulár vymení za poďakovanie. Bez ohlásenia
+                  je to pre čítačku tichá výmena — ostane stáť tam, kde bolo
+                  tlačidlo, a nedozvie sa, či správa odišla. */}
               {sent ? (
-                <div className="ljoin-done">
+                <div className="ljoin-done" role="status" aria-live="polite">
                   <div className="ljoin-done-mark" aria-hidden="true">✓</div>
                   <h3>Ďakujeme!</h3>
                   <p>Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími informáciami o spolupráci.</p>
@@ -160,7 +163,7 @@ export function LabJoinUs() {
                     onChange={e => { setForm({ ...form, message: e.target.value }); clear('message'); }} />
                   {errors.message && <span className="ljoin-err">{errors.message}</span>}
 
-                  <button type="submit" className="ljoin-send" disabled={busy}>
+                  <button type="submit" className="ljoin-send" disabled={busy} aria-busy={busy}>
                     {busy ? 'Odosielam…' : 'Odoslať správu'}
                   </button>
                   <p className="ljoin-note">
