@@ -1121,16 +1121,44 @@ body[data-lab-theme='pecat'] {
   position: relative; overflow: hidden;
   background: var(--l-paper-2); border-top: 1px solid var(--l-line);
 }
-/* ── Tiché odtiene na tmavšom papieri ─────────────────────────────────────
-   Plochy s podkladom `--l-paper-2` (#e8e0cf) potrebujú o stupeň tmavší text:
-   základná hodnota tam dáva 4,18:1, čo je pod normou. Píše sa to na nádobu,
+/* ── PREPISY FARIEB PODĽA PODKLADU ────────────────────────────────────────
+   POZOR pri pridávaní nových sekcií: tieto tokeny sa nedajú nastaviť raz pre
+   celý šat, lebo ich čitateľnosť závisí od plochy, na ktorej text leží.
+   Nádoby, ktoré ich predefinúvajú, sú PRÁVE TIETO:
+
+     .ljoin, .lart-side, .lart-more   podklad `--l-paper-2` #e8e0cf
+     .lfoot                            tmavá päta #191c24
+
+   Nový blok s podkladom `--l-paper-2` alebo tmavý blok mimo tohto zoznamu
+   dostane základné hodnoty, ktoré sú stavané na papier a kartu — a ticho
+   spadne pod normu. Vtedy ho sem dopíš. Overí to `node audit/kontrast-over.mjs`.
+
+   ── Tiché odtiene na tmavšom papieri ──
+   Základná hodnota tam dáva 4,18:1, čo je pod normou. Píše sa to na nádobu,
    nie na jednotlivé prvky — vlastnosť sa dedí, takže všetkých 20 výskytov
-   vnútri sa opraví naraz a v komponentoch netreba meniť nič. */
+   vnútri sa opraví naraz a v komponentoch netreba meniť nič.
+
+   ── Pečatná červená ──
+   `--l-second` #c9483a je podpisová farba a ako veľký či dekoratívny prvok
+   ostáva všade nedotknutá. Ako DROBNÝ TEXT ale padá: 3,58:1 na tmavšom
+   papieri (číslice v „Kľúčových faktoch"), 3,63:1 na tmavej päte.
+   Na svetlom sa preto ide hlbšie, na tmavom svetlejšie — čo je presne to,
+   čo už kódujú `--l-second-deep` a jeho náprotivok.
+
+   Na papieri sa berie hotový `--l-second-deep`: tmavšia zemitá červená číta
+   ako pečatný vosk, teda ako to, na čom šat stojí, a nepribúda nová farba.
+   V päte je jedna nová hodnota — `--l-second-light` (8,15:1) by bola na
+   drobnom texte vypláchnutá do ružova a pečať by z nej zmizla. */
 .ljoin,
 .lart-side,
 .lart-more {
-  --l-muted: #606166;    /* 4,71:1 na #e8e0cf */
-  --l-muted-2: #636058;  /* 4,78:1 na #e8e0cf */
+  --l-muted: #606166;              /* 4,71:1 na #e8e0cf */
+  --l-muted-2: #636058;            /* 4,78:1 na #e8e0cf */
+  --l-second: var(--l-second-deep); /* 6,27:1 na #e8e0cf (bolo 3,58:1) */
+}
+
+.lfoot {
+  --l-second: #dd6d5c;             /* 5,20:1 na #191c24 (bolo 3,63:1) */
 }
 /* Vrstevnice v prázdne naľavo od textu (ten istý motív ako v pätičke).
    Na úzkom okne by liezli pod text, tak sa zhasnú. */
