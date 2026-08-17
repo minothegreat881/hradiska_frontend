@@ -267,7 +267,7 @@ export function MapaHradisk() {
   const [ready, setReady] = useState(false);
   /* Názvy miest v obrazovkových súradniciach — reliéf sám nemá popisy, takže
      bez nich sa v ňom nedá zorientovať. */
-  const [mesta, setMesta] = useState<{ n: string; x: number; y: number; r: number }[]>([]);
+  const [mesta, setMesta] = useState<{ id: number; n: string; x: number; y: number; r: number }[]>([]);
   /* Podklad: kresba reliéfu alebo satelitná snímka. */
   const [podklad, setPodklad] = useState<'relief' | 'satelit'>('relief');
   const [zoom, setZoom] = useState(MIN_Z);
@@ -591,8 +591,14 @@ export function MapaHradisk() {
        je o rád lacnejšie. */
     const w0 = b.getWest(), e0 = b.getEast(), s0 = b.getSouth(), n0 = b.getNorth();
     const kandidati = MESTA
-      .filter(m => m.x > w0 && m.x < e0 && m.y > s0 && m.y < n0)
-      .map(m => { const p = map.project([m.x, m.y]); return { n: m.n, x: p.x, y: p.y, r: m.r }; })
+      .map((m, i) => ({ m, i }))
+      .filter(({ m }) => m.x > w0 && m.x < e0 && m.y > s0 && m.y < n0)
+      /* Poradové číslo v zozname je jediný spoľahlivý identifikátor popisu.
+         Názov ním byť nemôže: dve mestá sa vedia volať rovnako (Komárno na
+         oboch brehoch Dunaja), React by ich považoval za jeden a ten istý
+         prvok — a staré popisy pri posune mapy nezmizli, len sa hromadili.
+         Tak vzniklo pätnásť Komárn roztrúsených po mape. */
+      .map(({ m, i }) => { const p = map.project([m.x, m.y]); return { id: i, n: m.n, x: p.x, y: p.y, r: m.r }; })
       .filter(m => m.x > 4 && m.y > 4 && m.x < width - 4 && m.y < height - 4)
       .sort((a, b) => a.r - b.r);
 
@@ -1240,7 +1246,7 @@ export function MapaHradisk() {
               mapa je o lokalitách, mestá sú len pomôcka na zorientovanie. */}
           {mesta.map(m => (
             <span
-              key={m.n}
+              key={m.id}
               className={m.r === 0 ? 'lmap-mesto is-velke' : 'lmap-mesto'}
               style={{ transform: `translate3d(${m.x}px, ${m.y}px, 0)` }}
             >

@@ -732,7 +732,11 @@
 
    Držia sa vzadu: tenké, tiché, s papierovým obrysom, aby sa dali čítať aj
    cez tieňovanie kopcov. Značky lokalít ich vždy prekryjú. */
-.lmap-mesto { position: absolute; left: 0; top: 0; will-change: transform; }
+/* Bez `will-change`: každý popis by tým dostal vlastnú vrstvu v grafike
+   a pri tridsiatich naraz to na slabších telefónoch necháva za textom
+   zvyšky predošlého vykreslenia. Popisy sa aj tak prekresľujú raz za
+   snímok, zrýchlenie by nič nezískalo. */
+.lmap-mesto { position: absolute; left: 0; top: 0; }
 .lmap-mesto-b {
   position: absolute; left: -2px; top: -2px; width: 4px; height: 4px;
   border-radius: 50%; background: rgba(20, 18, 15, .45);

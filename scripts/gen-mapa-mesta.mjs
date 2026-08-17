@@ -67,17 +67,38 @@ const run = async () => {
        zvyšok by pri priblížení mapu zaplavil. */
     if (doma && t.place === 'village' && p < 700) continue;
 
-    rows.push({ name, lat: +e.lat.toFixed(4), lng: +e.lon.toFixed(4), pop: p, doma, hlavne });
+    rows.push({ name, povodny: t.name, lat: +e.lat.toFixed(4), lng: +e.lon.toFixed(4), pop: p, doma, hlavne });
   }
 
-  /* Zhodné názvy z viacerých uzlov (OSM ich občas má) — nechá sa väčší. */
-  const byName = new Map();
+  /* ── Dvojníci ─────────────────────────────────────────────────────────
+     Slovenský názov cudzieho mesta sa vie zhodovať s naším. Chemnitz má
+     v OSM `name:sk` = Kamenica, čo je to isté ako dve slovenské obce, a na
+     mape by z toho boli tri Kamenice. V takom prípade dostane cudzie mesto
+     späť svoj pôvodný názov — Slovák hľadá Chemnitz. */
+  const domace = new Set(rows.filter(r => r.doma).map(r => r.name));
   for (const r of rows) {
-    const k = r.name + '|' + Math.round(r.lat * 4) + '|' + Math.round(r.lng * 4);
-    const prev = byName.get(k);
-    if (!prev || r.pop > prev.pop) byName.set(k, r);
+    if (!r.doma && r.povodny && r.povodny !== r.name && domace.has(r.name)) r.name = r.povodny;
   }
-  const all = [...byName.values()].sort((a, b) => b.pop - a.pop);
+
+  /* Ten istý názov kúsok od seba = jedno miesto zapísané dvakrát. Typicky
+     dvojmestá cez rieku: Komárno a maďarský Komárom, ktorý sa po slovensky
+     tiež volá Komárno — na mape z toho boli dva popisy vedľa seba. Ostane
+     väčší z nich. Rovnaké názvy ĎALEKO od seba sú v poriadku, takých obcí
+     máme veľa a sú to naozaj rôzne miesta. */
+  const BLIZKO_KM = 30;
+  const km = (a, b) => {
+    const dy = (a.lat - b.lat) * 111;
+    const dx = (a.lng - b.lng) * 111 * Math.cos(((a.lat + b.lat) / 2) * Math.PI / 180);
+    return Math.hypot(dx, dy);
+  };
+  const zoradene = [...rows].sort((a, b) => b.pop - a.pop);
+  const all = [];
+  let zahodene = 0;
+  for (const r of zoradene) {
+    if (all.some(x => x.name === r.name && km(x, r) < BLIZKO_KM)) { zahodene++; continue; }
+    all.push(r);
+  }
+  console.log('zlúčených dvojníkov:', zahodene);
 
   /* Od akého priblíženia sa názov ukáže. Rebríček je podľa veľkosti, aby
      mapa pri oddialení niesla len to najväčšie a pri približovaní pribúdalo. */
