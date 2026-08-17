@@ -29,6 +29,7 @@ import { LabFooter } from './LabFooter';
 const GalleryPage = lazy(() => import('../pages/GalleryPage').then(m => ({ default: m.GalleryPage })));
 const LabGaleria = lazy(() => import('./LabGaleria'));
 const CategoryPage = lazy(() => import('../pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
+const AktualityPage = lazy(() => import('../pages/AktualityPage').then(m => ({ default: m.AktualityPage })));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -65,7 +66,9 @@ export default function DesignLab() {
   /* Ďalšie stránky webu v šate. Vykresľujú sa PRODUKČNÉ komponenty — tie sú
      potokenizované, takže šat si nesú samy a netreba pre ne druhú verziu.
      Laboratórium je tu na to, aby sa dali pozrieť pred nasadením. */
-  const podstranka = path.startsWith('/design/galeria') ? 'galeria' : null;
+  const podstranka = path.startsWith('/design/galeria') ? 'galeria'
+    : path.startsWith('/design/aktuality') ? 'aktuality'
+    : null;
   /* Kategória a podkategória sú tá istá stránka, líšia sa len slugom. */
   const kategoriaSlug = path.startsWith('/design/category/')
     ? decodeURIComponent(path.slice('/design/category/'.length).replace(/\/$/, ''))
@@ -162,6 +165,10 @@ export default function DesignLab() {
         {kategoriaSlug ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
             <CategoryPage categorySlug={kategoriaSlug} />
+          </Suspense>
+        ) : podstranka === 'aktuality' ? (
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
+            <AktualityPage />
           </Suspense>
         ) : podstranka === 'galeria' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>

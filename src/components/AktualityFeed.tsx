@@ -18,8 +18,8 @@ import { slovakiaBorderDetailed } from '../data/slovakia-border';
 // ============================================================================
 // Jednotná zlato-hnedá pre VŠETKY odkazy/akcenty (Zobraziť viac, hover atď.)
 // ============================================================================
-const GOLD = '#7d4f1d';
-const GOLD_SOFT = '#a87437';
+const GOLD = 'var(--hr-accent-deep)';
+const GOLD_SOFT = 'var(--hr-accent)';
 
 // ============================================================================
 // Typy aktivity – TLMENÉ pastelové chipy (svetlý podklad + tmavý text rovnakého odtieňa)
@@ -30,7 +30,7 @@ const TYP_META: Record<AktualitaTyp, { label: string; bg: string; fg: string; bo
   socha_pamatnik: { label: 'Pamätník',         bg: '#ECE6F4', fg: '#5A3B86', border: '#D6C9E8' },
   podujatie:      { label: 'Podujatie',        bg: '#FAEFD9', fg: '#8C5810', border: '#E8D2A0' },
   vyskum:         { label: 'Výskum',           bg: '#E2EEF2', fg: '#2C6680', border: '#C3D8E0' },
-  ine:            { label: 'Iné',              bg: '#EFEAE0', fg: '#5D4E37', border: '#DCD2BF' },
+  ine:            { label: 'Iné',              bg: 'var(--hr-wash-1)', fg: 'var(--hr-body-2)', border: 'var(--hr-line-strong)' },
 };
 
 const FILTERS: { id: AktualitaTyp | 'all'; label: string }[] = [
@@ -97,7 +97,7 @@ function PhotoPlaceholder({ className, style }: { className?: string; style?: Re
     <div
       className={className}
       style={{
-        background: '#f0e6d1',
+        background: 'var(--hr-wash-4)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -105,7 +105,7 @@ function PhotoPlaceholder({ className, style }: { className?: string; style?: Re
       }}
       aria-hidden="true"
     >
-      <Camera className="w-7 h-7" style={{ color: '#a89070', opacity: 0.7 }} />
+      <Camera className="w-7 h-7" style={{ color: 'var(--hr-muted-2)', opacity: 0.7 }} />
     </div>
   );
 }
@@ -160,7 +160,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
       <button
         onClick={onClose}
         className="absolute top-4 right-4 z-10 w-11 h-11 flex items-center justify-center rounded-full"
-        style={{ background: 'rgba(15,11,7,0.78)', color: '#faf7f1', border: '1px solid rgba(196,165,116,0.45)' }}
+        style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,0.45)' }}
         aria-label="Zavrieť"
       >
         <X className="w-5 h-5" />
@@ -170,7 +170,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 flex items-center justify-center rounded-full"
-            style={{ background: 'rgba(15,11,7,0.78)', color: '#faf7f1', border: '1px solid rgba(196,165,116,0.45)' }}
+            style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,0.45)' }}
             aria-label="Predchádzajúce"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -178,7 +178,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
             className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 flex items-center justify-center rounded-full"
-            style={{ background: 'rgba(15,11,7,0.78)', color: '#faf7f1', border: '1px solid rgba(196,165,116,0.45)' }}
+            style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,0.45)' }}
             aria-label="Nasledujúce"
           >
             <ChevronRight className="w-5 h-5" />
@@ -203,7 +203,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
       {images.length > 1 && (
         <div
           className="absolute bottom-6 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs"
-          style={{ background: 'rgba(15,11,7,0.78)', color: '#e8dcc8', border: '1px solid rgba(196,165,116,0.35)' }}
+          style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-relief-high)', border: '1px solid rgba(196,165,116,0.35)' }}
         >
           {idx + 1} / {images.length}
         </div>
@@ -232,7 +232,7 @@ function PhotoTile({ img, idx, style, onOpen, overlay }: {
     <button
       onClick={() => onOpen(idx)}
       className="block relative overflow-hidden p-0 m-0"
-      style={{ ...style, background: '#f0e6d1', border: 'none' }}
+      style={{ ...style, background: 'var(--hr-wash-4)', border: 'none' }}
     >
       <SafeImg
         src={src}
@@ -298,7 +298,7 @@ function PhotoGrid({ fotky, onOpenLightbox }: { fotky: StrapiImage[]; onOpenLigh
         overlay={extra > 0 ? (
           <div
             className="absolute inset-0 flex items-center justify-center"
-            style={{ background: 'rgba(20,16,10,0.55)', color: '#faf7f1', fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 600 }}
+            style={{ background: 'rgba(20,16,10,0.55)', color: 'var(--hr-surface)', fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 600 }}
           >
             +{extra}
           </div>
@@ -349,7 +349,7 @@ function LokalitaStrip({ coords, name, okres, onClick }: {
       onMouseLeave={() => setHover(false)}
       className="w-full flex items-center gap-3 px-3 py-2 cursor-pointer text-left"
       style={{
-        background: hover ? '#efe2c1' : '#f3e8cc',
+        background: hover ? 'var(--hr-chip-bg)' : 'var(--hr-wash-6)',
         border: 'none',
         borderTop: '1px solid rgba(196,165,116,0.35)',
         height: 62,
@@ -360,13 +360,13 @@ function LokalitaStrip({ coords, name, okres, onClick }: {
       {/* Mini mapa 66×38 */}
       <div
         className="flex-shrink-0 overflow-hidden"
-        style={{ width: MINI_W, height: MINI_H, borderRadius: 6, background: '#f7eed8' }}
+        style={{ width: MINI_W, height: MINI_H, borderRadius: 6, background: 'var(--hr-wash-4)' }}
       >
         <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} preserveAspectRatio="xMidYMid meet" width="100%" height="100%" style={{ display: 'block' }}>
           <path
             d={slovakiaPath}
-            fill="#f0e0bf"
-            stroke="#a87437"
+            fill="var(--hr-wash-7)"
+            stroke="var(--hr-accent)"
             strokeWidth="2.5"
             strokeLinejoin="round"
           />
@@ -382,14 +382,14 @@ function LokalitaStrip({ coords, name, okres, onClick }: {
       <div className="flex-1 min-w-0">
         <div
           className="truncate"
-          style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 500, color: '#2d1810', lineHeight: 1.2 }}
+          style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 500, color: 'var(--hr-ink)', lineHeight: 1.2 }}
         >
           {name}
         </div>
         {okres && (
           <div
             className="truncate"
-            style={{ fontFamily: 'Georgia, serif', fontSize: 12, color: '#8b7a5e', marginTop: 1 }}
+            style={{ fontFamily: 'Georgia, serif', fontSize: 12, color: 'var(--hr-muted)', marginTop: 1 }}
           >
             okres {okres}
           </div>
@@ -400,8 +400,8 @@ function LokalitaStrip({ coords, name, okres, onClick }: {
       <span
         className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md"
         style={{
-          background: hover ? '#fff8e6' : 'transparent',
-          color: '#7d4f1d',
+          background: hover ? 'var(--hr-wash-1)' : 'transparent',
+          color: 'var(--hr-accent-deep)',
           border: '1px solid rgba(125,79,29,0.4)',
           fontFamily: 'Georgia, serif',
           fontSize: 12,
@@ -433,7 +433,7 @@ function focusHradisko(name: string) {
 // ============================================================================
 // CeramicDivider – slovanská keramická vlnovka (SVG pattern), zdieľateľná
 // ============================================================================
-export function CeramicDivider({ color = '#b39a72', maxWidth = 540 }: { color?: string; maxWidth?: number }) {
+export function CeramicDivider({ color = 'var(--hr-muted-2)', maxWidth = 540 }: { color?: string; maxWidth?: number }) {
   const uid = useId();
   const patternId = `ceramic-wave-${uid}`;
   return (
@@ -470,7 +470,7 @@ function vignetteOverlay(place: string | undefined, strength: 'strong' | 'soft')
         <span
           className="absolute left-3 bottom-3"
           style={{
-            fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#f4ead4',
+            fontFamily: 'ui-monospace, monospace', fontSize: 11, color: 'var(--hr-on-photo-2)',
             background: 'rgba(28,21,16,.55)', borderRadius: 6, padding: '4px 9px',
             pointerEvents: 'none',
           }}
@@ -509,7 +509,7 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
     <article
       className="aktualita-featured-grid"
       style={{
-        background: '#fbf6ea', border: '1px solid #e3d4ad', borderRadius: 16, overflow: 'hidden',
+        background: 'var(--hr-on-photo)', border: '1px solid var(--hr-line-strong)', borderRadius: 16, overflow: 'hidden',
         boxShadow: '0 16px 42px -24px rgba(60,40,15,.55)', marginBottom: 26,
       }}
     >
@@ -525,7 +525,7 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
             className="absolute inset-0"
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'radial-gradient(ellipse at 50% 40%, #f5ecd8 0%, #ece0c4 55%, #ddcba4 100%)',
+              background: 'radial-gradient(ellipse at 50% 40%, var(--hr-wash-4) 0%, var(--hr-wash-5) 55%, var(--hr-line-soft) 100%)',
             }}
           >
             <picture style={{ display: 'contents' }}>
@@ -550,7 +550,7 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
             fontSize: 10, letterSpacing: '.1em', padding: '6px 11px', borderRadius: 999,
           }}
         >
-          <span style={{ color: '#c8862f' }}>◆</span>PRIPNUTÉ
+          <span style={{ color: 'var(--hr-accent-soft)' }}>◆</span>PRIPNUTÉ
         </span>
       </div>
 
@@ -558,26 +558,26 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
         <div className="flex items-center gap-3 mb-3">
           <div
             className="flex-shrink-0 flex items-center justify-center rounded-full"
-            style={{ width: 38, height: 38, background: '#f0e6d1', border: '1px solid rgba(125,79,29,0.25)' }}
+            style={{ width: 38, height: 38, background: 'var(--hr-wash-4)', border: '1px solid rgba(125,79,29,0.25)' }}
             aria-hidden="true"
           >
             <Shield className="w-4.5 h-4.5" style={{ color: GOLD }} />
           </div>
           <div className="min-w-0">
-            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#2e2213' }}>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: 'var(--hr-ink-3)' }}>
               Slovanské hradiská
             </div>
-            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e' }}>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: 'var(--hr-muted)' }}>
               {formatSkDate(item.datum)} · {item.author} · {item.readingTime} min čítania
             </div>
           </div>
         </div>
 
-        <h3 style={{ margin: '0 0 10px', fontFamily: 'var(--font-serif)', fontSize: 27, fontWeight: 700, color: '#2e2213', lineHeight: 1.12 }}>
+        <h3 style={{ margin: '0 0 10px', fontFamily: 'var(--font-serif)', fontSize: 27, fontWeight: 700, color: 'var(--hr-ink-3)', lineHeight: 1.12 }}>
           {item.title}
         </h3>
         {item.excerpt && (
-          <p style={{ margin: '0 0 18px', fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.5, color: '#4a3f2e' }}>
+          <p style={{ margin: '0 0 18px', fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.5, color: 'var(--hr-body)' }}>
             {item.excerpt}
           </p>
         )}
@@ -586,8 +586,8 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
           href={`/blog/${item.slug}`}
           style={{
             display: 'inline-block',
-            fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.05em', color: '#fbf6ea',
-            background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', borderRadius: 999,
+            fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.05em', color: 'var(--hr-on-photo)',
+            background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))', borderRadius: 999,
             padding: '9px 16px', textDecoration: 'none',
           }}
         >
@@ -606,7 +606,7 @@ function KronikaCard({ item }: { item: KronikaItem }) {
       <article
         className="h-full flex flex-col overflow-hidden"
         style={{
-          background: '#fffdf8',
+          background: 'var(--hr-surface)',
           border: '1px solid rgba(196,165,116,0.4)',
           borderRadius: 12,
           boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
@@ -617,7 +617,7 @@ function KronikaCard({ item }: { item: KronikaItem }) {
           {item.coverUrl ? (
             <SafeImg src={item.coverUrl} alt="" className="w-full h-full object-cover ak-cover" />
           ) : (
-            <div className="w-full h-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 50% 40%, #f5ecd8 0%, #ece0c4 55%, #ddcba4 100%)' }}>
+            <div className="w-full h-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 50% 40%, var(--hr-wash-4) 0%, var(--hr-wash-5) 55%, var(--hr-line-soft) 100%)' }}>
               <picture style={{ display: 'contents' }}>
                 {/* Priehľadné logo — viď poznámku pri prvom zástupnom obrázku vyššie. */}
                 <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
@@ -629,7 +629,7 @@ function KronikaCard({ item }: { item: KronikaItem }) {
 
         {/* TELO */}
         <div className="flex flex-col flex-1" style={{ padding: 24 }}>
-          <div className="flex items-center gap-1.5 flex-wrap" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, color: '#8a795e', marginBottom: 8 }}>
+          <div className="flex items-center gap-1.5 flex-wrap" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, color: 'var(--hr-muted)', marginBottom: 8 }}>
             <Calendar className="w-3 h-3" />
             <span>{formatSkDate(item.datum)}</span>
             <span aria-hidden="true">·</span>
@@ -638,17 +638,17 @@ function KronikaCard({ item }: { item: KronikaItem }) {
             <span>{item.readingTime} min čítania</span>
           </div>
 
-          <h3 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 20, fontWeight: 600, color: '#2d1810', lineHeight: 1.25, letterSpacing: '0.02em', margin: '0 0 10px' }}>
+          <h3 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 20, fontWeight: 600, color: 'var(--hr-ink)', lineHeight: 1.25, letterSpacing: '0.02em', margin: '0 0 10px' }}>
             {item.title}
           </h3>
 
           {item.excerpt && (
-            <p className="ak-excerpt" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 14.5, color: '#5d4e37', lineHeight: 1.6, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+            <p className="ak-excerpt" style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 14.5, color: 'var(--hr-body-2)', lineHeight: 1.6, margin: '0 0 20px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {item.excerpt}
             </p>
           )}
 
-          <span className="inline-flex items-center gap-1.5 ak-cta" style={{ marginTop: 'auto', fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, fontWeight: 500, color: '#7d4f1d', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          <span className="inline-flex items-center gap-1.5 ak-cta" style={{ marginTop: 'auto', fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, fontWeight: 500, color: 'var(--hr-accent-deep)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
             Čítať <ArrowRight className="w-4 h-4" />
           </span>
         </div>
@@ -673,7 +673,7 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
     <article
       className="aktualita-featured-grid"
       style={{
-        background: '#fbf6ea', border: '1px solid #e3d4ad', borderRadius: 16, overflow: 'hidden',
+        background: 'var(--hr-on-photo)', border: '1px solid var(--hr-line-strong)', borderRadius: 16, overflow: 'hidden',
         boxShadow: '0 16px 42px -24px rgba(60,40,15,.55)', marginBottom: 26,
       }}
     >
@@ -691,7 +691,7 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
             fontSize: 10, letterSpacing: '.1em', padding: '6px 11px', borderRadius: 999,
           }}
         >
-          <span style={{ color: '#c8862f' }}>◆</span>PRIPNUTÉ
+          <span style={{ color: 'var(--hr-accent-soft)' }}>◆</span>PRIPNUTÉ
         </span>
         {fotky.length > 0 && (
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(18,13,8,.68) 0%, rgba(18,13,8,.2) 46%, transparent 70%)' }} />
@@ -700,7 +700,7 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
           <span
             className="absolute pointer-events-none"
             style={{
-              left: 14, bottom: 14, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: '#f4ead4',
+              left: 14, bottom: 14, fontFamily: 'ui-monospace, monospace', fontSize: 11, color: 'var(--hr-on-photo-2)',
               background: 'rgba(28,21,16,.55)', borderRadius: 6, padding: '4px 9px',
             }}
           >
@@ -713,14 +713,14 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
         <div className="flex items-center gap-3 mb-3">
           <div
             className="flex-shrink-0 flex items-center justify-center rounded-full"
-            style={{ width: 38, height: 38, background: '#f0e6d1', border: '1px solid rgba(125,79,29,0.25)' }}
+            style={{ width: 38, height: 38, background: 'var(--hr-wash-4)', border: '1px solid rgba(125,79,29,0.25)' }}
             aria-hidden="true"
           >
             <Shield className="w-4.5 h-4.5" style={{ color: GOLD }} />
           </div>
           <div className="min-w-0">
-            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: '#2e2213' }}>Slovanské hradiská</div>
-            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e' }}>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600, color: 'var(--hr-ink-3)' }}>Slovanské hradiská</div>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: 'var(--hr-muted)' }}>
               {formatSkDate(item.datum)}{hradisko ? ` · ${hradisko.name}` : ''}
             </div>
           </div>
@@ -728,11 +728,11 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
           <TypeChip typ={item.typAktivity} />
         </div>
 
-        <h3 style={{ margin: '0 0 10px', fontFamily: 'var(--font-serif)', fontSize: 27, fontWeight: 700, color: '#2e2213', lineHeight: 1.12 }}>
+        <h3 style={{ margin: '0 0 10px', fontFamily: 'var(--font-serif)', fontSize: 27, fontWeight: 700, color: 'var(--hr-ink-3)', lineHeight: 1.12 }}>
           {item.nazov}
         </h3>
         {text && (
-          <p style={{ margin: '0 0 18px', fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.5, color: '#4a3f2e', whiteSpace: 'pre-line' }}>
+          <p style={{ margin: '0 0 18px', fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.5, color: 'var(--hr-body)', whiteSpace: 'pre-line' }}>
             {visibleText}
           </p>
         )}
@@ -742,8 +742,8 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
             <button
               onClick={() => setExpanded(e => !e)}
               style={{
-                fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.05em', color: '#fbf6ea',
-                background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', border: 'none', borderRadius: 999,
+                fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.05em', color: 'var(--hr-on-photo)',
+                background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))', border: 'none', borderRadius: 999,
                 padding: '9px 16px', cursor: 'pointer',
               }}
             >
@@ -754,8 +754,8 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
             <button
               onClick={() => focusHradisko(hradisko.name)}
               style={{
-                fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.04em', color: '#9a5d1f',
-                background: 'transparent', border: '1px solid #d9c69a', borderRadius: 999, padding: '9px 14px', cursor: 'pointer',
+                fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.04em', color: 'var(--hr-accent)',
+                background: 'transparent', border: '1px solid var(--hr-chip-border)', borderRadius: 999, padding: '9px 14px', cursor: 'pointer',
               }}
             >
               Na mape
@@ -765,7 +765,7 @@ function FeaturedPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenL
           {fotky.length > 0 && (
             <button
               onClick={() => onOpenLightbox(0)}
-              style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: '#8a795e', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--hr-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               Galéria ({fotky.length})
             </button>
@@ -790,7 +790,7 @@ function MasonryPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLi
     <article
       className="aktualita-masonry-card"
       style={{
-        display: 'inline-block', width: '100%', background: '#fbf6ea', border: '1px solid #e3d4ad',
+        display: 'inline-block', width: '100%', background: 'var(--hr-on-photo)', border: '1px solid var(--hr-line-strong)',
         borderRadius: 14, boxShadow: '0 12px 32px -22px rgba(60,40,15,.5)', overflow: 'hidden',
         marginBottom: 22, breakInside: 'avoid', transition: 'transform .18s, box-shadow .18s',
       }}
@@ -813,15 +813,15 @@ function MasonryPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLi
         <div className="flex items-center gap-2 mb-2">
           <TypeChip typ={item.typAktivity} />
           <div className="flex-1" />
-          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: '#8a795e' }}>{formatSkDate(item.datum)}</span>
+          <span style={{ fontFamily: 'var(--font-serif)', fontSize: 13, color: 'var(--hr-muted)' }}>{formatSkDate(item.datum)}</span>
         </div>
-        <h3 style={{ margin: '0 0 7px', fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 700, color: '#2e2213', lineHeight: 1.15 }}>
+        <h3 style={{ margin: '0 0 7px', fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 700, color: 'var(--hr-ink-3)', lineHeight: 1.15 }}>
           {item.nazov}
         </h3>
         {item.obsah && (
           <p
             style={{
-              margin: 0, fontFamily: 'var(--font-serif)', fontSize: 16, lineHeight: 1.5, color: '#4a3f2e', whiteSpace: 'pre-line',
+              margin: 0, fontFamily: 'var(--font-serif)', fontSize: 16, lineHeight: 1.5, color: 'var(--hr-body)', whiteSpace: 'pre-line',
               ...(expanded ? {} : { display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }),
             }}
           >
@@ -830,7 +830,7 @@ function MasonryPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLi
         )}
         <button
           onClick={() => setExpanded(e => !e)}
-          style={{ background: 'none', border: 'none', padding: '4px 0 12px', color: '#9a5d1f', fontFamily: 'var(--font-serif)', fontSize: 16, cursor: 'pointer' }}
+          style={{ background: 'none', border: 'none', padding: '4px 0 12px', color: 'var(--hr-accent)', fontFamily: 'var(--font-serif)', fontSize: 16, cursor: 'pointer' }}
         >
           {expanded ? 'Zobraziť menej' : 'Zobraziť viac'}
         </button>
@@ -838,9 +838,9 @@ function MasonryPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLi
 
       <div
         className="flex items-center gap-2"
-        style={{ padding: '10px 17px', borderTop: '1px solid #ece0c2', background: '#f7efdb' }}
+        style={{ padding: '10px 17px', borderTop: '1px solid var(--hr-surface-3)', background: 'var(--hr-wash-4)' }}
       >
-        <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 600, color: '#2e2213' }}>
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 600, color: 'var(--hr-ink-3)' }}>
           {hradisko?.name ?? item.hradiskoSlug ?? '—'}
         </span>
         <div className="flex-1" />
@@ -851,7 +851,7 @@ function MasonryPost({ item, onOpenLightbox }: { item: StrapiAktualita; onOpenLi
             onMouseLeave={() => setHoverMap(false)}
             style={{
               fontFamily: 'var(--font-heading)', fontSize: 10, letterSpacing: '.04em',
-              color: hoverMap ? '#c8862f' : '#9a5d1f', background: 'none', border: 'none', cursor: 'pointer',
+              color: hoverMap ? 'var(--hr-accent-soft)' : 'var(--hr-accent)', background: 'none', border: 'none', cursor: 'pointer',
             }}
           >
             Na mape →
@@ -896,7 +896,7 @@ export function AktualitaCard({ item }: { item: StrapiAktualita }) {
         id={`aktualita-${item.documentId}`}
         className="flex flex-col overflow-hidden"
         style={{
-          background: '#fffdf8',
+          background: 'var(--hr-surface)',
           borderRadius: 12,
           border: '1px solid rgba(196,165,116,0.4)',
           boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
@@ -920,7 +920,7 @@ export function AktualitaCard({ item }: { item: StrapiAktualita }) {
             className="flex-shrink-0 flex items-center justify-center rounded-full"
             style={{
               width: 40, height: 40,
-              background: '#f0e6d1',
+              background: 'var(--hr-wash-4)',
               border: '1px solid rgba(125,79,29,0.25)',
             }}
             aria-hidden="true"
@@ -932,7 +932,7 @@ export function AktualitaCard({ item }: { item: StrapiAktualita }) {
             {/* Meno + drobný chip */}
             <div className="flex items-center gap-2 flex-wrap leading-tight">
               <span
-                style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: '#2d1810', fontWeight: 500 }}
+                style={{ fontFamily: 'Georgia, serif', fontSize: 15, color: 'var(--hr-ink)', fontWeight: 500 }}
               >
                 Slovanské hradiská
               </span>
@@ -940,7 +940,7 @@ export function AktualitaCard({ item }: { item: StrapiAktualita }) {
             {/* Meta riadok – ako FB pod menom */}
             <div
               className="flex items-center gap-1.5 mt-0.5 flex-wrap"
-              style={{ color: '#8b7a5e', fontSize: 12, fontFamily: 'Georgia, serif' }}
+              style={{ color: 'var(--hr-muted)', fontSize: 12, fontFamily: 'Georgia, serif' }}
             >
               <Calendar className="w-3 h-3" />
               <span>{formatSkDate(item.datum)}</span>
@@ -965,14 +965,14 @@ export function AktualitaCard({ item }: { item: StrapiAktualita }) {
         <div className="px-4 pt-3 pb-3">
           <h3
             className="leading-tight font-semibold mb-2"
-            style={{ fontFamily: 'Georgia, serif', fontSize: 17, color: '#2d1810' }}
+            style={{ fontFamily: 'Georgia, serif', fontSize: 17, color: 'var(--hr-ink)' }}
           >
             {item.nazov}
           </h3>
           {text && (
             <p
               style={{
-                color: '#3d3528',
+                color: 'var(--hr-ink-2)',
                 fontFamily: 'Georgia, serif',
                 fontSize: 15,
                 lineHeight: 1.5,
@@ -1061,7 +1061,7 @@ function ActionButton({ icon, labelFull, labelShort, onClick }: { icon: React.Re
       onMouseLeave={() => setHover(false)}
       className="flex-1 inline-flex items-center justify-center gap-2 py-2 rounded-md"
       style={{
-        color: '#5d4e37',
+        color: 'var(--hr-body-2)',
         fontFamily: 'Georgia, serif',
         fontSize: 13,
         fontWeight: 500,
@@ -1091,7 +1091,7 @@ function AktualitaSkeleton() {
     <div
       className="overflow-hidden"
       style={{
-        background: '#fffdf8',
+        background: 'var(--hr-surface)',
         borderRadius: 12,
         border: '1px solid rgba(196,165,116,0.4)',
         boxShadow: '0 1px 2px rgba(70,40,20,0.06)',
@@ -1193,14 +1193,14 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
         {showHeader && (
           <header className="text-center">
             <div className="flex items-center justify-center gap-2 mb-3 opacity-60" aria-hidden="true">
-              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, transparent, #c4a574)' }} />
-              <span style={{ color: '#c4a574', fontSize: 12, lineHeight: 1 }}>⚜</span>
-              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, #c4a574, transparent)' }} />
+              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-line-quiet))' }} />
+              <span style={{ color: 'var(--hr-line-quiet)', fontSize: 12, lineHeight: 1 }}>⚜</span>
+              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, var(--hr-line-quiet), transparent)' }} />
             </div>
-            <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 38px)', fontWeight: 700, color: '#2e2213' }}>
+            <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px, 4vw, 38px)', fontWeight: 700, color: 'var(--hr-ink-3)' }}>
               Aktuality zo života združenia
             </h2>
-            <p style={{ margin: '6px 0 0', fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 19, color: '#8a795e' }}>
+            <p style={{ margin: '6px 0 0', fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 19, color: 'var(--hr-muted)' }}>
               Kronika brigád, podujatí a obnov pamiatok
             </p>
             <CeramicDivider />
@@ -1214,7 +1214,7 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
         )}
 
         {state === 'empty' && (
-          <p className="text-center py-10" style={{ color: '#8a795e', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+          <p className="text-center py-10" style={{ color: 'var(--hr-muted)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
             Zatiaľ tu nie sú žiadne príspevky. Hneď ako vyrazíme do terénu, dáme vedieť ✦
           </p>
         )}
@@ -1238,8 +1238,8 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
                       fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.04em',
                       padding: '8px 16px', borderRadius: 999, cursor: 'pointer', transition: 'all .15s',
                       ...(active
-                        ? { background: 'linear-gradient(180deg,#c8862f,#9a5d1f)', color: '#fbf6ea', border: '1px solid #9a5d1f' }
-                        : { background: '#f6efdd', color: '#5a4a32', border: '1px solid #d9c69a' }),
+                        ? { background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))', color: 'var(--hr-on-photo)', border: '1px solid var(--hr-accent)' }
+                        : { background: 'var(--hr-surface-2)', color: 'var(--hr-body-2)', border: '1px solid var(--hr-chip-border)' }),
                     }}
                   >
                     {f.label}
@@ -1249,7 +1249,7 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
             </div>
 
             {masonryItems.length === 0 ? (
-              <p className="text-center py-10" style={{ color: '#8a795e', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+              <p className="text-center py-10" style={{ color: 'var(--hr-muted)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
                 V tejto kategórii zatiaľ nie sú žiadne príspevky.
               </p>
             ) : (
@@ -1266,9 +1266,9 @@ export default function AktualityFeed({ initialPageSize = 20, showHeader = true 
                       disabled={loadingMore}
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium hover:brightness-110 disabled:opacity-60"
                       style={{
-                        background: '#fbf6ea',
-                        color: '#5d4e37',
-                        border: '1px solid #d9c69a',
+                        background: 'var(--hr-on-photo)',
+                        color: 'var(--hr-body-2)',
+                        border: '1px solid var(--hr-chip-border)',
                         fontFamily: 'var(--font-serif)',
                         transition: 'background 150ms ease',
                       }}
