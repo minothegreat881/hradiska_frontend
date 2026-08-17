@@ -782,3 +782,22 @@
   background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
   color: var(--l-card);
 }
+
+/* ── Prístupnosť ovládania mapy ────────────────────────────────────────────
+   Pečatná červená je podpisová farba, ale ako drobný text padá pod normu.
+   Rieši sa to na nádobe, nie na prvkoch: na tmavom paneli sa ide svetlejšie,
+   na svetlom hlbšie. Dekoratívne prvky (vlások pod nadpisom, prstence bodov)
+   sa tým posunú o odtieň, textu to vráti čitateľnosť. */
+.lmap-side {
+  --l-second: #dd6d5c;   /* 5,20:1 na #191c24 (bolo 3,63:1) */
+}
+.lmap-pad-c {
+  color: var(--l-second-deep) !important;   /* 7,24:1 na #f4f0e8 (bolo 4,13:1) */
+}
+
+/* Plátno mapy je fokusovateľné (`tabindex="0"`), ale nedávalo o tom vedieť —
+   pri prechode tabulátorom nebolo vidieť, že sa zameranie ocitlo v mape. */
+.lmap .maplibregl-canvas:focus-visible {
+  outline: 3px solid var(--l-second);
+  outline-offset: -3px;
+}
