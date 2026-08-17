@@ -36,12 +36,12 @@ export function TermsPage() {
           className="prose-content space-y-5"
           style={{
             background: 'var(--hr-surface)',
-            border: '1px solid rgba(196,165,116,0.4)',
+            border: '1px solid var(--hr-line)',
             borderRadius: 12,
             padding: '32px',
-            boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
+            boxShadow: 'var(--hr-shadow-sm)',
             color: 'var(--hr-body)',
-            fontFamily: 'Georgia, serif',
+            fontFamily: 'var(--font-serif, Georgia, serif)',
             fontSize: 15,
             lineHeight: 1.7,
           }}

@@ -2622,3 +2622,78 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 }
 @media (max-width: 700px) { .lakt-mriezka { grid-template-columns: 1fr; } }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PRÁVNE STRÁNKY (zásady, podmienky)
+   Trieda `prose-content` v projekte nemala ŽIADNE pravidlá — celá podoba bola
+   v inline štýle a text išiel v Georgii bez akéhokoľvek rytmu: nadpisy
+   sekcií splývali s odsekmi a dokument sa nedal preletieť očami.
+
+   Právny text je číslovaný sled, takže číslovanie tu nie je ozdoba, ale
+   pravdivá štruktúra — dostáva preto priestor a vlastnú váhu.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lab .prose-content {
+  max-width: 68ch;
+  margin-inline: auto;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.75 !important;
+  color: var(--l-body) !important;
+  padding: clamp(24px, 4vw, 46px) !important;
+  border-radius: 14px !important;
+  background: var(--l-card) !important;
+  border: 1px solid var(--l-line) !important;
+}
+
+/* Nadpis sekcie. Odstup zhora je výrazne väčší než zdola — nadpis patrí
+   k tomu, čo NASLEDUJE, nie k tomu, čo skončilo. */
+/* `!important` je tu nutné: nadpisy nesú inline štýl priamo v stránke
+   a bez neho by ostali v pôvodnej veľkosti aj odstupoch. */
+.lab .prose-content h2 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-size: clamp(19px, 2.2vw, 23px) !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  color: var(--l-ink) !important;
+  margin: 46px 0 12px !important;
+  padding-top: 22px !important;
+  border-top: 1px solid var(--l-line) !important;
+  text-wrap: balance;
+}
+.lab .prose-content h2:first-child {
+  margin-top: 0 !important; padding-top: 0 !important; border-top: 0 !important;
+}
+
+.lab .prose-content h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 17px; font-weight: 600; color: var(--l-ink);
+  margin: 26px 0 8px;
+}
+.lab .prose-content p { margin: 0 0 14px; }
+.lab .prose-content strong { color: var(--l-ink); font-weight: 600; }
+
+/* Odrážky ako záznamy, nie ako guľôčky — pečatná čiarka namiesto bodky. */
+.lab .prose-content ul { list-style: none; margin: 0 0 16px; padding: 0; }
+.lab .prose-content ul li {
+  position: relative; padding-left: 22px; margin-bottom: 8px;
+}
+.lab .prose-content ul li::before {
+  content: ''; position: absolute; left: 2px; top: .72em;
+  width: 10px; height: 1px; background: var(--l-second);
+}
+.lab .prose-content ol { margin: 0 0 16px; padding-left: 22px; }
+.lab .prose-content ol li { margin-bottom: 8px; }
+
+.lab .prose-content a {
+  color: var(--l-second-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.lab .prose-content a:hover { color: var(--l-second); }
+
+/* Dátum aktualizácie nad dokumentom — údaj, teda strojové písmo. */
+.lab .parchment > .container > .text-center > .mt-3 {
+  font-family: var(--mono); font-style: normal;
+  font-size: 12px; letter-spacing: .08em; color: var(--l-muted);
+}
