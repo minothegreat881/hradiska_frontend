@@ -1827,7 +1827,8 @@ body[data-lab-theme='pecat'],
    Vykresľuje sa portálom priamo do `body`, teda MIMO `.lab`. Preto sú palety
    šatu vypísané aj na `body[data-lab-theme]` — inak by sa sem tokeny
    nedostali a box by ostal zlatohnedý. */
-body[data-lab-theme] .pl-overlay {
+body[data-lab-theme] .pl-overlay,
+:root[data-sat='pecat'] .pl-overlay {
   --pl-card: var(--l-card);
   --pl-surface: var(--l-paper);
   --pl-bubble: var(--l-paper-2);
@@ -2847,3 +2848,13 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    `.lab` (ktorá sedí až na obale vnútri) nedosiahne — všetko, čo si farbu
    nenastavuje samo, by dedilo starú hnedočiernu. */
 :root[data-sat='pecat'] body { color: var(--l-body); }
+
+
+/* Riadok akcií vo svetlíku: „Páči sa mi" sa lámalo na dva riadky, kým
+   „Komentovať" a „Zdieľať" ostávali na jednom — riadok tým vyzeral rozbito. */
+:root[data-sat='pecat'] .pl-act,
+body[data-lab-theme] .pl-act {
+  white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  flex: 1 1 0; min-width: 0;
+}

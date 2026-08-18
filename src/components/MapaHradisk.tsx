@@ -1034,14 +1034,21 @@ export function MapaHradisk() {
     const onEnd = (e: TouchEvent) => {
       if (moved || e.timeStamp - t0 > 700) return;
       e.stopPropagation();
+      /* KĽÚČOVÉ: bez tohto prehliadač po zdvihnutí prsta ešte dogeneruje
+         klik — a ten dopadne až vtedy, keď je mapa na celej obrazovke
+         a pod prstom je niečo úplne iné. Návštevník tak ťukol na mapu
+         a skončil na náhodnej kategórii pod ňou. */
+      e.preventDefault();
       open();
     };
     /* Myš na úzkom okne — tam žiadne rozlišovanie netreba. */
     const onClick = (e: Event) => { e.stopPropagation(); open(); };
 
-    el.addEventListener('touchstart', onStart, true);
-    el.addEventListener('touchmove', onMove, true);
-    el.addEventListener('touchend', onEnd, true);
+    /* `passive: false` je nutné — inak prehliadač `preventDefault()` v
+       `touchend` ignoruje a dogenerovaný klik prejde. */
+    el.addEventListener('touchstart', onStart, { capture: true, passive: false });
+    el.addEventListener('touchmove', onMove, { capture: true, passive: false });
+    el.addEventListener('touchend', onEnd, { capture: true, passive: false });
     el.addEventListener('click', onClick, true);
     return () => {
       el.removeEventListener('touchstart', onStart, true);

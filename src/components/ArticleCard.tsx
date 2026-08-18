@@ -61,6 +61,38 @@ export function ArticleCard({ article }: ArticleCardProps) {
         }}
       />
 
+      {/* 1b. Keď fotka chýba, nastúpi značka združenia. Prázdna tmavá plocha
+             pôsobila ako chyba načítania; logo hovorí, že fotku k tomuto
+             zápisu jednoducho nemáme. */}
+      {!article.coverImage && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute', inset: 0, display: 'grid', placeItems: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <picture>
+            <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
+            <img
+              src="/logo_hradiska_small.png"
+              alt=""
+              width={256}
+              height={256}
+              loading="lazy"
+              decoding="async"
+              /* Značka je tmavá a karta bez fotky tiež — v pôvodných farbách
+                 by na nej nebola vidieť. Prekresľuje sa preto na svetlú
+                 siluetu a zostáva vodoznakom, nie obrázkom. */
+              style={{
+                width: '52%', maxWidth: 168, height: 'auto',
+                opacity: 0.22, filter: 'brightness(0) invert(1)',
+              }}
+            />
+          </picture>
+        </span>
+      )}
+
       {/* 2. Scrim — horná tretina číra, spodok takmer nepriehľadný */}
       <div
         aria-hidden="true"
