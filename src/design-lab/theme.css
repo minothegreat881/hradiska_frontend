@@ -2858,3 +2858,111 @@ body[data-lab-theme] .pl-act {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   flex: 1 1 0; min-width: 0;
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PROFIL ČLENA
+   Web je kronika, takže profil je vlastná kronika člena. Skladba je tá istá
+   ako v archíve a v aktualitách: hlavička so značkou, register po riadkoch,
+   vlások medzi záznamami. Žiadne odznaky úrovní — koľko kto napísal, je
+   údaj, nie titul.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lprof { background: var(--l-paper); min-height: 100vh; }
+.lprof-in { padding: 34px 0 90px; max-width: 1120px; }
+
+.lprof-hlava {
+  display: flex; align-items: center; gap: 20px;
+  padding-bottom: 26px; margin-bottom: 30px;
+  border-bottom: 1px solid var(--l-line);
+}
+.lprof-pecat {
+  flex: none; width: 64px; height: 64px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: linear-gradient(155deg, var(--l-second), var(--l-second-deep));
+  color: var(--l-card);
+  font-family: 'Fraunces', Georgia, serif; font-size: 27px; font-weight: 600;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.3), 0 6px 16px rgba(20,18,15,.25);
+}
+.lprof-meno {
+  margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+  font-size: clamp(28px, 3.4vw, 40px); line-height: 1.05; color: var(--l-ink);
+}
+.lprof-udaje {
+  margin: 6px 0 0; font-family: var(--mono); font-size: 12px;
+  letter-spacing: .08em; color: var(--l-muted); font-variant-numeric: tabular-nums;
+}
+.lprof-udaje b { color: var(--l-ink); font-weight: 600; }
+.lprof-nastavenia {
+  margin-left: auto; flex: none;
+  padding: 10px 18px; border-radius: 999px; cursor: pointer;
+  background: transparent; border: 1px solid var(--l-line-2); color: var(--l-body);
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  transition: border-color .16s ease, color .16s ease;
+}
+.lprof-nastavenia:hover { border-color: var(--l-second); color: var(--l-ink); }
+
+.lprof-telo { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 40px; }
+
+/* Register sekcií — tá istá reč ako legenda mapy. */
+.lprof-register { display: flex; flex-direction: column; align-self: start; position: sticky; top: 84px; }
+.lprof-register button {
+  position: relative; display: flex; align-items: baseline; gap: 10px;
+  padding: 12px 2px; border: 0; border-bottom: 1px solid var(--l-line);
+  background: transparent; cursor: pointer; text-align: left;
+  font-family: 'Inter', sans-serif; font-size: 15px; color: var(--l-body);
+  transition: color .16s ease;
+}
+.lprof-register button:hover { color: var(--l-ink); }
+.lprof-register button.is-on { color: var(--l-ink); font-weight: 600; }
+.lprof-register button.is-on::before {
+  content: ''; position: absolute; left: -14px; top: 50%;
+  width: 6px; height: 6px; margin-top: -3px; border-radius: 50%;
+  background: var(--l-second);
+}
+.lprof-reg-nazov { flex: 1; }
+.lprof-reg-pocet {
+  font-family: var(--mono); font-size: 11px; color: var(--l-muted-2);
+  font-variant-numeric: tabular-nums;
+}
+.lprof-nove { width: 7px; height: 7px; border-radius: 50%; background: var(--l-second); flex: none; }
+
+/* Záznamy — register po riadkoch, nie kôpka kariet. */
+.lprof-zoznam { list-style: none; margin: 0; padding: 0; }
+.lprof-zaznam {
+  padding: 18px 0 18px 16px; border-bottom: 1px solid var(--l-line);
+  border-left: 2px solid transparent;
+}
+.lprof-zaznam.is-nove { border-left-color: var(--l-second); }
+.lprof-riadok { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lprof-kto { font-family: 'Inter', sans-serif; font-weight: 600; color: var(--l-ink); }
+.lprof-co { font-family: 'Inter', sans-serif; color: var(--l-body); }
+.lprof-kedy {
+  margin-left: auto; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .06em; color: var(--l-muted-2); white-space: nowrap;
+}
+.lprof-kde, .lprof-nazov {
+  display: inline-block; margin-top: 4px;
+  font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+  color: var(--l-second-deep); text-decoration: none;
+}
+.lprof-nazov { font-size: 18px; line-height: 1.3; }
+.lprof-kde:hover, .lprof-nazov:hover { text-decoration: underline; }
+.lprof-citat {
+  margin: 8px 0 0; padding-left: 12px; border-left: 1px solid var(--l-line-2);
+  font-family: 'Inter', sans-serif; font-size: 14.5px; line-height: 1.6; color: var(--l-body);
+}
+.lprof-reakcie, .lprof-znacka {
+  display: inline-block; margin-top: 8px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--l-muted);
+}
+
+@media (max-width: 860px) {
+  .lprof-telo { grid-template-columns: 1fr; gap: 22px; }
+  .lprof-register { position: static; flex-direction: row; overflow-x: auto; gap: 6px; }
+  .lprof-register button { border-bottom: 0; white-space: nowrap; padding: 10px 15px; border-radius: 999px; border: 1px solid var(--l-line-2); }
+  .lprof-register button.is-on { background: var(--l-ink); color: var(--l-on-dark-2); border-color: var(--l-ink); }
+  .lprof-register button.is-on::before { display: none; }
+  .lprof-hlava { flex-wrap: wrap; }
+  .lprof-nastavenia { margin-left: 0; }
+}

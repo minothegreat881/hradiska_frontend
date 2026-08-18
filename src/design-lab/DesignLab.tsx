@@ -30,7 +30,7 @@ const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then(m => ({ def
 const PrivacyPage = lazy(() => import('../pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import('../pages/TermsPage').then(m => ({ default: m.TermsPage })));
 const AccountPage = lazy(() => import('../pages/AccountPage').then(m => ({ default: m.AccountPage })));
-const ProfilePage = lazy(() => import('../pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const LabProfil = lazy(() => import('./LabProfil'));
 import './theme.css';
 
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
@@ -181,7 +181,7 @@ export default function DesignLab() {
         ) : podstranka === 'ucet' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><AccountPage mode="login" /></Suspense>
         ) : podstranka === 'profil' ? (
-          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><ProfilePage /></Suspense>
+          <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><LabProfil /></Suspense>
         ) : podstranka === 'aktuality' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
             <LabAktualityStranka />
