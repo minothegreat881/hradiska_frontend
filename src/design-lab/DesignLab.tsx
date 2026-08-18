@@ -16,20 +16,14 @@
  */
 
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { HomePage } from '../pages/HomePage';
-import { ArticlePage } from '../pages/ArticlePage';
 import { LabArticle } from './LabArticle';
-import { Footer } from '../components/Footer';
-import { NavBar } from '../components/NavBar';
 import { LabNav } from './LabNav';
 import { LabHome } from './LabHome';
 import { LabJoinUs } from './LabJoinUs';
 import { LabCategories } from './LabCategories';
 import { LabFooter } from './LabFooter';
-const GalleryPage = lazy(() => import('../pages/GalleryPage').then(m => ({ default: m.GalleryPage })));
 const LabGaleria = lazy(() => import('./LabGaleria'));
 const CategoryPage = lazy(() => import('../pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
-const AktualityPage = lazy(() => import('../pages/AktualityPage').then(m => ({ default: m.AktualityPage })));
 const LabAktualityStranka = lazy(() => import('./LabAktualityStranka'));
 const SearchResultsPage = lazy(() => import('../pages/SearchResultsPage').then(m => ({ default: m.SearchResultsPage })));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
@@ -42,7 +36,6 @@ import './theme.css';
 /* Písmo a skladba sú vo všetkých témach rovnaké (Fraunces na nadpisy + Inter na text,
    redakčný rozvrh) — líši sa výhradne farebná skladba. */
 const THEMES = [
-  { id: 'povodna', label: 'Pôvodná', note: 'Cinzel · pergamen · zlato — dnešný stav' },
   { id: 'uhlie', label: 'Uhlie', note: 'neutrálny papier · antracit · medená iskra' },
   /* Nové kombinácie. Iskra je v každej teplá (pravidlo šatu), mení sa podklad
      a to, o akú dvojicu ide — viď poznámky pri paletách v `theme.css`. */
@@ -102,7 +95,6 @@ export default function DesignLab() {
    * z laboratória naozaj odvedú — inak by sa tvárili, že existujú.
    */
   const keepInLab = (e: React.MouseEvent) => {
-    if (theme === 'povodna') return;
     const a = (e.target as HTMLElement).closest?.('a');
     if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     const href = a.getAttribute('href') || '';
@@ -118,8 +110,7 @@ export default function DesignLab() {
      `.lab`. Bez tejto značky by sa k nemu tokeny šatu nedostali a ostal by
      zlatohnedý. Po odchode z laboratória sa značka upratuje. */
   useEffect(() => {
-    if (theme === 'povodna') delete document.body.dataset.labTheme;
-    else document.body.dataset.labTheme = theme;
+    document.body.dataset.labTheme = theme;
     return () => { delete document.body.dataset.labTheme; };
   }, [theme]);
 
@@ -162,14 +153,12 @@ export default function DesignLab() {
           <a href="/" style={{ fontSize: 12, color: 'rgba(255,255,255,.6)', textDecoration: 'none' }}>← na web (starý šat)</a>
         </div>
       </div>
-
-      {/* `povodna` = bez prekrytia, teda presne dnešný web. */}
       <div
-        className={theme === 'povodna' ? undefined : 'lab'}
-        data-theme={theme === 'povodna' ? undefined : theme}
+        className="lab"
+        data-theme={theme}
         onClickCapture={keepInLab}
       >
-        {theme === 'povodna' ? <NavBar /> : <LabNav />}
+        {<LabNav />}
 
         {/* Cieľ preskočenia. `tabIndex={-1}` je nutný, aby sa dal zamerať
             programovo — bez neho skok presunie iba pohľad, nie zameranie,
@@ -195,34 +184,29 @@ export default function DesignLab() {
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}><ProfilePage /></Suspense>
         ) : podstranka === 'aktuality' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
-            {/* `povodna` ukáže doterajšiu nástenku, aby bolo vidieť rozdiel. */}
-            {theme === 'povodna' ? <AktualityPage /> : <LabAktualityStranka />}
+            <LabAktualityStranka />
           </Suspense>
         ) : podstranka === 'galeria' ? (
           <Suspense fallback={<div className="lart-wait">Načítavam…</div>}>
-            {/* `povodna` ukáže dnešnú galériu, aby sa dali postaviť vedľa seba. */}
-            {theme === 'povodna' ? <GalleryPage /> : <LabGaleria />}
+            <LabGaleria />
           </Suspense>
         ) : articleSlug ? (
-          /* Stránka článku. `povodna` ukáže produkčnú, aby sa dali postaviť
-             vedľa seba na tom istom článku. */
-          theme === 'povodna' ? <ArticlePage articleSlug={articleSlug} /> : <LabArticle slug={articleSlug} />
+          <LabArticle slug={articleSlug} />
         ) : (
           <>
             {/* `LabHome` je tá istá skladba ako `HomePage`, len s labovým pásom
                 kroniky (ten sedí uprostred, tak sa nedá dokresliť za stránku).
                 Kategórie a výzva idú za ňou ako samostatné labové komponenty —
                 poradie stránky tým ostáva zachované. */}
-            {theme === 'povodna' ? <HomePage /> : <LabHome />}
-            {theme !== 'povodna' && <LabCategories />}
-            {theme !== 'povodna' && <LabJoinUs />}
+            {<LabHome />}
+            <LabCategories />
+            <LabJoinUs />
           </>
         )}
 
         </div>
 
-        {/* To isté pre pätičku — v téme ide nová, `povodna` ukáže produkčnú. */}
-        {theme === 'povodna' ? <Footer /> : <LabFooter />}
+          {<LabFooter />}
       </div>
     </>
   );

@@ -1,7 +1,5 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
-/* Šat Pečať sa sťahuje až pri zapnutí — kým je vypnutý, nikoho nestojí nič.
-   Platí len tam, kde je trieda `.lab`, teda v laboratóriu a tu po `?sat=pecat`. */
-const SatPecat = lazy(() => import('./design-lab/satPecat'));
+import './design-lab/theme.css';
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
 const ArticlePagePecat = lazy(() => import('./design-lab/LabArticle'));
@@ -13,13 +11,9 @@ const LabCategories = lazy(() => import('./design-lab/LabCategories').then(m => 
 const LabJoinUs = lazy(() => import('./design-lab/LabJoinUs').then(m => ({ default: m.LabJoinUs })));
 const GalleryPagePecat = lazy(() => import('./design-lab/LabGaleria'));
 const AktualityPagePecat = lazy(() => import('./design-lab/LabAktualityStranka'));
-import { NavBar } from './components/NavBar';
-import { HomePage } from './pages/HomePage';
 import { SiteDetailPage } from './pages/SiteDetailPage';
-import { ArticlePage } from './pages/ArticlePage';
 import { AboutPage } from './pages/AboutPage';
 import { CategoryPage } from './pages/CategoryPage';
-import { AktualityPage } from './pages/AktualityPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
 import { AccountPage, type AccountMode } from './pages/AccountPage';
@@ -27,7 +21,6 @@ import { SearchResultsPage } from './pages/SearchResultsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { MemberAuthProvider } from './auth/MemberAuth';
 import { Toaster } from './components/ui/sonner';
-import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { InstallPrompt } from './components/InstallPrompt';
 import { initConsent } from './lib/consent';
@@ -40,7 +33,6 @@ const AdminApp = lazy(() => import('./admin/AdminApp'));
 // Mapa (Cesium/maplibre) a galéria (lightgallery) sú najťažšie závislosti.
 // Lazy → nesťahuje ich bežný návštevník článku, len kto otvorí /galeria.
 
-const GalleryPage = lazy(() => import('./pages/GalleryPage').then((m) => ({ default: m.GalleryPage })));
 
 // Skúšobná plocha pre farebný šat domovskej stránky (/design). Lazy — bežný
 // návštevník ju nikdy nestiahne. Vykresľuje SKUTOČNÚ HomePage, len ju zvonku
@@ -210,26 +202,12 @@ function App() {
 
   /* Voľba šatu prežije preklik na ďalšiu stránku — `?sat=` sa zapamätá.
      Kým sa nezapne, nikto na webe nič nespozoruje. */
-  /* Šat Pečať je ODTERAZ PREDVOLENÝ. Starý zlatohnedý sa dá ešte vyvolať
-     cez `?sat=povodna` — nie pre návštevníka, ale aby sa dalo pri hlásenej
-     chybe rýchlo porovnať, či ju spôsobil šat. Záloha stavu pred prepnutím
-     je v značke `stary-sat-2026-08-18`. */
-  const satZapnuty = useMemo(() => {
-    if (typeof window === 'undefined') return true;
-    const chce = new URLSearchParams(window.location.search).get('sat');
-    if (chce === 'pecat') { try { localStorage.removeItem('sat'); } catch { /* súkromný režim */ } return true; }
-    if (chce === 'povodna') { try { localStorage.setItem('sat', 'povodna'); } catch { /* súkromný režim */ } return false; }
-    try { return localStorage.getItem('sat') !== 'povodna'; } catch { return true; }
-  }, [pathname]);
 
-  /* Značka na koreni dokumentu — musí byť AŽ ZA `satZapnuty`, inak by sa
-     čítal skôr, než vznikne. Cookie lišta, výzva na inštaláciu, hlásenia aj
-     svetlík fotky idú PORTÁLOM mimo `.lab`, kam by šat nedosiahol, a rodiny
-     `--ck-*` a `--ch-*` sú definované priamo na svojich prvkoch, kde
-     dedenie z `.lab` prehráva. */
-  useEffect(() => {
-    document.documentElement.dataset.sat = satZapnuty ? 'pecat' : 'povodna';
-  }, [satZapnuty]);
+  /* Značka na koreni dokumentu. Cookie lišta, výzva na inštaláciu, hlásenia
+     aj svetlík fotky idú PORTÁLOM mimo `.lab`, kam by šat nedosiahol, a
+     rodiny `--ck-*`, `--ch-*` a `--ad-*` sú definované priamo na svojich
+     prvkoch, kde dedenie z `.lab` prehráva. */
+  useEffect(() => { document.documentElement.dataset.sat = 'pecat'; }, []);
 
   // Laboratórium má vlastný rám — prepínač tém je nad stránkou.
   if (route === 'design') {
@@ -253,45 +231,32 @@ function App() {
         {/* Aj administrácia beží v šate — má vlastný rám mimo `.lab`, takže
             paletu berie zo značky na koreni dokumentu. Nosič sa tu musí
             vykresliť zvlášť: táto vetva sa vracia skôr než hlavná. */}
-        {satZapnuty && <SatPecat />}
         <AdminApp />
       </Suspense>
     );
   }
 
   return (
-    /* ── ŠAT PEČAŤ NA OSTREJ STRÁNKE ────────────────────────────────────
-       Šat žije v `design-lab/theme.css` a je zapuzdrený pod `.lab`. Aby
-       platil aj tu, stačí ostrej stránke dať tú istú triedu — žiadne
-       pravidlo sa neprepisuje a laboratórium ostáva nedotknuté.
-
-       Zapína sa VÝSLOVNE, aby sa dal skúšať na ostrej adrese bez toho, aby
-       ho videl každý návštevník:
-         ?sat=pecat    zapne a zapamätá
-         ?sat=povodna  vypne a zapamätä
-       Predvolene je vypnutý. Prepínač je pri `satZapnuty` nižšie. */
-    <div className={satZapnuty ? 'min-h-screen lab' : 'min-h-screen'}
-         data-theme={satZapnuty ? 'pecat' : undefined}>
-      {satZapnuty && <Suspense fallback={null}><SatPecat /></Suspense>}
-      {satZapnuty ? <LabNav /> : <NavBar />}
+    /* Šat Pečať je JEDINÝ šat webu. Trieda `.lab` je tu preto, že pod ňou
+       je celý šat zapuzdrený — laboratórium aj ostrá stránka tak bežia na
+       tom istom, bez druhej vetvy, ktorú by bolo treba udržiavať.
+       Starý zlatohnedý šat je v značke `stary-sat-2026-08-18`. */
+    <div className="min-h-screen lab" data-theme="pecat">
+      <LabNav />
 
       <Suspense fallback={
-        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8a795e', fontFamily: 'Georgia, serif', fontSize: 15 }}>
+        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--hr-muted)', fontFamily: 'var(--font-serif, Georgia, serif)', fontSize: 15 }}>
           Načítavam…
         </div>
       }>
-        {route === 'home' && (satZapnuty
-          ? <><LabHome /><LabCategories /><LabJoinUs /></>
-          : <HomePage />)}
-        {route === 'galeria' && (satZapnuty ? <GalleryPagePecat /> : <GalleryPage />)}
-        {route === 'aktuality' && (satZapnuty ? <AktualityPagePecat /> : <AktualityPage />)}
+        {route === 'home' && <><LabHome /><LabCategories /><LabJoinUs /></>}
+        {route === 'galeria' && <GalleryPagePecat />}
+        {route === 'aktuality' && <AktualityPagePecat />}
         {route === 'privacy' && <PrivacyPage />}
         {route === 'terms' && <TermsPage />}
         {route === 'site' && <SiteDetailPage siteSlug={params.slug} />}
         {route === 'category' && <CategoryPage categorySlug={params.slug} />}
-        {route === 'article' && (satZapnuty
-          ? <ArticlePagePecat slug={params.slug} />
-          : <ArticlePage articleSlug={params.slug} />)}
+        {route === 'article' && <ArticlePagePecat slug={params.slug} />}
         {route === 'account' && <AccountPage mode={accountMode} />}
         {route === 'hladat' && <SearchResultsPage query={params.q} />}
         {route === 'notfound' && <NotFoundPage />}
@@ -299,7 +264,7 @@ function App() {
 
       <Toaster position="top-center" />
 
-      {satZapnuty ? <LabFooter /> : <Footer />}
+      <LabFooter />
 
       {/* GDPR cookie-consent — fixed dole, neblokuje scroll; späť sa otvorí z pätičky */}
       <CookieBanner />
