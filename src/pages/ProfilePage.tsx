@@ -155,14 +155,26 @@ export function ProfilePage() {
               {vek && <> · <b>{vek.cislo}</b> {vek.slovo}</>}
             </p>
           </div>
-          <button
-            type="button"
-            className="lprof-nastavenia"
-            aria-pressed={sekcia === 'nastavenia'}
-            onClick={() => setSekcia('nastavenia')}
-          >
-            Nastavenia účtu
-          </button>
+          {/* Odhlásenie patrí sem, nie do nastavení: je to úkon, ktorý človek
+              robí najčastejšie zo všetkých v profile, a hľadať ho pod
+              „Nastavenia účtu" znamená prejsť tri obrazovky pre jeden klik. */}
+          <div className="lprof-ukony">
+            <button
+              type="button"
+              className="lprof-nastavenia"
+              aria-pressed={sekcia === 'nastavenia'}
+              onClick={() => setSekcia('nastavenia')}
+            >
+              Nastavenia účtu
+            </button>
+            <button
+              type="button"
+              className="lprof-nastavenia"
+              onClick={() => { signOut(); prejdi('/'); }}
+            >
+              Odhlásiť sa
+            </button>
+          </div>
         </header>
 
         {profil?.preModerated && (
@@ -560,10 +572,11 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
         </div>
       </section>
 
+      {/* Odhlásenie je v hlavičke profilu — tu ostáva len to, čo sa nedá
+          vrátiť, aby si to nikto nepomýlil s odhlásením. */}
       <section className="lprof-ucet">
-        <h2>Účet</h2>
+        <h2>Zrušenie účtu</h2>
         <div className="lprof-tlacidla">
-          <button type="button" onClick={onOdhlas}>Odhlásiť sa</button>
           {!rusim && <button type="button" className="lprof-zrusit" onClick={() => setRusim(true)}>Zrušiť účet</button>}
         </div>
         {rusim && (

@@ -2884,8 +2884,9 @@ body[data-lab-theme] .pl-act {
   letter-spacing: .08em; color: var(--l-muted); font-variant-numeric: tabular-nums;
 }
 .lprof-udaje b { color: var(--l-ink); font-weight: 600; }
+.lprof-ukony { margin-left: auto; flex: none; display: flex; gap: 10px; flex-wrap: wrap; }
 .lprof-nastavenia {
-  margin-left: auto; flex: none;
+  flex: none;
   padding: 10px 18px; border-radius: 999px; cursor: pointer;
   background: transparent; border: 1px solid var(--l-line-2); color: var(--l-body);
   font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
@@ -2957,7 +2958,7 @@ body[data-lab-theme] .pl-act {
   .lprof-register button.is-on { background: var(--l-ink); color: var(--l-on-dark-2); border-color: var(--l-ink); }
   .lprof-register button.is-on::before { display: none; }
   .lprof-hlava { flex-wrap: wrap; }
-  .lprof-nastavenia { margin-left: 0; }
+  .lprof-ukony { margin-left: 0; }
 }
 
 /* Vlastná fotografia namiesto iniciály — kruh ostáva ten istý. */
