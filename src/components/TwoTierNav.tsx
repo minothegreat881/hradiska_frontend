@@ -24,8 +24,8 @@ const NAV_GRADIENT = 'linear-gradient(180deg,var(--hr-dark) 0%,var(--hr-dark-2) 
 const NAV_BORDER_GOLD = 'var(--hr-accent)';
 const CAT_TEXT = 'var(--hr-on-dark)';
 const CAT_TEXT_ACTIVE = 'var(--hr-on-dark-strong)';
-const CAT_OPEN_BG = 'rgba(200,161,90,0.16)';
-const CAT_HOVER_BG = 'rgba(200,161,90,0.14)';
+const CAT_OPEN_BG = 'var(--hr-line)';
+const CAT_HOVER_BG = 'var(--hr-line)';
 const CAT_UNDERLINE = 'var(--hr-accent-soft)';
 const BADGE_BG = 'var(--hr-accent-soft)';
 const BADGE_TEXT = 'var(--hr-dark-2)';
@@ -364,9 +364,9 @@ function CategoryButton({ cat, isOpen, onToggle }: CategoryButtonProps) {
 // Vzhľad prevzatý z pôvodného MegaMenu dropdownu: TMAVÉ pozadie, lokality v
 // 2 STĹPCOCH (2 vedľa seba, viac riadkov), ikonka 📍, svetlý text, zlatá pätička.
 const ROLETKA_DARK_BG = 'var(--hr-dark-3)';
-const ROLETKA_DARK_BORDER = 'rgba(196,165,116,0.25)';
+const ROLETKA_DARK_BORDER = 'var(--hr-line)';
 const ROLETKA_DARK_TEXT = 'var(--hr-on-dark-2)';
-const ROLETKA_DARK_HOVER_BG = 'rgba(196,165,116,0.15)';
+const ROLETKA_DARK_HOVER_BG = 'var(--hr-line)';
 const ROLETKA_DARK_ACCENT = 'var(--hr-badge)';
 const ROLETKA_PIN = 'var(--hr-accent-deep)';
 

@@ -31,13 +31,6 @@ const CLANKY = [
   { href: '/category/aktuality', label: 'Aktuality' },
 ];
 
-const O_PROJEKTE = [
-  { href: '/about', label: 'O nás' },
-  { href: '/about#team', label: 'Tím' },
-  { href: 'mailto:info@hradiska.sk', label: 'Kontakt' },
-  { href: '/about#podporte', label: 'Podporte nás' },
-];
-
 const SOCIALS = [
   {
     label: 'Facebook',
@@ -208,7 +201,6 @@ export function Footer() {
           {/* ---- Navigačné stĺpce ---- */}
           <FooterColumn title="Kategórie" links={KATEGORIE} />
           <FooterColumn title="Články" links={CLANKY} />
-          <FooterColumn title="O projekte" links={O_PROJEKTE} />
         </div>
 
         {/* ---- Fleur-de-lis oddeľovač ---- */}

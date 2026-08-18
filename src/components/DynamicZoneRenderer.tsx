@@ -505,7 +505,7 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
                   width: 6,
                   height: 6,
                   borderRadius: 9999,
-                  background: '#a87437',
+                  background: 'var(--hr-accent-soft)',
                 }}
               />
               {renderInlineChildren(item.children)}
@@ -668,8 +668,8 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
         clear: needsClearBefore ? 'both' : undefined,
         margin: '2.4rem auto',
         maxWidth: 520,
-        background: 'rgba(196,165,116,0.07)',
-        border: '1px solid rgba(168,116,55,0.2)',
+        background: 'var(--hr-line)',
+        border: '1px solid var(--hr-accent-border)',
         borderRadius: 10,
         padding: '2.1rem 2.4rem 1.8rem',
         textAlign: 'center',
@@ -677,9 +677,9 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
     >
       {/* Ornament: line - diamond - line */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: '1.1rem' }}>
-        <span style={{ height: 1, width: 34, background: 'rgba(168,116,55,0.45)' }} />
-        <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#a87437', transform: 'rotate(45deg)' }} />
-        <span style={{ height: 1, width: 34, background: 'rgba(168,116,55,0.45)' }} />
+        <span style={{ height: 1, width: 34, background: 'var(--hr-accent-border)' }} />
+        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--hr-accent-soft)', transform: 'rotate(45deg)' }} />
+        <span style={{ height: 1, width: 34, background: 'var(--hr-accent-border)' }} />
       </div>
       {block.title && (
         <div
@@ -718,7 +718,7 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
           style={{
             marginTop: '1.2rem',
             paddingTop: '0.9rem',
-            borderTop: '1px solid rgba(168,116,55,0.22)',
+            borderTop: '1px solid var(--hr-accent-border)',
             fontFamily: 'Georgia, "Times New Roman", serif',
             fontStyle: 'normal',
             fontSize: '12.5px',

@@ -9,11 +9,11 @@ import { usePathname } from '../hooks/usePathname';
 const GOLD_BRIGHT = '#e8c56e';
 const TEXT_LIGHT = '#f0e8dc';
 const TEXT_MUTED = '#a89a82';
-const PILL_BG = 'rgba(196,165,116,0.18)';
+const PILL_BG = 'var(--hr-line)';
 const NAV_BG = '#1f1611';
 const DROPDOWN_BG = '#2e2317';
-const HOVER_BG = 'rgba(196,165,116,0.15)';
-const BORDER_GOLD = 'rgba(196,165,116,0.25)';
+const HOVER_BG = 'var(--hr-line)';
+const BORDER_GOLD = 'var(--hr-line)';
 
 interface CategoryStripProps {
   categories: NavigationItem[];
@@ -394,7 +394,7 @@ function DropdownPanel({ category, children_, rect, onClose }: DropdownPanelProp
               el.style.color = TEXT_LIGHT;
             }}
           >
-            <MapPin style={{ width: 12, height: 12, color: '#a87437', flexShrink: 0, marginTop: 3 }} />
+            <MapPin style={{ width: 12, height: 12, color: 'var(--hr-accent-soft)', flexShrink: 0, marginTop: 3 }} />
             <span style={{ whiteSpace: 'normal', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
               {child.label}
             </span>

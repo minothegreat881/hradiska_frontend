@@ -161,7 +161,7 @@ export function JoinUs() {
               position: 'absolute',
               inset: 0,
               background:
-                'repeating-linear-gradient(58deg, rgba(200,161,90,.05) 0 2px, transparent 2px 10px)',
+                'repeating-linear-gradient(58deg, var(--hr-line) 0 2px, transparent 2px 10px)',
               pointerEvents: 'none',
             }}
           />

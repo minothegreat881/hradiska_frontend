@@ -38,7 +38,7 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
   const style: React.CSSProperties = compact
     ? { ...base, width: 38, height: 38, borderRadius: 8, background: 'transparent', border: 0 }
     : { ...base, gap: 7, padding: '7px 14px', borderRadius: 999,
-        background: 'rgba(255,247,231,0.08)', border: '1px solid rgba(200,161,90,0.4)' };
+        background: 'rgba(255,247,231,0.08)', border: '1px solid var(--hr-line)' };
 
   return (
     <button
@@ -46,7 +46,7 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
       title={label}
       aria-label={label}
       style={style}
-      onMouseEnter={(e) => { if (compact) (e.currentTarget as HTMLElement).style.background = 'rgba(196,165,116,0.15)'; }}
+      onMouseEnter={(e) => { if (compact) (e.currentTarget as HTMLElement).style.background = 'var(--hr-line)'; }}
       onMouseLeave={(e) => { if (compact) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
     >
       {isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}

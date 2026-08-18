@@ -1848,6 +1848,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .article-card [data-title] {
   transition: color 0.2s ease;
 }
+/* Nadpis má farbu v INLINE štýle (`color: var(--card-title)`), takže priame
+   pravidlo pre nabehnutie ju nikdy neprebilo — inline vyhráva. Prepína sa
+   preto samotná premenná na karte: inline `var()` sa vyhodnocuje z kaskády
+   prvku, takže zmena tokenu sa doň premietne. */
+.article-card:hover,
+.article-card:focus-visible {
+  --card-title: var(--card-title-hover);
+}
 .article-card:hover [data-title],
 .article-card:focus-visible [data-title] {
   color: var(--card-title-hover);

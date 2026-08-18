@@ -16,7 +16,7 @@ const wrap: React.CSSProperties = {
 };
 const card: React.CSSProperties = {
   width: 'min(440px, 100%)', background: 'var(--hr-surface)', borderRadius: 16,
-  border: '1px solid rgba(196,165,116,0.4)',
+  border: '1px solid var(--hr-line)',
   boxShadow: '0 20px 50px -30px rgba(60,40,15,.4)', padding: '34px 32px',
 };
 const label: React.CSSProperties = {

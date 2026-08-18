@@ -198,7 +198,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   </span>
                   <span
                     aria-hidden="true"
-                    style={{ width: 5, height: 5, borderRadius: 999, background: 'rgba(230,201,138,.6)' }}
+                    style={{ width: 5, height: 5, borderRadius: 999, background: 'var(--hr-line-soft)' }}
                   />
                   <span
                     style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: 'var(--ch-meta)' }}

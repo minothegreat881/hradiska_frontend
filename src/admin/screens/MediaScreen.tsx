@@ -78,7 +78,7 @@ export function MediaScreen() {
       </div>
 
       {error && (
-        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: '#fbeae8', borderColor: '#e8c4bf' }}>
+        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: 'var(--hr-error-bg)', borderColor: 'var(--hr-error-line)' }}>
           <AlertCircle className="w-4 h-4" style={{ color: 'var(--ad-danger)', flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: 13.5, color: 'var(--ad-danger)' }}>{error}</div>
         </div>
@@ -87,7 +87,7 @@ export function MediaScreen() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(158px, 1fr))', gap: 14 }}>
         {items.map(f => (
           <div key={f.id} className="acard" style={{ overflow: 'hidden', position: 'relative' }}>
-            <div style={{ aspectRatio: '4 / 3', background: '#efe6d0' }}>
+            <div style={{ aspectRatio: '4 / 3', background: 'var(--hr-wash-2)' }}>
               <img src={fileUrl(f, 'thumbnail')} alt="" loading="lazy"
                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>

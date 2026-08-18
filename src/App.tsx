@@ -5,6 +5,14 @@ const SatPecat = lazy(() => import('./design-lab/satPecat'));
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
 const ArticlePagePecat = lazy(() => import('./design-lab/LabArticle'));
+/* Časti webu, ktoré v novom šate nesú vlastnú skladbu, nie len farby. */
+const LabNav = lazy(() => import('./design-lab/LabNav').then(m => ({ default: m.LabNav })));
+const LabFooter = lazy(() => import('./design-lab/LabFooter').then(m => ({ default: m.LabFooter })));
+const LabHome = lazy(() => import('./design-lab/LabHome').then(m => ({ default: m.LabHome })));
+const LabCategories = lazy(() => import('./design-lab/LabCategories').then(m => ({ default: m.LabCategories })));
+const LabJoinUs = lazy(() => import('./design-lab/LabJoinUs').then(m => ({ default: m.LabJoinUs })));
+const GalleryPagePecat = lazy(() => import('./design-lab/LabGaleria'));
+const AktualityPagePecat = lazy(() => import('./design-lab/LabAktualityStranka'));
 import { NavBar } from './components/NavBar';
 import { HomePage } from './pages/HomePage';
 import { SiteDetailPage } from './pages/SiteDetailPage';
@@ -39,7 +47,7 @@ const GalleryPage = lazy(() => import('./pages/GalleryPage').then((m) => ({ defa
 // prefarbí; produkčné komponenty sa nemenia.
 const DesignLab = lazy(() => import('./design-lab/DesignLab'));
 
-type Route = 'design' | 'home' | 'site' | 'article' | 'about' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
+type Route = 'design' | 'home' | 'site' | 'article' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
 
 // Cesty účtov → režim AccountPage
 const ACCOUNT_ROUTES: Record<string, AccountMode> = {
@@ -122,8 +130,6 @@ function App() {
       } else if (path.startsWith('/blog/')) {
         setRoute('article');
         setParams({ slug: path.replace('/blog/', '') });
-      } else if (path === '/about') {
-        setRoute('about');
       } else {
         // Neznáma cesta → poriadna 404 (nie tiché zobrazenie domovskej = soft 404).
         setRoute('notfound');
@@ -201,15 +207,29 @@ function App() {
     };
   }, [route]);
 
+
   /* Voľba šatu prežije preklik na ďalšiu stránku — `?sat=` sa zapamätá.
      Kým sa nezapne, nikto na webe nič nespozoruje. */
+  /* Šat Pečať je ODTERAZ PREDVOLENÝ. Starý zlatohnedý sa dá ešte vyvolať
+     cez `?sat=povodna` — nie pre návštevníka, ale aby sa dalo pri hlásenej
+     chybe rýchlo porovnať, či ju spôsobil šat. Záloha stavu pred prepnutím
+     je v značke `stary-sat-2026-08-18`. */
   const satZapnuty = useMemo(() => {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === 'undefined') return true;
     const chce = new URLSearchParams(window.location.search).get('sat');
-    if (chce === 'pecat') { try { localStorage.setItem('sat', 'pecat'); } catch { /* súkromný režim */ } return true; }
-    if (chce === 'povodna') { try { localStorage.removeItem('sat'); } catch { /* súkromný režim */ } return false; }
-    try { return localStorage.getItem('sat') === 'pecat'; } catch { return false; }
+    if (chce === 'pecat') { try { localStorage.removeItem('sat'); } catch { /* súkromný režim */ } return true; }
+    if (chce === 'povodna') { try { localStorage.setItem('sat', 'povodna'); } catch { /* súkromný režim */ } return false; }
+    try { return localStorage.getItem('sat') !== 'povodna'; } catch { return true; }
   }, [pathname]);
+
+  /* Značka na koreni dokumentu — musí byť AŽ ZA `satZapnuty`, inak by sa
+     čítal skôr, než vznikne. Cookie lišta, výzva na inštaláciu, hlásenia aj
+     svetlík fotky idú PORTÁLOM mimo `.lab`, kam by šat nedosiahol, a rodiny
+     `--ck-*` a `--ch-*` sú definované priamo na svojich prvkoch, kde
+     dedenie z `.lab` prehráva. */
+  useEffect(() => {
+    document.documentElement.dataset.sat = satZapnuty ? 'pecat' : 'povodna';
+  }, [satZapnuty]);
 
   // Laboratórium má vlastný rám — prepínač tém je nad stránkou.
   if (route === 'design') {
@@ -230,6 +250,10 @@ function App() {
           </div>
         }
       >
+        {/* Aj administrácia beží v šate — má vlastný rám mimo `.lab`, takže
+            paletu berie zo značky na koreni dokumentu. Nosič sa tu musí
+            vykresliť zvlášť: táto vetva sa vracia skôr než hlavná. */}
+        {satZapnuty && <SatPecat />}
         <AdminApp />
       </Suspense>
     );
@@ -249,16 +273,18 @@ function App() {
     <div className={satZapnuty ? 'min-h-screen lab' : 'min-h-screen'}
          data-theme={satZapnuty ? 'pecat' : undefined}>
       {satZapnuty && <Suspense fallback={null}><SatPecat /></Suspense>}
-      <NavBar />
+      {satZapnuty ? <LabNav /> : <NavBar />}
 
       <Suspense fallback={
         <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8a795e', fontFamily: 'Georgia, serif', fontSize: 15 }}>
           Načítavam…
         </div>
       }>
-        {route === 'home' && <HomePage />}
-        {route === 'galeria' && <GalleryPage />}
-        {route === 'aktuality' && <AktualityPage />}
+        {route === 'home' && (satZapnuty
+          ? <><LabHome /><LabCategories /><LabJoinUs /></>
+          : <HomePage />)}
+        {route === 'galeria' && (satZapnuty ? <GalleryPagePecat /> : <GalleryPage />)}
+        {route === 'aktuality' && (satZapnuty ? <AktualityPagePecat /> : <AktualityPage />)}
         {route === 'privacy' && <PrivacyPage />}
         {route === 'terms' && <TermsPage />}
         {route === 'site' && <SiteDetailPage siteSlug={params.slug} />}
@@ -266,7 +292,6 @@ function App() {
         {route === 'article' && (satZapnuty
           ? <ArticlePagePecat slug={params.slug} />
           : <ArticlePage articleSlug={params.slug} />)}
-        {route === 'about' && <AboutPage />}
         {route === 'account' && <AccountPage mode={accountMode} />}
         {route === 'hladat' && <SearchResultsPage query={params.q} />}
         {route === 'notfound' && <NotFoundPage />}
@@ -274,7 +299,7 @@ function App() {
 
       <Toaster position="top-center" />
 
-      <Footer />
+      {satZapnuty ? <LabFooter /> : <Footer />}
 
       {/* GDPR cookie-consent — fixed dole, neblokuje scroll; späť sa otvorí z pätičky */}
       <CookieBanner />

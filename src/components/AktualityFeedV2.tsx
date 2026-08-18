@@ -273,7 +273,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
             <a
               href={intro ? `/blog/${intro.slug}` : '/aktuality'}
               className="akv2-tile"
-              style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minHeight: 0, borderRadius: 26, overflow: 'hidden', background: 'linear-gradient(160deg, var(--hr-wash-6), var(--hr-wash-7))', border: '1px solid var(--hr-line-soft)', boxShadow: 'inset 0 0 0 6px rgba(255,253,248,.55), inset 0 0 0 7px rgba(200,161,90,.45), 0 16px 36px -20px rgba(40,26,10,.45)', padding: '30px 36px' }}
+              style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minHeight: 0, borderRadius: 26, overflow: 'hidden', background: 'linear-gradient(160deg, var(--hr-wash-6), var(--hr-wash-7))', border: '1px solid var(--hr-line-soft)', boxShadow: 'inset 0 0 0 6px rgba(255,253,248,.55), inset 0 0 0 7px var(--hr-line), 0 16px 36px -20px rgba(40,26,10,.45)', padding: '30px 36px' }}
             >
               <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 36, fontWeight: 700, color: 'var(--hr-ink-3)', lineHeight: 1.04, marginBottom: 12 }}>
                 {intro?.title ?? 'Prečo to vlastne robím'}
@@ -293,13 +293,13 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
               </span>
             </a>
 
-            <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,.4)', borderRadius: 22, boxShadow: '0 10px 28px -18px rgba(60,40,15,.3)', padding: '18px 10px 16px' }}>
+            <div style={{ flexShrink: 0, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: 'var(--hr-surface)', border: '1px solid var(--hr-line)', borderRadius: 22, boxShadow: '0 10px 28px -18px rgba(60,40,15,.3)', padding: '18px 10px 16px' }}>
               {[
                 { n: items.length ? String(items.length) : '—', l: 'zápisov v kronike' },
                 { n: String(yearsActive), l: 'rokov činnosti' },
                 { n: `${hradiskaData.length}+`, l: 'hradísk na mape' },
               ].map((s, i) => (
-                <span key={s.l} style={{ textAlign: 'center', borderLeft: i === 1 ? '1px solid rgba(196,165,116,.35)' : 'none', borderRight: i === 1 ? '1px solid rgba(196,165,116,.35)' : 'none' }}>
+                <span key={s.l} style={{ textAlign: 'center', borderLeft: i === 1 ? '1px solid var(--hr-line)' : 'none', borderRight: i === 1 ? '1px solid var(--hr-line)' : 'none' }}>
                   <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 27, fontWeight: 600, color: 'var(--hr-accent)', lineHeight: 1 }}>{s.n}</span>
                   <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 13.5, fontStyle: 'italic', color: 'var(--hr-body-3)', marginTop: 5 }}>{s.l}</span>
                 </span>
@@ -352,7 +352,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
         {/* časová os prepojená so scrollom */}
         <div style={{ display: 'flex', alignItems: 'center', margin: '6px 0 36px' }}>
           <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, color: 'var(--hr-accent-deep)', flexShrink: 0, marginRight: 20 }}>{yearNewest}</span>
-          <div style={{ flex: 1, position: 'relative', height: 6, borderRadius: 999, background: 'rgba(168,116,55,.18)' }}>
+          <div style={{ flex: 1, position: 'relative', height: 6, borderRadius: 999, background: 'var(--hr-accent-border)' }}>
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: 'linear-gradient(90deg,var(--hr-accent-soft),var(--hr-accent-deep))', width: `${osFill}%`, transition: 'width .12s linear' }} />
             <div style={{ position: 'absolute', top: '50%', left: `${osFill}%`, transform: 'translate(-50%,-50%)', width: 18, height: 18, borderRadius: 999, background: 'var(--hr-surface)', border: '2px solid var(--hr-accent-soft)', boxShadow: '0 4px 10px rgba(60,40,15,.3)', transition: 'left .12s linear' }} />
           </div>

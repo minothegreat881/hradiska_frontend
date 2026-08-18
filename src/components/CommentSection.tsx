@@ -84,7 +84,7 @@ function CommentItem({
           gap: 12,
           alignItems: 'flex-start',
           background: '#fffdf8',
-          border: `1px solid ${isBeingRepliedTo ? '#a87437' : 'rgba(196,165,116,0.4)'}`,
+          border: `1px solid ${isBeingRepliedTo ? 'var(--hr-accent-soft)' : 'var(--hr-line)'}`,
           borderRadius: 10,
           padding: 16,
           transition: 'border-color 0.2s',
@@ -95,8 +95,8 @@ function CommentItem({
             width: 36,
             height: 36,
             borderRadius: 9999,
-            background: 'linear-gradient(135deg, #c4a574 0%, #a87437 100%)',
-            color: '#fffdf8',
+            background: 'linear-gradient(135deg, var(--hr-line-quiet) 0%, var(--hr-accent-soft) 100%)',
+            color: 'var(--hr-on-photo)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -144,10 +144,10 @@ function CommentItem({
                 style={{
                   fontFamily: 'Georgia, serif',
                   fontSize: 10,
-                  color: '#a87437',
+                  color: 'var(--hr-ink-3)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
-                  background: 'rgba(196,165,116,0.15)',
+                  background: 'var(--hr-line)',
                   padding: '2px 6px',
                   borderRadius: 4,
                 }}
@@ -199,7 +199,7 @@ function CommentItem({
                 cursor: 'pointer',
                 fontFamily: 'Georgia, serif',
                 fontSize: 12,
-                color: liked ? '#a87437' : '#7a6b56',
+                color: liked ? 'var(--hr-accent-soft)' : '#7a6b56',
                 fontWeight: liked ? 600 : 400,
                 transition: 'color 0.15s',
               }}
@@ -208,7 +208,7 @@ function CommentItem({
                 style={{
                   width: 14,
                   height: 14,
-                  fill: liked ? '#a87437' : 'transparent',
+                  fill: liked ? 'var(--hr-accent-soft)' : 'transparent',
                   strokeWidth: liked ? 2.2 : 2,
                   transition: 'fill 0.15s',
                 }}
@@ -266,7 +266,7 @@ function CommentItem({
                   maxLength={5000}
                   style={{
                     width: '100%', padding: '9px 12px', background: '#fdfbf6',
-                    border: '1px solid #a87437', borderRadius: 8, outline: 'none',
+                    border: '1px solid var(--hr-accent-soft)', borderRadius: 8, outline: 'none',
                     fontFamily: 'Georgia, serif', fontSize: 14, color: '#2d2418', resize: 'vertical',
                   }}
                 />
@@ -281,7 +281,7 @@ function CommentItem({
                     }}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px',
-                      background: replyText.trim() ? '#a87437' : 'rgba(168,116,55,0.3)', color: '#fffdf8',
+                      background: replyText.trim() ? 'var(--hr-accent-soft)' : 'var(--hr-accent-border)', color: 'var(--hr-on-photo)',
                       border: 0, borderRadius: 8, fontFamily: 'Georgia, serif', fontSize: 13, fontWeight: 600,
                       cursor: replyText.trim() ? 'pointer' : 'not-allowed',
                     }}
@@ -298,7 +298,7 @@ function CommentItem({
             ) : (
               <div style={{ marginTop: 10, fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
                 <button type="button" onClick={() => goTo('/prihlasenie')}
-                        style={{ color: '#a87437', background: 'none', border: 0, cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'Georgia, serif', fontSize: 13 }}>
+                        style={{ color: 'var(--hr-accent-soft)', background: 'none', border: 0, cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'Georgia, serif', fontSize: 13 }}>
                   Prihláste sa
                 </button>{' '}a zapojte sa do diskusie.
               </div>
@@ -489,7 +489,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
     width: '100%',
     padding: '10px 14px',
     background: '#fdfbf6',
-    border: '1px solid rgba(196,165,116,0.5)',
+    border: '1px solid var(--hr-line)',
     borderRadius: 8,
     outline: 'none',
     fontFamily: 'Georgia, serif',
@@ -652,8 +652,8 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             height: 24,
             padding: '0 8px',
             borderRadius: 9999,
-            background: '#a87437',
-            color: '#fffdf8',
+            background: 'var(--hr-accent-soft)',
+            color: 'var(--hr-on-photo)',
             fontFamily: 'Georgia, serif',
             fontSize: 12,
             fontWeight: 600,
@@ -669,7 +669,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       <hr
         style={{
           height: 1,
-          background: 'linear-gradient(90deg, #c4a574 0%, rgba(196,165,116,0) 100%)',
+          background: 'linear-gradient(90deg, var(--hr-line-quiet) 0%, rgba(196,165,116,0) 100%)',
           margin: '8px 0 24px',
           border: 0,
         }}
@@ -702,7 +702,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               fontStyle: 'italic',
               padding: 16,
               background: '#fffdf8',
-              border: '1px dashed rgba(196,165,116,0.4)',
+              border: '1px dashed var(--hr-line)',
               borderRadius: 10,
               margin: 0,
             }}
@@ -736,7 +736,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
         style={{
           marginTop: 32,
           background: '#fffdf8',
-          border: '1px solid rgba(196,165,116,0.4)',
+          border: '1px solid var(--hr-line)',
           borderRadius: 12,
           padding: 20,
         }}
@@ -748,7 +748,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             fontFamily: 'Georgia, serif',
             fontSize: 13,
             fontWeight: 600,
-            color: '#a87437',
+            color: 'var(--hr-accent-soft)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             margin: 0,
@@ -761,7 +761,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             style={{
               fontFamily: 'Georgia, serif',
               fontSize: 13,
-              color: '#a87437',
+              color: 'var(--hr-accent-soft)',
               fontStyle: 'italic',
               margin: '12px 0 0',
             }}
@@ -795,8 +795,8 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               onClick={handleSubmit}
               style={{
                 alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8,
-                padding: '10px 24px', background: canSubmit ? '#a87437' : 'rgba(168,116,55,0.3)',
-                color: '#fffdf8', border: 0, borderRadius: 8, fontFamily: 'Georgia, serif',
+                padding: '10px 24px', background: canSubmit ? 'var(--hr-accent-soft)' : 'var(--hr-accent-border)',
+                color: 'var(--hr-on-photo)', border: 0, borderRadius: 8, fontFamily: 'Georgia, serif',
                 fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
                 cursor: canSubmit ? 'pointer' : 'not-allowed', transition: 'background 0.2s',
               }}
@@ -809,7 +809,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
           <div
             style={{
               marginTop: 16, padding: '18px 20px', borderRadius: 10,
-              background: 'rgba(196,165,116,0.10)', border: '1px dashed rgba(196,165,116,0.5)',
+              background: 'var(--hr-line)', border: '1px dashed var(--hr-line)',
               textAlign: 'center', fontFamily: 'Georgia, serif',
             }}
           >

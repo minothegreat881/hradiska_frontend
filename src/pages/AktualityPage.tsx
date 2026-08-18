@@ -106,7 +106,7 @@ export function AktualityPage() {
               className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110"
               style={{
                 background: 'var(--hr-surface)',
-                border: '1px solid rgba(196,165,116,0.55)',
+                border: '1px solid var(--hr-line)',
                 color: 'var(--hr-body-2)',
                 fontFamily: 'Georgia, serif',
               }}
