@@ -113,11 +113,18 @@
   --hr-line-quiet: var(--l-line-2);
   --hr-hairline: var(--l-line);
 
-  --hr-accent: var(--l-accent);
-  --hr-accent-soft: var(--l-accent-soft);
-  --hr-accent-deep: var(--l-accent-deep);
-  --hr-accent-glow: var(--l-accent-glow);
-  --hr-accent-border: var(--l-accent-glow);
+  /* AKCENT JE PEČATNÁ ČERVENÁ, nie atrament. Pôvodne tu bol `--l-accent`,
+     čo je v tomto šate takmer čierna — a keďže `--hr-accent*` nesie na webe
+     tlačidlá, odkazy, značky aj číslovanie v kľúčových faktoch, všetko to
+     zosivelo a prestalo si odpovedať s červenou, ktorú používajú labové
+     komponenty. Jedno miesto, veľa následkov. */
+  --hr-accent: var(--l-second);
+  --hr-accent-soft: var(--l-second);
+  --hr-accent-deep: var(--l-second-deep);
+  --hr-accent-glow: rgba(201, 72, 58, .18);
+  /* Rám okolo akčných prvkov (ikony zdieľania) — pečatná červená stlmená,
+     nie atramentový závoj, inak sú krúžky sotva vidieť. */
+  --hr-accent-border: rgba(201, 72, 58, .45);
 
   --hr-dark: var(--l-dark);
   --hr-dark-2: var(--l-dark-2);
@@ -1192,10 +1199,17 @@ body[data-lab-theme='pecat'],
   --l-muted: #606166;              /* 4,71:1 na #e8e0cf */
   --l-muted-2: #636058;            /* 4,78:1 na #e8e0cf */
   --l-second: var(--l-second-deep); /* 6,27:1 na #e8e0cf (bolo 3,58:1) */
+  /* `--hr-accent*` sa počíta UŽ NA KORENI, takže samotný prepis `--l-second`
+     ho nezmení — treba prepísať aj jeho. Tudy tečie farba do produkčných
+     komponentov (nadpisy v bočnom stĺpci, značky, číslovanie). */
+  --hr-accent: var(--l-second-deep);
+  --hr-accent-soft: var(--l-second-deep);
 }
 
 .lfoot {
   --l-second: #dd6d5c;             /* 5,20:1 na #191c24 (bolo 3,63:1) */
+  --hr-accent: #dd6d5c;
+  --hr-accent-soft: #dd6d5c;
 }
 /* Vrstevnice v prázdne naľavo od textu (ten istý motív ako v pätičke).
    Na úzkom okne by liezli pod text, tak sa zhasnú. */

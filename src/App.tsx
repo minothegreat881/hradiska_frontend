@@ -47,7 +47,7 @@ const GalleryPage = lazy(() => import('./pages/GalleryPage').then((m) => ({ defa
 // prefarbí; produkčné komponenty sa nemenia.
 const DesignLab = lazy(() => import('./design-lab/DesignLab'));
 
-type Route = 'design' | 'home' | 'site' | 'article' | 'about' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
+type Route = 'design' | 'home' | 'site' | 'article' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
 
 // Cesty účtov → režim AccountPage
 const ACCOUNT_ROUTES: Record<string, AccountMode> = {
@@ -130,8 +130,6 @@ function App() {
       } else if (path.startsWith('/blog/')) {
         setRoute('article');
         setParams({ slug: path.replace('/blog/', '') });
-      } else if (path === '/about') {
-        setRoute('about');
       } else {
         // Neznáma cesta → poriadna 404 (nie tiché zobrazenie domovskej = soft 404).
         setRoute('notfound');
@@ -294,7 +292,6 @@ function App() {
         {route === 'article' && (satZapnuty
           ? <ArticlePagePecat slug={params.slug} />
           : <ArticlePage articleSlug={params.slug} />)}
-        {route === 'about' && <AboutPage />}
         {route === 'account' && <AccountPage mode={accountMode} />}
         {route === 'hladat' && <SearchResultsPage query={params.q} />}
         {route === 'notfound' && <NotFoundPage />}

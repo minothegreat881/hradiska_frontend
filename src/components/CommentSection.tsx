@@ -144,7 +144,7 @@ function CommentItem({
                 style={{
                   fontFamily: 'Georgia, serif',
                   fontSize: 10,
-                  color: 'var(--hr-accent-soft)',
+                  color: 'var(--hr-ink-3)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
                   background: 'var(--hr-line)',

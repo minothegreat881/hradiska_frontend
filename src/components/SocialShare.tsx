@@ -101,9 +101,9 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
                 width: 40,
                 height: 40,
                 borderRadius: 9999,
-                border: '1px solid var(--hr-accent-soft)',
+                border: '1px solid var(--hr-accent-border)',
                 background: 'transparent',
-                color: '#3a2a1a',
+                color: 'var(--hr-ink)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -111,12 +111,12 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
                 textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'var(--hr-accent-soft)';
-                e.currentTarget.style.color = '#fffdf8';
+                e.currentTarget.style.background = 'var(--hr-accent-deep)';
+                e.currentTarget.style.color = 'var(--hr-on-photo)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#3a2a1a';
+                e.currentTarget.style.color = 'var(--hr-ink)';
               }}
             >
               <Icon style={{ width: 18, height: 18 }} />
@@ -130,7 +130,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
               width: 40,
               height: 40,
               borderRadius: 9999,
-              border: '1px solid var(--hr-accent-soft)',
+              border: '1px solid var(--hr-accent-border)',
               background: copied ? 'var(--hr-accent-soft)' : 'transparent',
               color: copied ? '#fffdf8' : '#3a2a1a',
               display: 'inline-flex',
@@ -141,14 +141,14 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
             }}
             onMouseEnter={(e) => {
               if (!copied) {
-                e.currentTarget.style.background = 'var(--hr-accent-soft)';
-                e.currentTarget.style.color = '#fffdf8';
+                e.currentTarget.style.background = 'var(--hr-accent-deep)';
+                e.currentTarget.style.color = 'var(--hr-on-photo)';
               }
             }}
             onMouseLeave={(e) => {
               if (!copied) {
                 e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#3a2a1a';
+                e.currentTarget.style.color = 'var(--hr-ink)';
               }
             }}
           >
