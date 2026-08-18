@@ -22,6 +22,9 @@ for (const [meno, sirka, vyska] of [['pc', 1440, 1000], ['mobil', 390, 844]]) {
   for (const [vzor, telo] of ODPOVEDE) {
     await ctx.route(vzor, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(telo) }));
   }
+  /* Súbory z uploadov servisuje logo — ide o to, či sa adresa poskladá
+     správne, nie o to, čo je na snímke. */
+  await ctx.route('**/uploads/**', (r) => r.fulfill({ path: 'public/logo_hradiska_small.png' }));
   await ctx.addInitScript(() => localStorage.setItem('hradiska.member.jwt', 'test'));
   const p = await ctx.newPage();
   p.on('console', (m) => { if (m.type() === 'error') console.log('  konzola:', m.text().slice(0, 160)); });

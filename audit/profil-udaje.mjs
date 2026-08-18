@@ -62,10 +62,13 @@ const ZDIELANE = { data: [
   { documentId: 'z1', channel: 'facebook', createdAt: pred(600), post: { title: 'Bojná — Valy', slug: 'bojna-valy' } },
 ] };
 
+/* Cesty sú relatívne ku koreňu Strapi, presne ako ich vracia server —
+   práve na tom sa fotky raz už rozbili, keď sa vkladali do `src` bez
+   predpony. Náhľad ich preto musí dostať v tomto tvare. */
 const FOTKY = { data: [
-  { fileId: 4412, url: '/logo_hradiska_small.png', thumb: '/logo_hradiska_small.png', alt: 'Profil sondy',
+  { fileId: 4412, url: '/uploads/sonda.png', thumb: '/uploads/thumbnail_sonda.png', alt: 'Profil sondy',
     post: { title: 'Výprava Poľské hradiská 2', slug: 'vyprava-polske-hradiska-2' } },
-  { fileId: 4413, url: '/logo_hradiska_small.png', thumb: '/logo_hradiska_small.png', alt: 'Val od západu',
+  { fileId: 4413, url: '/uploads/val.png', thumb: '/uploads/thumbnail_val.png', alt: 'Val od západu',
     post: { title: 'Bojná — Valy', slug: 'bojna-valy' } },
 ] };
 

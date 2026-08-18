@@ -69,9 +69,12 @@ function kedy(iso: string): string {
 
 const datum = (iso: string) => new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
+/** Strapi vracia cesty relatívne k svojmu koreňu — bez predpony sa hľadajú
+    na frontende a obrázok sa nenačíta. */
+const naAdresu = (u: string | null | undefined) => (u ? (u.startsWith('http') ? u : STRAPI_URL + u) : null);
+
 function mediaUrl(m: { url: string; formats?: Record<string, { url: string }> } | null | undefined): string | null {
-  const u = m?.formats?.thumbnail?.url || m?.url;
-  return u ? (u.startsWith('http') ? u : STRAPI_URL + u) : null;
+  return naAdresu(m?.formats?.thumbnail?.url || m?.url);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -423,7 +426,7 @@ function Fotky({ items }: { items: LikedPhoto[] | null }) {
       {items.map((f) => (
         <li key={f.fileId}>
           <a href={f.post ? `/blog/${f.post.slug}?fotoFile=${f.fileId}` : '/galeria'}>
-            <img src={f.thumb || f.url} alt={f.alt || ''} loading="lazy" decoding="async" />
+            <img src={naAdresu(f.thumb || f.url) || ''} alt={f.alt || ''} loading="lazy" decoding="async" />
             {f.post && <span>{f.post.title}</span>}
           </a>
         </li>
