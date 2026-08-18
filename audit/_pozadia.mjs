@@ -29,8 +29,15 @@ if (BASE.includes('localhost')) {
 const vsetko = {};
 for (const [n, cesta] of [['domovska','/design?t=pecat'], ['clanok','/design/blog/mikulcice-kopcany?t=pecat']]) {
   await p.goto(BASE + cesta, { waitUntil: 'domcontentloaded' });
-  for (let i=0;i<3;i++){const x=p.locator('.ck-btn-primary').first();
-    if(await x.count()&&await x.isVisible()){await x.click({force:true});await p.waitForTimeout(300);}else break;}
+  /* Cookie lišta sa objavuje s oneskorením a prekrýva spodok stránky —
+     bez trpezlivého odkliknutia hlásia merania falošné chyby (kurzor
+     skončí na lište, nie na mape). */
+  for (let i = 0; i < 12; i++) {
+    const x = p.locator('.ck-btn-primary').first();
+    if (await x.count() && await x.isVisible()) { await x.click({ force: true }); await p.waitForTimeout(400); }
+    if (!(await p.locator('.ck-root').count())) break;
+    await p.waitForTimeout(500);
+  }
   await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await p.waitForTimeout(4000);
   await p.evaluate(() => window.scrollTo(0, 0));

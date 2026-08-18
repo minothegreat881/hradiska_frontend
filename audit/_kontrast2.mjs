@@ -9,8 +9,15 @@ const p = await ctx.newPage();
 const out = {};
 for (const [n, cesta] of [['domovska','/design?t=pecat'], ['clanok','/design/blog/mikulcice-kopcany?t=pecat']]) {
   await p.goto(BASE+cesta, { waitUntil:'domcontentloaded' });
-  for (let i=0;i<3;i++){const x=p.locator('.ck-btn-primary').first();
-    if(await x.count()&&await x.isVisible()){await x.click({force:true});await p.waitForTimeout(300);}else break;}
+  /* Cookie lišta sa objavuje s oneskorením a prekrýva spodok stránky —
+     bez trpezlivého odkliknutia hlásia merania falošné chyby (kurzor
+     skončí na lište, nie na mape). */
+  for (let i = 0; i < 12; i++) {
+    const x = p.locator('.ck-btn-primary').first();
+    if (await x.count() && await x.isVisible()) { await x.click({ force: true }); await p.waitForTimeout(400); }
+    if (!(await p.locator('.ck-root').count())) break;
+    await p.waitForTimeout(500);
+  }
   await p.waitForTimeout(6500);
   out[n] = await p.evaluate(() => {
     const lum=(c)=>{const s=c.map(v=>{v/=255;return v<=0.03928?v/12.92:((v+0.055)/1.055)**2.4;});return .2126*s[0]+.7152*s[1]+.0722*s[2];};

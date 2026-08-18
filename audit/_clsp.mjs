@@ -3,8 +3,15 @@ const b = await chromium.launch();
 const ctx = await b.newContext({ viewport:{width:1440,height:900} });
 const p = await ctx.newPage();
 await p.goto('https://webdesignforhradiskask.vercel.app/design?t=pecat', { waitUntil:'domcontentloaded' });
-for (let i=0;i<3;i++){const x=p.locator('.ck-btn-primary').first();
-  if(await x.count()&&await x.isVisible()){await x.click({force:true});await p.waitForTimeout(300);}else break;}
+/* Cookie lišta sa objavuje s oneskorením a prekrýva spodok stránky —
+   bez trpezlivého odkliknutia hlásia merania falošné chyby (kurzor
+   skončí na lište, nie na mape). */
+for (let i = 0; i < 12; i++) {
+  const x = p.locator('.ck-btn-primary').first();
+  if (await x.count() && await x.isVisible()) { await x.click({ force: true }); await p.waitForTimeout(400); }
+  if (!(await p.locator('.ck-root').count())) break;
+  await p.waitForTimeout(500);
+}
 await p.waitForTimeout(6500);
 const r = await p.evaluate(() => {
   let ustalene=0, riziko=[];

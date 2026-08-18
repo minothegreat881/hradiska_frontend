@@ -17,8 +17,15 @@ if (BASE.includes('localhost')) await p.route('**/strapi/**', async (r) => { con
   try { const res=await fetch(ZDROJ+u.pathname+u.search,{headers:{accept:'application/json'}});
     r.fulfill({status:res.status, body:Buffer.from(await res.arrayBuffer()), headers:{'content-type':res.headers.get('content-type')||'application/json'}}); } catch { r.abort(); } });
 await p.goto(BASE+'/',{waitUntil:'domcontentloaded'});
-for (let i=0;i<3;i++){const x=p.locator('.ck-btn-primary').first();
-  if(await x.count()&&await x.isVisible()){await x.click({force:true});await p.waitForTimeout(300);}else break;}
+/* Cookie lišta sa objavuje s oneskorením a prekrýva spodok stránky —
+   bez trpezlivého odkliknutia hlásia merania falošné chyby (kurzor
+   skončí na lište, nie na mape). */
+for (let i = 0; i < 12; i++) {
+  const x = p.locator('.ck-btn-primary').first();
+  if (await x.count() && await x.isVisible()) { await x.click({ force: true }); await p.waitForTimeout(400); }
+  if (!(await p.locator('.ck-root').count())) break;
+  await p.waitForTimeout(500);
+}
 await p.waitForSelector('.lmap');
 await p.locator('.lmap-canvas').scrollIntoViewIfNeeded();
 await p.waitForTimeout(8000);

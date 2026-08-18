@@ -11,10 +11,14 @@ const run = async () => {
   page.on('pageerror', e => errs.push('PAGE ERROR: ' + e.message));
 
   await page.goto(URL, { waitUntil: 'domcontentloaded' });
-  for (let i = 0; i < 3; i++) {
+  /* Cookie lišta sa objaví s oneskorením a prekrýva spodok stránky. Bez
+     trpezlivého odkliknutia skončí kurzor na nej a meranie hlási falošnú
+     chybu — presne to sa stalo pri kontrole po nasadení. */
+  for (let i = 0; i < 12; i++) {
     const b = page.locator('.ck-btn-primary').first();
-    if (await b.count() && await b.isVisible()) { await b.click({ force: true }); await page.waitForTimeout(300); }
-    else break;
+    if (await b.count() && await b.isVisible()) { await b.click({ force: true }); await page.waitForTimeout(400); }
+    if (!(await page.locator('.ck-root').count())) break;
+    await page.waitForTimeout(500);
   }
   await page.waitForSelector('.lmap', { timeout: 30000 });
   await page.locator('.lmap-canvas').scrollIntoViewIfNeeded();
@@ -60,7 +64,15 @@ const run = async () => {
     const b = await many.nth(i).boundingBox();
     if (!b) continue;
     const x = b.x + b.width / 2, y = b.y + b.height / 2;
-    if (x > cbox.x + 40 && x < cbox.x + cbox.width - 40 && y > cbox.y + 40 && y < cbox.y + cbox.height - 40) pin = b;
+    if (!(x > cbox.x + 40 && x < cbox.x + cbox.width - 40 && y > cbox.y + 40 && y < cbox.y + cbox.height - 40)) continue;
+    /* A nesmie ho nič prekrývať. Po súhlase s cookies ostáva vpravo dole
+       malý pripnutý gombík lišty — bod pod ním sa zamerať nedá a meranie
+       hlásilo falošnú chybu. */
+    const volny = await page.evaluate(([px, py]) => {
+      const e = document.elementFromPoint(px, py);
+      return !!e && !!e.closest('.lmap-canvas');
+    }, [x, y]);
+    if (volny) pin = b;
   }
   if (pin) {
     // plynulý príchod: zvýraznenie sa počíta z POHYBU myši, skok ho nespustí
