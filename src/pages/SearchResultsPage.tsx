@@ -9,7 +9,7 @@ import {
 const T = {
   bg: 'var(--hr-surface)',
   panelBg: 'var(--hr-surface)',
-  border: 'rgba(196,165,116,0.4)',
+  border: 'var(--hr-line)',
   amber: 'var(--hr-accent)',
   amberSoft: 'var(--hr-accent-soft)',
   textMain: 'var(--hr-ink-3)',

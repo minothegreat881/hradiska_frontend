@@ -121,7 +121,7 @@ export function ProfilePage() {
       }}>
         <div aria-hidden style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'repeating-linear-gradient(58deg, rgba(200,161,90,.05) 0 2px, transparent 2px 10px)',
+          background: 'repeating-linear-gradient(58deg, var(--hr-line) 0 2px, transparent 2px 10px)',
         }} />
         {/* avatar */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -142,7 +142,7 @@ export function ProfilePage() {
             <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 28, fontWeight: 700, color: 'var(--hr-on-photo-2)', margin: 0 }}>{name}</h1>
             <span style={{
               fontFamily: 'Cinzel, serif', fontSize: 12, color: 'var(--hr-mark-bg)', padding: '4px 12px', borderRadius: 999,
-              background: 'rgba(122,31,36,.55)', border: '1px solid rgba(200,161,90,.55)',
+              background: 'rgba(122,31,36,.55)', border: '1px solid var(--hr-line)',
             }}>{level(stats.comments)}</span>
           </div>
           <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', color: 'var(--hr-muted-2)', margin: '6px 0 14px' }}>
@@ -532,7 +532,7 @@ function Settings({ profile, token, onClose, onSaved, onSignOut, onDeleted }: {
         </div>
 
         {/* GDPR */}
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px dashed rgba(196,165,116,.5)' }}>
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px dashed var(--hr-line)' }}>
           {!confirmDel ? (
             <button onClick={() => setConfirmDel(true)} style={{ ...btnLink, color: '#a04338' }}>Zmazať účet</button>
           ) : (

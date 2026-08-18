@@ -69,7 +69,7 @@ export function UsersScreen() {
       </div>
 
       {error && (
-        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: '#fbeae8', borderColor: '#e8c4bf' }}>
+        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: 'var(--hr-error-bg)', borderColor: 'var(--hr-error-line)' }}>
           <AlertCircle className="w-4 h-4" style={{ color: 'var(--ad-danger)', flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: 13.5, color: 'var(--ad-danger)' }}>{error}</div>
         </div>

@@ -16,10 +16,10 @@ const GOLD = '#c4a574';
 const GOLD_BRIGHT = '#e8c56e';
 const TEXT_LIGHT = '#f0e8dc';
 const DROPDOWN_BG = '#2e2317';
-const HOVER_BG = 'rgba(196,165,116,0.15)';
-const ACTIVE_BG = 'rgba(196,165,116,0.20)';
-const BORDER_GOLD = 'rgba(196,165,116,0.25)';
-const PILL_BG = 'rgba(196,165,116,0.18)';
+const HOVER_BG = 'var(--hr-line)';
+const ACTIVE_BG = 'var(--hr-line)';
+const BORDER_GOLD = 'var(--hr-line)';
+const PILL_BG = 'var(--hr-line)';
 
 function pluralLokalit(n: number): string {
   if (n === 1) return 'lokalitu';
@@ -88,7 +88,7 @@ export function MegaMenu({ item, isOpen, onToggle, onClose }: MegaMenuProps) {
           whiteSpace: 'nowrap',
         }}
         onMouseEnter={(e) => {
-          if (!isOpen) (e.currentTarget as HTMLElement).style.background = 'rgba(196,165,116,0.12)';
+          if (!isOpen) (e.currentTarget as HTMLElement).style.background = 'var(--hr-line)';
         }}
         onMouseLeave={(e) => {
           if (!isOpen) (e.currentTarget as HTMLElement).style.background = 'transparent';
@@ -192,7 +192,7 @@ export function MegaMenu({ item, isOpen, onToggle, onClose }: MegaMenuProps) {
                     style={{
                       width: 12,
                       height: 12,
-                      color: '#a87437',
+                      color: 'var(--hr-accent-soft)',
                       flexShrink: 0,
                     }}
                   />

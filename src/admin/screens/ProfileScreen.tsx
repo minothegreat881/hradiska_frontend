@@ -110,7 +110,7 @@ export function ProfileScreen() {
       </div>
 
       {loadError && (
-        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: '#fbeae8', borderColor: '#e8c4bf' }}>
+        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: 'var(--hr-error-bg)', borderColor: 'var(--hr-error-line)' }}>
           <AlertCircle className="w-4 h-4" style={{ color: 'var(--ad-danger)', flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: 13.5, color: 'var(--ad-danger)' }}>{loadError}</div>
         </div>
@@ -122,7 +122,7 @@ export function ProfileScreen() {
           aria-hidden="true"
           style={{
             width: 44, height: 44, borderRadius: 999, flexShrink: 0,
-            background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
+            background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent-deep))', color: 'var(--hr-on-photo)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17, fontWeight: 600,
           }}
         >

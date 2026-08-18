@@ -27,7 +27,7 @@ export function AnalyticsScreen({ onEdit }: { onEdit: (id: string) => void }) {
               className="abtn"
               style={{
                 border: 'none', padding: '6px 12px', fontSize: 13,
-                background: period === p ? 'linear-gradient(180deg,#b0813a,#8a5316)' : 'transparent',
+                background: period === p ? 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent-deep))' : 'transparent',
                 color: period === p ? '#fff' : 'var(--ad-secondary)',
               }}
             >
@@ -40,7 +40,7 @@ export function AnalyticsScreen({ onEdit }: { onEdit: (id: string) => void }) {
       {/* Upozornenie — meranie zatiaľ nebeží */}
       <div
         className="acard"
-        style={{ padding: '12px 16px', marginBottom: 18, display: 'flex', gap: 10, alignItems: 'flex-start', background: '#f6ead0', borderColor: 'var(--ad-draft-br)' }}
+        style={{ padding: '12px 16px', marginBottom: 18, display: 'flex', gap: 10, alignItems: 'flex-start', background: 'var(--hr-wash-6)', borderColor: 'var(--ad-draft-br)' }}
       >
         <AlertCircle className="w-4 h-4" style={{ color: 'var(--ad-draft-fg)', flexShrink: 0, marginTop: 2 }} />
         <div style={{ fontSize: 13, color: 'var(--ad-draft-fg)', lineHeight: 1.55 }}>
@@ -77,7 +77,7 @@ export function AnalyticsScreen({ onEdit }: { onEdit: (id: string) => void }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: 14 }}>
           <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0 }}>Zobrazenia a návštevníci</h2>
           <div style={{ flex: 1 }} />
-          <Legend color="#c8862f" label="Zobrazenia" />
+          <Legend color="var(--hr-accent-soft)" label="Zobrazenia" />
           <Legend color="#7c1f24" label="Návštevníci" />
         </div>
         <MainChart />
@@ -135,7 +135,7 @@ export function AnalyticsScreen({ onEdit }: { onEdit: (id: string) => void }) {
                     <span style={{ marginLeft: 'auto', fontWeight: 600 }}>{c.count}</span>
                   </div>
                   <div style={{ height: 6, background: 'var(--ad-line)', borderRadius: 999 }}>
-                    <div style={{ width: `${pct}%`, height: '100%', borderRadius: 999, background: 'linear-gradient(90deg,#e6c98a,#c8862f)' }} />
+                    <div style={{ width: `${pct}%`, height: '100%', borderRadius: 999, background: 'linear-gradient(90deg,var(--hr-on-photo-3),var(--hr-accent-soft))' }} />
                   </div>
                 </div>
               );
@@ -148,7 +148,7 @@ export function AnalyticsScreen({ onEdit }: { onEdit: (id: string) => void }) {
               <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 9, fontSize: 13 }}>
                 <span style={{ color: 'var(--ad-secondary)', flex: 1 }}>{s.label}</span>
                 <div style={{ width: 76, height: 6, background: 'var(--ad-line)', borderRadius: 999 }}>
-                  <div style={{ width: `${s.pct}%`, height: '100%', borderRadius: 999, background: '#c8862f' }} />
+                  <div style={{ width: `${s.pct}%`, height: '100%', borderRadius: 999, background: 'var(--hr-accent-soft)' }} />
                 </div>
                 <span style={{ fontWeight: 600, width: 34, textAlign: 'right' }}>{s.pct} %</span>
               </div>
@@ -175,7 +175,7 @@ function Sparkline({ points }: { points: number[] }) {
   const d = points.map((p, i) => `${(i / (points.length - 1)) * 100},${28 - ((p - min) / span) * 24}`).join(' ');
   return (
     <svg viewBox="0 0 100 30" preserveAspectRatio="none" style={{ width: '100%', height: 30, marginTop: 9, display: 'block' }} aria-hidden="true">
-      <polyline points={d} fill="none" stroke="#c8862f" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+      <polyline points={d} fill="none" stroke="var(--hr-accent-soft)" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
@@ -193,12 +193,12 @@ function MainChart() {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 220, display: 'block' }} role="img" aria-label="Graf návštevnosti">
       {[0.25, 0.5, 0.75, 1].map(f => (
-        <line key={f} x1={PAD} x2={W - PAD} y1={y(maxV * f)} y2={y(maxV * f)} stroke="#efe6d0" strokeWidth="1" />
+        <line key={f} x1={PAD} x2={W - PAD} y1={y(maxV * f)} y2={y(maxV * f)} stroke="var(--hr-wash-2)" strokeWidth="1" />
       ))}
       <polygon points={area} fill="rgba(200,134,47,.12)" />
-      <polyline points={views} fill="none" stroke="#c8862f" strokeWidth="2" />
+      <polyline points={views} fill="none" stroke="var(--hr-accent-soft)" strokeWidth="2" />
       <polyline points={visitors} fill="none" stroke="#7c1f24" strokeWidth="2" />
-      <circle cx={x(CHART_DAYS.length - 1)} cy={y(CHART_DAYS[CHART_DAYS.length - 1].views)} r="3.5" fill="#c8862f" />
+      <circle cx={x(CHART_DAYS.length - 1)} cy={y(CHART_DAYS[CHART_DAYS.length - 1].views)} r="3.5" fill="var(--hr-accent-soft)" />
       <circle cx={x(CHART_DAYS.length - 1)} cy={y(CHART_DAYS[CHART_DAYS.length - 1].visitors)} r="3.5" fill="#7c1f24" />
     </svg>
   );

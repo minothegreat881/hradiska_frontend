@@ -160,7 +160,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
       <button
         onClick={onClose}
         className="absolute top-4 right-4 z-10 w-11 h-11 flex items-center justify-center rounded-full"
-        style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,0.45)' }}
+        style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid var(--hr-line)' }}
         aria-label="Zavrieť"
       >
         <X className="w-5 h-5" />
@@ -170,7 +170,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 flex items-center justify-center rounded-full"
-            style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,0.45)' }}
+            style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid var(--hr-line)' }}
             aria-label="Predchádzajúce"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -178,7 +178,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
             className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-11 h-11 flex items-center justify-center rounded-full"
-            style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid rgba(196,165,116,0.45)' }}
+            style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-surface)', border: '1px solid var(--hr-line)' }}
             aria-label="Nasledujúce"
           >
             <ChevronRight className="w-5 h-5" />
@@ -203,7 +203,7 @@ function Lightbox({ images, startIndex, onClose }: { images: StrapiImage[]; star
       {images.length > 1 && (
         <div
           className="absolute bottom-6 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs"
-          style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-relief-high)', border: '1px solid rgba(196,165,116,0.35)' }}
+          style={{ background: 'rgba(15,11,7,0.78)', color: 'var(--hr-relief-high)', border: '1px solid var(--hr-line)' }}
         >
           {idx + 1} / {images.length}
         </div>
@@ -253,7 +253,7 @@ function PhotoGrid({ fotky, onOpenLightbox }: { fotky: StrapiImage[]; onOpenLigh
   // 1 fotka – plná šírka karty
   if (fotky.length === 1) {
     return (
-      <div style={{ borderTop: '1px solid rgba(196,165,116,0.35)' }}>
+      <div style={{ borderTop: '1px solid var(--hr-line)' }}>
         <PhotoTile img={fotky[0]} idx={0} style={{ width: '100%', height: 320 }} onOpen={onOpenLightbox} />
       </div>
     );
@@ -262,7 +262,7 @@ function PhotoGrid({ fotky, onOpenLightbox }: { fotky: StrapiImage[]; onOpenLigh
   // 2 fotky – 50:50
   if (fotky.length === 2) {
     return (
-      <div className="grid grid-cols-2" style={{ gap: 2, borderTop: '1px solid rgba(196,165,116,0.35)' }}>
+      <div className="grid grid-cols-2" style={{ gap: 2, borderTop: '1px solid var(--hr-line)' }}>
         {fotky.map((f, i) => (
           <PhotoTile key={f.id} img={f} idx={i} style={{ width: '100%', aspectRatio: '1 / 1' }} onOpen={onOpenLightbox} />
         ))}
@@ -278,7 +278,7 @@ function PhotoGrid({ fotky, onOpenLightbox }: { fotky: StrapiImage[]; onOpenLigh
       style={{
         gridTemplateColumns: '1fr 1fr',
         gap: 2,
-        borderTop: '1px solid rgba(196,165,116,0.35)',
+        borderTop: '1px solid var(--hr-line)',
       }}
     >
       <PhotoTile
@@ -351,7 +351,7 @@ function LokalitaStrip({ coords, name, okres, onClick }: {
       style={{
         background: hover ? 'var(--hr-chip-bg)' : 'var(--hr-wash-6)',
         border: 'none',
-        borderTop: '1px solid rgba(196,165,116,0.35)',
+        borderTop: '1px solid var(--hr-line)',
         height: 62,
         transition: 'background 150ms ease',
       }}
@@ -607,7 +607,7 @@ function KronikaCard({ item }: { item: KronikaItem }) {
         className="h-full flex flex-col overflow-hidden"
         style={{
           background: 'var(--hr-surface)',
-          border: '1px solid rgba(196,165,116,0.4)',
+          border: '1px solid var(--hr-line)',
           borderRadius: 12,
           boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
         }}
@@ -898,7 +898,7 @@ export function AktualitaCard({ item }: { item: StrapiAktualita }) {
         style={{
           background: 'var(--hr-surface)',
           borderRadius: 12,
-          border: '1px solid rgba(196,165,116,0.4)',
+          border: '1px solid var(--hr-line)',
           boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
         }}
       >
@@ -1014,7 +1014,7 @@ export function AktualitaCard({ item }: { item: StrapiAktualita }) {
         {/* AKČNÁ LIŠTA – Galéria vľavo, Zdieľať vpravo (mapa je teraz v pásiku) */}
         <footer
           className="flex items-stretch"
-          style={{ borderTop: '1px solid rgba(196,165,116,0.35)', padding: 4 }}
+          style={{ borderTop: '1px solid var(--hr-line)', padding: 4 }}
         >
           {fotky.length > 0 ? (
             <ActionButton
@@ -1065,7 +1065,7 @@ function ActionButton({ icon, labelFull, labelShort, onClick }: { icon: React.Re
         fontFamily: 'Georgia, serif',
         fontSize: 13,
         fontWeight: 500,
-        background: hover ? 'rgba(196,165,116,0.15)' : 'transparent',
+        background: hover ? 'var(--hr-line)' : 'transparent',
         transition: 'background 150ms ease',
         border: 'none',
         cursor: 'pointer',
@@ -1083,7 +1083,7 @@ function ActionButton({ icon, labelFull, labelShort, onClick }: { icon: React.Re
 // ============================================================================
 function AktualitaSkeleton() {
   const shimmer: React.CSSProperties = {
-    background: 'linear-gradient(110deg, rgba(196,165,116,0.10) 8%, rgba(196,165,116,0.22) 18%, rgba(196,165,116,0.10) 33%)',
+    background: 'linear-gradient(110deg, var(--hr-line) 8%, var(--hr-line) 18%, var(--hr-line) 33%)',
     backgroundSize: '200% 100%',
     animation: 'aktualita-shimmer 1.4s linear infinite',
   };
@@ -1093,7 +1093,7 @@ function AktualitaSkeleton() {
       style={{
         background: 'var(--hr-surface)',
         borderRadius: 12,
-        border: '1px solid rgba(196,165,116,0.4)',
+        border: '1px solid var(--hr-line)',
         boxShadow: '0 1px 2px rgba(70,40,20,0.06)',
       }}
     >

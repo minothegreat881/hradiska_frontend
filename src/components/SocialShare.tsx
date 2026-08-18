@@ -65,7 +65,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
   return (
     <div style={{ width: '100%', margin: '40px 0' }}>
       {/* Horná zlatá linka */}
-      <div style={{ height: 1, background: 'rgba(196,165,116,0.6)', marginBottom: 16 }} />
+      <div style={{ height: 1, background: 'var(--hr-line)', marginBottom: 16 }} />
       <div
         style={{
           display: 'flex',
@@ -82,7 +82,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
             fontWeight: 600,
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
-            color: '#a87437',
+            color: 'var(--hr-accent-soft)',
           }}
         >
           Zdieľať článok
@@ -101,7 +101,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
                 width: 40,
                 height: 40,
                 borderRadius: 9999,
-                border: '1px solid #a87437',
+                border: '1px solid var(--hr-accent-soft)',
                 background: 'transparent',
                 color: '#3a2a1a',
                 display: 'inline-flex',
@@ -111,7 +111,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
                 textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#a87437';
+                e.currentTarget.style.background = 'var(--hr-accent-soft)';
                 e.currentTarget.style.color = '#fffdf8';
               }}
               onMouseLeave={(e) => {
@@ -130,8 +130,8 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
               width: 40,
               height: 40,
               borderRadius: 9999,
-              border: '1px solid #a87437',
-              background: copied ? '#a87437' : 'transparent',
+              border: '1px solid var(--hr-accent-soft)',
+              background: copied ? 'var(--hr-accent-soft)' : 'transparent',
               color: copied ? '#fffdf8' : '#3a2a1a',
               display: 'inline-flex',
               alignItems: 'center',
@@ -141,7 +141,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
             }}
             onMouseEnter={(e) => {
               if (!copied) {
-                e.currentTarget.style.background = '#a87437';
+                e.currentTarget.style.background = 'var(--hr-accent-soft)';
                 e.currentTarget.style.color = '#fffdf8';
               }
             }}
@@ -161,7 +161,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
         </div>
       </div>
       {/* Spodná zlatá linka */}
-      <div style={{ height: 1, background: 'rgba(196,165,116,0.6)', marginTop: 16 }} />
+      <div style={{ height: 1, background: 'var(--hr-line)', marginTop: 16 }} />
     </div>
   );
 }

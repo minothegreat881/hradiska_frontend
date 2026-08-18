@@ -54,7 +54,9 @@
  * súboru, nie prepisovania päťdesiatich hodnôt.
  */
 
-.lab {
+/* Token vrstva platí aj mimo laboratória — pozri poznámku pri palete. */
+.lab,
+:root[data-sat='pecat'] {
   /* Šat stojí na dvojici Fraunces + Inter: výrazná premenná antikva na
      nadpisy, neutrálna bezserifová na text. Tieto dva tokeny ale ukazovali
      na Inter, takže KAŽDÁ potokenizovaná stránka webu dostala v nadpise
@@ -570,8 +572,12 @@ body[data-lab-theme='mach'] {
    modročierny) a vosková pečať. Web má na tieto pramene celú kategóriu, tak
    je to jediná téma, ktorá pomenúva sama seba. Červená je najsilnejšia iskra
    zo štyroch — preto je jej v šate najmenej. */
+/* `:root[data-sat='pecat']` je tu preto, aby paleta platila aj MIMO `.lab` —
+   v administrácii, ktorá má vlastný rám, a v prvkoch vykresľovaných portálom
+   (cookie lišta, hlásenia, svetlík fotky). */
 .lab[data-theme='pecat'],
-body[data-lab-theme='pecat'] {
+body[data-lab-theme='pecat'],
+:root[data-sat='pecat'] {
   --l-paper: #f3ede1; --l-paper-2: #e8e0cf; --l-card: #fffcf6;
   /* Tiché odtiene sú rozdelené podľa PODKLADU, nie jednou hodnotou. Merané:
      token sedí na troch plochách — karte #fffcf6, papieri #f3ede1 a tmavšom
@@ -2562,7 +2568,77 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    kategórie, kde je kariet dvanásť, prebila celý šat — stránka pôsobila
    staro, hoci značky aj písmo už boli pečatné.
    ══════════════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════
+   SADY PREMENNÝCH, KTORÉ ŽIJÚ MIMO `--hr-*`
+   Cookie lišta, hlavička kategórie a karta článku majú vlastné rodiny
+   premenných — a `--ck-*` aj `--ch-*` sú definované PRIAMO NA SVOJICH
+   PRVKOCH (`.ck-root`, `.cat-hero`), takže dedenie z `.lab` proti nim
+   prehráva. Preto sa prepisujú na tých istých prvkoch.
+
+   Značka `[data-sat='pecat']` je na koreni dokumentu: cookie lišta, výzva na
+   inštaláciu, hlásenia a svetlík fotky idú PORTÁLOM mimo `.lab`, kam by šat
+   inak nedosiahol.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root[data-sat='pecat'] .ck-root {
+  --ck-card-top: var(--l-card);
+  --ck-card-bottom: var(--l-paper-2);
+  --ck-card-border: var(--l-line-2);
+  --ck-rim: var(--l-second-deep);
+  --ck-wave: var(--l-second-light);
+  --ck-shield-top: var(--l-second);
+  --ck-shield-bottom: var(--l-second-deep);
+  --ck-shield-border: rgba(243, 237, 225, .45);
+  --ck-pill-text: var(--l-second-deep);
+  --ck-pill-bg: var(--l-paper-2);
+  --ck-pill-border: var(--l-line-2);
+  --ck-title: var(--l-ink);
+  --ck-body: var(--l-body);
+  --ck-accent: var(--l-second-deep);
+  --ck-muted: var(--l-muted);
+  --ck-link: var(--l-muted);
+  --ck-btn-top: var(--l-second);
+  --ck-btn-bottom: var(--l-second-deep);
+  --ck-btn-border: var(--l-second-deep);
+  --ck-btn-text: var(--l-card);
+  --ck-btn2-border: var(--l-line-2);
+  --ck-btn2-text: var(--l-body);
+  --ck-edge: var(--l-line);
+}
+
+:root[data-sat='pecat'] .cat-hero {
+  --ch-title: var(--l-on-dark-2);
+  --ch-sub: var(--l-on-dark);
+  --ch-meta: var(--l-on-dark-3);
+  --ch-border: var(--l-second-deep);
+  --ch-frame: rgba(243, 237, 225, .28);
+  --ch-fallback: var(--l-ink);
+  --ch-gold: var(--l-second-light);
+  --ch-chip-bg: rgba(143, 44, 34, .62);
+  --ch-chip-border: rgba(243, 237, 225, .5);
+  --ch-chip-text: var(--l-on-dark-2);
+  --ch-pill-bg: var(--l-second-light);
+  --ch-pill-text: var(--l-ink);
+}
+
+:root[data-sat='pecat'] {
+  --card-border: var(--l-line-2);
+  --card-chip-bg: rgba(143, 44, 34, .82);
+  --card-chip-border: rgba(243, 237, 225, .45);
+  --card-chip-text: var(--l-on-dark-2);
+  --card-title: var(--l-on-dark-2);
+  --card-title-hover: var(--l-second-light);
+  --card-excerpt: var(--l-on-dark);
+  --card-meta: var(--l-on-dark-3);
+  --card-meta-line: rgba(243, 237, 225, .18);
+  --card-arrow: var(--l-second-light);
+  --card-dot: var(--l-muted);
+}
+
 .lab {
+  /* Základná farba textu dokumentu. Bez nej všetko, čo si farbu nenastavuje
+     samo, dedilo starú hnedočiernu `#2d1810` z `body` — a to je väčšina
+     bežného textu na stránkach, ktoré sme prefarbili len po tokenoch. */
+  color: var(--l-body);
   --card-img-fallback: var(--l-ink);
   --card-scrim: linear-gradient(
     180deg,
@@ -2697,3 +2773,63 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   font-family: var(--mono); font-style: normal;
   font-size: 12px; letter-spacing: .08em; color: var(--l-muted);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ADMINISTRÁCIA
+   Má vlastný rám mimo `.lab` a vlastnú rodinu premenných `--ad-*` definovanú
+   priamo na `.admin` — dedenie z koreňa proti nej prehráva, tak sa prepisuje
+   na tom istom prvku. Bez toho ostávala administrácia zlatohnedá, kým celý
+   web okolo nej už bol pečatný.
+
+   Hlavná akčná farba je pečatná červená, nie atramentová: v nástroji, kde sa
+   klikaním publikuje a maže, musí byť tlačidlo vidieť ako prvé. Stavové
+   farby (zverejnené, koncept, nebezpečné) ostávajú konvenčné — zelená
+   znamená v poriadku vo všetkých šatoch.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root[data-sat='pecat'] .admin {
+  --ad-app: var(--l-paper);
+  --ad-card: var(--l-card);
+  --ad-surface: var(--l-paper-2);
+  --ad-border: var(--l-line-2);
+  --ad-line: var(--l-line);
+  --ad-field-border: var(--l-line-2);
+
+  /* Bočný pruh: atramentový ako panel mapy a pätička. */
+  --ad-side-top: var(--l-ink);
+  --ad-side-bottom: #0f1116;
+  --ad-side-line: rgba(243, 237, 225, .12);
+  --ad-side-text: var(--l-on-dark);
+  --ad-side-active: var(--l-second-light);
+  --ad-side-label: var(--l-on-dark-3);
+
+  /* Akčná farba. */
+  --ad-amber: var(--l-second);
+  --ad-amber-deep: var(--l-second-deep);
+  --ad-amber-mid: var(--l-second);
+  --ad-amber-bright: var(--l-second-light);
+
+  --ad-text: var(--l-ink);
+  --ad-panel-head: var(--l-body);
+  --ad-secondary: var(--l-body);
+  --ad-secondary-2: var(--l-muted);
+  --ad-muted: var(--l-muted-2);
+
+  /* Farby typov blokov v editore — rozlišovacie, nesú význam. Iba sa
+     zosúladia s pečatnou rečou. */
+  --ad-blk-rich: var(--l-second);
+  --ad-blk-quote: var(--l-second-deep);
+}
+
+/* Hlásenia (toast). Sonner si berie farby z troch premenných, ktoré patria
+   do sady prevzatej so šablónou. Sú použité len tu, ale hlásenie vyskočí nad
+   ktoroukoľvek stránkou, takže by inak svietilo v starých farbách. */
+:root[data-sat='pecat'] {
+  --popover: var(--l-card);
+  --popover-foreground: var(--l-ink);
+  --border: var(--l-line-2);
+}
+
+/* Základná farba dokumentu. `globals.css` ju dáva na `body`, kam trieda
+   `.lab` (ktorá sedí až na obale vnútri) nedosiahne — všetko, čo si farbu
+   nenastavuje samo, by dedilo starú hnedočiernu. */
+:root[data-sat='pecat'] body { color: var(--l-body); }

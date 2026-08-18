@@ -64,7 +64,7 @@ export function LoginScreen() {
       style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 20,
-        background: 'radial-gradient(ellipse at 50% 35%, #faf5e8 0%, #f4efe3 45%, #e8dcc4 100%)',
+        background: 'radial-gradient(ellipse at 50% 35%, var(--hr-wash-1) 0%, var(--hr-wash-1) 45%, var(--hr-relief-high) 100%)',
       }}
     >
       <div className="acard" style={{ width: 400, maxWidth: '100%', padding: 32 }}>
@@ -77,8 +77,8 @@ export function LoginScreen() {
               aria-hidden="true"
               style={{
                 width: 56, height: 56, objectFit: 'contain', borderRadius: 14, padding: 3,
-                background: 'radial-gradient(circle at 38% 30%, #f0d9a8, #c8a15a)',
-                border: '1px solid #e6c98a', margin: '0 auto 14px', display: 'block',
+                background: 'radial-gradient(circle at 38% 30%, var(--hr-line-soft), var(--hr-line-gold))',
+                border: '1px solid var(--hr-on-photo-3)', margin: '0 auto 14px', display: 'block',
               }}
             />
           </picture>

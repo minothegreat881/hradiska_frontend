@@ -115,14 +115,14 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
           <option value="draft">Koncepty</option>
         </select>
         <button className="abtn" onClick={() => resetPage(setNoCover)(!noCover)}
-                style={noCover ? { borderColor: 'var(--ad-amber)', background: '#f6ead0' } : undefined}>
+                style={noCover ? { borderColor: 'var(--ad-amber)', background: 'var(--hr-wash-6)' } : undefined}>
           <ImageOff className="w-4 h-4" /> Bez coveru
           <span className="ad-badge">{counts.noCover}</span>
         </button>
       </div>
 
       {error && (
-        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: '#fbeae8', borderColor: '#e8c4bf' }}>
+        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: 'var(--hr-error-bg)', borderColor: 'var(--hr-error-line)' }}>
           <AlertCircle className="w-4 h-4" style={{ color: 'var(--ad-danger)', flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: 13.5, color: 'var(--ad-danger)' }}>{error}</div>
         </div>
@@ -152,7 +152,7 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
               {!loading && rows.map(a => (
                 <tr key={a.documentId}>
                   <td>
-                    <div style={{ width: 44, height: 32, borderRadius: 6, background: '#efe6d0', border: '1px solid var(--ad-line)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 44, height: 32, borderRadius: 6, background: 'var(--hr-wash-2)', border: '1px solid var(--ad-line)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {a.coverThumbUrl
                         ? <img src={a.coverThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
                         : <ImageOff className="w-3.5 h-3.5" style={{ color: 'var(--ad-muted)' }} />}
@@ -206,7 +206,7 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
           {pages.map((p, i) => p === '…'
             ? <span key={`e${i}`} style={{ color: 'var(--ad-muted)', padding: '0 4px' }}>…</span>
             : <button key={p} className="abtn abtn-icon" onClick={() => setPage(p)}
-                      style={p === page ? { borderColor: 'var(--ad-amber)', background: '#f6ead0' } : undefined}>{p}</button>
+                      style={p === page ? { borderColor: 'var(--ad-amber)', background: 'var(--hr-wash-6)' } : undefined}>{p}</button>
           )}
           <button className="abtn abtn-icon" disabled={page >= pageCount} onClick={() => setPage(p => p + 1)}>›</button>
         </div>

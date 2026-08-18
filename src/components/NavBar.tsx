@@ -18,9 +18,9 @@ const GOLD_BRIGHT = 'var(--hr-badge)';
 const TEXT_LIGHT = 'var(--hr-on-dark-2)';
 const TEXT_MUTED = 'var(--hr-on-dark-3)';
 const BORDER_GOLD = 'var(--hr-line-on-dark)';
-const HOVER_BG = 'rgba(196,165,116,0.15)';
-const ACTIVE_BG = 'rgba(196,165,116,0.20)';
-const PILL_BG = 'rgba(196,165,116,0.18)';
+const HOVER_BG = 'var(--hr-line)';
+const ACTIVE_BG = 'var(--hr-line)';
+const PILL_BG = 'var(--hr-line)';
 const NAV_HEIGHT = 64;
 
 function pluralLokalit(n: number): string {

@@ -67,7 +67,7 @@ export function RichTextEditor({
 
   const btn = (active: boolean): React.CSSProperties => ({
     ...TOOLBAR_BTN,
-    ...(active ? { background: '#f6ead0', borderColor: 'var(--ad-amber)', color: 'var(--ad-amber-deep)' } : {}),
+    ...(active ? { background: 'var(--hr-wash-6)', borderColor: 'var(--ad-amber)', color: 'var(--ad-amber-deep)' } : {}),
   });
 
   const setLink = () => {

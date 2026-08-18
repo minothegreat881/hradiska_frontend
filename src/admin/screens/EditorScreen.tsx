@@ -316,8 +316,8 @@ export function EditorScreen({
           role="status"
           style={{
             padding: '11px 15px', marginBottom: 16, fontSize: 13.5,
-            background: saveMsg.tone === 'ok' ? 'var(--ad-pub-bg)' : '#fbeae8',
-            borderColor: saveMsg.tone === 'ok' ? 'var(--ad-pub-br)' : '#e8c4bf',
+            background: saveMsg.tone === 'ok' ? 'var(--ad-pub-bg)' : 'var(--hr-error-bg)',
+            borderColor: saveMsg.tone === 'ok' ? 'var(--ad-pub-br)' : 'var(--hr-error-line)',
             color: saveMsg.tone === 'ok' ? 'var(--ad-pub-fg)' : 'var(--ad-danger)',
           }}
         >
@@ -423,7 +423,7 @@ export function EditorScreen({
               <div
                 style={{
                   height: 120, borderRadius: 9, border: '1px dashed var(--ad-field-border)',
-                  background: '#f1e8d2', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'var(--hr-wash-4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: 'var(--ad-muted)', fontSize: 13, marginBottom: 10, gap: 8,
                 }}
               >
@@ -617,7 +617,7 @@ function ImageBlock({ data, onPatch, onPick }: any) {
           style={{
             width: '100%', height: 104, borderRadius: 9, overflow: 'hidden', padding: 0, cursor: 'pointer',
             border: data.image ? '1px solid var(--ad-line)' : '1px dashed var(--ad-field-border)',
-            background: '#f1e8d2', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--hr-wash-4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             gap: 8, color: 'var(--ad-muted)', fontSize: 13, marginBottom: 10,
           }}
           title="Kliknutím vyberiete obrázok"

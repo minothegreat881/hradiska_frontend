@@ -56,10 +56,10 @@ export function LocationMap({
         aria-label="Kliknutím umiestnite značku"
         style={{
           width: '100%', height: 'auto', display: 'block', cursor: 'crosshair',
-          background: '#f7eed8', border: '1px solid var(--ad-line)', borderRadius: 9,
+          background: 'var(--hr-wash-4)', border: '1px solid var(--ad-line)', borderRadius: 9,
         }}
       >
-        <path d={PATH} fill="#eadcbb" stroke="#a87437" strokeWidth="2" strokeLinejoin="round" />
+        <path d={PATH} fill="var(--hr-line-soft)" stroke="var(--hr-accent)" strokeWidth="2" strokeLinejoin="round" />
         {hasPin && (
           <g transform={`translate(${pinX.toFixed(1)} ${pinY.toFixed(1)})`}>
             <circle cx="0" cy="3" r="5" fill="rgba(0,0,0,.25)" />

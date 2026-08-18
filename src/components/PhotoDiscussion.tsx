@@ -310,7 +310,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
           aria-hidden="true"
           style={{
             flexShrink: 0, width: 34, height: 34, borderRadius: 999,
-            background: isLoggedIn ? 'linear-gradient(135deg,#a87437,#7d4f1d)' : '#e6d7b0',
+            background: isLoggedIn ? 'linear-gradient(135deg,var(--hr-accent-soft),#7d4f1d)' : '#e6d7b0',
             color: isLoggedIn ? '#fffdf8' : '#8a795e',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700,

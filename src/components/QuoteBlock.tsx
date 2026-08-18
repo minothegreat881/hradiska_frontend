@@ -27,8 +27,8 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
         <blockquote
           className="relative py-5 px-6"
           style={{
-            background: 'rgba(196,165,116,0.08)',
-            borderLeft: '3px solid #a87437',
+            background: 'var(--hr-line)',
+            borderLeft: '3px solid var(--hr-accent-soft)',
             borderRadius: '0 8px 8px 0',
             color: '#2d2418',
             width: '100%',
@@ -38,7 +38,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
             style={{
               width: 16,
               height: 16,
-              color: '#a87437',
+              color: 'var(--hr-accent-soft)',
               marginBottom: 8,
               opacity: 0.8,
             }}
@@ -69,7 +69,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
               style={{
                 marginTop: 12,
                 paddingTop: 10,
-                borderTop: '1px solid rgba(168,116,55,0.25)',
+                borderTop: '1px solid var(--hr-accent-border)',
               }}
             >
               <Feather style={{ width: 14, height: 14, color: '#7d4f1d' }} />
@@ -103,8 +103,8 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
       <blockquote
         className="relative py-4 px-6"
         style={{
-          background: 'rgba(196,165,116,0.08)',
-          borderLeft: '3px solid #a87437',
+          background: 'var(--hr-line)',
+          borderLeft: '3px solid var(--hr-accent-soft)',
           borderRadius: '0 8px 8px 0',
           color: '#2d2418',
           width: '100%',
@@ -118,9 +118,9 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
             margin: 0,
           }}
         >
-          <span style={{ fontSize: '1.5em', color: '#a87437', opacity: 0.7 }}>„</span>
+          <span style={{ fontSize: '1.5em', color: 'var(--hr-accent-soft)', opacity: 0.7 }}>„</span>
           {text}
-          <span style={{ fontSize: '1.5em', color: '#a87437', opacity: 0.7 }}>“</span>
+          <span style={{ fontSize: '1.5em', color: 'var(--hr-accent-soft)', opacity: 0.7 }}>“</span>
         </p>
 
         {(author || source) && (

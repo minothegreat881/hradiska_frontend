@@ -101,7 +101,7 @@ export function MediaPicker({
         </div>
 
         {error && (
-          <div style={{ padding: '10px 14px', background: '#fbeae8', color: 'var(--ad-danger)', fontSize: 13 }}>{error}</div>
+          <div style={{ padding: '10px 14px', background: 'var(--hr-error-bg)', color: 'var(--ad-danger)', fontSize: 13 }}>{error}</div>
         )}
 
         {/* Mriežka */}
@@ -119,7 +119,7 @@ export function MediaPicker({
                     border: `2px solid ${on ? 'var(--ad-amber)' : 'var(--ad-line)'}`,
                   }}
                 >
-                  <div style={{ aspectRatio: '4 / 3', background: '#efe6d0' }}>
+                  <div style={{ aspectRatio: '4 / 3', background: 'var(--hr-wash-2)' }}>
                     <img src={fileUrl(f, 'thumbnail')} alt="" loading="lazy"
                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </div>

@@ -216,7 +216,7 @@ function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; ln
 // Shared design tokens for sidebar cards
 const cardStyle: React.CSSProperties = {
   background: '#fffdf8',
-  border: '1px solid rgba(196,165,116,0.4)',
+  border: '1px solid var(--hr-line)',
   borderRadius: 12,
   boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
   padding: 16,
@@ -227,7 +227,7 @@ const cardTitleStyle: React.CSSProperties = {
   fontFamily: 'Georgia, serif',
   fontSize: 13,
   fontWeight: 600,
-  color: '#a87437',
+  color: 'var(--hr-accent-soft)',
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
   marginBottom: 12,
@@ -259,7 +259,7 @@ export function KeyFactsCard({ facts }: { facts: KeyFact[] }) {
                 width: 24,
                 height: 24,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #a87437 0%, #7d4f1d 100%)',
+                background: 'linear-gradient(135deg, var(--hr-accent-soft) 0%, #7d4f1d 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -278,7 +278,7 @@ export function KeyFactsCard({ facts }: { facts: KeyFact[] }) {
                   fontFamily: 'Georgia, serif',
                   fontSize: 11,
                   fontWeight: 600,
-                  color: '#a87437',
+                  color: 'var(--hr-accent-soft)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                 }}
@@ -333,7 +333,7 @@ export function TimelineCard({ timeline }: { timeline: TimelineEvent[] }) {
                   width: 10,
                   height: 10,
                   borderRadius: '50%',
-                  background: '#a87437',
+                  background: 'var(--hr-accent-soft)',
                   marginTop: 5,
                   flexShrink: 0,
                 }}
@@ -344,7 +344,7 @@ export function TimelineCard({ timeline }: { timeline: TimelineEvent[] }) {
                     width: 2,
                     flex: 1,
                     minHeight: '2rem',
-                    background: 'rgba(196,165,116,0.4)',
+                    background: 'var(--hr-line)',
                   }}
                 />
               )}
@@ -454,8 +454,8 @@ export function ArticleSidebar({
                 style={{
                   display: 'inline-block',
                   padding: '5px 12px',
-                  background: 'rgba(196,165,116,0.10)',
-                  border: '1px solid rgba(196,165,116,0.45)',
+                  background: 'var(--hr-line)',
+                  border: '1px solid var(--hr-line)',
                   color: '#7d4f1d',
                   fontFamily: 'Georgia, serif',
                   fontSize: 12,
@@ -465,10 +465,10 @@ export function ArticleSidebar({
                   transition: 'all 0.2s',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(196,165,116,0.22)';
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'var(--hr-line)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(196,165,116,0.10)';
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'var(--hr-line)';
                 }}
               >
                 {tag}
@@ -494,7 +494,7 @@ export function ArticleSidebar({
                   gap: 12,
                   padding: 8,
                   borderRadius: 10,
-                  border: '1px solid rgba(196,165,116,0.25)',
+                  border: '1px solid var(--hr-line)',
                   textDecoration: 'none',
                   background: '#fffdf8',
                   transition: 'all 0.2s',
@@ -507,7 +507,7 @@ export function ArticleSidebar({
                     borderRadius: 8,
                     overflow: 'hidden',
                     flexShrink: 0,
-                    background: 'rgba(196,165,116,0.15)',
+                    background: 'var(--hr-line)',
                   }}
                 >
                   <img
@@ -541,7 +541,7 @@ export function ArticleSidebar({
                 </div>
                 <ChevronRight
                   className="group-hover:translate-x-1 transition-all"
-                  style={{ width: 16, height: 16, color: '#a87437', flexShrink: 0 }}
+                  style={{ width: 16, height: 16, color: 'var(--hr-accent-soft)', flexShrink: 0 }}
                 />
               </a>
             ))}

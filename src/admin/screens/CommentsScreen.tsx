@@ -17,16 +17,16 @@ const PAGE = 30;
 
 const STATUS_CHIP: Record<CommentStatus, { label: string; style: React.CSSProperties }> = {
   visible: { label: 'Schválený', style: { color: '#3d5c40', background: '#e4ecdc', border: '1px solid #c5d4b8' } },
-  waiting: { label: 'Čaká', style: { color: '#8a5316', background: '#f6ead0', border: '1px solid #e0cb95' } },
-  reported: { label: 'Nahlásený', style: { color: '#a04338', background: '#f6e3dc', border: '1px solid #dcb3a4' } },
-  hidden: { label: 'Skrytý', style: { color: '#7a6b56', background: '#efe6d0', border: '1px solid #d9c69a' } },
-  spam: { label: 'Spam', style: { color: '#7a6b56', background: '#efe6d0', border: '1px solid #d9c69a' } },
+  waiting: { label: 'Čaká', style: { color: 'var(--hr-accent-deep)', background: 'var(--hr-wash-6)', border: '1px solid var(--hr-line-soft)' } },
+  reported: { label: 'Nahlásený', style: { color: 'var(--hr-error-text)', background: '#f6e3dc', border: '1px solid #dcb3a4' } },
+  hidden: { label: 'Skrytý', style: { color: 'var(--hr-clear-text)', background: 'var(--hr-wash-2)', border: '1px solid var(--hr-chip-border)' } },
+  spam: { label: 'Spam', style: { color: 'var(--hr-clear-text)', background: 'var(--hr-wash-2)', border: '1px solid var(--hr-chip-border)' } },
 };
 
 // ľavá hrana karty podľa stavu
 const LEFT_BORDER: Partial<Record<CommentStatus, string>> = {
-  waiting: '4px solid #c8862f',
-  reported: '4px solid #a04338',
+  waiting: '4px solid var(--hr-accent-soft)',
+  reported: '4px solid var(--hr-error-text)',
 };
 
 const TEMPLATES: { id: WarningTemplate; label: string; text: string }[] = [
@@ -180,7 +180,7 @@ export function CommentsScreen() {
             className="abtn"
             onClick={() => switchSource(id)}
             style={source === id
-              ? { borderColor: 'var(--ad-amber)', background: '#f6ead0', fontWeight: 700 }
+              ? { borderColor: 'var(--ad-amber)', background: 'var(--hr-wash-6)', fontWeight: 700 }
               : {}}
           >
             {label}
@@ -191,7 +191,7 @@ export function CommentsScreen() {
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         {chips.map(c => (
           <button key={c.id} className="abtn" onClick={() => { setStatus(c.id); setPage(1); }}
-                  style={{ whiteSpace: 'nowrap', ...(status === c.id ? { borderColor: 'var(--ad-amber)', background: '#f6ead0' } : {}) }}>
+                  style={{ whiteSpace: 'nowrap', ...(status === c.id ? { borderColor: 'var(--ad-amber)', background: 'var(--hr-wash-6)' } : {}) }}>
             {c.label} <span className="ad-badge">{c.n}</span>
           </button>
         ))}
@@ -203,7 +203,7 @@ export function CommentsScreen() {
       </div>
 
       {error && (
-        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: '#fbeae8', borderColor: '#e8c4bf' }}>
+        <div className="acard" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', gap: 10, background: 'var(--hr-error-bg)', borderColor: 'var(--hr-error-line)' }}>
           <AlertCircle className="w-4 h-4" style={{ color: 'var(--ad-danger)', flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: 13.5, color: 'var(--ad-danger)' }}>{error}</div>
         </div>
@@ -226,7 +226,7 @@ export function CommentsScreen() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                     <strong style={{ fontSize: 13.5 }}>{c.authorName}</strong>
                     {!!c.warnsCount && c.warnsCount > 0 && (
-                      <span style={chipStyle({ color: '#a04338', background: '#f6e3dc' })} title="Počet upozornení autora">
+                      <span style={chipStyle({ color: 'var(--hr-error-text)', background: '#f6e3dc' })} title="Počet upozornení autora">
                         ⚠ {c.warnsCount}
                       </span>
                     )}
@@ -254,14 +254,14 @@ export function CommentsScreen() {
                   </button>
                 )}
                 {c.status !== 'hidden' && (
-                  <button className="abtn" onClick={() => act(c, 'hidden')} style={{ color: '#a04338' }}>
+                  <button className="abtn" onClick={() => act(c, 'hidden')} style={{ color: 'var(--hr-error-text)' }}>
                     <X className="w-3.5 h-3.5" /> Zamietnuť
                   </button>
                 )}
                 <button className="abtn" onClick={() => openPanel(c, 'reply')} disabled={!c.postDocumentId}>
                   <Reply className="w-3.5 h-3.5" /> Odpovedať
                 </button>
-                <button className="abtn" onClick={() => openPanel(c, 'warn')} disabled={!c.userId} style={{ color: '#8a5316' }}>
+                <button className="abtn" onClick={() => openPanel(c, 'warn')} disabled={!c.userId} style={{ color: 'var(--hr-accent-deep)' }}>
                   <AlertTriangle className="w-3.5 h-3.5" /> Upozornenie
                 </button>
                 {c.status !== 'spam' && (
@@ -269,7 +269,7 @@ export function CommentsScreen() {
                 )}
                 <div style={{ flex: 1 }} />
                 {c.userId && (
-                  <button className="abtn" onClick={() => doBlock(c)} style={{ color: '#a04338' }}>
+                  <button className="abtn" onClick={() => doBlock(c)} style={{ color: 'var(--hr-error-text)' }}>
                     <ShieldOff className="w-3.5 h-3.5" /> Blokovať autora
                   </button>
                 )}

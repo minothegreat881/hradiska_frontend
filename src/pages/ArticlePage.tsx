@@ -612,8 +612,8 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                       height: 24,
                       padding: '0 8px',
                       borderRadius: 9999,
-                      background: '#a87437',
-                      color: '#fffdf8',
+                      background: 'var(--hr-accent-soft)',
+                      color: 'var(--hr-on-photo)',
                       fontFamily: 'Georgia, serif',
                       fontSize: 12,
                       fontWeight: 600,
@@ -623,7 +623,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                   </div>
                   <hr style={{
                     height: 1,
-                    background: 'linear-gradient(90deg, #c4a574 0%, rgba(196,165,116,0) 100%)',
+                    background: 'linear-gradient(90deg, var(--hr-line-quiet) 0%, rgba(196,165,116,0) 100%)',
                     margin: '8px 0 24px',
                     border: 0,
                   }} />
@@ -637,7 +637,7 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                           gap: 12,
                           alignItems: 'flex-start',
                           background: '#fffdf8',
-                          border: '1px solid rgba(196,165,116,0.4)',
+                          border: '1px solid var(--hr-line)',
                           borderRadius: 10,
                           padding: 14,
                         }}
@@ -653,8 +653,8 @@ export function ArticlePage({ articleSlug }: ArticlePageProps) {
                           display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          background: '#a87437',
-                          color: '#fffdf8',
+                          background: 'var(--hr-accent-soft)',
+                          color: 'var(--hr-on-photo)',
                           borderRadius: 9999,
                           fontFamily: 'Georgia, serif',
                           fontSize: 12,

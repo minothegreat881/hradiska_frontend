@@ -359,13 +359,13 @@ export function HistoricalGallery({ images, title = 'Fotogaléria' }: Historical
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             minWidth: 24, height: 24, padding: '0 8px', borderRadius: 9999,
-            background: '#a87437', color: '#fffdf8', fontFamily: 'Georgia, serif', fontSize: 12, fontWeight: 600,
+            background: 'var(--hr-accent-soft)', color: 'var(--hr-on-photo)', fontFamily: 'Georgia, serif', fontSize: 12, fontWeight: 600,
           }}
         >
           {images.length}
         </span>
       </div>
-      <hr style={{ height: 1, background: 'linear-gradient(90deg, #c4a574 0%, rgba(196,165,116,0) 100%)', margin: '8px 0 24px', border: 0 }} />
+      <hr style={{ height: 1, background: 'linear-gradient(90deg, var(--hr-line-quiet) 0%, rgba(196,165,116,0) 100%)', margin: '8px 0 24px', border: 0 }} />
 
       {/* Grid miniatúr */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
@@ -377,7 +377,7 @@ export function HistoricalGallery({ images, title = 'Fotogaléria' }: Historical
             aria-label={image.alt || image.caption || `Otvoriť obrázok ${idx + 1}`}
             style={{ background: 'transparent', border: 0, padding: 0, cursor: 'zoom-in', display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'left', font: 'inherit', color: 'inherit' }}
           >
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 8, border: '1px solid rgba(196,165,116,0.4)', pointerEvents: 'none' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 8, border: '1px solid var(--hr-line)', pointerEvents: 'none' }}>
               <ImageWithFallback
                 src={image.url}
                 alt={image.alt || image.caption || `Obrázok ${idx + 1}`}

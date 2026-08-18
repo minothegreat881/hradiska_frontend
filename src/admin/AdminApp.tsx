@@ -119,13 +119,13 @@ function AdminShell() {
               aria-hidden="true"
               style={{
                 width: 38, height: 38, objectFit: 'contain', borderRadius: 10, padding: 2,
-                background: 'radial-gradient(circle at 38% 30%, #f0d9a8, #c8a15a)',
-                border: '1px solid #e6c98a', flexShrink: 0,
+                background: 'radial-gradient(circle at 38% 30%, var(--hr-line-soft), var(--hr-line-gold))',
+                border: '1px solid var(--hr-on-photo-3)', flexShrink: 0,
               }}
             />
           </picture>
           <div style={{ lineHeight: 1.25, minWidth: 0 }}>
-            <div className="ad-brand" style={{ fontSize: 15, fontWeight: 700, color: '#f4ead4' }}>
+            <div className="ad-brand" style={{ fontSize: 15, fontWeight: 700, color: 'var(--hr-on-photo-2)' }}>
               Hradiska.sk
             </div>
             <div style={{ fontSize: 9.5, letterSpacing: '.15em', color: 'var(--ad-side-label)' }}>
@@ -163,7 +163,7 @@ function AdminShell() {
             aria-hidden="true"
             style={{
               width: 34, height: 34, borderRadius: 999, flexShrink: 0,
-              background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
+              background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent-deep))', color: 'var(--hr-on-photo)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 13, fontWeight: 600,
             }}
@@ -179,7 +179,7 @@ function AdminShell() {
               background: 'none', border: 'none', padding: 0, cursor: 'pointer',
             }}
           >
-            <div style={{ fontSize: 13, color: '#e8dcc8', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.username}</div>
+            <div style={{ fontSize: 13, color: 'var(--hr-relief-high)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.username}</div>
             <div style={{ fontSize: 11, color: 'var(--ad-side-label)' }}>Superadmin · upraviť</div>
           </button>
           <button

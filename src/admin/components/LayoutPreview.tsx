@@ -12,15 +12,15 @@ export function LayoutPreview({
   const w = Number(width) || 50;
 
   const line = (key: number, pct = 100) => (
-    <div key={key} style={{ height: 3, borderRadius: 2, background: '#ded2b6', width: `${pct}%` }} />
+    <div key={key} style={{ height: 3, borderRadius: 2, background: 'var(--hr-line-strong)', width: `${pct}%` }} />
   );
 
   const imgBox = (style: React.CSSProperties = {}) => (
     <div
       style={{
-        background: 'linear-gradient(135deg,#e6c98a,#c8862f)',
+        background: 'linear-gradient(135deg,var(--hr-on-photo-3),var(--hr-accent-soft))',
         borderRadius: 3,
-        border: '1px solid #b0813a',
+        border: '1px solid var(--hr-accent-soft)',
         ...style,
       }}
     />

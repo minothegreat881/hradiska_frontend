@@ -1108,7 +1108,7 @@ export default function Slovakia3DReliefMap() {
           backgroundImage: `
             radial-gradient(ellipse at 20% 20%, rgba(212, 192, 160, 0.12) 0%, transparent 50%),
             radial-gradient(ellipse at 80% 80%, rgba(212, 192, 160, 0.08) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 50%, rgba(196, 165, 116, 0.1) 0%, transparent 60%),
+            radial-gradient(ellipse at 50% 50%, var(--hr-line) 0%, transparent 60%),
             url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E")
           `
         }}
@@ -1177,7 +1177,7 @@ export default function Slovakia3DReliefMap() {
         className="relative border-b py-5 px-6"
         style={{
           background: 'linear-gradient(180deg, rgba(44, 36, 24, 0.9) 0%, rgba(26, 21, 16, 0.95) 100%)',
-          borderColor: 'rgba(196, 165, 116, 0.3)'
+          borderColor: 'var(--hr-line)'
         }}
       >
         {/* Header ornamental line */}
@@ -1258,7 +1258,7 @@ export default function Slovakia3DReliefMap() {
                     className="px-4 py-2 rounded-lg backdrop-blur-sm"
                     style={{
                       background: 'linear-gradient(135deg, rgba(44, 36, 24, 0.9) 0%, rgba(26, 21, 16, 0.9) 100%)',
-                      border: '1px solid rgba(196, 165, 116, 0.4)',
+                      border: '1px solid var(--hr-line)',
                       boxShadow: '0 4px 16px rgba(0,0,0,0.4)'
                     }}
                   >
@@ -1341,7 +1341,7 @@ export default function Slovakia3DReliefMap() {
                   width: 32,
                   height: 32,
                   borderRadius: 8,
-                  border: '1px solid rgba(196, 165, 116, 0.5)',
+                  border: '1px solid var(--hr-line)',
                   background: 'rgba(31, 26, 20, 0.95)',
                   color: 'var(--hr-line-quiet)',
                   display: 'inline-flex',
@@ -1391,7 +1391,7 @@ export default function Slovakia3DReliefMap() {
                       onClick={(e) => { e.stopPropagation(); setLegendOpen(true); }}
                       className="lg:hidden absolute bottom-4 right-4 z-20 rounded-full shadow-lg inline-flex items-center gap-1.5"
                       style={{
-                        background: 'rgba(28,23,16,0.94)', border: '1px solid rgba(196,165,116,0.4)',
+                        background: 'rgba(28,23,16,0.94)', border: '1px solid var(--hr-line)',
                         color: 'var(--hr-line-quiet)', fontFamily: 'Georgia, serif', fontSize: 12, padding: '8px 13px',
                       }}
                       aria-label="Zobraziť legendu"
@@ -1403,7 +1403,7 @@ export default function Slovakia3DReliefMap() {
                     className={`${legendOpen ? 'block' : 'hidden'} lg:block absolute bottom-4 right-4 z-10 rounded-xl shadow-2xl`}
                     style={{
                       background: 'rgba(28, 23, 16, 0.94)',
-                      border: '1px solid rgba(196, 165, 116, 0.35)',
+                      border: '1px solid var(--hr-line)',
                       backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
                       padding: '12px 14px', width: 'min(74vw, 224px)',
                     }}
@@ -1438,7 +1438,7 @@ export default function Slovakia3DReliefMap() {
                       })}
                     </div>
 
-                    <div style={{ height: 1, background: 'rgba(196,165,116,0.22)', margin: '10px 0 8px' }} />
+                    <div style={{ height: 1, background: 'var(--hr-line)', margin: '10px 0 8px' }} />
                     <div className="flex items-center" style={{ gap: 7 }}>
                       <span style={{ fontSize: 10, color: 'var(--hr-muted-2)', whiteSpace: 'nowrap' }}>0 m</span>
                       <div style={{ flex: 1, height: 7, borderRadius: 3, background: grad }} />
@@ -1491,7 +1491,7 @@ export default function Slovakia3DReliefMap() {
                 style={{
                   background: 'var(--hr-paper-bright)',
                   borderRadius: 20,
-                  boxShadow: '0 30px 70px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(196,165,116,0.4)',
+                  boxShadow: '0 30px 70px -15px rgba(0,0,0,0.6), 0 0 0 1px var(--hr-line)',
                   maxHeight: 'calc(100vh - 64px)',
                   display: 'flex',
                   flexDirection: 'column',
@@ -1523,7 +1523,7 @@ export default function Slovakia3DReliefMap() {
                       background: 'rgba(15,11,7,0.78)',
                       color: 'var(--hr-paper-bright)',
                       backdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(196,165,116,0.45)',
+                      border: '1px solid var(--hr-line)',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                     }}
                     aria-label="Zavrieť"
@@ -1584,8 +1584,8 @@ export default function Slovakia3DReliefMap() {
                     ].map(({ icon: Icon, label, value }) => (
                       <div key={label} className="px-3 py-3 rounded-xl"
                         style={{
-                          background: 'rgba(196,165,116,0.10)',
-                          border: '1px solid rgba(196,165,116,0.28)',
+                          background: 'var(--hr-line)',
+                          border: '1px solid var(--hr-line)',
                         }}>
                         <div className="flex items-center gap-1.5 mb-1.5">
                           <Icon className="w-3.5 h-3.5" style={{ color: 'var(--hr-line-quiet)' }} />
@@ -1651,7 +1651,7 @@ export default function Slovakia3DReliefMap() {
           className="relative border-t py-3 px-8 text-center"
           style={{
             background: 'linear-gradient(180deg, rgba(26, 21, 16, 0.95) 0%, rgba(44, 36, 24, 0.9) 100%)',
-            borderColor: 'rgba(196, 165, 116, 0.3)',
+            borderColor: 'var(--hr-line)',
           }}
         >
           <button
