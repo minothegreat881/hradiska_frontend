@@ -12,7 +12,6 @@ const LabJoinUs = lazy(() => import('./design-lab/LabJoinUs').then(m => ({ defau
 const GalleryPagePecat = lazy(() => import('./design-lab/LabGaleria'));
 const AktualityPagePecat = lazy(() => import('./design-lab/LabAktualityStranka'));
 import { SiteDetailPage } from './pages/SiteDetailPage';
-import { AboutPage } from './pages/AboutPage';
 import { CategoryPage } from './pages/CategoryPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
@@ -34,12 +33,7 @@ const AdminApp = lazy(() => import('./admin/AdminApp'));
 // Lazy → nesťahuje ich bežný návštevník článku, len kto otvorí /galeria.
 
 
-// Skúšobná plocha pre farebný šat domovskej stránky (/design). Lazy — bežný
-// návštevník ju nikdy nestiahne. Vykresľuje SKUTOČNÚ HomePage, len ju zvonku
-// prefarbí; produkčné komponenty sa nemenia.
-const DesignLab = lazy(() => import('./design-lab/DesignLab'));
-
-type Route = 'design' | 'home' | 'site' | 'article' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
+type Route = 'home' | 'site' | 'article' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
 
 // Cesty účtov → režim AccountPage
 const ACCOUNT_ROUTES: Record<string, AccountMode> = {
@@ -80,10 +74,6 @@ function App() {
       } else if (ACCOUNT_ROUTES[path]) {
         setRoute('account');
         setAccountMode(ACCOUNT_ROUTES[path]);
-      } else if (path === '/design' || path.startsWith('/design/')) {
-        // Laboratórium má aj podstránky (`/design/blog/<slug>`); cestu si
-        // rozoberie samo, router ju sem len pustí.
-        setRoute('design');
       } else if (path === '/hladat' || path === '/vyhladavanie') {
         setRoute('hladat');
         setParams({ q: searchParams.get('q') || '' });
@@ -209,15 +199,6 @@ function App() {
      prvkoch, kde dedenie z `.lab` prehráva. */
   useEffect(() => { document.documentElement.dataset.sat = 'pecat'; }, []);
 
-  // Laboratórium má vlastný rám — prepínač tém je nad stránkou.
-  if (route === 'design') {
-    return (
-      <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', color: '#888', fontSize: 14 }}>Načítavam…</div>}>
-        <DesignLab />
-      </Suspense>
-    );
-  }
-
   // Admin má vlastný shell — bez NavBaru, pätičky a Toasteru webu.
   if (route === 'admin') {
     return (
@@ -237,9 +218,9 @@ function App() {
   }
 
   return (
-    /* Šat Pečať je JEDINÝ šat webu. Trieda `.lab` je tu preto, že pod ňou
-       je celý šat zapuzdrený — laboratórium aj ostrá stránka tak bežia na
-       tom istom, bez druhej vetvy, ktorú by bolo treba udržiavať.
+    /* Šat Pečať je JEDINÝ šat webu. Trieda `.lab` je tu preto, že pod ňou je
+       celý šat zapuzdrený — premenovať ju by znamenalo prepísať vyše dvoch
+       tisíc riadkov CSS bez toho, aby sa čokoľvek zmenilo na obrazovke.
        Starý zlatohnedý šat je v značke `stary-sat-2026-08-18`. */
     <div className="min-h-screen lab" data-theme="pecat">
       <LabNav />

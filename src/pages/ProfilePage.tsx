@@ -1,574 +1,602 @@
 'use client';
 
+/**
+ * Profil člena — vlastná kronika.
+ *
+ * PREČO NANOVO. Predošlá podoba bola sled kariet s odznakmi úrovní
+ * („Bádateľ", „Kronikár"), farebnými štítkami a modálnym oknom nastavení.
+ * Vyzerala ako panel aplikácie, nie ako časť encyklopédie — a po prezlečení
+ * webu do pečatného šatu ostala jedinou stránkou v starej grafike.
+ *
+ * ČÍM JE TERAZ. Web je kronika, takže profil je vlastná kronika člena: čo
+ * napísal, čo si odložil, čo sa k jeho príspevkom ozvalo. Skladba je tá istá
+ * ako vo fotoarchíve a v aktualitách — hlavička so značkou, register po
+ * riadkoch, vláskové čiary medzi záznamami. Žiadne boxy, žiadne odznaky
+ * úrovní: koľko kto napísal, je ÚDAJ, nie titul.
+ *
+ * Nastavenia nie sú modálne okno, ale posledná položka registra. Modál mal
+ * zmysel, kým bol profil jedna dlhá stránka; register ho robí zbytočným.
+ *
+ * Nové ozvy nesú červený prúžok pri ľavom okraji a bodku v registri — stav
+ * sa dá prečítať aj z polohy, nielen z farby.
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 import { useMember } from '../auth/MemberAuth';
 import { deleteMyAccount } from '../lib/memberApi';
 import {
-  getProfile, getNotifications, getMyComments, getMyPhotoComments, getMyFavorites, getMyLikedPhotos, getMyShares,
-  markAllRead, editComment, deleteComment, editPhotoComment, deletePhotoComment, updateProfile, uploadAvatar,
-  type Profile, type NotificationItem, type MyComment, type FavoritePost, type MyShare, type LikedPhoto,
+  getProfile, getNotifications, getMyComments, getMyPhotoComments,
+  getMyFavorites, getMyLikedPhotos, getMyShares, markAllRead,
+  editComment, deleteComment, editPhotoComment, deletePhotoComment,
+  updateProfile, uploadAvatar,
+  type Profile, type NotificationItem, type MyComment, type FavoritePost,
+  type LikedPhoto, type MyShare,
 } from '../lib/profileApi';
-import {
-  pushSupported, pushPermission, enablePush, disablePush, isPushEnabled,
-} from '../lib/push';
+import { pushSupported, pushPermission, enablePush, disablePush, isPushEnabled } from '../lib/push';
 
-const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
-const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
+const STRAPI_URL = import.meta.env.PROD
+  ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi')
+  : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 
-/* ── odznak úrovne podľa počtu komentárov (gamifikácia) ── */
-function level(comments: number): string {
-  if (comments >= 30) return '✦ Kronikár';
-  if (comments >= 10) return '✦ Verný pútnik';
-  if (comments >= 3) return '✦ Hosť hradiska';
-  return '✦ Pocestný';
+const prejdi = (p: string) => { window.history.pushState({}, '', p); window.dispatchEvent(new PopStateEvent('popstate')); };
+
+type Sekcia = 'ozvy' | 'prispevky' | 'ulozene' | 'fotky' | 'nastavenia';
+
+/** Prvé písmeno mena do pečate. */
+const iniciala = (m: string) => ((m || '?').trim().charAt(0) || '?').toUpperCase();
+
+/** Ako dlho je človek v kronike. Menej než rok sa hlási v mesiacoch. */
+function vKronike(iso: string): { cislo: string; slovo: string } {
+  const d = new Date(iso), teraz = new Date();
+  const mes = (teraz.getFullYear() - d.getFullYear()) * 12 + (teraz.getMonth() - d.getMonth());
+  if (mes < 12) {
+    const m = Math.max(1, mes);
+    return { cislo: String(m), slovo: m === 1 ? 'mesiac v kronike' : m < 5 ? 'mesiace v kronike' : 'mesiacov v kronike' };
+  }
+  const r = Math.floor(mes / 12);
+  return { cislo: String(r), slovo: r === 1 ? 'rok v kronike' : r < 5 ? 'roky v kronike' : 'rokov v kronike' };
 }
 
-function initials(name: string): string {
-  return name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
+/** Relatívny čas — v kronike stačí hrubo. */
+function kedy(iso: string): string {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 90) return 'pred chvíľou';
+  const m = Math.floor(s / 60); if (m < 60) return `pred ${m} min`;
+  const h = Math.floor(m / 60); if (h < 24) return `pred ${h} h`;
+  const d = Math.floor(h / 24); if (d < 31) return `pred ${d} dňami`;
+  return new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
 }
 
-const MONTHS = ['januári', 'februári', 'marci', 'apríli', 'máji', 'júni', 'júli', 'auguste', 'septembri', 'októbri', 'novembri', 'decembri'];
-function joinedLabel(iso: string): string {
-  const d = new Date(iso);
-  return `Členom družiny od ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-function relTime(iso: string): string {
-  const d = new Date(iso);
-  const now = new Date();
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mm = String(d.getMinutes()).padStart(2, '0');
-  const sameDay = d.toDateString() === now.toDateString();
-  const yest = new Date(now); yest.setDate(now.getDate() - 1);
-  if (sameDay) return `DNES · ${hh}:${mm}`;
-  if (d.toDateString() === yest.toDateString()) return `VČERA · ${hh}:${mm}`;
-  return `${d.getDate()}. ${d.getMonth() + 1}. ${d.getFullYear()}`;
-}
+const datum = (iso: string) => new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
 function mediaUrl(m: { url: string; formats?: Record<string, { url: string }> } | null | undefined): string | null {
-  if (!m) return null;
-  const u = m.formats?.thumbnail?.url || m.url;
-  return u.startsWith('http') ? u : `${STRAPI_URL}${u}`;
+  const u = m?.formats?.thumbnail?.url || m?.url;
+  return u ? (u.startsWith('http') ? u : STRAPI_URL + u) : null;
 }
 
-/* ── farby (pergamen web) ── */
-const C = {
-  card: 'var(--hr-surface)', border: 'var(--hr-line-soft)', amber: 'var(--hr-accent)', amber2: 'var(--hr-accent-soft)',
-  ink: 'var(--hr-body)', muted: 'var(--hr-muted-2)', bordo: '#7c1f24',
-};
-
+/* ══════════════════════════════════════════════════════════════════════════
+   STRÁNKA
+   ══════════════════════════════════════════════════════════════════════════ */
 export function ProfilePage() {
   const { member, token, signOut } = useMember();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [tab, setTab] = useState<'notif' | 'comments' | 'saved'>('notif');
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const [notifs, setNotifs] = useState<NotificationItem[] | null>(null);
-  const [comments, setComments] = useState<MyComment[] | null>(null);
-  const [favorites, setFavorites] = useState<FavoritePost[] | null>(null);
-  const [likedPhotos, setLikedPhotos] = useState<LikedPhoto[] | null>(null);
-  const [shares, setShares] = useState<MyShare[] | null>(null);
-  const [unread, setUnread] = useState(0);
+  const [profil, setProfil] = useState<Profile | null>(null);
+  const [sekcia, setSekcia] = useState<Sekcia>('ozvy');
+  const [ozvy, setOzvy] = useState<NotificationItem[] | null>(null);
+  const [prispevky, setPrispevky] = useState<MyComment[] | null>(null);
+  const [ulozene, setUlozene] = useState<FavoritePost[] | null>(null);
+  const [zdielane, setZdielane] = useState<MyShare[] | null>(null);
+  const [fotky, setFotky] = useState<LikedPhoto[] | null>(null);
+  const [novych, setNovych] = useState(0);
 
-  // načítanie profilu + notifikácií
   useEffect(() => {
     if (!token) return;
-    getProfile(token).then(setProfile).catch(() => {});
-    getNotifications(token).then((r) => {
-      setNotifs(r.data);
-      setUnread(r.data.filter((n) => !n.read).length);
-    }).catch(() => setNotifs([]));
+    getProfile(token).then(setProfil).catch(() => {});
+    getNotifications(token)
+      .then((r) => { setOzvy(r.data); setNovych(r.data.filter((n) => !n.read).length); })
+      .catch(() => setOzvy([]));
   }, [token]);
 
-  // lenivé načítanie ostatných tabov + označenie notifikácií prečítanými
+  const nacitajPrispevky = () => {
+    if (!token) return;
+    Promise.all([getMyComments(token).catch(() => []), getMyPhotoComments(token).catch(() => [])])
+      .then(([a, b]) => setPrispevky([...a, ...b].sort((x, y) => +new Date(y.createdAt) - +new Date(x.createdAt))));
+  };
+
   useEffect(() => {
     if (!token) return;
-    if (tab === 'notif' && unread > 0) {
-      markAllRead(token).then(() => setUnread(0)).catch(() => {});
+    if (sekcia === 'ozvy' && novych > 0) markAllRead(token).then(() => setNovych(0)).catch(() => {});
+    if (sekcia === 'prispevky' && prispevky === null) nacitajPrispevky();
+    if (sekcia === 'ulozene' && ulozene === null) {
+      getMyFavorites(token).then(setUlozene).catch(() => setUlozene([]));
+      getMyShares(token).then(setZdielane).catch(() => setZdielane([]));
     }
-    if (tab === 'comments' && comments === null) loadComments();
-    if (tab === 'saved' && favorites === null) {
-      getMyFavorites(token).then(setFavorites).catch(() => setFavorites([]));
-      getMyLikedPhotos(token).then(setLikedPhotos).catch(() => setLikedPhotos([]));
-      getMyShares(token).then(setShares).catch(() => setShares([]));
-    }
-  }, [tab, token]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (sekcia === 'fotky' && fotky === null) getMyLikedPhotos(token).then(setFotky).catch(() => setFotky([]));
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [sekcia, token]);
 
-  // „Moje komentáre" = blog + galéria spolu, zoradené od najnovšieho.
-  function loadComments() {
-    if (!token) return;
-    Promise.all([
-      getMyComments(token).catch(() => []),
-      getMyPhotoComments(token).catch(() => []),
-    ]).then(([blog, photo]) =>
-      setComments([...blog, ...photo].sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
-    );
+  const meno = profil?.displayName || profil?.username || member?.username || '';
+  const vek = profil?.joinedAt ? vKronike(profil.joinedAt) : null;
+
+  const register: { id: Sekcia; nazov: string; pocet: number | null }[] = useMemo(() => [
+    { id: 'ozvy', nazov: 'Ozvalo sa', pocet: ozvy?.length ?? null },
+    { id: 'prispevky', nazov: 'Moje príspevky', pocet: prispevky?.length ?? profil?.stats.comments ?? null },
+    { id: 'ulozene', nazov: 'Odložené', pocet: ulozene?.length ?? profil?.stats.favorites ?? null },
+    { id: 'fotky', nazov: 'Moje fotografie', pocet: fotky?.length ?? null },
+    { id: 'nastavenia', nazov: 'Nastavenia', pocet: null },
+  ], [ozvy, prispevky, ulozene, fotky, profil]);
+
+  if (!token) {
+    return <div className="lprof"><div className="container lprof-in"><p className="lprof-prazdno">Načítavam…</p></div></div>;
   }
 
-  if (!member || !token) return <div style={{ padding: 60, textAlign: 'center', fontFamily: 'Cormorant Garamond, serif' }}>Načítavam…</div>;
-
-  const name = profile?.displayName || member.displayName || member.username;
-  const stats = profile?.stats || { comments: 0, favorites: 0, shares: 0 };
-  const avatarSrc = mediaUrl(profile?.avatar);
+  const avatar = mediaUrl(profil?.avatar);
 
   return (
-    <div style={{ maxWidth: 980, margin: '0 auto', padding: '28px 20px 80px' }}>
-      {/* ── HLAVIČKA ── */}
-      <header style={{
-        position: 'relative', overflow: 'hidden', borderRadius: 18, padding: '28px 32px',
-        background: 'linear-gradient(180deg,var(--hr-dark-3),var(--hr-dark-4))', border: '1px solid var(--hr-relief-edge)',
-        display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap',
-      }}>
-        <div aria-hidden style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'repeating-linear-gradient(58deg, var(--hr-line) 0 2px, transparent 2px 10px)',
-        }} />
-        {/* avatar */}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          {avatarSrc ? (
-            <img src={avatarSrc} alt="" width={78} height={78}
-                 style={{ width: 78, height: 78, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--hr-line-gold)' }} />
-          ) : (
-            <div style={{
-              width: 78, height: 78, borderRadius: '50%', border: '2px solid var(--hr-line-gold)',
-              background: 'radial-gradient(circle at 36% 30%, var(--hr-accent), #7c1f24)',
-              display: 'grid', placeItems: 'center', fontFamily: 'Cinzel, serif', fontSize: 28, color: 'var(--hr-line-soft)',
-            }}>{initials(name)}</div>
-          )}
-        </div>
-        {/* meno + meta + štatistiky */}
-        <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <h1 style={{ fontFamily: 'Cinzel, serif', fontSize: 28, fontWeight: 700, color: 'var(--hr-on-photo-2)', margin: 0 }}>{name}</h1>
-            <span style={{
-              fontFamily: 'Cinzel, serif', fontSize: 12, color: 'var(--hr-mark-bg)', padding: '4px 12px', borderRadius: 999,
-              background: 'rgba(122,31,36,.55)', border: '1px solid var(--hr-line)',
-            }}>{level(stats.comments)}</span>
+    <div className="lprof">
+      <div className="container lprof-in">
+
+        <nav aria-label="Omrvinky" className="lgal-omrvinky">
+          <ol>
+            <li><a href="/">Domov</a></li>
+            <li aria-hidden="true">·</li>
+            <li>Môj profil</li>
+          </ol>
+        </nav>
+
+        <header className="lprof-hlava">
+          {avatar
+            ? <img className="lprof-pecat lprof-pecat-foto" src={avatar} alt="" width={64} height={64} />
+            : <span className="lprof-pecat" aria-hidden="true">{iniciala(meno)}</span>}
+          <div>
+            <h1 className="lprof-meno">{meno || 'Môj profil'}</h1>
+            <p className="lprof-udaje">
+              <b>{profil?.stats.comments ?? 0}</b> príspevkov
+              {vek && <> · <b>{vek.cislo}</b> {vek.slovo}</>}
+            </p>
           </div>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', color: 'var(--hr-muted-2)', margin: '6px 0 14px' }}>
-            {profile ? joinedLabel(profile.joinedAt) : ''}
+          <button
+            type="button"
+            className="lprof-nastavenia"
+            aria-pressed={sekcia === 'nastavenia'}
+            onClick={() => setSekcia('nastavenia')}
+          >
+            Nastavenia účtu
+          </button>
+        </header>
+
+        {profil?.preModerated && (
+          <p className="lprof-vystraha" role="status">
+            Vaše príspevky pred zverejnením číta správca.
+            {profil.warnsCount > 0 && ` Upozornení: ${profil.warnsCount}.`}
           </p>
-          <div style={{ display: 'flex', gap: 28 }}>
-            {[['komentárov', stats.comments], ['obľúbených', stats.favorites], ['zdieľaní', stats.shares]].map(([lbl, n]) => (
-              <div key={lbl as string}>
-                <div style={{ fontFamily: 'Cinzel, serif', fontSize: 24, color: 'var(--hr-on-photo-3)' }}>{n as number}</div>
-                <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14, color: 'var(--hr-muted-2)' }}>{lbl}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <button onClick={() => setSettingsOpen(true)} style={{
-          position: 'relative', alignSelf: 'flex-start', fontFamily: 'Cinzel, serif', fontSize: 12,
-          color: 'var(--hr-on-photo-3)', background: 'transparent', border: '1px solid var(--hr-body-2)', borderRadius: 999,
-          padding: '8px 16px', cursor: 'pointer',
-        }}>⚙ Nastavenia</button>
-      </header>
-
-      {/* ── TABY ── */}
-      <div role="tablist" aria-label="Sekcie profilu" style={{ display: 'flex', gap: 10, margin: '22px 0 18px', flexWrap: 'wrap' }}>
-        <Tab id="notif" active={tab} set={setTab} badge={unread}>Upozornenia</Tab>
-        <Tab id="comments" active={tab} set={setTab}>Moje komentáre</Tab>
-        <Tab id="saved" active={tab} set={setTab}>Obľúbené a zdieľané</Tab>
-      </div>
-
-      {/* ── OBSAH ── */}
-      {tab === 'notif' && <div role="tabpanel"><NotifList items={notifs} /></div>}
-      {tab === 'comments' && <div role="tabpanel"><CommentsList items={comments} token={token} onChange={loadComments} /></div>}
-      {tab === 'saved' && <div role="tabpanel"><SavedGrid favorites={favorites} shares={shares} likedPhotos={likedPhotos} /></div>}
-
-      {settingsOpen && profile && (
-        <Settings profile={profile} token={token}
-                  onClose={() => setSettingsOpen(false)}
-                  onSaved={(p) => setProfile(p)}
-                  onSignOut={() => { signOut(); go('/'); }}
-                  onDeleted={() => { signOut(); go('/'); }} />
-      )}
-    </div>
-  );
-}
-
-/* ── TAB pilulka ── */
-function Tab({ id, active, set, badge, children }: {
-  id: 'notif' | 'comments' | 'saved'; active: string; set: (t: any) => void; badge?: number; children: React.ReactNode;
-}) {
-  const on = active === id;
-  return (
-    <button role="tab" aria-selected={on} onClick={() => set(id)} style={{
-      fontFamily: 'Cinzel, serif', fontSize: 12, letterSpacing: '.02em', cursor: 'pointer',
-      padding: '9px 18px', borderRadius: 999, position: 'relative',
-      background: on ? 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))' : 'var(--hr-wash-1)',
-      color: on ? 'var(--hr-on-photo)' : C.ink, border: on ? '1px solid var(--hr-accent)' : `1px solid var(--hr-chip-border)`,
-    }}>
-      {children}
-      {!on && !!badge && badge > 0 && (
-        <span style={{
-          marginLeft: 8, background: C.bordo, color: '#fff', borderRadius: 999,
-          fontSize: 11, padding: '1px 7px', fontFamily: 'system-ui',
-        }}>{badge}</span>
-      )}
-    </button>
-  );
-}
-
-/* ── UPOZORNENIA ── */
-function NotifList({ items }: { items: NotificationItem[] | null }) {
-  if (items === null) return <Skeleton n={3} />;
-  if (!items.length) return <Empty>Zatiaľ žiadne upozornenia. Keď niekto zareaguje na tvoj komentár, uvidíš to tu.</Empty>;
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {items.map((n) => <NotifCard key={n.documentId} n={n} />)}
-    </div>
-  );
-}
-
-function NotifCard({ n }: { n: NotificationItem }) {
-  const who = n.actor?.displayName || n.actor?.username || 'Niekto';
-  const postTitle = n.post?.title || n.aktualita?.nazov || '';
-  // Foto-komentár (galéria) — preklik rovno na tú fotku (?fotoFile), inak na článok.
-  const isPhotoNotif = !!(n.photoComment || n.fileId);
-  const postHref = n.post
-    ? `/blog/${n.post.slug}${isPhotoNotif && n.fileId ? `?fotoFile=${n.fileId}` : ''}`
-    : n.aktualita ? '/aktuality' : '#';
-  const isWarn = n.type === 'warning';
-  const unreadBar = !n.read && (n.type === 'reply' || n.type === 'like');
-
-  const icon = { reply: '↩', like: '♥', warning: '⚠', post: '✦' }[n.type];
-  const iconBg = { reply: '#e6eddf', like: '#f2dfda', warning: '#f2d5cc', post: 'var(--hr-wash-2)' }[n.type];
-  const iconFg = { reply: '#5c7a52', like: '#7c1f24', warning: '#a04338', post: 'var(--hr-accent)' }[n.type];
-
-  const many = n.aggregateCount > 1;
-
-  let text: React.ReactNode;
-  if (n.type === 'reply') text = isPhotoNotif
-    ? <><b>{who}</b> odpovedal/a na tvoj komentár k fotke v galérii</>
-    : <><b>{who}</b> odpovedal/a na tvoj komentár pod <i>{postTitle}</i></>;
-  else if (n.type === 'like') text = isPhotoNotif
-    ? <><b>{many ? `${n.aggregateCount} čitateľov` : who}</b> ocenil{many ? 'i' : '/a'} tvoj komentár k fotke</>
-    : <><b>{many ? `${n.aggregateCount} čitateľov` : who}</b> ocenil{many ? 'i' : '/a'} tvoj komentár pod <i>{postTitle}</i></>;
-  else if (n.type === 'warning') text = <>Upozornenie správcu o nedodržaní noriem blogu.</>;
-  else text = <>Nový článok na Hradiská.sk: <i>{postTitle}</i></>;
-
-  return (
-    <div style={{
-      display: 'flex', gap: 14, padding: '14px 16px', borderRadius: 12,
-      background: isWarn ? '#f6e3dc' : C.card,
-      border: `1px solid ${isWarn ? '#dcb3a4' : C.border}`,
-      borderLeft: isWarn ? '5px solid #a04338' : unreadBar ? '5px solid var(--hr-accent-soft)' : `1px solid ${C.border}`,
-      position: 'relative',
-    }}>
-      <div aria-hidden style={{
-        width: 38, height: 38, borderRadius: '50%', flexShrink: 0, display: 'grid', placeItems: 'center',
-        background: iconBg, color: iconFg, fontSize: 17,
-      }}>{icon}</div>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, color: C.ink, margin: 0, lineHeight: 1.4 }}>
-          {text}{n.post || n.aktualita ? <> — <a href={postHref} style={{ color: C.amber, fontStyle: 'italic' }}>{postTitle}</a></> : null}
-        </p>
-        {(n.type === 'reply' || n.type === 'warning') && n.text && (
-          <div style={{
-            fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', color: 'var(--hr-clear-text)', fontSize: 15.5,
-            borderLeft: '3px solid var(--hr-chip-border)', padding: '4px 12px', margin: '8px 0 0',
-            background: 'rgba(255,251,240,.6)', borderRadius: '0 8px 8px 0',
-          }}>{n.text}</div>
         )}
-        <div style={{ fontFamily: 'Cinzel, serif', fontSize: 13, color: 'var(--hr-muted-2)', letterSpacing: '.04em', marginTop: 8 }}>
-          {relTime(n.createdAt)}
+
+        <div className="lprof-telo">
+          <nav className="lprof-register" aria-label="Časti profilu">
+            {register.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className={sekcia === s.id ? 'is-on' : undefined}
+                aria-current={sekcia === s.id ? 'page' : undefined}
+                onClick={() => setSekcia(s.id)}
+              >
+                <span className="lprof-reg-nazov">{s.nazov}</span>
+                {s.pocet !== null && <span className="lprof-reg-pocet">{String(s.pocet).padStart(2, '0')}</span>}
+                {s.id === 'ozvy' && novych > 0 && <span className="lprof-nove" aria-label={`${novych} nových`} />}
+              </button>
+            ))}
+          </nav>
+
+          <section className="lprof-obsah">
+            {sekcia === 'ozvy' && <Ozvy items={ozvy} />}
+            {sekcia === 'prispevky' && (
+              <Prispevky items={prispevky} token={token} onZmena={() => { setPrispevky(null); nacitajPrispevky(); }} />
+            )}
+            {sekcia === 'ulozene' && <Ulozene clanky={ulozene} zdielane={zdielane} />}
+            {sekcia === 'fotky' && <Fotky items={fotky} />}
+            {sekcia === 'nastavenia' && (profil
+              ? <Nastavenia profil={profil} token={token} onProfil={setProfil} onOdhlas={() => { signOut(); prejdi('/'); }} />
+              : <p className="lprof-prazdno">Načítavam…</p>)}
+          </section>
         </div>
       </div>
-      {unreadBar && <span aria-hidden style={{ width: 9, height: 9, borderRadius: '50%', background: 'var(--hr-accent-soft)', flexShrink: 0, alignSelf: 'center' }} />}
     </div>
   );
 }
 
-/* ── MOJE KOMENTÁRE ── */
-const STATUS_CHIP: Record<string, { t: string; fg: string; bg: string; bd: string }> = {
-  visible: { t: 'Zverejnený', fg: '#3d5c40', bg: '#e4ecdc', bd: '#c5d4b8' },
-  waiting: { t: 'Čaká na schválenie', fg: 'var(--hr-accent-deep)', bg: 'var(--hr-wash-6)', bd: 'var(--hr-line-soft)' },
-  reported: { t: 'Nahlásený', fg: '#a04338', bg: '#f6e3dc', bd: '#dcb3a4' },
-  hidden: { t: 'Skrytý', fg: 'var(--hr-clear-text)', bg: 'var(--hr-wash-2)', bd: 'var(--hr-chip-border)' },
-  spam: { t: 'Odstránený', fg: 'var(--hr-clear-text)', bg: 'var(--hr-wash-2)', bd: 'var(--hr-chip-border)' },
+/* ══════════════════════════════════════════════════════════════════════════
+   OZVALO SA
+   ══════════════════════════════════════════════════════════════════════════ */
+function Ozvy({ items }: { items: NotificationItem[] | null }) {
+  if (items === null) return <Kostra n={3} />;
+  if (!items.length) {
+    return <p className="lprof-prazdno">Zatiaľ sa nikto neozval. Záznam pribudne, keď niekto odpovie na váš príspevok alebo ho ocení.</p>;
+  }
+
+  return (
+    <ul className="lprof-zoznam">
+      {items.map((n) => {
+        const kto = n.actor?.displayName || n.actor?.username || 'Niekto';
+        const nazov = n.post?.title || n.aktualita?.nazov || '';
+        const kFotke = !!(n.photoComment || n.fileId);
+        const odkaz = n.post
+          ? `/blog/${n.post.slug}${kFotke && n.fileId ? `?fotoFile=${n.fileId}` : ''}`
+          : n.aktualita ? '/aktuality' : null;
+        const viac = n.aggregateCount > 1;
+
+        let ktoText = kto;
+        let coText = 'sa ozval';
+        if (n.type === 'reply') {
+          coText = kFotke ? 'odpovedal na váš komentár k fotografii' : 'odpovedal na váš komentár';
+        } else if (n.type === 'like') {
+          ktoText = viac ? `${n.aggregateCount} čitateľov` : kto;
+          coText = `${viac ? 'ocenilo' : 'ocenil'} váš komentár${kFotke ? ' k fotografii' : ''}`;
+        } else if (n.type === 'warning') {
+          ktoText = 'Správca';
+          coText = 'upozorňuje na nedodržanie pravidiel diskusie';
+        } else if (n.type === 'post') {
+          ktoText = 'Nový článok';
+          coText = 'pribudol v kronike';
+        }
+
+        const citat = n.type === 'post' ? null : (n.comment?.content || n.photoComment?.content || n.text);
+
+        return (
+          <li key={n.documentId} className={`lprof-zaznam${!n.read ? ' is-nove' : ''}${n.type === 'warning' ? ' je-vystraha' : ''}`}>
+            <div className="lprof-riadok">
+              <span className="lprof-kto">{ktoText}</span>
+              <span className="lprof-co">{coText}</span>
+              <span className="lprof-kedy">{kedy(n.createdAt)}</span>
+            </div>
+            {nazov && (odkaz
+              ? <a className="lprof-kde" href={odkaz}>{nazov}</a>
+              : <span className="lprof-kde">{nazov}</span>)}
+            {citat && <p className="lprof-citat">{citat}</p>}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOJE PRÍSPEVKY
+   ══════════════════════════════════════════════════════════════════════════ */
+/* Zverejnený príspevok stav nehlási — je to bežný prípad a štítok „Zverejnený"
+   pri každom riadku by len šumel. Hlási sa len to, čo si žiada pozornosť. */
+const STAV: Record<string, string> = {
+  waiting: 'čaká na schválenie',
+  reported: 'nahlásený',
+  hidden: 'skrytý',
+  spam: 'odstránený',
 };
 
-function CommentsList({ items, token, onChange }: { items: MyComment[] | null; token: string; onChange: () => void }) {
-  if (items === null) return <Skeleton n={2} />;
-  if (!items.length) return <Empty>Zatiaľ si nenapísal(a) žiadny komentár. Zapoj sa do diskusie pod článkami.</Empty>;
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {items.map((c) => <CommentCard key={c.documentId} c={c} token={token} onChange={onChange} />)}
-    </div>
-  );
-}
-
-function CommentCard({ c, token, onChange }: { c: MyComment; token: string; onChange: () => void }) {
-  const chip = STATUS_CHIP[c.status] || STATUS_CHIP.visible;
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(c.content);
+function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token: string; onZmena: () => void }) {
+  const [upravovany, setUpravovany] = useState<string | null>(null);
+  const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
+  const [chyba, setChyba] = useState('');
 
-  const isPhoto = c.source === 'photo';
-  const save = async () => {
-    setBusy(true);
+  if (items === null) return <Kostra n={3} />;
+  if (!items.length) {
+    return <p className="lprof-prazdno">Zatiaľ ste nič nenapísali. Do diskusie sa dá zapojiť pod každým článkom.</p>;
+  }
+
+  const uloz = async (c: MyComment) => {
+    if (!text.trim()) return;
+    setBusy(true); setChyba('');
     try {
-      if (isPhoto) await editPhotoComment(token, c.documentId, draft);
-      else await editComment(token, c.documentId, draft);
-      setEditing(false); onChange();
-    } finally { setBusy(false); }
+      await (c.source === 'photo' ? editPhotoComment : editComment)(token, c.documentId, text.trim());
+      setUpravovany(null);
+      onZmena();
+    } catch { setChyba('Úpravu sa nepodarilo uložiť. Skúste to prosím znova.'); }
+    finally { setBusy(false); }
   };
-  const remove = async () => {
-    if (!window.confirm('Naozaj zmazať tento komentár?')) return;
-    setBusy(true);
+
+  const zmaz = async (c: MyComment) => {
+    if (!window.confirm('Zmazať tento príspevok? Nedá sa to vrátiť.')) return;
+    setBusy(true); setChyba('');
     try {
-      if (isPhoto) await deletePhotoComment(token, c.documentId);
-      else await deleteComment(token, c.documentId);
-      onChange();
-    } finally { setBusy(false); }
+      await (c.source === 'photo' ? deletePhotoComment : deleteComment)(token, c.documentId);
+      onZmena();
+    } catch { setChyba('Príspevok sa nepodarilo zmazať. Skúste to prosím znova.'); }
+    finally { setBusy(false); }
   };
 
   return (
-    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: '16px 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <div>
-          <span style={{ fontFamily: 'Cinzel, serif', fontSize: 10, color: C.amber, letterSpacing: '.05em' }}>
-            {isPhoto ? 'K FOTKE V GALÉRII' : 'POD ČLÁNKOM'}
-          </span>{' '}
-          {c.post ? <a href={`/blog/${c.post.slug}${isPhoto && c.fileId ? `?fotoFile=${c.fileId}` : ''}`} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: C.amber, fontWeight: 600 }}>{c.post.title}</a>
-                  : <span style={{ color: C.muted }}>{isPhoto ? 'Galéria' : '—'}</span>}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontFamily: 'Cinzel, serif', fontSize: 11, padding: '3px 10px', borderRadius: 999, color: chip.fg, background: chip.bg, border: `1px solid ${chip.bd}` }}>{chip.t}</span>
-          <span style={{ fontFamily: 'Cinzel, serif', fontSize: 12, color: 'var(--hr-muted-2)' }}>{relTime(c.createdAt)}</span>
-        </div>
-      </div>
-      {editing ? (
-        <div style={{ marginTop: 10 }}>
-          <textarea value={draft} onChange={(e) => setDraft(e.target.value)} rows={3} style={{
-            width: '100%', fontFamily: 'Cormorant Garamond, serif', fontSize: 16, color: C.ink,
-            border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 12px', background: 'var(--hr-surface)', resize: 'vertical',
-          }} />
-          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-            <button onClick={save} disabled={busy} style={btnPrimary}>Uložiť</button>
-            <button onClick={() => { setEditing(false); setDraft(c.content); }} style={btnLink}>Zrušiť</button>
-          </div>
-        </div>
-      ) : (
-        <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, color: C.ink, margin: '10px 0 0', lineHeight: 1.5 }}>{c.content}</p>
-      )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--hr-wash-2)' }}>
-        <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14.5, color: C.muted }}>
-          ♥ {c.likes} páči sa · ↩ {c.replyCount} {c.replyCount === 1 ? 'odpoveď' : 'odpovede'}
-        </span>
-        {!editing && (
-          <span style={{ display: 'flex', gap: 14 }}>
-            <button onClick={() => setEditing(true)} style={btnLink}>Upraviť</button>
-            <button onClick={remove} disabled={busy} style={{ ...btnLink, color: '#a04338' }}>Zmazať</button>
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ── OBĽÚBENÉ A ZDIEĽANÉ ── */
-function SavedGrid({ favorites, shares, likedPhotos }: { favorites: FavoritePost[] | null; shares: MyShare[] | null; likedPhotos: LikedPhoto[] | null }) {
-  const merged = useMemo(() => {
-    if (favorites === null) return null;
-    const map = new Map<string, { title: string; slug: string; cat?: string | null; cover?: string | null; fav: boolean; shared: boolean }>();
-    for (const f of favorites) map.set(f.slug, { title: f.title, slug: f.slug, cat: f.category?.name ?? null, cover: mediaUrl(f.coverImage), fav: true, shared: false });
-    for (const s of shares || []) {
-      if (!s.post) continue;
-      const ex = map.get(s.post.slug);
-      if (ex) ex.shared = true;
-      else map.set(s.post.slug, { title: s.post.title, slug: s.post.slug, fav: false, shared: true });
-    }
-    return [...map.values()];
-  }, [favorites, shares]);
-
-  if (merged === null) return <Skeleton n={2} />;
-  const photos = likedPhotos ?? [];
-  if (!merged.length && !photos.length) return <Empty>Zatiaľ nemáš obľúbené ani zdieľané. Klikni na ♥ pri článku alebo fotke, ktorá ťa zaujme.</Empty>;
-
-  const sectionTitle: React.CSSProperties = { fontFamily: 'Cinzel, serif', fontSize: 13, letterSpacing: '.04em', color: C.amber, margin: '0 0 10px' };
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 26 }}>
-      {merged.length > 0 && (
-        <section>
-          <h3 style={sectionTitle}>Články</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
-            {merged.map((a) => (
-              <a key={a.slug} href={`/blog/${a.slug}`} style={{
-                display: 'flex', gap: 12, alignItems: 'center', background: C.card, border: `1px solid ${C.border}`,
-                borderRadius: 14, padding: 12, textDecoration: 'none', transition: 'transform .15s, box-shadow .15s',
-              }}>
-                <div style={{ width: 74, height: 54, borderRadius: 9, border: '1px solid var(--hr-chip-border)', flexShrink: 0, overflow: 'hidden', background: 'var(--hr-wash-2)' }}>
-                  {a.cover && <img src={a.cover} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 700, color: C.ink, lineHeight: 1.25 }}>{a.title}</div>
-                  {a.cat && <div style={{ fontFamily: 'Cinzel, serif', fontSize: 11, color: C.muted, marginTop: 3 }}>{a.cat}</div>}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 15 }}>
-                  {a.fav && <span style={{ color: C.bordo }} title="Obľúbené">♥</span>}
-                  {a.shared && <span style={{ color: '#5c7a52' }} title="Zdieľané">⇗</span>}
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {photos.length > 0 && (
-        <section>
-          <h3 style={sectionTitle}>Obľúbené fotky</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 10 }}>
-            {photos.map((p) => (
-              <a
-                key={p.fileId}
-                href={p.post ? `/blog/${p.post.slug}?fotoFile=${p.fileId}` : '#'}
-                title={p.post?.title || 'Fotka'}
-                style={{ display: 'block', position: 'relative', borderRadius: 10, overflow: 'hidden', border: `1px solid ${C.border}`, background: 'var(--hr-wash-2)' }}
-              >
-                <img src={`${STRAPI_URL}${p.thumb}`} alt={p.alt} style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', display: 'block' }} />
-                <span aria-hidden style={{ position: 'absolute', top: 6, right: 6, color: '#fff', fontSize: 13, textShadow: '0 1px 3px rgba(0,0,0,.6)' }}>♥</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
-}
-
-/* ── NASTAVENIA (modal) ── */
-function Settings({ profile, token, onClose, onSaved, onSignOut, onDeleted }: {
-  profile: Profile; token: string; onClose: () => void; onSaved: (p: Profile) => void; onSignOut: () => void; onDeleted: () => void;
-}) {
-  const [name, setName] = useState(profile.displayName || '');
-  const [prefs, setPrefs] = useState(profile.prefs);
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState('');
-  const [confirmDel, setConfirmDel] = useState(false);
-  const [push, setPush] = useState(false);
-  const canPush = pushSupported();
-
-  useEffect(() => { isPushEnabled().then(setPush); }, []);
-
-  const save = async () => {
-    setBusy(true); setMsg('');
-    try {
-      await updateProfile(token, { displayName: name, ...prefs });
-      const fresh = await getProfile(token);
-      onSaved(fresh);
-      setMsg('Uložené.');
-    } catch { setMsg('Uloženie zlyhalo.'); } finally { setBusy(false); }
-  };
-  const onAvatar = async (file: File) => {
-    setBusy(true); setMsg('');
-    try { const id = await uploadAvatar(token, file); await updateProfile(token, { avatar: id }); onSaved(await getProfile(token)); setMsg('Avatar zmenený.'); }
-    catch { setMsg('Nahranie avatara zlyhalo.'); } finally { setBusy(false); }
-  };
-  const togglePush = async () => {
-    setBusy(true);
-    try {
-      if (push) { await disablePush(token); setPush(false); }
-      else { const r = await enablePush(token); setPush(r.ok); if (!r.ok) setMsg(r.reason === 'denied' ? 'Povolenie notifikácií bolo zamietnuté.' : 'Push sa nepodarilo zapnúť.'); }
-    } finally { setBusy(false); }
-  };
-
-  return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(28,21,16,.5)', display: 'grid', placeItems: 'center', zIndex: 50, padding: 16 }}>
-      <div onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Nastavenia profilu" style={{
-        width: 'min(520px,100%)', maxHeight: '88vh', overflowY: 'auto', background: 'var(--hr-surface)',
-        border: `1px solid ${C.border}`, borderRadius: 16, padding: '26px 28px',
-      }}>
-        <h2 style={{ fontFamily: 'Cinzel, serif', fontSize: 20, color: C.ink, margin: '0 0 18px' }}>Nastavenia profilu</h2>
-
-        <Field label="Zobrazené meno">
-          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} style={input} />
-        </Field>
-
-        <Field label="Avatar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            {mediaUrl(profile.avatar) ? (
-              <img src={mediaUrl(profile.avatar)!} alt="" style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: `1px solid ${C.border}` }} />
-            ) : (
-              <div style={{ width: 56, height: 56, borderRadius: '50%', border: `1px solid ${C.border}`, background: 'radial-gradient(circle at 36% 30%, var(--hr-accent), #7c1f24)', display: 'grid', placeItems: 'center', color: 'var(--hr-line-soft)', fontFamily: 'Cinzel, serif', fontSize: 20 }}>{initials(profile.displayName || profile.username)}</div>
-            )}
-            <label style={{ cursor: busy ? 'default' : 'pointer', fontFamily: 'Cinzel, serif', fontSize: 12, color: C.amber, background: 'var(--hr-wash-1)', border: `1px solid ${C.border}`, borderRadius: 999, padding: '9px 16px', display: 'inline-flex', alignItems: 'center', gap: 8, opacity: busy ? 0.6 : 1 }}>
-              {busy ? 'Nahrávam…' : (mediaUrl(profile.avatar) ? 'Zmeniť obrázok' : 'Nahrať obrázok')}
-              <input type="file" accept="image/*" disabled={busy} onChange={(e) => e.target.files?.[0] && onAvatar(e.target.files[0])} style={{ display: 'none' }} />
-            </label>
-          </div>
-          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 13.5, color: C.muted, margin: '6px 0 0' }}>
-            Fotka alebo logo, ktoré ťa bude reprezentovať (JPG/PNG).
-          </p>
-        </Field>
-
-        <fieldset style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', margin: '10px 0' }}>
-          <legend style={{ fontFamily: 'Cinzel, serif', fontSize: 12, color: C.amber, padding: '0 6px' }}>Upozornenia v aplikácii</legend>
-          {([['notifyReply', 'Odpovede na moje komentáre'], ['notifyLike', 'Lajky mojich komentárov'], ['notifyPost', 'Nové články a aktuality']] as const).map(([k, lbl]) => (
-            <label key={k} style={checkRow}>
-              <input type="checkbox" checked={(prefs as any)[k]} onChange={(e) => setPrefs({ ...prefs, [k]: e.target.checked })} /> {lbl}
-            </label>
-          ))}
-          <label style={checkRow}>
-            <input type="checkbox" checked={prefs.notifyEmail} onChange={(e) => setPrefs({ ...prefs, notifyEmail: e.target.checked })} /> Posielať aj e-mailom
-          </label>
-        </fieldset>
-
-        {canPush && (
-          <label style={{ ...checkRow, marginBottom: 6 }}>
-            <input type="checkbox" checked={push} onChange={togglePush} disabled={busy || pushPermission() === 'denied'} />
-            Push notifikácie do nainštalovanej aplikácie {pushPermission() === 'denied' && <em style={{ color: '#a04338' }}> (v prehliadači zablokované)</em>}
-          </label>
-        )}
-
-        {msg && <p style={{ fontFamily: 'Cormorant Garamond, serif', color: '#5c7a52', fontSize: 15 }}>{msg}</p>}
-
-        <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-          <button onClick={save} disabled={busy} style={btnPrimary}>Uložiť zmeny</button>
-          <button onClick={onClose} style={btnLink}>Zavrieť</button>
-          <button onClick={onSignOut} style={{ ...btnLink, marginLeft: 'auto' }}>Odhlásiť sa</button>
-        </div>
-
-        {/* GDPR */}
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px dashed var(--hr-line)' }}>
-          {!confirmDel ? (
-            <button onClick={() => setConfirmDel(true)} style={{ ...btnLink, color: '#a04338' }}>Zmazať účet</button>
-          ) : (
-            <div>
-              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: 'var(--hr-body-2)', margin: '0 0 10px' }}>
-                Účet sa zmaže natrvalo. Komentáre zostanú ako <strong>Zmazaný účet</strong>. Nedá sa vrátiť.
-              </p>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => setConfirmDel(false)} style={btnLink}>Zrušiť</button>
-                <button onClick={async () => { try { await deleteMyAccount(token); onDeleted(); } catch { setMsg('Zmazanie zlyhalo.'); } }}
-                        style={{ background: '#a04338', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 16px', cursor: 'pointer', fontFamily: 'Cinzel, serif', fontSize: 13 }}>
-                  Zmazať natrvalo
-                </button>
+    <>
+      {chyba && <p className="lprof-chyba" role="alert">{chyba}</p>}
+      <ul className="lprof-zoznam">
+        {items.map((c) => {
+          const kFotke = c.source === 'photo';
+          const odkaz = c.post ? `/blog/${c.post.slug}${kFotke && c.fileId ? `?fotoFile=${c.fileId}` : ''}` : null;
+          return (
+            <li key={c.documentId} className="lprof-zaznam">
+              <div className="lprof-riadok">
+                <span className="lprof-co">{kFotke ? 'k fotografii' : 'pod článkom'}</span>
+                <span className="lprof-kedy">{c.editedAt ? `upravené ${kedy(c.editedAt)}` : kedy(c.createdAt)}</span>
               </div>
-            </div>
-          )}
+              {c.post && (odkaz
+                ? <a className="lprof-kde" href={odkaz}>{c.post.title}</a>
+                : <span className="lprof-kde">{c.post.title}</span>)}
+
+              {upravovany === c.documentId ? (
+                <div className="lprof-uprava">
+                  <label htmlFor={`lprof-up-${c.documentId}`} className="lab-only-reader">Znenie príspevku</label>
+                  <textarea
+                    id={`lprof-up-${c.documentId}`}
+                    value={text}
+                    rows={4}
+                    onChange={(e) => setText(e.target.value)}
+                  />
+                  <div className="lprof-tlacidla">
+                    <button type="button" className="lprof-hlavne" disabled={busy} onClick={() => uloz(c)}>Uložiť zmenu</button>
+                    <button type="button" onClick={() => setUpravovany(null)}>Zrušiť</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="lprof-citat">{c.content}</p>
+                  <div className="lprof-riadok lprof-spodok">
+                    <span className="lprof-reakcie">{c.likes} ocenení · {c.replyCount} odpovedí</span>
+                    {STAV[c.status] && <span className="lprof-stav">{STAV[c.status]}</span>}
+                    <span className="lprof-akcie">
+                      <button type="button" onClick={() => { setUpravovany(c.documentId); setText(c.content); }}>Upraviť</button>
+                      <button type="button" disabled={busy} onClick={() => zmaz(c)}>Zmazať</button>
+                    </span>
+                  </div>
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ODLOŽENÉ — články, ktoré si člen odložil, a čo poslal ďalej
+   ══════════════════════════════════════════════════════════════════════════ */
+function Ulozene({ clanky, zdielane }: { clanky: FavoritePost[] | null; zdielane: MyShare[] | null }) {
+  if (clanky === null) return <Kostra n={3} />;
+  if (!clanky.length && !(zdielane || []).length) {
+    return <p className="lprof-prazdno">Zatiaľ ste si nič neodložili. Článok sa odkladá srdcom v jeho hlavičke.</p>;
+  }
+  return (
+    <>
+      {clanky.length > 0 && (
+        <ul className="lprof-zoznam">
+          {clanky.map((z) => (
+            <li key={z.documentId} className="lprof-zaznam">
+              <div className="lprof-riadok"><a className="lprof-nazov" href={`/blog/${z.slug}`}>{z.title}</a></div>
+              {z.category && <span className="lprof-znacka">{z.category.name}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {(zdielane || []).length > 0 && (
+        <section className="lprof-podskupina">
+          <h2>Poslané ďalej</h2>
+          <ul className="lprof-zoznam">
+            {zdielane!.map((s) => (
+              <li key={s.documentId} className="lprof-zaznam">
+                <div className="lprof-riadok">
+                  <span className="lprof-co">{s.channel || 'odkazom'}</span>
+                  <span className="lprof-kedy">{datum(s.createdAt)}</span>
+                </div>
+                {s.post && <a className="lprof-kde" href={`/blog/${s.post.slug}`}>{s.post.title}</a>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOJE FOTOGRAFIE
+   ══════════════════════════════════════════════════════════════════════════ */
+function Fotky({ items }: { items: LikedPhoto[] | null }) {
+  if (items === null) return <Kostra n={2} />;
+  if (!items.length) {
+    return <p className="lprof-prazdno">Zatiaľ ste neocenili žiadnu fotografiu. Srdce nájdete pri každej snímke v článku aj vo fotoarchíve.</p>;
+  }
+  return (
+    <ul className="lprof-fotky">
+      {items.map((f) => (
+        <li key={f.fileId}>
+          <a href={f.post ? `/blog/${f.post.slug}?fotoFile=${f.fileId}` : '/galeria'}>
+            <img src={f.thumb || f.url} alt={f.alt || ''} loading="lazy" decoding="async" />
+            {f.post && <span>{f.post.title}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NASTAVENIA
+   ══════════════════════════════════════════════════════════════════════════ */
+function Nastavenia({ profil, token, onProfil, onOdhlas }: {
+  profil: Profile; token: string; onProfil: (p: Profile) => void; onOdhlas: () => void;
+}) {
+  const [meno, setMeno] = useState(profil.displayName || '');
+  const [prefs, setPrefs] = useState(profil.prefs);
+  const [push, setPush] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [hlaska, setHlaska] = useState('');
+  const [chyba, setChyba] = useState('');
+  const [rusim, setRusim] = useState(false);
+
+  useEffect(() => { isPushEnabled().then(setPush).catch(() => {}); }, []);
+
+  const oznam = (s: string) => { setHlaska(s); setChyba(''); };
+  const zlyhalo = (s: string) => { setChyba(s); setHlaska(''); };
+
+  const uloz = async () => {
+    setBusy(true);
+    try {
+      await updateProfile(token, { displayName: meno, ...prefs });
+      onProfil(await getProfile(token));
+      oznam('Uložené.');
+    } catch { zlyhalo('Zmeny sa nepodarilo uložiť. Skúste to prosím znova.'); }
+    finally { setBusy(false); }
+  };
+
+  const nahrajFotku = async (file: File) => {
+    setBusy(true);
+    try {
+      const id = await uploadAvatar(token, file);
+      await updateProfile(token, { avatar: id });
+      onProfil(await getProfile(token));
+      oznam('Fotografia je zmenená.');
+    } catch { zlyhalo('Fotografiu sa nepodarilo nahrať. Skúste JPG alebo PNG.'); }
+    finally { setBusy(false); }
+  };
+
+  const prepniPush = async () => {
+    setBusy(true);
+    try {
+      if (push) {
+        await disablePush(token);
+        setPush(false);
+        oznam('Upozornenia v zariadení sú vypnuté.');
+      } else {
+        const r = await enablePush(token);
+        setPush(r.ok);
+        if (r.ok) oznam('Upozornenia v zariadení sú zapnuté.');
+        else zlyhalo(r.reason === 'denied'
+          ? 'Prehliadač má upozornenia zakázané. Povolíte ich v jeho nastaveniach pre túto stránku.'
+          : 'Upozornenia sa nepodarilo zapnúť.');
+      }
+    } finally { setBusy(false); }
+  };
+
+  const zrusUcet = async () => {
+    setBusy(true);
+    try { await deleteMyAccount(token); onOdhlas(); }
+    catch { zlyhalo('Účet sa nepodarilo zrušiť. Skúste to prosím znova.'); setBusy(false); }
+  };
+
+  const foto = mediaUrl(profil.avatar);
+  const PREFS: { k: keyof Profile['prefs']; t: string }[] = [
+    { k: 'notifyReply', t: 'Keď mi niekto odpovie' },
+    { k: 'notifyLike', t: 'Keď niekto ocení môj príspevok' },
+    { k: 'notifyPost', t: 'Keď pribudne nový článok' },
+    { k: 'notifyEmail', t: 'Posielať aj e-mailom' },
+  ];
+
+  return (
+    <div className="lprof-nast">
+      {hlaska && <p className="lprof-hlaska" role="status">{hlaska}</p>}
+      {chyba && <p className="lprof-chyba" role="alert">{chyba}</p>}
+
+      <section>
+        <h2>Ako sa podpisujem</h2>
+        <div className="lprof-pole">
+          <label htmlFor="lprof-meno">Zobrazené meno</label>
+          <input
+            id="lprof-meno"
+            value={meno}
+            maxLength={60}
+            placeholder={profil.username}
+            onChange={(e) => setMeno(e.target.value)}
+          />
         </div>
-      </div>
+        <p className="lprof-poznamka">Pod týmto menom vás uvidia ostatní pri príspevkoch. E-mail ({profil.email}) zostáva skrytý.</p>
+      </section>
+
+      <section>
+        <h2>Fotografia</h2>
+        <div className="lprof-foto">
+          {foto
+            ? <img src={foto} alt="" width={56} height={56} />
+            : <span className="lprof-pecat lprof-pecat-mala" aria-hidden="true">{iniciala(profil.displayName || profil.username)}</span>}
+          <label className="lprof-subor">
+            {foto ? 'Zmeniť fotografiu' : 'Nahrať fotografiu'}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={busy}
+              onChange={(e) => e.target.files?.[0] && nahrajFotku(e.target.files[0])}
+            />
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Kedy mi dať vedieť</h2>
+        <ul className="lprof-prefs">
+          {PREFS.map(({ k, t }) => (
+            <li key={k}>
+              <label>
+                <input type="checkbox" checked={prefs[k]} onChange={(e) => setPrefs({ ...prefs, [k]: e.target.checked })} />
+                {t}
+              </label>
+            </li>
+          ))}
+          {pushSupported() && (
+            <li>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={push}
+                  disabled={busy || pushPermission() === 'denied'}
+                  onChange={prepniPush}
+                />
+                Upozorniť priamo v zariadení
+              </label>
+            </li>
+          )}
+        </ul>
+        <div className="lprof-tlacidla">
+          <button type="button" className="lprof-hlavne" disabled={busy} onClick={uloz}>Uložiť zmeny</button>
+        </div>
+      </section>
+
+      <section className="lprof-ucet">
+        <h2>Účet</h2>
+        <div className="lprof-tlacidla">
+          <button type="button" onClick={onOdhlas}>Odhlásiť sa</button>
+          {!rusim && <button type="button" className="lprof-zrusit" onClick={() => setRusim(true)}>Zrušiť účet</button>}
+        </div>
+        {rusim && (
+          <div className="lprof-zrusenie">
+            <p>
+              Účet sa zmaže natrvalo. Vaše príspevky zostanú v diskusiách podpísané ako <b>Zmazaný účet</b>.
+              Vrátiť sa to nedá.
+            </p>
+            <div className="lprof-tlacidla">
+              <button type="button" onClick={() => setRusim(false)}>Ponechať účet</button>
+              <button type="button" className="lprof-hlavne lprof-zmazat" disabled={busy} onClick={zrusUcet}>Zmazať natrvalo</button>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
 
-/* ── drobné ── */
-const btnPrimary: React.CSSProperties = { fontFamily: 'Cinzel, serif', fontSize: 13, padding: '9px 18px', borderRadius: 999, border: '1px solid var(--hr-accent-deep)', background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))', color: 'var(--hr-on-photo)', cursor: 'pointer' };
-const btnLink: React.CSSProperties = { fontFamily: 'Cinzel, serif', fontSize: 13, background: 'none', border: 'none', color: C.amber, cursor: 'pointer', textDecoration: 'underline', padding: 0 };
-const input: React.CSSProperties = { width: '100%', height: 42, padding: '0 12px', background: 'var(--hr-surface)', border: `1px solid ${C.border}`, borderRadius: 8, fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: C.ink, outline: 'none' };
-const checkRow: React.CSSProperties = { display: 'flex', gap: 8, alignItems: 'center', fontFamily: 'Cormorant Garamond, serif', fontSize: 15.5, color: C.ink, padding: '4px 0' };
+/* Kostry namiesto točiaceho kolieska — stránka si udrží tvar a nepreskočí,
+   keď údaje doskočia. */
+function Kostra({ n }: { n: number }) {
+  return (
+    <ul className="lprof-zoznam" aria-hidden="true">
+      {Array.from({ length: n }, (_, i) => (
+        <li key={i} className="lprof-zaznam lprof-kostra">
+          <span style={{ width: '38%' }} />
+          <span style={{ width: '64%' }} />
+          <span style={{ width: '82%' }} />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div style={{ marginBottom: 12 }}><label style={{ display: 'block', fontFamily: 'Cinzel, serif', fontSize: 12, color: C.amber, marginBottom: 5 }}>{label}</label>{children}</div>;
-}
-function Empty({ children }: { children: React.ReactNode }) {
-  return <div style={{ textAlign: 'center', padding: '48px 20px', fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontStyle: 'italic', color: C.muted }}>{children}</div>;
-}
-function Skeleton({ n }: { n: number }) {
-  return <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>{Array.from({ length: n }).map((_, i) => (
-    <div key={i} style={{ height: 88, borderRadius: 12, background: 'linear-gradient(90deg,var(--hr-wash-4),var(--hr-wash-1),var(--hr-wash-4))', backgroundSize: '200% 100%', animation: 'shimmer 1.3s infinite' }} />
-  ))}<style>{`@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style></div>;
-}
+export default ProfilePage;

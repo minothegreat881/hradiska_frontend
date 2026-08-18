@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * Horná lišta — návrh pre redakčný šat. Žije LEN v laboratóriu; produkčná
- * `TwoTierNav.tsx` sa nedotýka.
+ * Horná lišta. Nahradila pôvodnú `TwoTierNav.tsx`.
  *
  * ZACHOVANÉ z pôvodnej lišty:
  *   • dva riadky kategórií — zmestia sa tak VŠETKY (je ich 14),

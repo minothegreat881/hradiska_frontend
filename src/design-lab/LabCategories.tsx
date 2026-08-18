@@ -1,9 +1,8 @@
 'use client';
 
 /**
- * KATEGÓRIE HRADÍSK — nový návrh. Žije LEN v laboratóriu; produkčný
- * `CategoryCard.tsx` ani sekcia v `HomePage.tsx` sa nedotýkajú (pôvodná sekcia
- * sa v téme skrýva cez CSS a vykreslí sa táto na jej mieste).
+ * KATEGÓRIE HRADÍSK. Nahradili pôvodné `CategoryCard.tsx` aj sekciu
+ * v zmazanej `HomePage.tsx`.
  *
  * TEXT JE PREVZATÝ DOSLOVA — nadpis, úvodná veta aj všetkých deväť popisov.
  *

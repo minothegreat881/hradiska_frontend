@@ -1,50 +1,48 @@
-/* Kontrola kontrastu textu v labe.
+/**
+ * Kontrast v profile člena.
  *
- * Pozadie sa skladá NAHOR cez celý reťazec rodičov s miešaním priehľadnosti.
- * Keď sa cestou narazí na obrázok alebo prechod, prvok sa hlási osobitne —
- * z farieb sa merať nedá a prvý prechod auditu si na tom vyrobil 30 falošných
- * nálezov.
+ * Profil vidí len prihlásený člen, takže sa naň bežné meranie nedostane.
+ * Skript preto podstrčí token a odpovede Strapi (tie isté ako
+ * `profil-nahlad.mjs`) a premeria všetkých päť častí registra.
  *
- *   node audit/kontrast-over.mjs [URL]
+ *   node audit/profil-kontrast.mjs [URL]
  */
 import { chromium } from 'playwright';
-const BASE = process.argv[2] || 'http://localhost:4188';
-const ZDROJ = 'https://webdesignforhradiskask.vercel.app';
+import { ODPOVEDE } from './profil-udaje.mjs';
+
+const URL = process.argv[2] || 'http://localhost:3000';
 
 const b = await chromium.launch();
-const ctx = await b.newContext({ viewport: { width: 1440, height: 2400 } });
-const p = await ctx.newPage();
-if (BASE.includes('localhost')) {
-  await p.route('**/strapi/**', async (r) => {
-    const u = new URL(r.request().url());
-    try {
-      const res = await fetch(ZDROJ + u.pathname + u.search, { headers: { accept: 'application/json' } });
-      r.fulfill({ status: res.status, body: Buffer.from(await res.arrayBuffer()),
-                  headers: { 'content-type': res.headers.get('content-type') || 'application/json' } });
-    } catch { r.abort(); }
-  });
+const ctx = await b.newContext({ viewport: { width: 1440, height: 2000 } });
+for (const [vzor, telo] of ODPOVEDE) {
+  await ctx.route(vzor, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(telo) }));
 }
+await ctx.addInitScript(() => localStorage.setItem('hradiska.member.jwt', 'test'));
+const p = await ctx.newPage();
+await p.goto(`${URL}/profil`, { waitUntil: 'domcontentloaded' });
+for (let i = 0; i < 12; i++) {
+  const x = p.locator('.ck-btn-primary').first();
+  if (await x.count() && await x.isVisible()) { await x.click({ force: true }); await p.waitForTimeout(350); }
+  if (!(await p.locator('.ck-root').count())) break;
+  await p.waitForTimeout(400);
+}
+await p.waitForSelector('.lprof-hlava');
 
 let zleSpolu = 0;
-/* Routy sa dajú zadať aj zvonku: node audit/kontrast-over.mjs <URL> <cesta…> */
-const ROUTY = process.argv.length > 3
-  ? process.argv.slice(3).map(c => [c.replace(/[^\w]+/g, '-').replace(/^-|-$/g, ''), c])
-  : [['domovska','/'], ['clanok','/blog/mikulcice-kopcany']];
-for (const [n, cesta] of ROUTY) {
-  await p.goto(BASE + cesta, { waitUntil: 'domcontentloaded' });
-  /* Cookie lišta sa objavuje s oneskorením a prekrýva spodok stránky —
-     bez trpezlivého odkliknutia hlásia merania falošné chyby (kurzor
-     skončí na lište, nie na mape). */
-  for (let i = 0; i < 12; i++) {
-    const x = p.locator('.ck-btn-primary').first();
-    if (await x.count() && await x.isVisible()) { await x.click({ force: true }); await p.waitForTimeout(400); }
-    if (!(await p.locator('.ck-root').count())) break;
-    await p.waitForTimeout(500);
+const CASTI = ['ozvy', 'prispevky', 'ulozene', 'fotky', 'nastavenia'];
+for (const [i, n] of CASTI.entries()) {
+  await p.locator('.lprof-register button').nth(i).click();
+  await p.waitForTimeout(800);
+  /* Rozbalené polia sa merajú tiež — inak by úprava príspevku ostala
+     nepremeraná a práve tam je najviac textu na netypickom podklade. */
+  if (n === 'prispevky') {
+    const u = p.locator('.lprof-akcie button').first();
+    if (await u.count()) { await u.click(); await p.waitForTimeout(400); }
   }
-  await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await p.waitForTimeout(4000);
-  await p.evaluate(() => window.scrollTo(0, 0));
-  await p.waitForTimeout(3000);
+  if (n === 'nastavenia') {
+    const z = p.locator('.lprof-zrusit').first();
+    if (await z.count()) { await z.click(); await p.waitForTimeout(400); }
+  }
 
   const r = await p.evaluate(() => {
     const roz = (s) => { const m = /rgba?\(([^)]+)\)/.exec(s); if (!m) return null;
@@ -118,10 +116,12 @@ for (const [n, cesta] of ROUTY) {
   });
 
   zleSpolu += r.zle.length;
-  console.log(`\n### ${n}  — porušení: ${r.zle.length}  (nad obrázkom, nemerateľné: ${r.obrazSpolu})`);
-  r.zle.sort((a,b)=>a.pomer-b.pomer).forEach(x =>
+  console.log(`
+### ${n}  — porušení: ${r.zle.length}  (nad obrázkom, nemerateľné: ${r.obrazSpolu})`);
+  r.zle.sort((a, b) => a.pomer - b.pomer).forEach(x =>
     console.log(`  ${x.pomer}:1 (min ${x.min})  ${x.px}px  ${x.farba} na ${x.pozadie}  ${x.el}  „${x.text}"`));
 }
 await b.close();
-console.log(`\nspolu: ${zleSpolu}`);
+console.log(`
+spolu: ${zleSpolu}`);
 process.exit(zleSpolu ? 1 : 0);

@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * „Pridajte sa k nám" — nový návrh. Žije LEN v laboratóriu; produkčný
- * `JoinUs.tsx` sa nedotýka (v laboratóriu sa skryje cez CSS).
+ * „Pridajte sa k nám". Nahradilo pôvodný `JoinUs.tsx`.
  *
  * TEXT JE PREVZATÝ DOSLOVA — vety, e-mail aj citát sú tie isté. Mení sa iba
  * to, ako sú podané.

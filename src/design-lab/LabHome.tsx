@@ -1,17 +1,14 @@
 'use client';
 
 /**
- * Domovská stránka v laboratóriu. Vznikla preto, že pás „Zo života združenia"
- * sedí UPROSTRED `HomePage` — kategórie a výzvu stačilo skryť a dokresliť za
- * ňu, ale pás sa takto nahradiť nedá bez toho, aby skončil na konci stránky.
+ * Domovská stránka. Nahradila pôvodnú `HomePage.tsx`, ktorá je zmazaná.
  *
- * PRODUKCIA SA NEDOTÝKA: `HomePage.tsx` ostáva nezmenená a téma `Pôvodná` ju
- * naďalej vykresľuje. Tu je tá istá skladba, len s labovým pásom:
+ * Skladba:
  *
  *   titulná fotografia → searchbar → zápisy z kroniky → mapa
  *
- * Kategórie a „Pridajte sa k nám" nasledujú v `DesignLab` ako samostatné
- * labové komponenty, takže poradie stránky ostáva zachované.
+ * Kategórie a „Pridajte sa k nám" vykresľuje `App` hneď za ňou ako
+ * samostatné komponenty, takže poradie stránky ostáva zachované.
  */
 
 import { HeroSearch } from '../components/HeroSearch';

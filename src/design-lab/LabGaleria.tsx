@@ -94,9 +94,7 @@ export function LabGaleria() {
   }));
 
   /* Hlavička skupiny sa lepí POD to, čo je nad ňou. Odstup sa nedá napísať
-     natvrdo: v laboratóriu je nad stránkou ešte lišta na prepínanie šiat,
-     v produkcii len navigácia, a obe menia výšku podľa šírky okna. Preto sa
-     meria. */
+     natvrdo — horná lišta mení výšku podľa šírky okna. Preto sa meria. */
   const koren = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const zmeraj = () => {

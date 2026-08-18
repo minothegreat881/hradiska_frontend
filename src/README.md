@@ -26,26 +26,28 @@ Aplikácia je pripravená na priamu integráciu do Next.js 14 projektu. Všetky 
 
 ```
 /
+├── design-lab/          # Šat „Pečať" — jediný šat webu
+│   ├── theme.css       # Paleta, tokeny a skladby všetkých stránok
+│   ├── LabNav.tsx      # Horná lišta
+│   ├── LabHome.tsx     # Domovská stránka
+│   ├── LabArticle.tsx  # Detail článku
+│   ├── LabGaleria.tsx  # Fotoarchív
+│   ├── LabAktualityStranka.tsx # Kronika združenia
+│   └── LabFooter.tsx   # Pätička
 ├── components/          # React komponenty
-│   ├── NavBar.tsx      # Navigácia s mega-menu
 │   ├── HeroSearch.tsx  # Vyhľadávací komponent
-│   ├── FacetFilters.tsx # Filtrovací panel
-│   ├── SiteCard.tsx    # Karta lokality
 │   ├── ArticleCard.tsx # Karta článku
-│   ├── ResultsGrid.tsx # Mriežka výsledkov
-│   ├── MapView.tsx     # Interaktívna mapa
-│   └── FilterDrawer.tsx # Mobilný filter drawer
-├── pages/              # Stránky aplikácie
-│   ├── HomePage.tsx    # Domovská stránka
-│   ├── SearchPage.tsx  # Vyhľadávanie lokalít
+│   ├── MapaHradisk.tsx # Interaktívna mapa hradísk
+│   └── HistoricalGallery.tsx # Mriežka fotiek + svetlík
+├── pages/              # Stránky mimo šatu alebo bez vlastnej skladby
+│   ├── CategoryPage.tsx # Kategória a podkategórie
+│   ├── ProfilePage.tsx # Profil člena
+│   ├── AccountPage.tsx # Prihlásenie, registrácia, obnova hesla
 │   ├── SiteDetailPage.tsx # Detail lokality
-│   ├── BlogPage.tsx    # Zoznam článkov
-│   ├── ArticlePage.tsx # Detail článku
-│   └── AboutPage.tsx   # O projekte
-├── data/               # Mock dáta
-│   └── mock-data.ts    # Lokality, články, helper funkcie
+│   └── SearchResultsPage.tsx # Výsledky hľadania
 ├── styles/             # Štýly
-│   └── globals.css     # Design tokens + Tailwind
+│   ├── globals.css     # Design tokens + Tailwind
+│   └── mapa.css        # Mapa hradísk
 └── App.tsx             # Hlavná aplikácia + routing
 ```
 

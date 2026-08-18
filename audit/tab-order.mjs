@@ -3,7 +3,7 @@
  *   node audit/tab-order.mjs <ruta> [URL]
  */
 import { chromium } from 'playwright';
-const RUTA = process.argv[2] || '/design/blog/mikulcice-kopcany?t=pecat';
+const RUTA = process.argv[2] || '/blog/mikulcice-kopcany';
 const BASE = process.argv[3] || 'http://localhost:4188';
 const ZDROJ = 'https://webdesignforhradiskask.vercel.app';
 const MENO = RUTA.includes('/blog/') ? 'clanok' : 'domovska';

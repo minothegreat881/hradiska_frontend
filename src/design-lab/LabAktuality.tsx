@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * „ZO ŽIVOTA ZDRUŽENIA" — nový návrh pásu zápisov. Žije LEN v laboratóriu;
- * produkčný `AktualityFeedV2.tsx` sa nedotýka.
+ * „ZO ŽIVOTA ZDRUŽENIA" — pás zápisov na domovskej stránke. Nahradil
+ * `AktualityFeedV2.tsx`.
  *
  * DÁTA SÚ TIE ISTÉ: `getKronikaAll` / `getKronikaIntro` / `getDomovskaGaleria`
  * — žiadny nový endpoint, žiadny zápis, žiadny token.

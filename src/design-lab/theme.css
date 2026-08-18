@@ -2415,14 +2415,6 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   outline-offset: 3px;
 }
 
-/* Lišta laboratória (prepínač šiat) je nástroj, nie súčasť šatu — ale
-   klávesnicou sa má dať ovládať tiež. Predvolený rám na nej mal 2,7:1. */
-.lab-toolbar button:focus-visible,
-.lab-toolbar a:focus-visible {
-  outline: 2px solid #f3ede1;
-  outline-offset: 2px;
-}
-
 /* ══════════════════════════════════════════════════════════════════════════
    FOTOARCHÍV
    Skladba vychádza z toho, čím tie snímky sú: hárok kontaktných kópií
@@ -2950,6 +2942,7 @@ body[data-lab-theme] .pl-act {
 .lprof-citat {
   margin: 8px 0 0; padding-left: 12px; border-left: 1px solid var(--l-line-2);
   font-family: 'Inter', sans-serif; font-size: 14.5px; line-height: 1.6; color: var(--l-body);
+  max-width: 76ch;
 }
 .lprof-reakcie, .lprof-znacka {
   display: inline-block; margin-top: 8px;
@@ -2966,3 +2959,146 @@ body[data-lab-theme] .pl-act {
   .lprof-hlava { flex-wrap: wrap; }
   .lprof-nastavenia { margin-left: 0; }
 }
+
+/* Vlastná fotografia namiesto iniciály — kruh ostáva ten istý. */
+.lprof-pecat-foto { object-fit: cover; background: var(--l-paper-2); }
+.lprof-pecat-mala { width: 56px; height: 56px; font-size: 23px; }
+
+/* Oznamy stránky. Vedú sa rovnako ako záznam: prúžok pri ľavom okraji,
+   žiadny farebný box — na kronikovom papieri by pôsobil ako cudzí prvok. */
+.lprof-vystraha, .lprof-hlaska, .lprof-chyba {
+  margin: 0 0 22px; padding: 11px 0 11px 15px;
+  border-left: 3px solid var(--l-line-2); background: transparent;
+  font-family: 'Inter', sans-serif; font-size: 14.5px; line-height: 1.55; color: var(--l-body);
+}
+.lprof-vystraha, .lprof-chyba { border-left-color: var(--l-second); }
+.lprof-hlaska { border-left-color: var(--l-ink); }
+/* Upozornenie správcu je jediný záznam, ktorý nesie aj podklad — inak by sa
+   v rade ozvov stratil práve to, čo si pozornosť žiada najviac. */
+.lprof-zaznam.je-vystraha { border-left-color: var(--l-second-deep); background: linear-gradient(90deg, rgba(201,72,58,.07), transparent 46%); }
+
+/* Spodný riadok príspevku: údaje vľavo, úkony vpravo. */
+.lprof-spodok { margin-top: 4px; gap: 14px; }
+.lprof-stav {
+  display: inline-block; margin-top: 8px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--l-second-deep);
+}
+.lprof-akcie { margin-left: auto; display: flex; gap: 14px; }
+.lprof-akcie button {
+  padding: 0; border: 0; background: transparent; cursor: pointer;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--l-muted); border-bottom: 1px solid var(--l-line-2);
+  transition: color .16s ease, border-color .16s ease;
+}
+.lprof-akcie button:hover { color: var(--l-ink); border-color: var(--l-second); }
+.lprof-akcie button:disabled { opacity: .5; cursor: default; }
+
+/* Úprava príspevku na mieste — bez modálu, text ostáva tam, kde bol. */
+.lprof-uprava { margin-top: 10px; }
+.lprof-uprava textarea, .lprof-pole input {
+  width: 100%; padding: 11px 13px;
+  background: var(--l-card); border: 1px solid var(--l-line-2); border-radius: 2px;
+  font-family: 'Inter', sans-serif; font-size: 14.5px; line-height: 1.6; color: var(--l-ink);
+}
+.lprof-uprava textarea { resize: vertical; }
+.lprof-uprava textarea:focus-visible, .lprof-pole input:focus-visible {
+  outline: 2px solid var(--l-second); outline-offset: 1px; border-color: var(--l-second);
+}
+
+.lprof-tlacidla { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.lprof-tlacidla button {
+  padding: 10px 18px; border-radius: 999px; cursor: pointer;
+  background: transparent; border: 1px solid var(--l-line-2); color: var(--l-body);
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  transition: border-color .16s ease, color .16s ease, background-color .16s ease;
+}
+.lprof-tlacidla button:hover { border-color: var(--l-second); color: var(--l-ink); }
+.lprof-tlacidla button.lprof-hlavne { background: var(--l-ink); border-color: var(--l-ink); color: var(--l-on-dark-2); }
+.lprof-tlacidla button.lprof-hlavne:hover { background: var(--l-second-deep); border-color: var(--l-second-deep); color: var(--l-card); }
+.lprof-tlacidla button.lprof-zrusit { color: var(--l-second-deep); }
+.lprof-tlacidla button.lprof-zmazat { background: var(--l-second-deep); border-color: var(--l-second-deep); color: var(--l-card); }
+.lprof-tlacidla button:disabled { opacity: .55; cursor: default; }
+
+/* Fotografie — hárok s kontaktnými kópiami, ako vo fotoarchíve. */
+.lprof-fotky {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.lprof-fotky a { display: block; text-decoration: none; }
+.lprof-fotky img {
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover;
+  background: var(--l-paper-2); border: 1px solid var(--l-line);
+  transition: border-color .16s ease;
+}
+.lprof-fotky a:hover img { border-color: var(--l-second); }
+.lprof-fotky span {
+  display: block; margin-top: 7px;
+  font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.4; color: var(--l-body);
+}
+.lprof-fotky a:hover span { color: var(--l-second-deep); }
+
+/* Prázdne miesto je pozvánka, nie hlásenie o chybe. */
+.lprof-prazdno {
+  margin: 0; padding: 26px 0;
+  font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: var(--l-muted);
+  max-width: 56ch;
+}
+
+.lprof-podskupina { margin-top: 40px; }
+.lprof-podskupina h2 {
+  margin: 0 0 6px; font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--l-muted); font-weight: 400;
+}
+
+/* Nastavenia ako ďalšia časť registra, nie modálne okno. Formulár si drží
+   vlastnú šírku — deliace čiary cez celý obsah by pri krátkych poliach
+   pôsobili ako prázdne linajky. */
+.lprof-nast { max-width: 620px; }
+.lprof-nast section { padding-bottom: 26px; margin-bottom: 26px; border-bottom: 1px solid var(--l-line); }
+.lprof-nast section:last-child { border-bottom: 0; }
+.lprof-nast h2 {
+  margin: 0 0 14px; font-family: 'Fraunces', Georgia, serif; font-weight: 600;
+  font-size: 21px; color: var(--l-ink);
+}
+.lprof-pole { max-width: 420px; }
+.lprof-pole label {
+  display: block; margin-bottom: 6px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--l-muted);
+}
+.lprof-poznamka {
+  margin: 8px 0 0; max-width: 56ch;
+  font-family: 'Inter', sans-serif; font-size: 13.5px; line-height: 1.55; color: var(--l-muted);
+}
+
+.lprof-foto { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.lprof-foto img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 1px solid var(--l-line-2); }
+.lprof-subor {
+  display: inline-flex; align-items: center; padding: 10px 18px;
+  border-radius: 999px; border: 1px solid var(--l-line-2); cursor: pointer;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--l-body);
+  transition: border-color .16s ease, color .16s ease;
+}
+.lprof-subor:hover { border-color: var(--l-second); color: var(--l-ink); }
+.lprof-subor input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.lprof-subor:focus-within { outline: 2px solid var(--l-second); outline-offset: 2px; }
+
+.lprof-prefs { list-style: none; margin: 0; padding: 0; }
+.lprof-prefs li { border-bottom: 1px solid var(--l-line); }
+.lprof-prefs li:last-child { border-bottom: 0; }
+.lprof-prefs label {
+  display: flex; align-items: center; gap: 11px; padding: 11px 0; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 15px; color: var(--l-body);
+}
+.lprof-prefs input { width: 17px; height: 17px; accent-color: var(--l-second-deep); flex: none; }
+
+.lprof-zrusenie { margin-top: 14px; padding-left: 15px; border-left: 3px solid var(--l-second); }
+.lprof-zrusenie p {
+  margin: 0; max-width: 56ch;
+  font-family: 'Inter', sans-serif; font-size: 14.5px; line-height: 1.6; color: var(--l-body);
+}
+
+/* Kostra — drží tvar, kým údaje doskočia. */
+.lprof-kostra { display: flex; flex-direction: column; gap: 9px; }
+.lprof-kostra span { height: 12px; background: var(--l-paper-2); border-radius: 2px; }

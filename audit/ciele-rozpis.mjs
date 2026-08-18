@@ -63,7 +63,7 @@ const zmeraj = async (b, meno, w, h, dotyk, cesta) => {
 };
 
 const b = await chromium.launch();
-await zmeraj(b, 'mobil 390 (dotyk)', 390, 844, true, '/design/blog/mikulcice-kopcany?t=pecat');
-await zmeraj(b, 'dotykový notebook 1440 (dotyk, šírka desktopu)', 1440, 900, true, '/design/blog/mikulcice-kopcany?t=pecat');
-await zmeraj(b, 'myš 1440 (bez dotyku)', 1440, 900, false, '/design/blog/mikulcice-kopcany?t=pecat');
+await zmeraj(b, 'mobil 390 (dotyk)', 390, 844, true, '/blog/mikulcice-kopcany');
+await zmeraj(b, 'dotykový notebook 1440 (dotyk, šírka desktopu)', 1440, 900, true, '/blog/mikulcice-kopcany');
+await zmeraj(b, 'myš 1440 (bez dotyku)', 1440, 900, false, '/blog/mikulcice-kopcany');
 await b.close();

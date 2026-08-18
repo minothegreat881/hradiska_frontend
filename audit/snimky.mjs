@@ -10,7 +10,7 @@ for (const [meno, w, h, mob] of [['desktop',1440,900,false], ['mobil',390,844,tr
   if (BASE.includes('localhost')) await p.route('**/strapi/**', async (r) => { const u=new URL(r.request().url());
     try { const res=await fetch(ZDROJ+u.pathname+u.search,{headers:{accept:'application/json'}});
       r.fulfill({status:res.status, body:Buffer.from(await res.arrayBuffer()), headers:{'content-type':res.headers.get('content-type')||'application/json'}}); } catch { r.abort(); } });
-  for (const [n, cesta] of [['domovska','/design?t=pecat'], ['clanok','/design/blog/mikulcice-kopcany?t=pecat']]) {
+  for (const [n, cesta] of [['domovska','/'], ['clanok','/blog/mikulcice-kopcany']]) {
     await p.goto(BASE+cesta, { waitUntil:'domcontentloaded' });
     for (let i=0;i<3;i++){const x=p.locator('.ck-btn-primary').first();
       if(await x.count()&&await x.isVisible()){await x.click({force:true});await p.waitForTimeout(300);}else break;}

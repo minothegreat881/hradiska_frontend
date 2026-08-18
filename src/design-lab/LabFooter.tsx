@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * PÄTIČKA — nový návrh. Žije LEN v laboratóriu; produkčný `Footer.tsx` sa
- * nedotýka (v `DesignLab` sa v téme vykreslí táto namiesto neho).
+ * PÄTIČKA. Nahradila pôvodný `Footer.tsx`, ktorý je zmazaný.
  *
  * OBSAH JE PREVZATÝ DOSLOVA — tie isté odkazy, ten istý popis aj spodný riadok.
  * Mení sa iba to, ako sú podané.
