@@ -2629,6 +2629,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 
 :root[data-sat='pecat'] {
   --card-border: var(--l-line-2);
+  --card-border-hover: var(--l-second);
   --card-chip-bg: rgba(143, 44, 34, .82);
   --card-chip-border: rgba(243, 237, 225, .45);
   --card-chip-text: var(--l-on-dark-2);

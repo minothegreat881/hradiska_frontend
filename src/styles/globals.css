@@ -1793,6 +1793,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   --card-h: 420px;
   --card-radius: 15px;
   --card-border: #cdb98c;
+  --card-border-hover: var(--gold-accent-light);
   --card-img-fallback: #3a2a1e;
   --card-scrim: linear-gradient(
     180deg,
@@ -1823,12 +1824,18 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   text-decoration: none;
   border: 1px solid var(--card-border);
   box-shadow: 0 16px 40px -24px rgba(40, 26, 10, 0.5);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
+/* Okraj sa pri nabehnuti rozsvieti farbou sat. Druhy prstenec v `box-shadow`
+   je tam preto, ze samotny 1px ramik sa medzi tmavou kartou a papierom
+   takmer neuplatni — takto sa hrana zvyrazni, ale nezhrubne skokom, ktory
+   by kartu posunul. */
 .article-card:hover,
 .article-card:focus-visible {
   transform: translateY(-5px);
-  box-shadow: 0 30px 60px -26px rgba(40, 26, 10, 0.6);
+  border-color: var(--card-border-hover);
+  box-shadow: 0 30px 60px -26px rgba(40, 26, 10, 0.6),
+              0 0 0 1px var(--card-border-hover);
 }
 .article-card:focus-visible {
   outline: 2px solid var(--gold-accent);
