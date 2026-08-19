@@ -25,7 +25,7 @@ const outPath = resolve(__dirname, '..', 'public', 'sitemap.xml');
 
 // Statické cesty webu (verejné, indexovateľné). Bez /admin a účtových ciest.
 const STATIC_PATHS = [
-  '/', '/galeria', '/aktuality', '/about',
+  '/', '/galeria', '/aktuality',
   '/hradiska', '/kultura', '/archeologia', '/pramene', '/pravek',
   '/ochrana-osobnych-udajov', '/podmienky-pouzivania',
 ];

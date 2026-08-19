@@ -16,11 +16,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/hradiska</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

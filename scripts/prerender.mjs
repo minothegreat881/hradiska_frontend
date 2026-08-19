@@ -93,7 +93,6 @@ const STATIC = [
   { path: '/pravek', title: 'Praveké hradiská a kultúry', description: 'Praveké hradiská na Slovensku — lužická, púchovská, otomanská a ďalšie kultúry doby bronzovej a železnej.' },
   { path: '/galeria', title: 'Galéria hradísk a nálezov', description: 'Fotogaléria hradísk, archeologických nálezov, kresieb a 3D rekonštrukcií z dielne Hradiska.sk.' },
   { path: '/aktuality', title: 'Aktuality — kronika OZ Hradiská', description: 'Aktuality, podujatia a činnosť Občianskeho združenia Hradiská pri objavovaní a ochrane hradísk.' },
-  { path: '/about', title: 'O projekte Hradiská.sk', description: 'O projekte a Občianskom združení Hradiská venovanom slovanským hradiskám na Slovensku a v zahraničí.' },
   { path: '/ochrana-osobnych-udajov', title: 'Ochrana osobných údajov — Hradiská.sk', description: 'Zásady spracovania osobných údajov (GDPR) — kontá, komentáre, cookies, práva dotknutých osôb.' },
   { path: '/podmienky-pouzivania', title: 'Podmienky používania — Hradiská.sk', description: 'Podmienky používania webu Hradiská.sk — obsah a autorské práva, kontá, komentáre a zodpovednosť.' },
 ];
