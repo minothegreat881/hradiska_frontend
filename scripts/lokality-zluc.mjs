@@ -93,7 +93,8 @@ for (const v of vysledky) {
   }
 
   hotove.push({
-    slug: v.slug, nazov: vstup.nazov, kategoria: vstup.kategoria,
+    slug: v.slug, nazov: vstup.nazov,
+    kategoria: vstup.kategoria, kategoriaSlug: vstup.kategoriaSlug || null,
     miesto: vstup.miesto, okres: v.okres || null, kraj: v.kraj,
     lat: vstup.lat, lng: vstup.lng,
     datovanie_text: v.datovanie_text || null,

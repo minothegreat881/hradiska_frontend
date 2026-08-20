@@ -24,6 +24,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigationData } from '../hooks/useNavigationData';
 import { AccountNavLink } from '../components/AccountNavLink';
 import type { NavigationItem } from '../data/navigation-structure';
+import {
+  MegaPonuka, Prepinac, Skupiny, zoskup, lokalityKategorie,
+  type Zoskupenie,
+} from './LabPrehlad';
 
 /**
  * Delenie kategórií. Pôvodná lišta ho už používala, len ho nedávala najavo —
@@ -91,6 +95,9 @@ export function LabNav() {
    */
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMobileCat, setOpenMobileCat] = useState<string | null>(null);
+  /* Zoskupenie je spoločné pre celý prehľad — kto si raz zvolí kraje, ostane
+     pri nich aj po prepnutí kategórie aj po prechode z PC na telefón. */
+  const [zoskupenie, setZoskupenie] = useState<Zoskupenie>('kraj');
 
   useEffect(() => {
     if (open === null) return;
@@ -220,13 +227,27 @@ export function LabNav() {
                     </button>
                     {isOpen && (
                       <div className="lnav-m-list">
-                        {children.length > 0
-                          ? children.map(ch => (
-                              <a key={(ch.slug ?? '') + ch.label} href={ch.slug ?? '#'} onClick={() => setMenuOpen(false)}>
-                                {ch.label}
-                              </a>
-                            ))
-                          : <span className="lnav-m-empty">{loading ? 'Načítavam články…' : 'Zatiaľ bez článkov.'}</span>}
+                        {(() => {
+                          const lok = lokalityKategorie(catSlug(cat));
+                          /* Kategórie bez lokalít — aktuality, modely, pramene —
+                             nemajú kraj ani datovanie. Zoskupovať sa v nich nedá
+                             a prepínač by klamal, tak dostanú abecedný zoznam. */
+                          if (!lok.length) {
+                            return children.length > 0
+                              ? children.map(ch => (
+                                  <a key={(ch.slug ?? '') + ch.label} href={ch.slug ?? '#'} onClick={() => setMenuOpen(false)}>
+                                    {ch.label}
+                                  </a>
+                                ))
+                              : <span className="lnav-m-empty">{loading ? 'Načítavam články…' : 'Zatiaľ bez článkov.'}</span>;
+                          }
+                          return (
+                            <div className="lprh-m">
+                              <Prepinac hodnota={zoskupenie} onZmena={setZoskupenie} celeSirky />
+                              <Skupiny skupiny={zoskup(lok, zoskupenie, 1)} mobil onOdkaz={() => setMenuOpen(false)} />
+                            </div>
+                          );
+                        })()}
                         {cat.slug && (
                           <a className="lnav-m-all" href={cat.slug} onClick={() => setMenuOpen(false)}>
                             Zobraziť všetky{typeof cat.count === 'number' && cat.count > 0 ? ` (${cat.count})` : ''} <span aria-hidden="true">→</span>
@@ -246,9 +267,18 @@ export function LabNav() {
         </div>
       )}
 
-      {/* Roletka mimo radov — viď poznámka pri `open` vyššie. */}
+      {/* Mega-ponuka mimo radov — viď poznámka pri `open` vyššie. Nie je
+          ukotvená pod tlačidlom ako predtým: má 1280 px a pod krajnou
+          kategóriou by pretiekla z obrazovky. */}
       {openCat && (
-        <Panel cat={openCat} left={open!.left} loading={loading} onClose={() => setOpen(null)} />
+        <MegaPonuka
+          kategorie={{ primarne: rows[0].items, dalsie: rows[1].items }}
+          aktivna={openCat}
+          onKategoria={(c) => setOpen({ label: c.label, left: 0 })}
+          onZavri={() => setOpen(null)}
+          zoskupenie={zoskupenie}
+          onZoskupenie={setZoskupenie}
+        />
       )}
     </nav>
   );
@@ -283,42 +313,4 @@ function CatButton({ cat, open, onToggle }: {
 }
 
 /** Roletka. Vykresľuje sa na úrovni lišty, nie v rade — viď poznámka pri `open`. */
-function Panel({ cat, left, loading, onClose }: {
-  cat: NavigationItem; left: number; loading: boolean; onClose: () => void;
-}) {
-  const children = cat.children ?? [];
-  // Pri tlačidle blízko pravého okraja by panel pretiekol mimo obrazovku —
-  // vtedy sa ukotví tak, aby sa doň zmestil.
-  const W = 380;
-  const maxLeft = typeof window !== 'undefined' ? window.innerWidth - W - 24 : left;
-  const x = Math.max(12, Math.min(left, maxLeft));
-
-  return (
-    <div className="lnav-panel" role="menu" aria-label={`${cat.label} – zoznam lokalít`} style={{ left: x }}>
-      <div className="lnav-panel-head">
-        {cat.label}
-        {typeof cat.count === 'number' && cat.count > 0 && <span>{cat.count}</span>}
-      </div>
-      {children.length > 0 ? (
-        <div className="lnav-panel-list">
-          {children.map(ch => (
-            <a key={(ch.slug ?? '') + ch.label} href={ch.slug ?? '#'} role="menuitem" onClick={onClose}>
-              {ch.label}
-            </a>
-          ))}
-        </div>
-      ) : (
-        <div className="lnav-panel-empty">
-          {loading ? 'Načítavam články…' : 'V tejto kategórii zatiaľ nie sú články.'}
-        </div>
-      )}
-      {cat.slug && (
-        <a className="lnav-panel-all" href={cat.slug} onClick={onClose}>
-          Zobraziť všetky{typeof cat.count === 'number' && cat.count > 0 ? ` (${cat.count})` : ''} <span aria-hidden="true">→</span>
-        </a>
-      )}
-    </div>
-  );
-}
-
 export default LabNav;

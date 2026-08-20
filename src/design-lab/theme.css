@@ -3299,3 +3299,168 @@ body[data-lab-theme] .pl-act {
   transition: border-color .16s ease;
 }
 .lprof-doDiskusie:hover { border-bottom-color: currentColor; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PREHĽAD KATEGÓRIÍ  —  mega-ponuka (PC) a rozbalená kategória (telefón)
+   Roletka predtým vypísala články pod sebou v poradí z databázy; pri 41
+   lokalitách strážnej funkcie sa v tom stĺpci nedalo nič nájsť. Tu sú tie
+   isté lokality zoskupené podľa kraja, datovania alebo abecedy.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lprh {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  width: min(1280px, calc(100vw - 32px));
+  min-height: 520px;
+  max-height: min(76vh, 720px);
+  margin-top: 6px;
+  border: 1px solid var(--l-line-2);
+  border-radius: 12px;
+  background: var(--l-card);
+  box-shadow: 0 24px 60px rgba(40, 34, 22, .15);
+  overflow: hidden;
+  animation: lnav-in .16s ease-out;
+}
+
+/* Ľavý register — všetky kategórie naraz, aby sa dalo preskakovať bez
+   zatvárania ponuky. */
+.lprh-register {
+  flex: none;
+  width: 264px;
+  padding: 14px 0;
+  overflow-y: auto;
+  background: var(--l-paper);
+  border-right: 1px solid var(--l-line);
+}
+.lprh-register-h {
+  margin: 12px 22px 6px;
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--l-muted);
+}
+.lprh-register button {
+  position: relative;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; padding: 9px 22px; border: 0; background: transparent;
+  cursor: pointer; text-align: left;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 14.5px; color: var(--l-body);
+}
+.lprh-register button:hover { background: var(--l-paper-2); color: var(--l-ink); }
+.lprh-register button.is-on {
+  background: var(--l-paper-2); color: var(--l-second-deep); font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--l-second-deep);
+}
+.lprh-pocet { font-family: var(--mono); font-size: 12px; color: var(--l-muted); }
+.lprh-register button.is-on .lprh-pocet { color: var(--l-second-deep); }
+
+.lprh-hlavne { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.lprh-hlava {
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  padding: 20px 28px; border-bottom: 1px solid var(--l-line);
+}
+.lprh-hlava h2 {
+  margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 700;
+  font-size: 24px; color: var(--l-ink);
+}
+.lprh-suhrn {
+  margin: 3px 0 0; font-family: var(--mono); font-size: 11px; color: var(--l-muted);
+}
+.lprh-hladat {
+  width: 300px; max-width: 100%; margin-left: auto;
+  padding: 9px 14px; border-radius: 8px;
+  border: 1px solid var(--l-line-2); background: var(--l-paper);
+  font-family: 'Inter', system-ui, sans-serif; font-size: 14px; color: var(--l-ink);
+}
+.lprh-hladat::placeholder { color: var(--l-muted); }
+.lprh-hladat:focus-visible { outline: 2px solid var(--l-second); outline-offset: 1px; }
+
+.lprh-prepinac {
+  display: inline-flex; flex: none;
+  border: 1px solid var(--l-line-2); border-radius: 9px;
+  background: var(--l-paper); overflow: hidden;
+}
+.lprh-prepinac.je-siroky { display: flex; width: 100%; margin-bottom: 4px; }
+.lprh-prepinac.je-siroky button { flex: 1; text-align: center; padding: 9px 0; }
+.lprh-prepinac button {
+  padding: 8px 16px; border: 0; background: transparent; cursor: pointer;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--l-muted);
+}
+.lprh-prepinac button:hover { color: var(--l-ink); }
+.lprh-prepinac button.is-on { background: var(--l-ink); color: var(--l-on-dark-2); }
+
+/* Telo v troch stĺpcoch. Skupina sa nesmie zlomiť medzi stĺpce — polovica
+   Nitrianskeho kraja hore a polovica vedľa by bola horšia než jeden stĺpec. */
+.lprh-telo { flex: 1; overflow-y: auto; padding: 24px 28px; column-count: 3; column-gap: 32px; }
+.lprh-skupina { break-inside: avoid; margin-bottom: 24px; }
+.lprh-skupina-h {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--l-line);
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .13em; text-transform: uppercase; color: var(--l-muted);
+}
+.lprh-skupina-n { color: var(--l-muted-2); font-weight: 400; }
+.lprh-zoznam { list-style: none; margin: 6px 0 0; padding: 0; }
+.lprh-zoznam a {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+  margin: 0 -8px; padding: 7px 8px; border-radius: 6px; text-decoration: none;
+}
+.lprh-zoznam a:hover { background: var(--l-paper-2); }
+.lprh-nazov {
+  font-family: 'Inter', system-ui, sans-serif; font-size: 14.5px; font-weight: 500;
+  color: var(--l-ink);
+}
+.lprh-meta {
+  flex: none; font-family: var(--mono); font-size: 11px; color: var(--l-muted);
+  white-space: nowrap;
+}
+.lprh-prazdno {
+  margin: 0; font-family: 'Inter', system-ui, sans-serif; font-size: 14.5px;
+  color: var(--l-muted);
+}
+
+.lprh-pata {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 15px 28px; border-top: 1px solid var(--l-line); background: var(--l-paper);
+}
+.lprh-pata a {
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--l-second-deep);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.lprh-pata a:hover { color: var(--l-ink); }
+.lprh-pata span { font-family: var(--mono); font-size: 11px; color: var(--l-muted-2); }
+
+/* ── Telefón ──────────────────────────────────────────────────────────── */
+.lprh-m { display: block; }
+.lprh-m .lprh-skupina { margin-bottom: 4px; }
+.lprh-m .lprh-skupina-h { padding: 16px 0 5px; }
+.lprh-m .lprh-zoznam a {
+  display: grid; grid-template-columns: 5px minmax(0, 1fr); align-items: start;
+  gap: 11px; margin: 0; padding: 11px 0 10px; border-radius: 0;
+}
+.lprh-m .lprh-zoznam a:hover { background: transparent; }
+.lprh-bodka {
+  width: 5px; height: 5px; margin-top: 9px; border-radius: 50%;
+  background: var(--l-second); grid-row: span 2;
+}
+.lprh-m .lprh-nazov {
+  font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 500;
+  line-height: 1.2;
+}
+.lprh-m .lprh-meta {
+  grid-column: 2; font-size: 11.5px; white-space: normal; margin-top: 2px;
+}
+
+@media (max-width: 1340px) {
+  .lprh-telo { column-count: 2; }
+}
+@media (max-width: 1040px) {
+  .lprh { flex-direction: column; max-height: 80vh; }
+  .lprh-register { width: auto; border-right: 0; border-bottom: 1px solid var(--l-line); }
+  .lprh-telo { column-count: 1; }
+  .lprh-hladat { width: 100%; margin-left: 0; }
+}
