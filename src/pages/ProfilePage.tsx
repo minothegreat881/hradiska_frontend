@@ -223,7 +223,30 @@ export function ProfilePage() {
 
 /* ══════════════════════════════════════════════════════════════════════════
    OZVALO SA
+
+   Zoznam bol nečitateľný nie preto, že by mu chýbal obsah, ale preto, že
+   všetky záznamy mali rovnaký tvar a jediná farba na stránke — pečatná
+   červená — bola použitá na odkazy, prúžky aj bodky naraz. Nič potom
+   nerozlišovalo odpoveď od ocenenia a upozornenie od oznamu.
+
+   Každý druh ozvy má teraz vlastnú farbu, a nie náhodnú: sú to odtiene
+   z tej istej krajiny, akú ukazuje titulná ilustrácia — tráva, okrová zem,
+   pečať a rieka. Farba sedí na terči s iniciálou a na štítku druhu; telo
+   záznamu ostáva čierne na papieri, takže sa neprefarbuje text.
+
+   Červený prúžok pri ľavom okraji ostáva vyhradený JEDINEJ veci: že je ozva
+   nová. Keby ho prebrali druhy, prestal by o novosti hovoriť.
    ══════════════════════════════════════════════════════════════════════════ */
+
+type DruhOzvy = 'reply' | 'like' | 'warning' | 'post';
+
+const DRUH: Record<DruhOzvy, { stitok: string; znak: string }> = {
+  reply:   { stitok: 'Odpoveď',      znak: '↩' },
+  like:    { stitok: 'Ocenenie',     znak: '♥' },
+  warning: { stitok: 'Upozornenie',  znak: '!' },
+  post:    { stitok: 'Nový článok',  znak: '✦' },
+};
+
 function Ozvy({ items }: { items: NotificationItem[] | null }) {
   if (items === null) return <Kostra n={3} />;
   if (!items.length) {
@@ -233,6 +256,7 @@ function Ozvy({ items }: { items: NotificationItem[] | null }) {
   return (
     <ul className="lprof-zoznam">
       {items.map((n) => {
+        const druh = (DRUH[n.type as DruhOzvy] ? n.type : 'post') as DruhOzvy;
         const kto = n.actor?.displayName || n.actor?.username || 'Niekto';
         const nazov = n.post?.title || n.aktualita?.nazov || '';
         const kFotke = !!(n.photoComment || n.fileId);
@@ -241,34 +265,51 @@ function Ozvy({ items }: { items: NotificationItem[] | null }) {
           : n.aktualita ? '/aktuality' : null;
         const viac = n.aggregateCount > 1;
 
+        /* Kto sa ozval a čo urobil. Pri systémových ozvách nie je nikto —
+           terč vtedy nesie znak, nie iniciálu. */
         let ktoText = kto;
         let coText = 'sa ozval';
-        if (n.type === 'reply') {
+        let osoba = true;
+        if (druh === 'reply') {
           coText = kFotke ? 'odpovedal na váš komentár k fotografii' : 'odpovedal na váš komentár';
-        } else if (n.type === 'like') {
+        } else if (druh === 'like') {
           ktoText = viac ? `${n.aggregateCount} čitateľov` : kto;
           coText = `${viac ? 'ocenilo' : 'ocenil'} váš komentár${kFotke ? ' k fotografii' : ''}`;
-        } else if (n.type === 'warning') {
+          osoba = !viac;
+        } else if (druh === 'warning') {
           ktoText = 'Správca';
           coText = 'upozorňuje na nedodržanie pravidiel diskusie';
-        } else if (n.type === 'post') {
-          ktoText = 'Nový článok';
-          coText = 'pribudol v kronike';
+          osoba = false;
+        } else {
+          ktoText = 'Kronika';
+          coText = 'pribudol nový článok';
+          osoba = false;
         }
 
-        const citat = n.type === 'post' ? null : (n.comment?.content || n.photoComment?.content || n.text);
+        const citat = druh === 'post' ? null : (n.comment?.content || n.photoComment?.content || n.text);
 
         return (
-          <li key={n.documentId} className={`lprof-zaznam${!n.read ? ' is-nove' : ''}${n.type === 'warning' ? ' je-vystraha' : ''}`}>
-            <div className="lprof-riadok">
-              <span className="lprof-kto">{ktoText}</span>
-              <span className="lprof-co">{coText}</span>
-              <span className="lprof-kedy">{kedy(n.createdAt)}</span>
+          <li
+            key={n.documentId}
+            className={`lprof-zaznam lprof-ozva${!n.read ? ' is-nove' : ''}`}
+            data-druh={druh}
+          >
+            <span className="lprof-terc" aria-hidden="true">
+              {osoba ? iniciala(ktoText) : DRUH[druh].znak}
+            </span>
+
+            <div className="lprof-ozva-telo">
+              <div className="lprof-riadok">
+                <span className="lprof-kto">{ktoText}</span>
+                <span className="lprof-co">{coText}</span>
+                <span className="lprof-druh">{DRUH[druh].stitok}</span>
+                <span className="lprof-kedy">{kedy(n.createdAt)}</span>
+              </div>
+              {nazov && (odkaz
+                ? <a className="lprof-kde" href={odkaz}>{nazov}</a>
+                : <span className="lprof-kde">{nazov}</span>)}
+              {citat && <p className="lprof-citat">{citat}</p>}
             </div>
-            {nazov && (odkaz
-              ? <a className="lprof-kde" href={odkaz}>{nazov}</a>
-              : <span className="lprof-kde">{nazov}</span>)}
-            {citat && <p className="lprof-citat">{citat}</p>}
           </li>
         );
       })}

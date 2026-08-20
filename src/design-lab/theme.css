@@ -2918,12 +2918,47 @@ body[data-lab-theme] .pl-act {
 }
 .lprof-nove { width: 7px; height: 7px; border-radius: 50%; background: var(--l-second); flex: none; }
 
+/* ── Farby druhov ozvy ────────────────────────────────────────────────────
+   Nie sú vybrané náhodne: sú to odtiene z tej istej krajiny, akú ukazuje
+   titulná ilustrácia — tráva, okrová zem, pečať a rieka. Každá je dosť tmavá
+   na to, aby na nej papierové písmo prešlo normou (merané, nie odhadnuté).
+
+   Farba druhu sedí LEN na terči a na štítku. Telo záznamu ostáva čierne na
+   papieri — prefarbovať aj text by z registra spravilo pestrofarebný zoznam,
+   ktorý sa číta horšie než ten jednofarebný. */
+.lprof-ozva[data-druh='reply']   { --druh: #46613c; }   /* tráva */
+.lprof-ozva[data-druh='like']    { --druh: #75591c; }   /* okrová zem */
+.lprof-ozva[data-druh='warning'] { --druh: #8f2c22; }   /* pečať */
+.lprof-ozva[data-druh='post']    { --druh: #3f5a6b; }   /* rieka */
+
+/* Terč s iniciálou pisateľa; pri systémových ozvách nesie znak. Je to jediné
+   miesto, kde má farba plochu — oko podľa nej beží zoznamom dole. */
+.lprof-ozva { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; align-items: start; }
+.lprof-terc {
+  width: 40px; height: 40px; margin-top: 2px;
+  display: grid; place-items: center; border-radius: 50%;
+  background: var(--druh, var(--l-second-deep));
+  color: var(--l-on-dark-2);
+  font-family: 'Fraunces', Georgia, serif; font-size: 17px; font-weight: 600;
+  line-height: 1;
+}
+.lprof-druh {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--druh, var(--l-muted));
+  border: 1px solid currentColor; border-radius: 999px; padding: 2px 8px;
+  white-space: nowrap;
+}
+.lprof-ozva .lprof-citat { border-left-color: var(--druh, var(--l-line-2)); }
+.lprof-ozva-telo { min-width: 0; }
+
 /* Záznamy — register po riadkoch, nie kôpka kariet. */
 .lprof-zoznam { list-style: none; margin: 0; padding: 0; }
 .lprof-zaznam {
   padding: 18px 0 18px 16px; border-bottom: 1px solid var(--l-line);
   border-left: 2px solid transparent;
 }
+/* Prúžok pri ľavom okraji ostáva vyhradený JEDINEJ veci: že je ozva nová.
+   Keby ho prebrali druhy, prestal by o novosti hovoriť. */
 .lprof-zaznam.is-nove { border-left-color: var(--l-second); }
 .lprof-riadok { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .lprof-kto { font-family: 'Inter', sans-serif; font-weight: 600; color: var(--l-ink); }
