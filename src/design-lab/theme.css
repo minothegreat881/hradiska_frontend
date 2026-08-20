@@ -750,18 +750,10 @@ body[data-lab-theme='pecat'],
   }
 }
 
-/* 2 · Titulná fotografia sa pri posúvaní nepatrne priblíži — dá stránke hĺbku
-   bez toho, aby čokoľvek „lietalo". */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .lab .parchment picture img[src*="img_header"] {
-      animation: lab-hero linear both;
-      animation-timeline: view();
-      animation-range: entry 100% exit 0%;
-    }
-    @keyframes lab-hero { from { transform: scale(1); } to { transform: scale(1.06); } }
-  }
-}
+/* 2 · Titulná fotografia sa pri posúvaní približovala. Zrušené: nadpis dnes
+   leží NA nej, takže by sa mu pod písmenami menil podklad — nameraný kontrast
+   by platil len pre nezroloavanú stránku. A rekonštrukčná doska, ktorá dýcha,
+   pôsobí ako prezentácia, nie ako obrazová príloha. */
 
 /* 3 · Dlaždice kategórií: fotka sa priblíži, karta sa nadvihne a spodok
    podčiarkne akcent. Meď je v tomto štýle jediná farba, tak nech je vidieť. */
@@ -3104,3 +3096,93 @@ body[data-lab-theme] .pl-act {
 /* Kostra — drží tvar, kým údaje doskočia. */
 .lprof-kostra { display: flex; flex-direction: column; gap: 9px; }
 .lprof-kostra span { height: 12px; background: var(--l-paper-2); border-radius: 2px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TITULNÁ DOSKA
+   Fotografia je rekonštrukčná doska, nie banner — preto bez zaobleného rohu
+   a bez vrhnutého tieňa, len vláskový rám ako pri obrazovej prílohe.
+   Šírka je zámerne menšia než obsahový pás: predloha má 1217 px a v páse na
+   1376 px by sa ťahala nahor a zmäkla.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lhero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 1120px;
+  border: 1px solid var(--l-line-2);
+  background: var(--l-paper-2);
+}
+.lhero-obraz { display: block; width: 100%; height: auto; }
+.lhero-hladanie { max-width: 1120px; margin-inline: auto; }
+
+/* Nadpis leží v opare nad vodou — v pravej hornej štvrtine, kde má fotka
+   najpokojnejšiu plochu. Podkladom je hmla, ktorá tam na snímke už je, len
+   zhustená.
+   Prechod pokrýva CELÚ dosku, nie len okolie nadpisu: keď sedel na malom
+   rámčeku okolo textu, jeho okraj bolo vidieť ako svetlý obdĺžnik — kruh
+   sa nestihol vytratiť skôr, než ho orezala hrana prvku. */
+.lhero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    62% 58% at 82% 18%,
+    rgba(243, 237, 225, .93) 0%,
+    rgba(243, 237, 225, .82) 30%,
+    rgba(243, 237, 225, .46) 56%,
+    rgba(243, 237, 225, .12) 76%,
+    rgba(243, 237, 225, 0) 88%
+  );
+}
+.lhero-napis {
+  position: absolute;
+  z-index: 1;
+  top: 7%; right: 4.5%;
+  width: min(40%, 420px);
+  text-align: right;
+}
+
+.lhero-titul {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(30px, 4.6vw, 62px);
+  line-height: .98;
+  letter-spacing: -.015em;
+  color: var(--l-ink);
+  text-wrap: balance;
+}
+.lhero-ciara {
+  display: block;
+  width: 74px;
+  height: 2px;
+  margin: 16px 0 12px auto;
+  background: var(--l-second);
+}
+.lhero-podtitul {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: clamp(10px, 1.05vw, 12px);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--l-body);
+}
+
+/* Na telefóne nadpis z fotky zlieza pod ňu. Cez pol obrázka by sa nedal
+   prečítať ani so zhustenou hmlou a na 390 px by mu ostalo 160 px šírky. */
+@media (max-width: 767px) {
+  .lhero { border-bottom: 0; }
+  .lhero::after { display: none; }
+  .lhero-napis {
+    position: static;
+    width: auto;
+    text-align: left;
+    padding: 20px 18px 22px;
+    border: 1px solid var(--l-line-2);
+    border-top: 0;
+    background: var(--l-paper);
+  }
+  .lhero-titul { font-size: clamp(30px, 9vw, 44px); }
+  .lhero-ciara { margin: 14px auto 11px 0; }
+}

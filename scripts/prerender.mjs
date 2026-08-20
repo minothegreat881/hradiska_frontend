@@ -31,7 +31,7 @@ const STRAPI = (process.env.PRERENDER_STRAPI_URL || 'http://188.245.47.29').repl
 const MEDIA = (process.env.MEDIA_URL || `${SITE}/strapi`).replace(/\/$/, '');
 // Náhľad pre články bez vlastnej obálky. Banner má pomer 1,894 — to je presne
 // formát, ktorý siete pri zdieľaní očakávajú (1200 × 630), takže sa neoreže.
-const DEFAULT_OG = `${SITE}/img_header_hradiska_03.jpg`;
+const DEFAULT_OG = `${SITE}/img_header_hradiska_04.jpg`;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dist = resolve(__dirname, '..', 'dist');

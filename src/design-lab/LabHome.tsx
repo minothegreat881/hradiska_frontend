@@ -21,36 +21,47 @@ export function LabHome() {
     <div className="min-h-screen parchment relative">
       <InkEffect />
 
-      {/* Nadpis stránky. Vizuálne ho nesie titulná fotografia a názov
-          v navigácii, ale v osnove dokumentu chýbal — hierarchia začínala
-          na druhej úrovni a čítačka nemala čím stránku pomenovať. */}
-      <h1 className="lab-only-reader">Hradiská Slovenska</h1>
+      {/* Titulná doska.
 
-      {/* Hero */}
+          NÁZOV UŽ NIE JE V OBRÁZKU. Predtým bol: zlaté 3D písmo a tabuľka
+          „WWW.HRADISKA.SK" boli namaľované v JPEGu, takže sa nedali označiť,
+          na telefóne sa nezmenšovali, pri prechode na doménu by sa museli
+          prekresliť — a `h1` musel byť schovaný len pre čítačky, lebo skutočný
+          nadpis stránky bol obrázok.
+
+          Teraz je to živá typografia položená do oparu nad vodou. To miesto
+          nie je vybrané od oka: z piatich kandidátskych plôch fotografie má
+          najnižší rozptyl jasu (36 oproti 51 v korunách stromov), čiže je to
+          jediná časť, kde písmo nesedí raz na svetlom a raz na tmavom.
+
+          Na úzkej obrazovke nadpis z fotky zlieza pod ňu — cez pol obrázka by
+          sa nedal prečítať ani s podkladom. */}
       <section className="relative" style={{ zIndex: 30 }}>
         <div className="container relative pt-8 md:pt-12 pb-8 md:pb-16">
-          <div className="rounded-3xl overflow-hidden shadow-2xl" style={{ background: 'var(--hr-frame)' }}>
+          <figure className="lhero">
             <picture>
-              <source srcSet="/img_header_hradiska_03.webp" type="image/webp" />
+              <source srcSet="/img_header_hradiska_04.webp" type="image/webp" />
               <img
-                src="/img_header_hradiska_03.jpg"
-                alt="Slovanské hradiská — pohľad na opevnenie a život na hradisku"
-                width={1329}
-                height={752}
+                src="/img_header_hradiska_04.jpg"
+                alt="Rekonštrukcia slovanského hradiska: opevnená akropola nad riekou, pod ňou podhradie s obydliami za palisádou"
+                width={1217}
+                height={761}
                 fetchPriority="high"
                 decoding="async"
-                className="w-full h-auto object-contain"
-                style={{ display: 'block' }}
+                className="lhero-obraz"
               />
             </picture>
-          </div>
 
-          <div className="mt-6 md:mt-12 px-4 md:px-2">
-            <div className="flex items-center justify-center gap-2 mb-4 opacity-60" aria-hidden="true">
-              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, transparent, var(--hr-line-quiet))' }} />
-              <span style={{ color: 'var(--hr-line-quiet)', fontSize: 12, lineHeight: 1 }}>⚜</span>
-              <span className="h-px w-12" style={{ background: 'linear-gradient(90deg, var(--hr-line-quiet), transparent)' }} />
-            </div>
+            <figcaption className="lhero-napis">
+              <h1 className="lhero-titul">Slovanské<br />hradiská</h1>
+              <span className="lhero-ciara" aria-hidden="true" />
+              <p className="lhero-podtitul">Encyklopédia hradísk Slovenska</p>
+            </figcaption>
+          </figure>
+
+          {/* Hľadanie drží šírku dosky. Cez celý obsahový pás sa rozťahovalo
+              širšie než fotografia nad ním a obe hrany si prestali odpovedať. */}
+          <div className="lhero-hladanie mt-6 md:mt-10 px-4 md:px-2">
             <HeroSearch />
           </div>
         </div>
