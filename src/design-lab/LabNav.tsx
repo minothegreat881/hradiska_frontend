@@ -25,7 +25,7 @@ import { useNavigationData } from '../hooks/useNavigationData';
 import { AccountNavLink } from '../components/AccountNavLink';
 import type { NavigationItem } from '../data/navigation-structure';
 import {
-  MegaPonuka, Prepinac, Skupiny, zoskup, lokalityKategorie,
+  MegaPonuka, Prepinac, Skupiny, zoskup, lokalityKategorie, useClankyKategorie,
   type Zoskupenie,
 } from './LabPrehlad';
 
@@ -211,7 +211,6 @@ export function LabNav() {
               <span className="lnav-m-label">{row.label}</span>
               {row.items.map(cat => {
                 const isOpen = openMobileCat === cat.label;
-                const children = cat.children ?? [];
                 return (
                   <div className="lnav-m-cat" key={cat.label}>
                     <button
@@ -227,27 +226,12 @@ export function LabNav() {
                     </button>
                     {isOpen && (
                       <div className="lnav-m-list">
-                        {(() => {
-                          const lok = lokalityKategorie(catSlug(cat));
-                          /* Kategórie bez lokalít — aktuality, modely, pramene —
-                             nemajú kraj ani datovanie. Zoskupovať sa v nich nedá
-                             a prepínač by klamal, tak dostanú abecedný zoznam. */
-                          if (!lok.length) {
-                            return children.length > 0
-                              ? children.map(ch => (
-                                  <a key={(ch.slug ?? '') + ch.label} href={ch.slug ?? '#'} onClick={() => setMenuOpen(false)}>
-                                    {ch.label}
-                                  </a>
-                                ))
-                              : <span className="lnav-m-empty">{loading ? 'Načítavam články…' : 'Zatiaľ bez článkov.'}</span>;
-                          }
-                          return (
-                            <div className="lprh-m">
-                              <Prepinac hodnota={zoskupenie} onZmena={setZoskupenie} celeSirky />
-                              <Skupiny skupiny={zoskup(lok, zoskupenie, 1)} mobil onOdkaz={() => setMenuOpen(false)} />
-                            </div>
-                          );
-                        })()}
+                        <MobilKategoria
+                          slug={catSlug(cat)}
+                          zoskupenie={zoskupenie}
+                          onZoskupenie={setZoskupenie}
+                          onOdkaz={() => setMenuOpen(false)}
+                        />
                         {cat.slug && (
                           <a className="lnav-m-all" href={cat.slug} onClick={() => setMenuOpen(false)}>
                             Zobraziť všetky{typeof cat.count === 'number' && cat.count > 0 ? ` (${cat.count})` : ''} <span aria-hidden="true">→</span>
@@ -313,4 +297,36 @@ function CatButton({ cat, open, onToggle }: {
 }
 
 /** Roletka. Vykresľuje sa na úrovni lišty, nie v rade — viď poznámka pri `open`. */
+/**
+ * Rozbalená kategória na telefóne. Vlastný komponent preto, že si sťahuje
+ * zoznam článkov cez háčik — a háčik sa nesmie volať vnútri cyklu v tele
+ * inej funkcie.
+ */
+function MobilKategoria({ slug, zoskupenie, onZoskupenie, onOdkaz }: {
+  slug: string; zoskupenie: Zoskupenie; onZoskupenie: (z: Zoskupenie) => void; onOdkaz: () => void;
+}) {
+  const lokality = lokalityKategorie(slug);
+  const clanky = useClankyKategorie(slug);
+  const maLokality = lokality.length > 0;
+
+  if (clanky === null) return <span className="lnav-m-empty">Načítavam články…</span>;
+  if (!clanky.length) return <span className="lnav-m-empty">Zatiaľ bez článkov.</span>;
+
+  const jeLokalita = new Set(lokality.map(l => l.slug));
+  const ostatne = clanky
+    .filter(c => !jeLokalita.has(c.slug))
+    .map(c => ({ slug: `/blog/${c.slug}`, nazov: c.title, meta: '' }));
+
+  return (
+    <div className="lprh-m">
+      {maLokality && <Prepinac hodnota={zoskupenie} onZmena={onZoskupenie} celeSirky />}
+      <Skupiny
+        skupiny={zoskup(lokality, maLokality ? zoskupenie : 'az', 1, ostatne)}
+        mobil
+        onOdkaz={onOdkaz}
+      />
+    </div>
+  );
+}
+
 export default LabNav;

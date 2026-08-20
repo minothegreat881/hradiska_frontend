@@ -44,11 +44,27 @@ let zle = 0;
     };
   });
 
+  /* Zoznam sa ťahá z vyhľadávacieho registra — chvíľu trvá, kým dorazí. */
+  await p.waitForFunction(() => !/Načítavam/.test(document.querySelector('.lprh-suhrn')?.textContent || ''), null, { timeout: 30000 });
+  await p.waitForTimeout(400);
   const kraj = await stav();
   console.log(`PC · ${kraj.nadpis} · ${kraj.suhrn} · režim ${kraj.rezim} · stĺpcov ${kraj.stlpcov}`);
   console.log('  ' + kraj.skupiny.map((s) => `${s.nazov} ${s.pocet}`).join(' · '));
   if (kraj.polozky !== 41) { console.log(`✘ zobrazených ${kraj.polozky} položiek, čakalo sa 41`); zle++; }
-  else console.log('✔ všetkých 41 lokalít je v skupinách');
+  else console.log('✔ všetkých 41 článkov kategórie je v skupinách');
+
+  /* Kategória, kde je lokalita len jedna a zvyšok sú bežné články — presne
+     tá, na ktorej bolo vidieť, že prehľad ukazuje iba zlomok. */
+  await p.locator('.lprh-register button', { hasText: 'Povesti' }).first().click();
+  await p.waitForFunction(() => !/Načítavam/.test(document.querySelector('.lprh-suhrn')?.textContent || ''), null, { timeout: 30000 });
+  await p.waitForTimeout(400);
+  const pov = await stav();
+  console.log(`  Povesti · ${pov.suhrn}`);
+  console.log('  ' + pov.skupiny.map((s) => `${s.nazov} ${s.pocet}`).join(' · '));
+  if (pov.polozky < 15) { console.log(`✘ Povesti ukazujú ${pov.polozky} položiek, čakalo sa 15`); zle++; }
+  else console.log('✔ Povesti ukazujú všetky články, nie iba lokalitu');
+  await p.locator('.lprh-register button', { hasText: 'Strážna' }).first().click();
+  await p.waitForTimeout(600);
 
   for (const [tlacidlo, ocakavane] of [['Datovanie', 41], ['A–Z', 41]]) {
     await p.locator('.lprh-prepinac button', { hasText: tlacidlo }).click();
@@ -99,7 +115,10 @@ let zle = 0;
   await p.locator('.lnav-burger').tap();
   await p.waitForSelector('.lnav-m-btn', { timeout: 20000 });
   await p.locator('.lnav-m-btn', { hasText: 'Refugiá' }).first().tap();
-  await p.waitForTimeout(700);
+  /* Zoznam sa ťahá z vyhľadávacieho registra — kým dorazí, stojí tam
+     „Načítavam články…" a test by meral prázdno. */
+  await p.waitForSelector('.lprh-m .lprh-zoznam li', { timeout: 30000 });
+  await p.waitForTimeout(500);
   const m = await p.evaluate(() => ({
     prepinac: !!document.querySelector('.lprh-m .lprh-prepinac'),
     skupiny: [...document.querySelectorAll('.lprh-m .lprh-skupina')].map((s) => s.querySelector('.lprh-skupina-h span')?.textContent?.trim()),
@@ -107,8 +126,10 @@ let zle = 0;
   }));
   console.log(`\nTelefón · Refugiá · prepínač ${m.prepinac ? 'je' : 'CHÝBA'} · ${m.polozky} lokalít`);
   console.log('  ' + m.skupiny.join(' · '));
-  if (!m.prepinac || m.polozky !== 11) { console.log(`✘ na telefóne ${m.polozky} položiek, čakalo sa 11`); zle++; }
-  else console.log('✔ telefón zoskupuje rovnako');
+  /* 13 = všetky články kategórie: 11 lokalít + 2 bežné články. Test kedysi
+     čakal 11, lebo prehľad vtedy ukazoval iba lokality. */
+  if (!m.prepinac || m.polozky !== 13) { console.log(`✘ na telefóne ${m.polozky} položiek, čakalo sa 13`); zle++; }
+  else console.log('✔ telefón ukazuje všetky články kategórie a zoskupuje rovnako');
   await p.screenshot({ path: `${KAM}/mobil.png`, fullPage: false });
   await ctx.close();
 }

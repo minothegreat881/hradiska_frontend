@@ -16,10 +16,16 @@
  * z textov článkov (viď `scripts/lokality-zluc.mjs`) a ležia v
  * `src/data/lokality.json`. Kategórie bez lokalít — aktuality, modely,
  * pramene — zoskupovať nemajú čo; tie dostanú iba abecedný zoznam článkov.
+ *
+ * V prehľade sú VŠETKY články kategórie, nie iba lokality. Čo lokalitou nie
+ * je, ide do samostatnej skupiny na koniec — pri povestiach bola inak vidieť
+ * jediná, ktorá má súradnice, a zvyšných štrnásť sa dalo nájsť len cez
+ * „Zobraziť všetky".
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import lokalityData from '../data/lokality.json';
+import { getSearchIndex, type IndexDoc } from '../lib/searchIndex';
 import type { NavigationItem } from '../data/navigation-structure';
 
 export interface Lokalita {
@@ -54,6 +60,10 @@ const OBDOBIA = [
 ];
 
 const BEZ_UDAJA = 'Bez udania';
+/* Články, ktoré nie sú lokality — nemajú kraj ani datovanie. Nezmiznú,
+   len idú nabok: v prehľade majú byť VŠETKY články kategórie, nie iba tie,
+   ktoré prešli našimi kritériami. */
+const OSTATNE = 'Ostatné články';
 
 export interface Skupina {
   nazov: string;
@@ -74,19 +84,29 @@ const meta = (l: Lokalita) =>
  * sa podľa neho zoznam rozseká na bloky s rozsahom písmen („B – D"). Na
  * telefóne je stĺpec jeden, takže ostane jediná skupina „A – Z".
  */
-export function zoskup(lokality: Lokalita[], rezim: Zoskupenie, stlpcov = 1): Skupina[] {
+export function zoskup(
+  lokality: Lokalita[],
+  rezim: Zoskupenie,
+  stlpcov = 1,
+  ostatne: { slug: string; nazov: string; meta: string }[] = [],
+): Skupina[] {
   const zoradene = [...lokality].sort((a, b) => podlaAbecedy(a.nazov, b.nazov));
 
+  /* V abecede sa nič nevyčleňuje — písmeno má aj článok bez lokality, takže
+     zoznam je jeden a úplný. */
   if (rezim === 'az') {
-    if (stlpcov <= 1 || zoradene.length < stlpcov * 3) {
-      return zoradene.length ? [{ nazov: 'A – Z', polozky: zoradene.map(naPolozku) }] : [];
+    const vsetko = [...zoradene.map(naPolozku), ...ostatne]
+      .sort((a, b) => podlaAbecedy(a.nazov, b.nazov));
+    if (!vsetko.length) return [];
+    if (stlpcov <= 1 || vsetko.length < stlpcov * 3) {
+      return [{ nazov: 'A – Z', polozky: vsetko }];
     }
-    const naBlok = Math.ceil(zoradene.length / stlpcov);
+    const naBlok = Math.ceil(vsetko.length / stlpcov);
     const von: Skupina[] = [];
-    for (let i = 0; i < zoradene.length; i += naBlok) {
-      const kus = zoradene.slice(i, i + naBlok);
+    for (let i = 0; i < vsetko.length; i += naBlok) {
+      const kus = vsetko.slice(i, i + naBlok);
       const od = pismeno(kus[0].nazov), po = pismeno(kus[kus.length - 1].nazov);
-      von.push({ nazov: od === po ? od : `${od} – ${po}`, polozky: kus.map(naPolozku) });
+      von.push({ nazov: od === po ? od : `${od} – ${po}`, polozky: kus });
     }
     return von;
   }
@@ -110,7 +130,34 @@ export function zoskup(lokality: Lokalita[], rezim: Zoskupenie, stlpcov = 1): Sk
   /* „Bez udania" ide vždy na koniec — je to zvyšok, nie obdobie. */
   const zvysok = koše.get(BEZ_UDAJA);
   if (zvysok?.length) von.push({ nazov: BEZ_UDAJA, polozky: zvysok.map(naPolozku) });
+  /* A za ním články, ktoré lokalitou nie sú vôbec. */
+  if (ostatne.length) {
+    von.push({ nazov: OSTATNE, polozky: [...ostatne].sort((a, b) => podlaAbecedy(a.nazov, b.nazov)) });
+  }
   return von;
+}
+
+/**
+ * Všetky články kategórie z vyhľadávacieho registra — vrátane tých, ktoré
+ * lokalitami nie sú. Register je jedna požiadavka pre celý web a stránka si
+ * ho aj tak sťahuje na hľadanie, takže prehľad nič nestojí navyše.
+ *
+ * Prečo nie zoznam z navigácie: ten ťahá najviac 50 článkov na kategóriu,
+ * takže z 80 aktualít by 30 chýbalo.
+ */
+export function useClankyKategorie(slug: string) {
+  const [vsetky, setVsetky] = useState<IndexDoc[] | null>(null);
+  useEffect(() => {
+    let zrusene = false;
+    getSearchIndex()
+      .then(({ bySlug }) => { if (!zrusene) setVsetky([...bySlug.values()]); })
+      .catch(() => { if (!zrusene) setVsetky([]); });
+    return () => { zrusene = true; };
+  }, []);
+  return useMemo(() => {
+    if (!vsetky) return null;
+    return vsetky.filter((d) => d.categorySlug === slug);
+  }, [vsetky, slug]);
 }
 
 const naPolozku = (l: Lokalita) => ({ slug: `/blog/${l.slug}`, nazov: l.nazov, meta: meta(l) });
@@ -192,25 +239,37 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
   const [hladane, setHladane] = useState('');
   const slug = (aktivna.slug || '').replace('/category/', '').replace(/^\//, '');
   const lokality = lokalityKategorie(slug);
-  /* Kategórie bez lokalít (aktuality, modely, pramene) nemajú kraj ani
-     datovanie — zoskupovať sa v nich nedá a prepínač by klamal. */
+  const clanky = useClankyKategorie(slug);
+  /* Prepínač má zmysel len tam, kde je čo zoskupovať. Kategórie bez jedinej
+     lokality — modely, pramene — dostanú rovno abecedu; prepínač by v nich
+     ponúkal kraj, ktorý nikto nemá. */
   const maLokality = lokality.length > 0;
+  const rezim: Zoskupenie = maLokality ? zoskupenie : 'az';
 
-  const filtrovane = useMemo(() => {
+  /* Články, ktoré lokalitou nie sú. V prehľade majú byť VŠETKY články
+     kategórie — pri povestiach bola vidieť jediná, ktorá má súradnice,
+     a zvyšných štrnásť sa dalo nájsť len cez „Zobraziť všetky". */
+  const ostatne = useMemo(() => {
+    if (!clanky) return [];
+    const jeLokalita = new Set(lokality.map((l) => l.slug));
+    return clanky
+      .filter((c) => !jeLokalita.has(c.slug))
+      .map((c) => ({ slug: `/blog/${c.slug}`, nazov: c.title, meta: '' }));
+  }, [clanky, lokality]);
+
+  const zhoda = (text: string) => {
     const q = hladane.trim().toLocaleLowerCase('sk');
-    if (!q) return lokality;
-    return lokality.filter((l) =>
-      [l.nazov, l.miesto, l.okres, l.kraj, l.datovanie_text]
-        .some((v) => (v || '').toLocaleLowerCase('sk').includes(q)));
-  }, [lokality, hladane]);
+    return !q || text.toLocaleLowerCase('sk').includes(q);
+  };
+  const filtrovane = useMemo(
+    () => lokality.filter((l) => zhoda([l.nazov, l.miesto, l.okres, l.kraj, l.datovanie_text].filter(Boolean).join(' '))),
+    [lokality, hladane]);
+  const filtrovaneOstatne = useMemo(
+    () => ostatne.filter((o) => zhoda(o.nazov)), [ostatne, hladane]);
 
-  const skupiny = useMemo(() => {
-    if (maLokality) return zoskup(filtrovane, zoskupenie, 3);
-    const clanky = (aktivna.children ?? []).map((c) => ({
-      slug: c.slug ?? '#', nazov: c.label, meta: '',
-    })).sort((a, b) => podlaAbecedy(a.nazov, b.nazov));
-    return clanky.length ? [{ nazov: 'A – Z', polozky: clanky }] : [];
-  }, [maLokality, filtrovane, zoskupenie, aktivna]);
+  const skupiny = useMemo(
+    () => zoskup(filtrovane, rezim, 3, filtrovaneOstatne),
+    [filtrovane, rezim, filtrovaneOstatne]);
 
   const zobrazenych = skupiny.reduce((n, s) => n + s.polozky.length, 0);
 
@@ -241,29 +300,28 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
           <div>
             <h2>{aktivna.label}</h2>
             <p className="lprh-suhrn">
-              {maLokality ? `${lokality.length} lokalít` : `${(aktivna.children ?? []).length} článkov`}
+              {clanky === null ? 'Načítavam…' : `${clanky.length} článkov`}
+              {maLokality && ` · z toho ${lokality.length} lokalít`}
               {hladane.trim() && ` · zobrazených ${zobrazenych}`}
             </p>
           </div>
-          {maLokality && (
-            <>
-              <input
-                className="lprh-hladat"
-                type="search"
-                value={hladane}
-                onChange={(e) => setHladane(e.target.value)}
-                placeholder="Hľadať hradisko, obec alebo okres"
-                aria-label="Hľadať v kategórii"
-              />
-              <Prepinac hodnota={zoskupenie} onZmena={onZoskupenie} />
-            </>
-          )}
+          <input
+            className="lprh-hladat"
+            type="search"
+            value={hladane}
+            onChange={(e) => setHladane(e.target.value)}
+            placeholder={maLokality ? 'Hľadať hradisko, obec alebo okres' : 'Hľadať v kategórii'}
+            aria-label="Hľadať v kategórii"
+          />
+          {maLokality && <Prepinac hodnota={zoskupenie} onZmena={onZoskupenie} />}
         </header>
 
         <div className="lprh-telo">
-          {hladane.trim() && !zobrazenych
-            ? <p className="lprh-prazdno">Nič sa nenašlo. Skúste obec alebo okres.</p>
-            : <Skupiny skupiny={skupiny} onOdkaz={onZavri} />}
+          {clanky === null
+            ? <p className="lprh-prazdno">Načítavam zoznam…</p>
+            : hladane.trim() && !zobrazenych
+              ? <p className="lprh-prazdno">Nič sa nenašlo. Skúste obec alebo okres.</p>
+              : <Skupiny skupiny={skupiny} onOdkaz={onZavri} />}
         </div>
 
         <footer className="lprh-pata">
