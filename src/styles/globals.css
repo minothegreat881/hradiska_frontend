@@ -1490,8 +1490,12 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
    tým neutrpí — kto ovláda web klávesnicou, vidí, kde stojí. */
 .hero-search-input:focus,
 .hero-search-input:focus-visible {
-  outline: none;
-  box-shadow: none;
+  /* `!important` je tu vedome: prebíja sa globálne `*:focus-visible`, ktoré
+     v pečatnom šate kreslí červený obrys — a v tomto jedinom prípade je
+     nadbytočný, lebo fokus ukazuje celý bar naraz. Bez neho sa okolo poľa
+     kreslil červený obdĺžnik vnútri pilulky. */
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Na úzkych displejoch má prednosť samotný text pred nápovedou „⏎ ENTER". */

@@ -66,11 +66,6 @@ export function LabHome() {
               />
             </picture>
           </div>
-          {/* Popiska hovorí, že ide o PREDSTAVU, nie o zameranú lokalitu.
-              Handoff mal na tomto mieste „Rekonštrukcia opevneného sídliska
-              z 9. storočia" — na encyklopédii by to znelo ako údaj o konkrétnom
-              náleze, ktorý za tou ilustráciou nie je. */}
-          <figcaption>Ilustračná rekonštrukcia hradiska — akropola nad riekou a opevnené podhradie</figcaption>
         </figure>
 
         <div className="lhero-hladanie">

@@ -379,7 +379,10 @@ export function HeroSearch() {
               borderRadius: 8,
               flexShrink: 0,
               transition: 'background 250ms ease, color 250ms ease, border-color 250ms ease, box-shadow 250ms ease',
-              ...(isFocused
+              /* Rovnako ako rám baru: myšou sa nerozsvieti. Červený krúžok
+                 s presvitom okolo lupy bol vo vnútri pilulky to najviditeľnejšie
+                 a pri kratšom bare pôsobil ako chyba. */
+              ...(ramKlavesnicou
                 ? {
                     color: T.panelBg,
                     background: `linear-gradient(135deg, ${T.amberLight}, ${T.amber})`,
