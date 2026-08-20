@@ -3098,99 +3098,71 @@ body[data-lab-theme] .pl-act {
 .lprof-kostra span { height: 12px; background: var(--l-paper-2); border-radius: 2px; }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   TITULNÁ ČASŤ  —  handoff „Celé hradisko" (2a)
-   Ilustrácia cez celú šírku a neorezaná, titulok vpravo hore na svetlom poli,
-   hľadanie preložené cez spodnú hranu snímky, pod ním populárne odkazy.
+   TITULNÁ ČASŤ  —  handoff „Múzejná tabuľa" (2b)
+   Titulok NAD obrazom, snímka v pasparte s popiskou, nič cez ňu neleží.
    Rozmery sú z handoffu prepočítané na návrhovú šírku 1440 px.
    ══════════════════════════════════════════════════════════════════════════ */
-/* Selektor je zámerne cez `.parchment`. V globals.css sedí pravidlo
-   `.parchment > section { z-index: 10 }`, ktoré je špecifickejšie než samotná
-   trieda — titulná časť tak skončila v tej istej vrstve ako sekcia pod ňou
-   a keďže je v dokumente skôr, roletka výsledkov hľadania sa kreslila POD
-   „Zo života združenia". Predtým to držal inline `style={{ zIndex: 30 }}`;
-   pri prepise do triedy sa tá ochrana ticho stratila. */
-.parchment > .lhero-sekcia { position: relative; z-index: 30; padding-bottom: 44px; }
-
-.lhero {
+.parchment > .lhero-sekcia {
   position: relative;
-  overflow: hidden;
-  margin: 0;
-  background: var(--l-paper-2);
-}
-/* `width: 100%` a žiadny `object-fit` — handoff žiada snímku celú, bez orezu. */
-.lhero-obraz { display: block; width: 100%; height: auto; }
-
-/* Svetlé pole pod titulkom. V handoffe je vyretušované priamo do fotografie;
-   tu je kreslené, takže sa dá doladiť a predloha ostane nedotknutá. Prechod
-   pokrýva celú snímku — keď sedel len na rámčeku okolo textu, jeho okraj bolo
-   vidieť ako svetlý obdĺžnik. */
-.lhero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(
-    66% 62% at 82% 17%,
-    rgba(243, 237, 225, .94) 0%,
-    rgba(243, 237, 225, .86) 32%,
-    rgba(243, 237, 225, .5) 58%,
-    rgba(243, 237, 225, .14) 78%,
-    rgba(243, 237, 225, 0) 90%
-  );
-}
-/* Spodný závoj z handoffu. Nie je ozdoba: hľadanie sa cezeň prekladá a bez
-   neho by biely pill splynul s vysvetlenou lúkou pod hradiskom. */
-.lhero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(to top, rgba(24, 16, 8, .25) 0%, rgba(24, 16, 8, 0) 18%);
+  z-index: 30;   /* `.parchment > section { z-index: 10 }` v globals.css je
+                    špecifickejšie než samotná trieda; bez cesty cez rodiča sa
+                    roletka hľadania kreslí POD sekciou „Zo života združenia". */
+  padding: 56px clamp(20px, 6.7vw, 96px) 48px;
+  text-align: center;
 }
 
-.lhero-napis {
-  position: absolute;
-  z-index: 2;
-  top: 6.2%;      /* 56 / 898 */
-  right: 4.4%;    /* 64 / 1440 */
-  text-align: right;
-}
-.lhero-titul {
-  margin: 0;
-  font-family: 'Fraunces', Georgia, serif;
-  font-weight: 700;
-  font-size: clamp(34px, 6.4vw, 92px);   /* 92 / 1440 */
-  line-height: 1;
-  letter-spacing: -.01em;
-  color: var(--l-ink);
-}
-.lhero-ciara {
-  display: block;
-  width: 64px;
-  height: 3px;
-  margin: 22px 0 14px auto;
-  background: var(--l-second);
-}
-.lhero-podtitul {
+/* Nadčiara: popis medzi dvomi krátkymi červenými linkami. */
+.lhero-nadciara {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: clamp(11px, .97vw, 14px);
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: .22em;
+  letter-spacing: .24em;
   text-transform: uppercase;
   color: var(--l-muted);
 }
+.lhero-nadciara span { width: 34px; height: 2px; background: var(--l-second); flex: none; }
 
-/* Hľadanie leží NA spodnej hrane snímky (−36 px), nie pod ňou. */
-/* Šírku drží tento obal, nie trieda `max-w-[780px]` na komponente: tá sa
+.lhero-titul {
+  margin: 18px 0 40px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(38px, 5.55vw, 80px);   /* 80 / 1440 */
+  line-height: 1.02;
+  letter-spacing: -.01em;
+  color: var(--l-ink);
+  text-wrap: balance;
+}
+
+/* Pasparta. Obraz v nej vychádza pri návrhovej šírke na ~1220 px, teda
+   presne na rozlíšenie predlohy — nikde sa neťahá nahor. */
+.lhero-tabula { margin: 0; }
+.lhero-ram {
+  padding: 14px;
+  border: 1px solid var(--l-line-2);
+  border-radius: 6px;
+  background: var(--l-card);
+  box-shadow: 0 18px 40px -22px rgba(74, 52, 18, .35);
+}
+.lhero-obraz { display: block; width: 100%; height: auto; border-radius: 2px; }
+.lhero-tabula figcaption {
+  margin-top: 16px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--l-muted);
+}
+
+/* Šírku drží tento obal, nie trieda `max-w-[...]` na komponente: tá sa
    z Tailwindu negenerovala a bar sa rozťahoval cez celý pás. */
 .lhero-hladanie {
-  position: relative;
-  z-index: 2;
-  width: min(780px, calc(100% - 48px));
-  margin: -36px auto 0;
+  width: min(760px, 100%);
+  margin: 36px auto 0;
 }
 
 .lhero-rychle {
@@ -3198,42 +3170,31 @@ body[data-lab-theme] .pl-act {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 18px;
-  padding: 24px 24px 0;
+  gap: 16px;
+  margin-top: 20px;
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
 }
 .lhero-rychle-popis { color: var(--l-muted); }
-.lhero-rychle a {
-  font-weight: 500;
-  color: var(--l-second-deep);
-  text-decoration: none;
-}
+.lhero-rychle a { font-weight: 500; color: var(--l-second-deep); text-decoration: none; }
 .lhero-rychle a:hover { text-decoration: underline; }
 .lhero-rychle span[aria-hidden] { color: var(--l-line-2); }
 
-/* Na úzkej obrazovke titulok z fotky zlieza pod ňu: pri 390 px by mu na
-   snímke ostalo ~160 px šírky a hmla by musela zakryť pol hradiska. */
 @media (max-width: 767px) {
-  .lhero::before { display: none; }
-  .lhero-napis {
-    position: static;
-    text-align: left;
-    padding: 20px 18px 22px;
-    background: var(--l-paper);
-    border-bottom: 1px solid var(--l-line);
-  }
-  .lhero-titul { font-size: clamp(32px, 9.4vw, 46px); }
-  .lhero-ciara { margin: 16px auto 12px 0; }
-  .lhero-hladanie { width: calc(100% - 32px); margin-top: 18px; }
-  .lhero-rychle { gap: 12px; padding: 20px 16px 0; }
+  .parchment > .lhero-sekcia { padding: 32px 16px 36px; }
+  .lhero-nadciara { font-size: 11px; gap: 10px; }
+  .lhero-nadciara span { width: 22px; }
+  .lhero-titul { margin: 14px 0 26px; }
+  .lhero-ram { padding: 8px; }
+  .lhero-tabula figcaption { margin-top: 12px; font-size: 13.5px; }
+  .lhero-hladanie { margin-top: 26px; }
 }
 
 /* Tlačidlo „Hľadať" v paneli hľadania (handoff 2a: 52 px, padding 0 30px). */
 .hero-search-odoslat {
   flex: none;
-  height: 52px;
-  padding: 0 30px;
+  height: 50px;
+  padding: 0 28px;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
@@ -3244,7 +3205,7 @@ body[data-lab-theme] .pl-act {
   background: var(--l-second-deep);
   color: var(--l-on-dark-2);
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   transition: background .18s ease;
 }
@@ -3254,4 +3215,15 @@ body[data-lab-theme] .pl-act {
 /* Na úzkej obrazovke by tlačidlo zjedlo pole, do ktorého sa píše. */
 @media (max-width: 600px) {
   .hero-search-odoslat { height: 44px; padding: 0 18px; font-size: 14px; }
+}
+
+/* Na úzkej obrazovke lupa vľavo mizne. Nie je to strata: tlačidlo „Hľadať"
+   vedľa hovorí to isté a tých ~54 px je rozdiel medzi odseknutým
+   „Hľadaj hradiská, člá" a celým popisom poľa. */
+@media (max-width: 600px) {
+  .hero-search-lupa { display: none !important; }
+  .lhero-hladanie .hero-search-input { font-size: 16px; }
+}
+@media (max-width: 600px) {
+  .hero-search-riadok { padding-left: 18px !important; }
 }

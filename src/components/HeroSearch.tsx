@@ -233,6 +233,18 @@ export function HeroSearch() {
      ukazovateľa. */
   const [ramKlavesnicou, setRamKlavesnicou] = useState(false);
   const prisloMysou = useRef(false);
+
+  /* Popis poľa sa na úzkej obrazovke skracuje. Orezaný text („Hľadaj
+     hradiská, člá") nie je pokyn, len zvyšok vety — a skrátiť sa cez CSS
+     nedá, placeholder je obsah, nie štýl. */
+  const [uzko, setUzko] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 600px)');
+    const zmer = () => setUzko(mq.matches);
+    zmer();
+    mq.addEventListener('change', zmer);
+    return () => mq.removeEventListener('change', zmer);
+  }, []);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [pulseKey, setPulseKey] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -340,7 +352,7 @@ export function HeroSearch() {
           // Zrušiť ho bez náhrady sa nedá — kto ovláda web klávesnicou, musí
           // vidieť, kde stojí. Preto svieti celý bar.
           background: T.panelBg,
-          border: `1px solid ${ramKlavesnicou ? T.amberLight : T.panelBorder}`,
+          border: `1.5px solid ${ramKlavesnicou ? T.amberLight : T.panelBorder}`,
           borderRadius: 999,
           boxShadow: ramKlavesnicou
             ? `0 0 0 4px ${T.focusGlow}, 0 24px 48px -14px rgba(74,52,18,.32)`
@@ -354,9 +366,10 @@ export function HeroSearch() {
             linka — a pri kliknutí zosilnela z .35 na .85, čiže sa tvárila ako
             stav. Odstránený bez náhrady; nič nesignalizoval. */}
         {/* Input riadok */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 10px 10px 24px' }}>
+        <div className="hero-search-riadok" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 9px 9px 24px' }}>
           <motion.span
             key={pulseKey}
+            className="hero-search-lupa"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -389,7 +402,7 @@ export function HeroSearch() {
             type="text"
             id="site-search"
             name="search"
-            placeholder="Hľadaj hradiská, články, kľúčové slová…"
+            placeholder={uzko ? 'Hľadaj hradiská…' : 'Hľadaj hradiská, články, kľúčové slová…'}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => {
