@@ -428,7 +428,13 @@
 .lnav-panel-all:hover { color: var(--l-accent-deep); background: var(--l-paper-2); border-radius: 0 0 9px 9px; }
 
 @media (max-width: 1100px) { .lnav-rowlabel { display: none; } }
-@media (max-width: 900px) { .lnav-cats { display: none; } }
+@media (max-width: 900px) {
+  .lnav-cats { display: none; }
+  /* Bez tohto sa ikony zastavia hneď za značkou a vpravo ostane prázdno:
+     namerané 105 px pri okne 390 px, kým vľavo má značka odsadenie 14 px.
+     Lišta tým pôsobí rozhodene — ikony patria k pravému okraju. */
+  .lnav-right { margin-left: auto; }
+}
 @media (prefers-reduced-motion: reduce) {
   .lnav-cat-btn, .lnav-cat-btn::after, .lnav-cats-row[data-secondary], .lnav-mark { transition: none; }
   .lnav-panel { animation: none; }

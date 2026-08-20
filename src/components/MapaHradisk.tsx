@@ -412,10 +412,25 @@ export function MapaHradisk() {
        reliefe je castejsie treba posunut nabok nez zoomovat, a dvoma prstami
        na trackpade je posun prirodzeny pohyb. Koliesko preto POSUVA (aj
        doprava/dolava cez `deltaX` alebo Shift), priblizuje az Ctrl/⌘. */
-    /* KOLIESKO PRIBLIŽUJE — tak, ako to človek od mapy čaká.
-       Chvíľu tu bolo naopak (koliesko posúvalo, priblíženie chcelo Ctrl),
-       čo bola zbytočná zvláštnosť. Posúvanie má ťahanie myšou. */
+    /* KOLIESKO PRIBLIŽUJE — tak, ako to človek od mapy čaká. Chvíľu tu bolo
+       naopak (koliesko posúvalo, priblíženie chcelo Ctrl), čo bola zbytočná
+       zvláštnosť. Posúvanie má ťahanie myšou.
+
+       LENŽE mapa je uprostred dlhej stránky. Kým sa cez ňu človek len
+       prescrolluje, koliesko mu pod kurzorom začalo približovať a stránka
+       zamrzla. Priblíženie sa preto ZAPÍNA až kliknutím do mapy a vypína,
+       keď z nej kurzor odíde: prechádzam okolo → stránka sa posúva,
+       pracujem s mapou → koliesko približuje.
+
+       Na celej obrazovke sa nemá kam scrollovať, tak je zapnuté rovno. */
     const el = map.getCanvasContainer();
+
+    if (!fullRef.current) map.scrollZoom.disable();
+    const zapniKoliesko = () => map.scrollZoom.enable();
+    const vypniKoliesko = () => { if (!fullRef.current) map.scrollZoom.disable(); };
+    el.addEventListener('mousedown', zapniKoliesko);
+    const koren = rootRef.current;
+    koren?.addEventListener('mouseleave', vypniKoliesko);
 
     /* KTO JE POD KURZOROM sa dopočíta z polôh uzlov, body samy myš
        nezachytávajú. Dovtedy platilo opačné: bod bol tlačidlo, takže mapa
@@ -852,6 +867,9 @@ export function MapaHradisk() {
     const map = mapRef.current;
     if (!map) return;
     fullRef.current = full;
+    /* Na celej obrazovke sa stránka scrollovať nedá, takže koliesko môže
+       približovať rovno — čakať na kliknutie by tam bola len prekážka. */
+    if (full) map.scrollZoom.enable(); else map.scrollZoom.disable();
     if (full) {
       document.body.style.overflow = 'hidden';
       /* Otáčanie dvoma prstami len prekáža — mapa má sever hore. Štipnutie
@@ -1022,9 +1040,17 @@ export function MapaHradisk() {
        čím sa ťuknutie nemusí na klik vôbec preložiť. A prečo v ZACHYTÁVACEJ
        fáze: takto sa poslucháč spustí skôr, než sa udalosť dostane
        k čomukoľvek vnútri, takže ho nemá čo pohltiť. */
+    /* Poslucháč sedí na koreni sekcie, takže dostane aj ťuknutia na ovládacie
+       prvky v bočnom paneli — a tie predtým pohltil: ťuknutie na „Satelit"
+       neprepilo podklad, iba otvorilo mapu na celú obrazovku. Ovládač si
+       preto svoje ťuknutie ponechá sám; plátno MapLibre a body ostávajú
+       otvárajúce, lebo tie žiadnu vlastnú akciu nemajú. */
+    const naOvladaci = (t: EventTarget | null) =>
+      t instanceof Element && !!t.closest('button, a, input, select, label, [role="button"], [role="group"]');
+
     let t0 = 0, x0 = 0, y0 = 0, moved = false;
     const onStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) { moved = true; return; }
+      if (e.touches.length !== 1 || naOvladaci(e.target)) { moved = true; return; }
       t0 = e.timeStamp; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; moved = false;
     };
     const onMove = (e: TouchEvent) => {
@@ -1032,7 +1058,7 @@ export function MapaHradisk() {
       if (Math.abs(e.touches[0].clientX - x0) > 12 || Math.abs(e.touches[0].clientY - y0) > 12) moved = true;
     };
     const onEnd = (e: TouchEvent) => {
-      if (moved || e.timeStamp - t0 > 700) return;
+      if (moved || naOvladaci(e.target) || e.timeStamp - t0 > 700) return;
       e.stopPropagation();
       /* KĽÚČOVÉ: bez tohto prehliadač po zdvihnutí prsta ešte dogeneruje
          klik — a ten dopadne až vtedy, keď je mapa na celej obrazovke
@@ -1042,7 +1068,7 @@ export function MapaHradisk() {
       open();
     };
     /* Myš na úzkom okne — tam žiadne rozlišovanie netreba. */
-    const onClick = (e: Event) => { e.stopPropagation(); open(); };
+    const onClick = (e: Event) => { if (naOvladaci(e.target)) return; e.stopPropagation(); open(); };
 
     /* `passive: false` je nutné — inak prehliadač `preventDefault()` v
        `touchend` ignoruje a dogenerovaný klik prejde. */
@@ -1111,7 +1137,8 @@ export function MapaHradisk() {
           <h2 className="lmap-title">Hradiská</h2>
           <div className="lmap-sub">Slovenska</div>
           <p className="lmap-lead">
-            Interaktívna mapa lokalít. Kolieskom približujete, ťahaním posúvate —
+            Interaktívna mapa lokalít. Kliknutím do nej zapnete koliesko na
+            približovanie, ťahaním posúvate —
             zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode
             otvoríte kartu lokality, klikom do mapy ju zavriete.
           </p>

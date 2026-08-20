@@ -10,7 +10,7 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait-primary",
-  "background_color": "#f7f4ed",
+  "background_color": "#f3ede1",
   "theme_color": "#f7f4ed",
   "categories": ["education", "books", "travel"],
   "icons": [
