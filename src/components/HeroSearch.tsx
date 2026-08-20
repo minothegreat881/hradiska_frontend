@@ -222,6 +222,17 @@ function ResultRow({
 export function HeroSearch() {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  /* Rám okolo baru je NÁHRADA za obrys prehliadača — nesmie zmiznúť tomu, kto
+     web ovláda klávesnicou. Myšou ho ale nikto nepotrebuje a vo vnútri
+     pilulky pôsobil ako červená linka. `isFocused` preto naďalej riadi
+     roletku a tento stav len ten rám.
+
+     `:focus-visible` sa na to použiť NEDÁ: pri textovom poli ho prehliadač
+     priznáva aj kliknutiu (pole čaká na písanie, tak fokus vždy ukazuje).
+     Rozlišuje sa teda spôsob príchodu — či fokusu predchádzalo stlačenie
+     ukazovateľa. */
+  const [ramKlavesnicou, setRamKlavesnicou] = useState(false);
+  const prisloMysou = useRef(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [pulseKey, setPulseKey] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -314,8 +325,12 @@ export function HeroSearch() {
   };
 
   return (
-    <div className="relative w-full max-w-[640px] mx-auto">
+    /* Šírka a tvar podľa handoffu „Celé hradisko": pilulka 780 × 72.
+       Zaoblenie 999 px namiesto 18 — bar leží na spodnej hrane fotografie
+       a hranatý roh tam pôsobil ako odrezaný kus obrazu. */
+    <div className="relative w-full max-w-[780px] mx-auto">
       <div
+        onPointerDown={() => { prisloMysou.current = true; }}
         style={{
           position: 'relative',
           // Pri fokuse sa rozsvieti pergamen a okraj prejde do zlatej. Toto je
@@ -324,31 +339,22 @@ export function HeroSearch() {
           // `overflow: hidden`, obrys sa orezal a kreslil rámik vnútri baru.
           // Zrušiť ho bez náhrady sa nedá — kto ovláda web klávesnicou, musí
           // vidieť, kde stojí. Preto svieti celý bar.
-          background: isFocused
-            ? 'linear-gradient(180deg,var(--hr-surface),var(--hr-wash-1))'
-            : T.panelBg,
-          border: `1px solid ${isFocused ? T.amberLight : T.panelBorder}`,
-          borderRadius: 18,
-          boxShadow: isFocused
-            ? `0 0 0 4px ${T.focusGlow}, 0 14px 34px -16px rgba(125,79,29,.5), inset 0 1px 0 rgba(255,255,255,.9)`
-            : '0 6px 20px rgba(125,79,29,.14), inset 0 1px 0 rgba(255,255,255,.75)',
+          background: T.panelBg,
+          border: `1px solid ${ramKlavesnicou ? T.amberLight : T.panelBorder}`,
+          borderRadius: 999,
+          boxShadow: ramKlavesnicou
+            ? `0 0 0 4px ${T.focusGlow}, 0 24px 48px -14px rgba(74,52,18,.32)`
+            : '0 24px 48px -14px rgba(74,52,18,.32)',
           transition: 'border-color 220ms ease, box-shadow 220ms ease, background 220ms ease',
           overflow: 'hidden',
         }}
       >
-        {/* Zlatý vlások po hornej hrane — pri fokuse zosilnie. Čisto ozdobný. */}
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute', left: 0, right: 0, top: 0, height: 2,
-            background: `linear-gradient(90deg, transparent, ${T.amberLight}, transparent)`,
-            opacity: isFocused ? 0.85 : 0.35,
-            transition: 'opacity 220ms ease',
-            pointerEvents: 'none',
-          }}
-        />
+        {/* Ozdobný vlások po hornej hrane bol tu ešte zo zlatého šatu. V pečati
+            je akcent červený, takže z neho vo vnútri pilulky vznikla červená
+            linka — a pri kliknutí zosilnela z .35 na .85, čiže sa tvárila ako
+            stav. Odstránený bez náhrady; nič nesignalizoval. */}
         {/* Input riadok */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 10px 10px 24px' }}>
           <motion.span
             key={pulseKey}
             style={{
@@ -388,6 +394,8 @@ export function HeroSearch() {
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => {
               setIsFocused(true);
+              setRamKlavesnicou(!prisloMysou.current);
+              prisloMysou.current = false;
               setPulseKey((k) => k + 1);
               // Zahrej index hneď pri fokuse, nech je prvé hľadanie okamžité.
               getSearchIndex().catch(() => {});
@@ -403,7 +411,7 @@ export function HeroSearch() {
                 }, 300);
               }
             }}
-            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+            onBlur={() => { setRamKlavesnicou(false); setTimeout(() => setIsFocused(false), 200); }}
             onKeyDown={handleKeyDown}
             className="flex-1 min-w-0 bg-transparent outline-none border-0 hero-search-input"
             style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: T.textMain, padding: 0, background: 'transparent' }}
@@ -477,6 +485,21 @@ export function HeroSearch() {
               ✕
             </motion.button>
           )}
+
+          {/* Odosielacie tlačidlo z handoffu. Doteraz sa hľadalo len klávesom
+              Enter — dala to tušiť iba nápoveda „⏎ ENTER", ktorá sa navyše
+              objaví až keď je čo odoslať, a na dotykovej obrazovke klávesu
+              Enter nikto nehľadá. */}
+          <button
+            type="button"
+            /* Prázdne pole tlačidlo NEVYPÍNA — zoslabnutá terakota vyzerala
+               ako chyba a v handoffe je tlačidlo stále plné. Klik bez zadania
+               postaví kurzor do poľa, čo je to jediné zmysluplné. */
+            onClick={() => (trimmed ? openResultsPage() : inputRef.current?.focus())}
+            className="hero-search-odoslat"
+          >
+            Hľadať
+          </button>
         </div>
       </div>
 

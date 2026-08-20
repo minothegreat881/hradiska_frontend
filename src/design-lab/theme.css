@@ -3098,91 +3098,160 @@ body[data-lab-theme] .pl-act {
 .lprof-kostra span { height: 12px; background: var(--l-paper-2); border-radius: 2px; }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   TITULNÁ DOSKA
-   Fotografia je rekonštrukčná doska, nie banner — preto bez zaobleného rohu
-   a bez vrhnutého tieňa, len vláskový rám ako pri obrazovej prílohe.
-   Šírka je zámerne menšia než obsahový pás: predloha má 1217 px a v páse na
-   1376 px by sa ťahala nahor a zmäkla.
+   TITULNÁ ČASŤ  —  handoff „Celé hradisko" (2a)
+   Ilustrácia cez celú šírku a neorezaná, titulok vpravo hore na svetlom poli,
+   hľadanie preložené cez spodnú hranu snímky, pod ním populárne odkazy.
+   Rozmery sú z handoffu prepočítané na návrhovú šírku 1440 px.
    ══════════════════════════════════════════════════════════════════════════ */
+/* Selektor je zámerne cez `.parchment`. V globals.css sedí pravidlo
+   `.parchment > section { z-index: 10 }`, ktoré je špecifickejšie než samotná
+   trieda — titulná časť tak skončila v tej istej vrstve ako sekcia pod ňou
+   a keďže je v dokumente skôr, roletka výsledkov hľadania sa kreslila POD
+   „Zo života združenia". Predtým to držal inline `style={{ zIndex: 30 }}`;
+   pri prepise do triedy sa tá ochrana ticho stratila. */
+.parchment > .lhero-sekcia { position: relative; z-index: 30; padding-bottom: 44px; }
+
 .lhero {
   position: relative;
   overflow: hidden;
-  margin: 0 auto;
-  max-width: 1120px;
-  border: 1px solid var(--l-line-2);
+  margin: 0;
   background: var(--l-paper-2);
 }
+/* `width: 100%` a žiadny `object-fit` — handoff žiada snímku celú, bez orezu. */
 .lhero-obraz { display: block; width: 100%; height: auto; }
-.lhero-hladanie { max-width: 1120px; margin-inline: auto; }
 
-/* Nadpis leží v opare nad vodou — v pravej hornej štvrtine, kde má fotka
-   najpokojnejšiu plochu. Podkladom je hmla, ktorá tam na snímke už je, len
-   zhustená.
-   Prechod pokrýva CELÚ dosku, nie len okolie nadpisu: keď sedel na malom
-   rámčeku okolo textu, jeho okraj bolo vidieť ako svetlý obdĺžnik — kruh
-   sa nestihol vytratiť skôr, než ho orezala hrana prvku. */
+/* Svetlé pole pod titulkom. V handoffe je vyretušované priamo do fotografie;
+   tu je kreslené, takže sa dá doladiť a predloha ostane nedotknutá. Prechod
+   pokrýva celú snímku — keď sedel len na rámčeku okolo textu, jeho okraj bolo
+   vidieť ako svetlý obdĺžnik. */
+.lhero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    66% 62% at 82% 17%,
+    rgba(243, 237, 225, .94) 0%,
+    rgba(243, 237, 225, .86) 32%,
+    rgba(243, 237, 225, .5) 58%,
+    rgba(243, 237, 225, .14) 78%,
+    rgba(243, 237, 225, 0) 90%
+  );
+}
+/* Spodný závoj z handoffu. Nie je ozdoba: hľadanie sa cezeň prekladá a bez
+   neho by biely pill splynul s vysvetlenou lúkou pod hradiskom. */
 .lhero::after {
   content: '';
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    62% 58% at 82% 18%,
-    rgba(243, 237, 225, .93) 0%,
-    rgba(243, 237, 225, .82) 30%,
-    rgba(243, 237, 225, .46) 56%,
-    rgba(243, 237, 225, .12) 76%,
-    rgba(243, 237, 225, 0) 88%
-  );
-}
-.lhero-napis {
-  position: absolute;
   z-index: 1;
-  top: 7%; right: 4.5%;
-  width: min(40%, 420px);
-  text-align: right;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(24, 16, 8, .25) 0%, rgba(24, 16, 8, 0) 18%);
 }
 
+.lhero-napis {
+  position: absolute;
+  z-index: 2;
+  top: 6.2%;      /* 56 / 898 */
+  right: 4.4%;    /* 64 / 1440 */
+  text-align: right;
+}
 .lhero-titul {
   margin: 0;
   font-family: 'Fraunces', Georgia, serif;
-  font-weight: 600;
-  font-size: clamp(30px, 4.6vw, 62px);
-  line-height: .98;
-  letter-spacing: -.015em;
+  font-weight: 700;
+  font-size: clamp(34px, 6.4vw, 92px);   /* 92 / 1440 */
+  line-height: 1;
+  letter-spacing: -.01em;
   color: var(--l-ink);
-  text-wrap: balance;
 }
 .lhero-ciara {
   display: block;
-  width: 74px;
-  height: 2px;
-  margin: 16px 0 12px auto;
+  width: 64px;
+  height: 3px;
+  margin: 22px 0 14px auto;
   background: var(--l-second);
 }
 .lhero-podtitul {
   margin: 0;
-  font-family: var(--mono);
-  font-size: clamp(10px, 1.05vw, 12px);
-  letter-spacing: .16em;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(11px, .97vw, 14px);
+  font-weight: 600;
+  letter-spacing: .22em;
   text-transform: uppercase;
-  color: var(--l-body);
+  color: var(--l-muted);
 }
 
-/* Na telefóne nadpis z fotky zlieza pod ňu. Cez pol obrázka by sa nedal
-   prečítať ani so zhustenou hmlou a na 390 px by mu ostalo 160 px šírky. */
+/* Hľadanie leží NA spodnej hrane snímky (−36 px), nie pod ňou. */
+/* Šírku drží tento obal, nie trieda `max-w-[780px]` na komponente: tá sa
+   z Tailwindu negenerovala a bar sa rozťahoval cez celý pás. */
+.lhero-hladanie {
+  position: relative;
+  z-index: 2;
+  width: min(780px, calc(100% - 48px));
+  margin: -36px auto 0;
+}
+
+.lhero-rychle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 24px 24px 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+}
+.lhero-rychle-popis { color: var(--l-muted); }
+.lhero-rychle a {
+  font-weight: 500;
+  color: var(--l-second-deep);
+  text-decoration: none;
+}
+.lhero-rychle a:hover { text-decoration: underline; }
+.lhero-rychle span[aria-hidden] { color: var(--l-line-2); }
+
+/* Na úzkej obrazovke titulok z fotky zlieza pod ňu: pri 390 px by mu na
+   snímke ostalo ~160 px šírky a hmla by musela zakryť pol hradiska. */
 @media (max-width: 767px) {
-  .lhero { border-bottom: 0; }
-  .lhero::after { display: none; }
+  .lhero::before { display: none; }
   .lhero-napis {
     position: static;
-    width: auto;
     text-align: left;
     padding: 20px 18px 22px;
-    border: 1px solid var(--l-line-2);
-    border-top: 0;
     background: var(--l-paper);
+    border-bottom: 1px solid var(--l-line);
   }
-  .lhero-titul { font-size: clamp(30px, 9vw, 44px); }
-  .lhero-ciara { margin: 14px auto 11px 0; }
+  .lhero-titul { font-size: clamp(32px, 9.4vw, 46px); }
+  .lhero-ciara { margin: 16px auto 12px 0; }
+  .lhero-hladanie { width: calc(100% - 32px); margin-top: 18px; }
+  .lhero-rychle { gap: 12px; padding: 20px 16px 0; }
+}
+
+/* Tlačidlo „Hľadať" v paneli hľadania (handoff 2a: 52 px, padding 0 30px). */
+.hero-search-odoslat {
+  flex: none;
+  height: 52px;
+  padding: 0 30px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  /* Tmavšia pečatná červená, nie základná. Na základnej (#c9483a) mal
+     16 px popis 4,03:1 pri požadovaných 4,5 — tá istá vec, prečo majú
+     `.ljoin` aj `.lart-more` prepísané `--l-second` na hlbší odtieň.
+     Prejdenie myšou ide do atramentu, aby norma platila aj v tom stave. */
+  background: var(--l-second-deep);
+  color: var(--l-on-dark-2);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background .18s ease;
+}
+.hero-search-odoslat:hover { background: var(--l-ink); }
+.hero-search-odoslat:focus-visible { outline: 2px solid var(--l-ink); outline-offset: 2px; }
+
+/* Na úzkej obrazovke by tlačidlo zjedlo pole, do ktorého sa píše. */
+@media (max-width: 600px) {
+  .hero-search-odoslat { height: 44px; padding: 0 18px; font-size: 14px; }
 }
