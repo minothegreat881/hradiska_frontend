@@ -77,7 +77,10 @@ function CommentItem({
   const [replyText, setReplyText] = useState('');
   const [sending, setSending] = useState(false);
   return (
-    <div style={{ marginLeft: depth > 0 ? 32 : 0, marginTop: 16 }}>
+    /* Kotva na konkrétny komentár. Bez nej sa dalo odkázať len na článok —
+       a upozornenie v profile („odpovedal na váš komentár") viedlo na začiatok
+       diskusie, kde si ho človek musel nájsť sám. */
+    <div id={`k-${comment.documentId}`} style={{ marginLeft: depth > 0 ? 32 : 0, marginTop: 16, scrollMarginTop: 96 }}>
       <div
         style={{
           display: 'flex',
@@ -453,6 +456,23 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
         m.mine = mineSet.has(m.documentId);
         return m;
       })));
+
+      /* Ak adresa nesie kotvu komentára, prejdi naň — až TERAZ, keď je
+         v dokumente. Prehliadač si hash spracuje pri načítaní stránky, keď
+         diskusia ešte nie je stiahnutá, takže by neskočil nikam.
+         Krátke zvýraznenie hovorí, ktorý z nich to je; bez neho človek
+         pristane uprostred vlákna a háda. */
+      const kotva = typeof window !== 'undefined' && window.location.hash.startsWith('#k-')
+        ? window.location.hash.slice(1) : '';
+      if (kotva) {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(kotva);
+          if (!el) return;
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('komentar-najdeny');
+          window.setTimeout(() => el.classList.remove('komentar-najdeny'), 2600);
+        });
+      }
     } catch (e) {
       console.warn('[CommentSection] fetch failed:', e);
       setComments([]);

@@ -265,6 +265,17 @@ function Ozvy({ items }: { items: NotificationItem[] | null }) {
           : n.aktualita ? '/aktuality' : null;
         const viac = n.aggregateCount > 1;
 
+        /* Druhý odkaz mieri na SAMOTNÝ komentár, nie len na článok. Bez neho
+           upozornenie „odpovedal na váš komentár" viedlo na začiatok
+           diskusie a človek si ho musel nájsť sám — pri dlhom vlákne to je
+           hľadanie ihly. Foto-komentáre otvára `?fotoFile`, blogové kotva
+           `#k-<id>`, ktorá skočí na komentár a nakrátko ho zvýrazní. */
+        const idKomentara = n.comment?.documentId || n.photoComment?.documentId || null;
+        const doDiskusie = !n.post ? null
+          : kFotke && n.fileId ? { href: `/blog/${n.post.slug}?fotoFile=${n.fileId}`, popis: 'Otvoriť fotografiu' }
+          : idKomentara ? { href: `/blog/${n.post.slug}#k-${idKomentara}`, popis: 'Zobraziť v diskusii' }
+          : null;
+
         /* Kto sa ozval a čo urobil. Pri systémových ozvách nie je nikto —
            terč vtedy nesie znak, nie iniciálu. */
         let ktoText = kto;
@@ -309,6 +320,11 @@ function Ozvy({ items }: { items: NotificationItem[] | null }) {
                 ? <a className="lprof-kde" href={odkaz}>{nazov}</a>
                 : <span className="lprof-kde">{nazov}</span>)}
               {citat && <p className="lprof-citat">{citat}</p>}
+              {doDiskusie && (
+                <a className="lprof-doDiskusie" href={doDiskusie.href}>
+                  {doDiskusie.popis} <span aria-hidden="true">→</span>
+                </a>
+              )}
             </div>
           </li>
         );

@@ -3273,3 +3273,29 @@ body[data-lab-theme] .pl-act {
 @media (max-width: 600px) {
   .hero-search-riadok { padding-left: 18px !important; }
 }
+
+/* Komentár, na ktorý viedol odkaz z profilu. Zvýraznenie doznie samo —
+   je to ukazovateľ „tu si", nie stav, ktorý by mal ostať. */
+.komentar-najdeny {
+  animation: komentar-blysk 2.6s ease-out;
+  border-radius: 10px;
+}
+@keyframes komentar-blysk {
+  0%, 55% { background: rgba(201, 72, 58, .13); box-shadow: 0 0 0 8px rgba(201, 72, 58, .13); }
+  100%    { background: transparent; box-shadow: 0 0 0 8px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .komentar-najdeny { animation: none; background: rgba(201, 72, 58, .13); }
+}
+
+/* Druhý odkaz v ozve — na samotný komentár, nie na článok. Vedený ticho:
+   hlavný odkaz je názov článku, toto je doplnok pod citátom. */
+.lprof-doDiskusie {
+  display: inline-block; margin-top: 10px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; text-decoration: none;
+  color: var(--druh, var(--l-second-deep));
+  border-bottom: 1px solid transparent;
+  transition: border-color .16s ease;
+}
+.lprof-doDiskusie:hover { border-bottom-color: currentColor; }
