@@ -163,10 +163,29 @@ export default function LabAktuality() {
     return () => { cancelled = true; };
   }, []);
 
-  const stripItems = useMemo(
-    () => items.filter(it => it.slug !== KRONIKA_INTRO_SLUG),
-    [items]
-  );
+  /* Prvé štyri zápisy sú pripnuté ručne. Pás je to prvé, čo z kroniky vidno,
+     a čisto podľa dátumu sa naň dostali zápisy bez použiteľnej fotografie —
+     karta potom ukazuje len vodoznak značky. Poradie je redakčné rozhodnutie,
+     nie chyba radenia.
+
+     Zvyšok ide ďalej podľa dátumu, od najnovšieho. Slug, ktorý sa v kronike
+     nenájde, sa proste preskočí — zoznam tak prežije aj premenovanie. */
+  const PRIPNUTE = [
+    '2-pre-hradiska-v-roku-2025',
+    'danuvina-alacris-opat-na-vodach-dunaja',
+    'bronzovy-poklad-z-hradiska-na-strednom-povazi',
+    'vyprava-polske-hradiska-3-gdansk-a-owidz',
+  ];
+
+  const stripItems = useMemo(() => {
+    const bezUvodu = items.filter(it => it.slug !== KRONIKA_INTRO_SLUG);
+    const napred = PRIPNUTE
+      .map(slug => bezUvodu.find(it => it.slug === slug))
+      .filter((it): it is KronikaItem => !!it);
+    const uzTam = new Set(napred.map(it => it.slug));
+    return [...napred, ...bezUvodu.filter(it => !uzTam.has(it.slug))];
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [items]);
 
   /** Jediné miesto, kde sa číta stav pásu — volá sa pri posune aj po načítaní. */
   const readStrip = useCallback(() => {
@@ -228,8 +247,12 @@ export default function LabAktuality() {
 
   if (state === 'error' || state === 'empty') return null;
 
-  const yearNewest = stripItems[0] ? new Date(stripItems[0].datum).getFullYear() : new Date().getFullYear();
-  const yearOldest = stripItems.length ? new Date(stripItems[stripItems.length - 1].datum).getFullYear() : FOUNDED_YEAR;
+  /* Krajné roky osi sa čítajú z DÁTUMOV, nie z prvej a poslednej karty.
+     Odkedy sú štyri zápisy pripnuté napred, prvá karta už nie je tá
+     najnovšia — os by inak tvrdila, že kronika končí rokom 2025. */
+  const roky = stripItems.map(it => new Date(it.datum).getFullYear()).filter(r => Number.isFinite(r));
+  const yearNewest = roky.length ? Math.max(...roky) : new Date().getFullYear();
+  const yearOldest = roky.length ? Math.min(...roky) : FOUNDED_YEAR;
   const yearsActive = new Date().getFullYear() - FOUNDED_YEAR;
   const cursorItem = stripItems[Math.min(cursorIdx, Math.max(0, stripItems.length - 1))];
   const cursorYear = cursorItem ? new Date(cursorItem.datum).getFullYear() : yearNewest;
