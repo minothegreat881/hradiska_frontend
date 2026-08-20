@@ -3140,7 +3140,12 @@ body[data-lab-theme] .pl-act {
 
 /* Pasparta. Obraz v nej vychádza pri návrhovej šírke na ~1220 px, teda
    presne na rozlíšenie predlohy — nikde sa neťahá nahor. */
-.lhero-tabula { margin: 0; }
+/* Tabuľa je užšia než stĺpec. V plnej šírke stĺpca vychádzal obraz na
+   1218 px a zabral takmer celú prvú obrazovku — titulok pri ňom pôsobil ako
+   popisok. Užší formát ho vráti na miesto obrazovej prílohy. Zároveň je
+   1012 px pod rozlíšením predlohy (1217), takže sa obraz zmenšuje, nie
+   naťahuje — ostrosť tým ide hore, nie dole. */
+.lhero-tabula { max-width: 1040px; margin: 0 auto; }
 .lhero-ram {
   padding: 14px;
   border: 1px solid var(--l-line-2);
