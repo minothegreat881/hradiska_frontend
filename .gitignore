@@ -43,3 +43,6 @@ nul
 .agents/
 .playwright-cli/
 skills-lock.json
+
+# Jednorazové pomocné skripty (rozbory, ladenie) — do repozitára nepatria.
+_*.mjs
