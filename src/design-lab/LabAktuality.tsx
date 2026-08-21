@@ -41,7 +41,7 @@ const GALLERY_FALLBACK: { src: string; place?: string }[] = [
   { src: '/articles/bojna/brana.jpg' },
   { src: '/articles/bojna/bojna-09-reconstruction.jpg' },
 ];
-const GALLERY_TILES = 5;
+const GALLERY_TILES = 6;
 const FOUNDED_YEAR = 2010;
 
 function pickGallery(pool: KronikaPhoto[], count: number): KronikaPhoto[] {
@@ -144,7 +144,13 @@ export default function LabAktuality() {
     }, { rootMargin: '400px' });
     io.observe(el);
     return () => { cancelled = true; io.disconnect(); };
-  }, []);
+    /* Závislosť na `state` je nutná, nie kozmetická. Kým sa kronika načítava,
+       celý komponent vracia `null` — mriežka v dokumente ešte nie je a
+       `galleryRef.current` je prázdny. Efekt s prázdnym poľom závislostí sa
+       spustil práve vtedy, nenašiel čo pozorovať a už sa nikdy nezopakoval.
+       Kurátorský výber sa preto nenačítal NIKDY a domovská stránka roky
+       ukazovala statickú zálohu s Bojnou. */
+  }, [state]);
 
   useEffect(() => {
     let cancelled = false;

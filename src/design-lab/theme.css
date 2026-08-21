@@ -990,7 +990,11 @@ body[data-lab-theme='pecat'],
 .lakv-track-live .lakv-knob-year { opacity: 1; }
 
 /* ── Fotogaléria ───────────────────────────────────────────────────────── */
-.lakv-gal { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 158px; gap: 14px; }
+/* Tri stĺpce, nie štyri. Prvá dlaždica zaberá 2 × 2 polia, zvyšných päť po
+   jednom — spolu presne deväť polí, čiže mriežka 3 × 3 bez ragged riadka.
+   Pri štyroch stĺpcoch sa vypĺňalo len päť dlaždíc a šiesta fotka z výberu
+   by ostala visieť sama v treťom riadku. */
+.lakv-gal { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 190px; gap: 14px; }
 .lakv-place {
   position: absolute; left: 14px; right: 14px; bottom: 12px; display: block; text-align: left;
   font-family: var(--mono); font-size: 11px; color: var(--hr-on-photo-2);
