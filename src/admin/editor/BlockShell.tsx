@@ -3,31 +3,44 @@
 /**
  * Obal jedného bloku na plátne editora.
  *
- * Fáza 1 — len rámik pri prejdení myšou a menovka typu. Výber, úchyt na
- * ťahanie, lišta bloku a tlačidlo „+ vložiť" pribudnú vo Fáze 2, drag a resize
- * obrázka vo Fáze 4.
+ * NEVYTVÁRA ŽIADNY BOX. Má `display: contents`, takže v rozvrhu akoby nebol —
+ * a to je zámer: obyčajný `div` okolo bloku posúval pomocné značky s nulovou
+ * výškou o 8 px (namerané na článku „Hradište pri Partizánskom" v mobilnom
+ * zobrazení, Fáza 1). S `display: contents` sedí rozvrh s webom na stotinu
+ * pixela.
  *
- * Dôležité: obal nesmie zmeniť rozvrh. Preto `display: contents`-ovú cestu
- * nevolíme (rozbila by `float` aj `clear`), ale obal je bežný blok bez okrajov
- * a rámik sa kreslí `outline`-om, ktorý nezaberá miesto.
+ * Preto sa sem nekreslí ani rámik výberu, ani úchyt či lišta — tie sú vo
+ * vrstve nad článkom (`BlockOverlay`), ktorá je absolútne umiestnená a takisto
+ * do rozvrhu nezasahuje.
+ *
+ * Obal teda robí dve veci: nesie značky `data-block-*` na meranie a chytá
+ * kliknutie a prejdenie myšou (udalosti bublajú z detí, aj keď box nemá).
  */
 
 import React from 'react';
+import { useEditorUI } from './EditorUIContext';
 
 export interface BlockShellProps {
-  /** Poradie bloku v článku, od 0. */
   index: number;
-  /** Ľudský názov typu bloku („Obrázok", „Citát", …). */
+  uid: string;
   label: string;
-  /** Strapi typ, napr. `content.image-block`. */
   type: string;
   children: React.ReactNode;
 }
 
-export function BlockShell({ index, label, type, children }: BlockShellProps) {
+export function BlockShell({ index, uid, label, type, children }: BlockShellProps) {
+  const ui = useEditorUI();
   return (
-    <div className="ed-block" data-block-index={index} data-block-type={type}>
-      <span className="ed-block-tag" aria-hidden="true">{label}</span>
+    <div
+      className="ed-block"
+      data-block-index={index}
+      data-block-uid={uid}
+      data-block-type={type}
+      data-block-label={label}
+      onMouseEnter={() => ui.hover(uid)}
+      onMouseLeave={() => ui.hover(null)}
+      onMouseDown={() => ui.select(uid)}
+    >
       {children}
     </div>
   );

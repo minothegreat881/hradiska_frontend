@@ -302,7 +302,7 @@ function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps
           <ImageWithFallback
             src={getStrapiImageUrl(block.image)}
             alt={altText}
-            loading="lazy"
+            loading={editMode ? 'eager' : 'lazy'}
             decoding="async"
             className={`absolute inset-0 w-full h-full ${isTallCapped ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
             style={{ objectPosition }}
@@ -652,7 +652,7 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
             <ImageWithFallback
               src={getStrapiImageUrl(image)}
               alt={image.alternativeText || image.caption || ''}
-              loading="lazy"
+              loading={editMode ? 'eager' : 'lazy'}
               decoding="async"
               className="w-full h-48 object-cover"
             />
@@ -770,13 +770,14 @@ export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererPro
 
   /* Obalenie do `BlockShell` rieši jedno miesto, nie každý `push` zvlášť.
      `current` drží blok, ktorý sa práve vykresľuje (nastavuje sa v cykle). */
-  let current: { type: string; index: number } = { type: '', index: 0 };
+  let current: { type: string; index: number; uid: string } = { type: '', index: 0, uid: '' };
   const pushNode = (node: React.ReactNode) => {
     renderedElements.push(
       editMode ? (
         <BlockShell
-          key={`shell-${current.index}`}
+          key={`shell-${current.uid || current.index}`}
           index={current.index}
+          uid={current.uid}
           type={current.type}
           label={BLOCK_LABELS[current.type] || 'Blok'}
         >
@@ -793,7 +794,8 @@ export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererPro
     if (skipIndices.has(idx)) continue;
 
     const block = blocks[idx];
-    current = { type: block.__component, index: idx };
+    // `__uid` pridáva editor; na webe tam nie je a `current.uid` ostane prázdne.
+    current = { type: block.__component, index: idx, uid: (block as any).__uid || String(idx) };
     const isPrevFloat = isPreviousBlockFloat(blocks, idx);
 
     // =======================================================================

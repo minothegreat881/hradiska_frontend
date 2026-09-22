@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft, Eye, GripVertical, Copy, Trash2, ChevronDown, Plus, X,
   Bold, Italic, Link2, List, ListOrdered, ImageOff, Loader2, Monitor, Smartphone,
+  Undo2, Redo2,
 } from 'lucide-react';
 import {
   BLOCK_TYPES, IMAGE_POSITIONS, IMAGE_WIDTHS, ASPECT_RATIOS,
@@ -24,6 +25,8 @@ import { type Tag } from '../api/tags';
 import { fileUrl, type MediaFile } from '../api/media';
 import { canPair, whyNotPair } from '../editor/snapping/positionZones';
 import { EditorCanvas, type CanvasDevice } from '../editor/EditorCanvas';
+import { useHistory } from '../editor/state/useHistory';
+import { useRowDrag } from '../editor/useRowDrag';
 
 interface Block {
   uid: string;
@@ -89,10 +92,21 @@ export function EditorScreen({
   const [dirty, setDirty] = useState(false);
   const [cats, setCats] = useState<{ slug: string; name: string }[]>([]);
 
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  /* Bloky idú cez históriu — Ctrl+Z vráti ktorýkoľvek z posledných 100 krokov.
+     `setBlocks` zapisuje do histórie, `blocksHistory.reset` nie (načítanie). */
+  const blocksHistory = useHistory<Block[]>([]);
+  const blocks = blocksHistory.state;
+  const setBlocks = blocksHistory.set;
+  const [selectedUid, setSelectedUid] = useState<string | null>(null);
+  /** Blok čakajúci na potvrdenie zmazania (dialóg je v admine, nie v plátne). */
+  const [askDelete, setAskDelete] = useState<string | null>(null);
   const [keyFacts, setKeyFacts] = useState<any[]>([]);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [loc, setLoc] = useState({ name: '', latitude: '', longitude: '', region: '', country: 'Slovensko' });
+
+  /* Úchyt pri faktoch a časovej osi bol doteraz iba obrázok — teraz naozaj ťahá. */
+  const factsDrag = useRowDrag(keyFacts, next => { setKeyFacts(next); setDirty(true); });
+  const timelineDrag = useRowDrag(timeline, next => { setTimeline(next); setDirty(true); });
   const [cover, setCover] = useState<any | null>(null);
   // Kam sa má priradiť vybraný obrázok: cover alebo konkrétny blok.
   const [picking, setPicking] = useState<{ target: 'cover' } | { target: 'block'; uid: string } | null>(null);
@@ -106,6 +120,15 @@ export function EditorScreen({
     if (!token) return;
     listCategories(token).then(setCats).catch(() => { /* výber kategórie ostane prázdny */ });
   }, [token]);
+
+  /* Klávesové skratky. Poslucháč musí byť nad skoršími návratmi komponentu
+     (načítavanie, chyba), inak by sa React háčiky volali podmienečne. */
+  const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => keyHandlerRef.current(e);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
 
   // Varovanie pri zatvorení karty s rozpísanými zmenami.
   useEffect(() => {
@@ -147,7 +170,7 @@ export function EditorScreen({
         setTimeline((d.timeline ?? []).map((t: any) => ({ uid: newUid(), cmpId: t.id, year: t.year ?? '', title: t.title ?? '', description: t.description ?? '', type: t.type ?? 'event' })));
         // `_original` drží presný JSON zo Strapi. Ak sa bloku nikto nedotkne,
         // uloží sa späť bezo zmeny a prevod cez TipTap sa naň vôbec nespustí.
-        setBlocks((d.blocks ?? []).map((b: any) => ({
+        blocksHistory.reset((d.blocks ?? []).map((b: any) => ({
           uid: newUid(), type: b.__component, cmpId: b.id,
           data: fromStrapiBlock(b),
           original: b,
@@ -266,26 +289,95 @@ export function EditorScreen({
   };
 
   const touch = () => setDirty(true);
+  const labelOf = (type: string) => BLOCK_TYPES.find(t => t.id === type)?.label || 'blok';
+
   const patchBlock = (uid: string, patch: any) => {
-    setBlocks(bs => bs.map(b => (b.uid === uid ? { ...b, data: { ...b.data, ...patch } } : b)));
-    touch();
-  };
-  const moveBlock = (uid: string, dir: -1 | 1) => {
-    setBlocks(bs => {
-      const i = bs.findIndex(b => b.uid === uid);
-      const j = i + dir;
-      if (i < 0 || j < 0 || j >= bs.length) return bs;
-      const next = [...bs];
-      [next[i], next[j]] = [next[j], next[i]];
-      return next;
-    });
+    setBlocks(bs => bs.map(b => (b.uid === uid ? { ...b, data: { ...b.data, ...patch } } : b)), 'úprava bloku');
     touch();
   };
 
-  const addBlock = (type: string) => {
-    setBlocks(bs => [...bs, { uid: newUid(), type, data: defaultsFor(type) }]);
+  /** Presun bloku na konkrétne miesto (0 = úplne hore). */
+  const moveBlockTo = (uid: string, toIndex: number) => {
+    setBlocks(bs => {
+      const from = bs.findIndex(b => b.uid === uid);
+      const to = Math.max(0, Math.min(bs.length - 1, toIndex));
+      if (from < 0 || from === to) return bs;
+      const next = [...bs];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    }, 'presun bloku');
     touch();
   };
+
+  const moveBlock = (uid: string, dir: -1 | 1) => {
+    const i = blocks.findIndex(b => b.uid === uid);
+    if (i >= 0) moveBlockTo(uid, i + dir);
+  };
+
+  /** Vloženie na miesto, nie na koniec. */
+  const insertBlock = (type: string, atIndex: number) => {
+    const uid = newUid();
+    setBlocks(bs => {
+      const next = [...bs];
+      next.splice(Math.max(0, Math.min(bs.length, atIndex)), 0, { uid, type, data: defaultsFor(type) });
+      return next;
+    }, `vloženie bloku ${labelOf(type)}`);
+    setSelectedUid(uid);
+    touch();
+  };
+
+  const addBlock = (type: string) => insertBlock(type, blocks.length);
+
+  const deleteBlock = (uid: string) => {
+    setBlocks(bs => bs.filter(b => b.uid !== uid), 'zmazanie bloku');
+    setSelectedUid(null);
+    touch();
+  };
+
+  /** Kópia ide HNEĎ POD originál (predtým padala na koniec článku). */
+  const duplicateBlock = (uid: string) => {
+    const copyUid = newUid();
+    setBlocks(bs => {
+      const i = bs.findIndex(b => b.uid === uid);
+      if (i < 0) return bs;
+      const next = [...bs];
+      // `cmpId` sa kópii NEDÁVA — v Strapi to musí byť nový komponent.
+      const { cmpId, ...rest } = next[i] as any;
+      next.splice(i + 1, 0, { ...rest, uid: copyUid });
+      return next;
+    }, 'duplikovanie bloku');
+    setSelectedUid(copyUid);
+    touch();
+  };
+
+  const undo = () => { blocksHistory.undo(); setSelectedUid(null); touch(); };
+  const redo = () => { blocksHistory.redo(); setSelectedUid(null); touch(); };
+
+  /** Klávesy platia rovnako v admine aj v okne plátna. */
+  const handleKey = (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement | null;
+    const typing = !!target?.closest?.('input, textarea, [contenteditable="true"]');
+    const ctrl = e.ctrlKey || e.metaKey;
+
+    if (ctrl && e.key.toLowerCase() === 'z' && !e.shiftKey) { e.preventDefault(); undo(); return; }
+    if (ctrl && (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))) {
+      e.preventDefault(); redo(); return;
+    }
+    if (typing || view !== 'canvas') return;
+
+    const i = blocks.findIndex(b => b.uid === selectedUid);
+    if (e.key === 'Escape') { setSelectedUid(null); return; }
+    if (e.key === 'ArrowDown' && i < blocks.length - 1) { e.preventDefault(); setSelectedUid(blocks[i + 1]?.uid ?? blocks[0]?.uid); }
+    if (e.key === 'ArrowUp' && i > 0) { e.preventDefault(); setSelectedUid(blocks[i - 1].uid); }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedUid) {
+      e.preventDefault();
+      setAskDelete(selectedUid);
+    }
+  };
+
+  // Odkaz drží vždy najnovšiu verziu; poslucháč sa registruje raz, vyššie.
+  keyHandlerRef.current = handleKey;
 
   return (
     <>
@@ -306,6 +398,24 @@ export function EditorScreen({
           {published ? "Publikovaný" : "Koncept"}
         </span>
         <div style={{ flex: 1 }} />
+
+        {/* Vrátenie zmien — funguje v oboch zobrazeniach, aj klávesmi Ctrl+Z / Ctrl+Y. */}
+        <div className="ad-seg" role="group" aria-label="História zmien">
+          <button
+            onClick={undo}
+            disabled={!blocksHistory.canUndo}
+            title={blocksHistory.undoLabel ? `Vrátiť: ${blocksHistory.undoLabel} (Ctrl+Z)` : 'Nie je čo vrátiť'}
+          >
+            <Undo2 className="w-3.5 h-3.5" /> Vrátiť
+          </button>
+          <button
+            onClick={redo}
+            disabled={!blocksHistory.canRedo}
+            title={blocksHistory.redoLabel ? `Znovu: ${blocksHistory.redoLabel} (Ctrl+Y)` : 'Nie je čo zopakovať'}
+          >
+            <Redo2 className="w-3.5 h-3.5" /> Znovu
+          </button>
+        </div>
 
         {/* Formulár / Vizuálny — kým beží prestavba, dá sa prepnúť a porovnať. */}
         <div className="ad-seg" role="group" aria-label="Zobrazenie editora">
@@ -398,9 +508,18 @@ export function EditorScreen({
                 authorName: author,
                 readingTime,
                 coverImage: cover,
-                /* Plátno kreslí to isté, čo sa uloží: tvar Strapi bloku. */
-                blocks: blocks.map(b => ({ __component: b.type, id: b.cmpId, ...b.data })),
+                /* Plátno kreslí to isté, čo sa uloží: tvar Strapi bloku.
+                   `__uid` je navyše — drží väzbu na blok vo formulári. */
+                blocks: blocks.map(b => ({ __component: b.type, id: b.cmpId, __uid: b.uid, ...b.data })),
               }}
+              selectedUid={selectedUid}
+              onSelect={setSelectedUid}
+              onMove={moveBlockTo}
+              onDelete={setAskDelete}
+              onDuplicate={duplicateBlock}
+              onInsert={insertBlock}
+              onKeyDown={handleKey}
+              blockTypes={BLOCK_TYPES as any}
             />
           ) : (
           <>
@@ -413,9 +532,9 @@ export function EditorScreen({
               onMoveUp={() => moveBlock(b.uid, -1)}
               onMoveDown={() => moveBlock(b.uid, 1)}
               onPatch={p => patchBlock(b.uid, p)}
-              onToggle={() => setBlocks(bs => bs.map(x => (x.uid === b.uid ? { ...x, collapsed: !x.collapsed } : x)))}
-              onDelete={() => { setBlocks(bs => bs.filter(x => x.uid !== b.uid)); touch(); }}
-              onDuplicate={() => { setBlocks(bs => [...bs, { ...b, uid: newUid() }]); touch(); }}
+              onToggle={() => setBlocks(bs => bs.map(x => (x.uid === b.uid ? { ...x, collapsed: !x.collapsed } : x)), 'zbalenie bloku')}
+              onDelete={() => deleteBlock(b.uid)}
+              onDuplicate={() => duplicateBlock(b.uid)}
             />
           ))}
 
@@ -554,9 +673,25 @@ export function EditorScreen({
           </Panel>
 
           <Panel title="Kľúčové fakty">
-            {keyFacts.map(f => (
-              <div key={f.uid} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <GripVertical className="w-3.5 h-3.5 ablock-grip" />
+            <div data-row-list>
+            {keyFacts.map((f, i) => (
+              <div
+                key={f.uid}
+                data-row-uid={f.uid}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
+                  opacity: factsDrag.dragUid === f.uid ? 0.4 : 1,
+                  borderTop: factsDrag.overIndex === i ? '2px solid var(--ad-amber-deep)' : '2px solid transparent',
+                }}
+              >
+                <button
+                  className="ad-grip"
+                  title="Potiahnutím zmeníte poradie"
+                  aria-label="Presunúť fakt"
+                  onPointerDown={factsDrag.startDrag(f.uid)}
+                >
+                  <GripVertical className="w-3.5 h-3.5" />
+                </button>
                 <select
                   className="afld" value={f.icon} style={{ width: 92, padding: '7px 8px', fontSize: 12 }}
                   onChange={e => { setKeyFacts(ks => ks.map(x => x.uid === f.uid ? { ...x, icon: e.target.value } : x)); touch(); }}
@@ -576,15 +711,32 @@ export function EditorScreen({
                 </button>
               </div>
             ))}
+            </div>
             <button className="abtn" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setKeyFacts(ks => [...ks, { uid: newUid(), label: '', value: '', icon: 'star' }]); touch(); }}>
               <Plus className="w-3.5 h-3.5" /> Pridať fakt
             </button>
           </Panel>
 
           <Panel title="Časová os">
-            {timeline.map(t => (
-              <div key={t.uid} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                <GripVertical className="w-3.5 h-3.5 ablock-grip" />
+            <div data-row-list>
+            {timeline.map((t, i) => (
+              <div
+                key={t.uid}
+                data-row-uid={t.uid}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
+                  opacity: timelineDrag.dragUid === t.uid ? 0.4 : 1,
+                  borderTop: timelineDrag.overIndex === i ? '2px solid var(--ad-amber-deep)' : '2px solid transparent',
+                }}
+              >
+                <button
+                  className="ad-grip"
+                  title="Potiahnutím zmeníte poradie"
+                  aria-label="Presunúť udalosť"
+                  onPointerDown={timelineDrag.startDrag(t.uid)}
+                >
+                  <GripVertical className="w-3.5 h-3.5" />
+                </button>
                 <input
                   className="afld" value={t.year} placeholder="~906" style={{ width: 68, padding: '7px 8px', fontSize: 13 }}
                   onChange={e => { setTimeline(ts => ts.map(x => x.uid === t.uid ? { ...x, year: e.target.value } : x)); touch(); }}
@@ -604,12 +756,38 @@ export function EditorScreen({
                 </button>
               </div>
             ))}
+            </div>
             <button className="abtn" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setTimeline(ts => [...ts, { uid: newUid(), year: '', title: '', description: '', type: 'event' }]); touch(); }}>
               <Plus className="w-3.5 h-3.5" /> Pridať udalosť
             </button>
           </Panel>
         </aside>
       </div>
+
+      {askDelete && (() => {
+        const b = blocks.find(x => x.uid === askDelete);
+        return (
+          <div
+            onClick={() => setAskDelete(null)}
+            style={{ position: 'fixed', inset: 0, zIndex: 120, background: 'rgba(30,22,12,.45)',
+                     display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(420px, 92vw)', padding: 20 }}>
+              <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 8px' }}>Zmazať blok?</h2>
+              <p style={{ fontSize: 13.5, color: 'var(--ad-secondary)', lineHeight: 1.55, margin: '0 0 16px' }}>
+                Blok „{labelOf(b?.type || '')}" sa z článku odstráni. Vrátiť sa dá tlačidlom
+                {' '}<strong>Vrátiť</strong> alebo klávesmi Ctrl+Z, a kým článok neuložíte, na webe sa nič nezmení.
+              </p>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button className="abtn" onClick={() => setAskDelete(null)}>Nechať</button>
+                <button className="abtn abtn-danger" onClick={() => { deleteBlock(askDelete); setAskDelete(null); }}>
+                  Zmazať blok
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {picking && (
         <MediaPicker

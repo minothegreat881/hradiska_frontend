@@ -2297,6 +2297,16 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .admin .abtn:hover:not(:disabled) { border-color: var(--ad-amber-mid); }
 
+/* Úchyt na preusporiadanie riadkov v pravom paneli editora. */
+.admin .ad-grip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 26px; flex-shrink: 0;
+  border: none; background: none; color: var(--ad-muted);
+  cursor: grab; touch-action: none; padding: 0;
+}
+.admin .ad-grip:hover { color: var(--ad-amber-deep); }
+.admin .ad-grip:active { cursor: grabbing; }
+
 /* Prepínače v lište editora (Formulár/Vizuálny, Počítač/Mobil). */
 .admin .ad-seg {
   display: inline-flex; border: 1px solid var(--ad-field-border);

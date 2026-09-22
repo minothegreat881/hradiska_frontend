@@ -180,6 +180,8 @@ interface ImageWrapperProps {
   rounded?: boolean;
   shadow?: boolean;
   className?: string;
+  /** Editor: načítaj hneď — pri ťahaní treba poznať rozmery obrázka. */
+  editMode?: boolean;
 }
 
 function ImageWrapper({
@@ -193,7 +195,8 @@ function ImageWrapper({
   decorative = false,
   rounded = true,
   shadow = true,
-  className = ''
+  className = '',
+  editMode = false,
 }: ImageWrapperProps) {
   const imgProps = decorative
     ? { alt: '', 'aria-hidden': true as const, role: 'presentation' as const }
@@ -219,7 +222,10 @@ function ImageWrapper({
         {...imgProps}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         style={{ objectPosition }}
-        loading={priority ? 'eager' : 'lazy'}
+        /* V editore vždy `eager`. Plátno je jedno vysoké okno bez vlastného
+           posúvania, takže odkladané načítanie by obrázky mimo viditeľnej časti
+           nespustilo vôbec — a editor potrebuje ich rozmery na ťahanie. */
+        loading={editMode || priority ? 'eager' : 'lazy'}
       />
       {/* Hover overlay with zoom icon */}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
@@ -281,6 +287,7 @@ function FloatLayout({
         height={height}
         priority={priority}
         decorative={decorative}
+        editMode={editMode}
         rounded={rounded}
         shadow={shadow}
       />
@@ -330,6 +337,7 @@ function FullWidthLayout({
         height={height}
         priority={priority}
         decorative={decorative}
+        editMode={editMode}
         rounded={rounded}
         shadow={shadow}
       />
@@ -390,6 +398,7 @@ function BreakoutLayout({
         height={height}
         priority={priority}
         decorative={decorative}
+        editMode={editMode}
         rounded={rounded}
         shadow={shadow}
       />
@@ -453,6 +462,7 @@ function CenterLayout({
         height={height}
         priority={priority}
         decorative={decorative}
+        editMode={editMode}
         rounded={rounded}
         shadow={shadow}
       />
