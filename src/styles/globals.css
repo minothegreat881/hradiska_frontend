@@ -2296,6 +2296,24 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   transition: border-color .15s ease, filter .15s ease, background .15s ease;
 }
 .admin .abtn:hover:not(:disabled) { border-color: var(--ad-amber-mid); }
+
+/* Prepínače v lište editora (Formulár/Vizuálny, Počítač/Mobil). */
+.admin .ad-seg {
+  display: inline-flex; border: 1px solid var(--ad-field-border);
+  border-radius: 9px; overflow: hidden; background: var(--ad-card);
+}
+.admin .ad-seg button {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 13px; font-weight: 500;
+  padding: 8px 13px; border: none; background: none;
+  color: var(--ad-secondary); cursor: pointer;
+}
+.admin .ad-seg button + button { border-left: 1px solid var(--ad-field-border); }
+.admin .ad-seg button:hover { color: var(--ad-text); }
+.admin .ad-seg button.is-on {
+  background: linear-gradient(180deg, var(--ad-amber-mid), var(--ad-amber-deep));
+  color: #fff;
+}
 .admin .abtn:disabled { opacity: .55; cursor: not-allowed; }
 .admin .abtn-primary {
   background: linear-gradient(180deg, var(--ad-amber-mid), var(--ad-amber-deep));

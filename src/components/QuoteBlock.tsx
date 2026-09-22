@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
+import { useEditMode } from './EditModeContext';
 import { Feather, Quote } from 'lucide-react';
 
 interface QuoteBlockProps {
@@ -11,6 +12,8 @@ interface QuoteBlockProps {
 }
 
 export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteBlockProps) {
+  // Na plátne editora sa zjavovanie pri scrollovaní vypína (viď EditModeContext).
+  const editMode = useEditMode();
   // Split text by newlines for poem formatting
   const lines = text.split('\n').filter(line => line.trim());
   const isPoem = lines.length > 2 || variant === 'poem';
@@ -19,10 +22,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
     return (
       <motion.div
         className="my-6 w-full"
-        initial={{ opacity: 0, y: 10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4 }}
+        {...(editMode ? {} : { initial: { opacity: 0, y: 10 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.4 } })}
       >
         <blockquote
           className="relative py-5 px-6"
@@ -95,10 +95,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
   return (
     <motion.div
       className="my-6 w-full"
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
+      {...(editMode ? {} : { initial: { opacity: 0, y: 10 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.4 } })}
     >
       <blockquote
         className="relative py-4 px-6"

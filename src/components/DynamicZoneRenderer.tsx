@@ -11,6 +11,8 @@ import { getStrapiImageUrl, StrapiImage } from '../lib/strapi';
    nikdy nepovedali o tom istom článku niečo iné. Modul je čisté funkcie bez
    závislostí, takže z neho do balíka webu nepríde nič z adminu. */
 import { canPair } from '../admin/editor/snapping/positionZones';
+import { BlockShell } from '../admin/editor/BlockShell';
+import { EditModeContext, useEditMode } from './EditModeContext';
 
 // Helper: open gallery modal with specific image
 function openGalleryWithImage(imageUrl: string) {
@@ -94,7 +96,26 @@ type DynamicBlock = RichTextBlock | ImageBlock | QuoteBlockType | ImageGalleryBl
 
 interface DynamicZoneRendererProps {
   blocks: DynamicBlock[];
+  /** Editor: každý blok sa obalí do `BlockShell` (rámik, menovka typu).
+   *  Na webe je `false` a renderer sa správa presne ako doteraz. */
+  editMode?: boolean;
 }
+
+/** Zjavovanie pri scrollovaní — na plátne editora sa vypína (viď EditModeContext). */
+function reveal(editMode: boolean, from: any, to: any, transition?: any) {
+  return editMode ? {} : { initial: from, whileInView: to, viewport: { once: true }, ...(transition ? { transition } : {}) };
+}
+
+/** Ľudské názvy typov blokov pre menovku v editore. */
+const BLOCK_LABELS: Record<string, string> = {
+  'content.rich-text': 'Text',
+  'content.image-block': 'Obrázok',
+  'content.quote-block': 'Citát',
+  'content.sources': 'Zdroje',
+  'content.embed': 'Vložené video',
+  'content.poem': 'Báseň',
+  'content.image-gallery': 'Galéria',
+};
 
 // =============================================================================
 // RENDERER: content.embed — responzívny prehrávač (YouTube / Vimeo / Sketchfab / Blogger)
@@ -221,7 +242,7 @@ interface PairedImageRowProps {
   rightBlock: ImageBlock;
 }
 
-function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
+function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps & { editMode?: boolean }) {
   const renderImage = (block: ImageBlock, position: 'left' | 'right') => {
     const altText = block.alt || block.image?.alternativeText || block.caption || 'Obrázok';
     const aspectRatio = block.aspectRatio || 'auto';
@@ -308,10 +329,7 @@ function PairedImageRow({ leftBlock, rightBlock }: PairedImageRowProps) {
   return (
     <motion.figure
       className="paired-image-row w-full mb-6 clear-both"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      {...reveal(!!editMode, { opacity: 0, y: 20 }, { opacity: 1, y: 0 }, { duration: 0.5 })}
     >
       {/* Desktop: side-by-side, Mobile: stacked */}
       <div
@@ -367,7 +385,7 @@ function renderInlineChildren(children: any[] = []): React.ReactNode[] {
 // RICH TEXT RENDERER with clear-before-heading pattern
 // =============================================================================
 
-function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasPrecedingFloat: boolean = false) {
+function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasPrecedingFloat: boolean = false, editMode: boolean = false) {
   if (!body) return null;
 
   let isFirstParagraphInBlock = true; // First paragraph of THIS block (for indent)
@@ -457,9 +475,7 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
             key={idx}
             className="text-xl md:text-2xl font-bold mb-4 mt-8 text-amber-900 dark:text-amber-100 clear-both"
             style={{ fontFamily: 'var(--font-heading)' }}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            {...reveal(editMode, { opacity: 0, y: 10 }, { opacity: 1, y: 0 })}
           >
             {text}
           </motion.h2>
@@ -529,10 +545,11 @@ function RichTextRenderer({
   isFirstRichTextBlock?: boolean;
   hasPrecedingFloat?: boolean;
 }) {
-  return <div className="mb-6">{renderRichText(block.body, isFirstRichTextBlock, hasPrecedingFloat)}</div>;
+  const editMode = useEditMode();
+  return <div className="mb-6">{renderRichText(block.body, isFirstRichTextBlock, hasPrecedingFloat, editMode)}</div>;
 }
 
-function ImageBlockRenderer({ block }: { block: ImageBlock }) {
+function ImageBlockRenderer({ block, editMode }: { block: ImageBlock; editMode?: boolean }) {
   const position = getPosition(block);
   const variant = positionToVariant(position);
   const altText = block.alt || block.image?.alternativeText || block.caption || 'Obrázok';
@@ -551,6 +568,7 @@ function ImageBlockRenderer({ block }: { block: ImageBlock }) {
       showCaption={block.showCaption ?? true}
       rounded={block.rounded ?? true}
       shadow={block.shadow ?? true}
+      editMode={editMode}
     />
   );
 }
@@ -610,6 +628,7 @@ function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; nee
 }
 
 function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGalleryBlock; needsClearBefore?: boolean }) {
+  const editMode = useEditMode();
   const columns = block.columns || '3';
   const gridCols = {
     '2': 'grid-cols-2',
@@ -622,19 +641,13 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
       {needsClearBefore && <div className="clear-both" />}
       <motion.div
         className={`grid ${gridCols[columns]} gap-4 my-6 clear-both`}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
+        {...reveal(editMode, { opacity: 0 }, { opacity: 1 }, { duration: 0.5 })}
       >
         {block.images?.map((image, idx) => (
           <motion.div
             key={image.id || idx}
             className="rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3, delay: idx * 0.1 }}
+            {...reveal(editMode, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1 }, { duration: 0.3, delay: idx * 0.1 })}
           >
             <ImageWithFallback
               src={getStrapiImageUrl(image)}
@@ -735,7 +748,7 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
 // MAIN RENDERER with pairing logic
 // =============================================================================
 
-export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
+export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererProps) {
   if (!blocks || blocks.length === 0) return null;
 
   // Find the index of the first rich-text block that actually contains a real
@@ -755,11 +768,32 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
   const renderedElements: React.ReactNode[] = [];
   const skipIndices = new Set<number>();
 
+  /* Obalenie do `BlockShell` rieši jedno miesto, nie každý `push` zvlášť.
+     `current` drží blok, ktorý sa práve vykresľuje (nastavuje sa v cykle). */
+  let current: { type: string; index: number } = { type: '', index: 0 };
+  const pushNode = (node: React.ReactNode) => {
+    renderedElements.push(
+      editMode ? (
+        <BlockShell
+          key={`shell-${current.index}`}
+          index={current.index}
+          type={current.type}
+          label={BLOCK_LABELS[current.type] || 'Blok'}
+        >
+          {node}
+        </BlockShell>
+      ) : (
+        node
+      )
+    );
+  };
+
   for (let idx = 0; idx < blocks.length; idx++) {
     // Skip if this block was already rendered as part of a pair
     if (skipIndices.has(idx)) continue;
 
     const block = blocks[idx];
+    current = { type: block.__component, index: idx };
     const isPrevFloat = isPreviousBlockFloat(blocks, idx);
 
     // =======================================================================
@@ -778,11 +812,12 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
         const leftBlock = currentPos === 'left' ? imgBlock : nextImgBlock;
         const rightBlock = currentPos === 'right' ? imgBlock : nextImgBlock;
 
-        renderedElements.push(
+        pushNode(
           <PairedImageRow
             key={`pair-${imgBlock.id || idx}-${nextImgBlock.id || idx + 1}`}
             leftBlock={leftBlock}
             rightBlock={rightBlock}
+            editMode={editMode}
           />
         );
 
@@ -792,10 +827,11 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
       }
 
       // Render single image block
-      renderedElements.push(
+      pushNode(
         <ImageBlockRenderer
           key={`${block.__component}-${imgBlock.id || idx}`}
           block={imgBlock}
+          editMode={editMode}
         />
       );
       continue;
@@ -806,7 +842,7 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
     // =======================================================================
     switch (block.__component) {
       case 'content.rich-text':
-        renderedElements.push(
+        pushNode(
           <RichTextRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as RichTextBlock}
@@ -817,7 +853,7 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
         break;
 
       case 'content.quote-block':
-        renderedElements.push(
+        pushNode(
           <QuoteBlockRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as QuoteBlockType}
@@ -827,7 +863,7 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
         break;
 
       case 'content.image-gallery':
-        renderedElements.push(
+        pushNode(
           <ImageGalleryRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as ImageGalleryBlock}
@@ -837,7 +873,7 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
         break;
 
       case 'content.sources':
-        renderedElements.push(
+        pushNode(
           <SourcesRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as SourcesBlock}
@@ -847,7 +883,7 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
         break;
 
       case 'content.embed':
-        renderedElements.push(
+        pushNode(
           <EmbedRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as EmbedBlock}
@@ -856,7 +892,7 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
         break;
 
       case 'content.poem':
-        renderedElements.push(
+        pushNode(
           <PoemRenderer
             key={`${block.__component}-${block.id || idx}`}
             block={block as PoemBlock}
@@ -871,10 +907,12 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
   }
 
   return (
-    <div className="dynamic-zone-content">
-      {renderedElements}
-      {/* Final clearfix for any trailing floats */}
-      <div className="clear-both" />
-    </div>
+    <EditModeContext.Provider value={!!editMode}>
+      <div className="dynamic-zone-content">
+        {renderedElements}
+        {/* Final clearfix for any trailing floats */}
+        <div className="clear-both" />
+      </div>
+    </EditModeContext.Provider>
   );
 }

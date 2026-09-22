@@ -3,6 +3,7 @@
 import { motion } from 'motion/react';
 import { ZoomIn } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useEditMode } from './EditModeContext';
 
 // Helper: open gallery modal with specific image
 function openGalleryWithImage(imageUrl: string) {
@@ -50,6 +51,24 @@ export interface BlogMediaProps {
   priority?: boolean;
   decorative?: boolean;
   className?: string;
+  /** Editor: bez postupného zjavovania — obrázok musí byť vidieť hneď. */
+  editMode?: boolean;
+}
+
+/**
+ * Zjavovanie pri scrollovaní. V editore sa vypína: plátno sa prekresľuje pri
+ * každej zmene a obrázok, ktorý sa najskôr roztiahne z priehľadnej, by pôsobil
+ * ako chyba. Pokojový stav je v oboch režimoch rovnaký.
+ */
+function revealProps(editMode?: boolean) {
+  return editMode
+    ? {}
+    : {
+        initial: { opacity: 0, y: 20 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true },
+        transition: { duration: 0.5 },
+      };
 }
 
 // =============================================================================
@@ -233,6 +252,7 @@ function FloatLayout({
   shadow = true,
   priority,
   decorative,
+  editMode,
 }: BlogMediaProps & { variant: 'left-float' | 'right-float' }) {
   const isLeft = variant === 'left-float';
   const captionAlign = isLeft ? 'left' : 'right';
@@ -250,10 +270,7 @@ function FloatLayout({
         marginLeft: isLeft ? '0' : '1.5rem',
         marginBottom: '1rem',
       }}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      {...revealProps(editMode)}
     >
       <ImageWrapper
         src={src}
@@ -297,14 +314,12 @@ function FullWidthLayout({
   shadow = true,
   priority,
   decorative,
+  editMode,
 }: BlogMediaProps) {
   return (
     <motion.figure
       className="w-full mb-6 clear-both"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      {...revealProps(editMode)}
     >
       <ImageWrapper
         src={src}
@@ -348,6 +363,7 @@ function BreakoutLayout({
   shadow = true,
   priority,
   decorative,
+  editMode,
 }: BlogMediaProps) {
   return (
     <motion.figure
@@ -363,10 +379,7 @@ function BreakoutLayout({
         paddingLeft: '1rem',
         paddingRight: '1rem',
       }}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      {...revealProps(editMode)}
     >
       <ImageWrapper
         src={src}
@@ -411,6 +424,7 @@ function CenterLayout({
   shadow = true,
   priority,
   decorative,
+  editMode,
 }: BlogMediaProps) {
   const effectiveWidth = getEffectiveWidth(widthPercent);
 
@@ -428,10 +442,7 @@ function CenterLayout({
     <motion.figure
       className={`mb-6 clear-both mx-auto blog-media-center${isFullColumn ? ' blog-media-center--full' : ''}`}
       style={{ maxWidth: effectiveWidth }}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      {...revealProps(editMode)}
     >
       <ImageWrapper
         src={src}
@@ -461,6 +472,9 @@ function CenterLayout({
 // =============================================================================
 
 export function BlogMedia(props: BlogMediaProps) {
+  // Na plátne editora sa zjavovanie vypína aj bez explicitného propu.
+  const editModeFromContext = useEditMode();
+  props = { ...props, editMode: props.editMode ?? editModeFromContext };
   const {
     variant = 'full-width',
     src,

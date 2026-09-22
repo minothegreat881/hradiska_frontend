@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   ArrowLeft, Eye, GripVertical, Copy, Trash2, ChevronDown, Plus, X,
-  Bold, Italic, Link2, List, ListOrdered, ImageOff, Loader2,
+  Bold, Italic, Link2, List, ListOrdered, ImageOff, Loader2, Monitor, Smartphone,
 } from 'lucide-react';
 import {
   BLOCK_TYPES, IMAGE_POSITIONS, IMAGE_WIDTHS, ASPECT_RATIOS,
@@ -23,6 +23,7 @@ import { LocationMap } from '../components/LocationMap';
 import { type Tag } from '../api/tags';
 import { fileUrl, type MediaFile } from '../api/media';
 import { canPair, whyNotPair } from '../editor/snapping/positionZones';
+import { EditorCanvas, type CanvasDevice } from '../editor/EditorCanvas';
 
 interface Block {
   uid: string;
@@ -95,6 +96,11 @@ export function EditorScreen({
   const [cover, setCover] = useState<any | null>(null);
   // Kam sa má priradiť vybraný obrázok: cover alebo konkrétny blok.
   const [picking, setPicking] = useState<{ target: 'cover' } | { target: 'block'; uid: string } | null>(null);
+
+  /* Fáza 1: plátno beží VEDĽA starého formulára, nie namiesto neho — nech sa
+     dá oboje porovnať. Starý stĺpec zmizne až vo Fáze 6. */
+  const [view, setView] = useState<'form' | 'canvas'>('form');
+  const [device, setDevice] = useState<CanvasDevice>('desktop');
 
   useEffect(() => {
     if (!token) return;
@@ -300,6 +306,32 @@ export function EditorScreen({
           {published ? "Publikovaný" : "Koncept"}
         </span>
         <div style={{ flex: 1 }} />
+
+        {/* Formulár / Vizuálny — kým beží prestavba, dá sa prepnúť a porovnať. */}
+        <div className="ad-seg" role="group" aria-label="Zobrazenie editora">
+          <button className={view === 'form' ? 'is-on' : ''} onClick={() => setView('form')}>Formulár</button>
+          <button className={view === 'canvas' ? 'is-on' : ''} onClick={() => setView('canvas')}>Vizuálny</button>
+        </div>
+
+        {view === 'canvas' && (
+          <div className="ad-seg" role="group" aria-label="Šírka náhľadu">
+            <button
+              className={device === 'desktop' ? 'is-on' : ''}
+              onClick={() => setDevice('desktop')}
+              title="Ako to vyzerá na počítači"
+            >
+              <Monitor className="w-3.5 h-3.5" /> Počítač
+            </button>
+            <button
+              className={device === 'mobil' ? 'is-on' : ''}
+              onClick={() => setDevice('mobil')}
+              title="Ako to vyzerá na telefóne (390 px) — obrázky sa správajú inak"
+            >
+              <Smartphone className="w-3.5 h-3.5" /> Mobil
+            </button>
+          </div>
+        )}
+
         {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts).
             Rozpísané zmeny v tomto formulári v ňom ešte nie sú. */}
         <a
@@ -357,6 +389,21 @@ export function EditorScreen({
             </div>
           </div>
 
+          {view === 'canvas' ? (
+            <EditorCanvas
+              device={device}
+              article={{
+                title,
+                excerpt,
+                authorName: author,
+                readingTime,
+                coverImage: cover,
+                /* Plátno kreslí to isté, čo sa uloží: tvar Strapi bloku. */
+                blocks: blocks.map(b => ({ __component: b.type, id: b.cmpId, ...b.data })),
+              }}
+            />
+          ) : (
+          <>
           {blocks.map((b, i) => (
             <BlockCard
               key={b.uid}
@@ -392,6 +439,8 @@ export function EditorScreen({
               ))}
             </div>
           </div>
+          </>
+          )}
         </div>
 
         {/* ═══ Pravý stĺpec — metadáta ═══ */}
