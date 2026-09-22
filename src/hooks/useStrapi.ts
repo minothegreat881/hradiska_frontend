@@ -10,6 +10,7 @@ import {
   type StrapiCategory,
   type StrapiTag,
 } from '../lib/strapi';
+import { getDraftPreviewToken } from '../lib/preview';
 
 /**
  * Hook to fetch blog posts with optional filters
@@ -62,12 +63,18 @@ export function useBlogPosts(options?: {
 }
 
 /**
- * Hook to fetch a single blog post by slug
+ * Hook to fetch a single blog post by slug.
+ *
+ * `preview`:
+ *   null     … bežná návšteva, publikovaná verzia
+ *   'draft'  … náhľad konceptu pre prihláseného správcu
+ *   'denied' … náhľad sa pýtal, ale token neprešiel → publikovaná verzia
  */
 export function useBlogPost(slug: string) {
   const [post, setPost] = useState<StrapiBlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [preview, setPreview] = useState<'draft' | 'denied' | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,8 +88,26 @@ export function useBlogPost(slug: string) {
 
       setLoading(true);
       setError(null);
+      setPreview(null);
 
       try {
+        const draftToken = getDraftPreviewToken();
+        if (draftToken) {
+          try {
+            const draft = await getBlogPostBySlug(slug, { draftToken });
+            if (!cancelled) {
+              setPost(draft);
+              setPreview('draft');
+              setLoading(false);
+            }
+            return;
+          } catch {
+            // Vypršaný alebo odobratý token — ukáž publikovanú verziu
+            // a nižšie to priznaj lištou, nech si to admin nepomýli s konceptom.
+            if (!cancelled) setPreview('denied');
+          }
+        }
+
         const result = await getBlogPostBySlug(slug);
         if (!cancelled) {
           setPost(result);
@@ -106,7 +131,7 @@ export function useBlogPost(slug: string) {
     };
   }, [slug]);
 
-  return { post, loading, error };
+  return { post, loading, error, preview };
 }
 
 /**

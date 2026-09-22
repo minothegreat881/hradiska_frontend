@@ -249,12 +249,22 @@ export async function getBlogPosts(options?: {
 /**
  * Get blog post by slug
  */
-export async function getBlogPostBySlug(slug: string): Promise<StrapiBlogPost | null> {
+export async function getBlogPostBySlug(
+  slug: string,
+  opts?: { draftToken?: string | null }
+): Promise<StrapiBlogPost | null> {
   // Deep populate for all fields including dynamic zone components
   const query = `filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage&populate[1]=gallery&populate[2]=category&populate[3]=tags&populate[4]=quotes&populate[5]=blocks.image&populate[6]=blocks.images&populate[7]=blocks.secondImage&populate[8]=location&populate[9]=keyFacts&populate[10]=timeline&populate[11]=blocks.items`;
 
+  // Náhľad konceptu pre prihláseného správcu (viď lib/preview.ts). Bez tokenu
+  // sa `status` neposiela vôbec a Strapi vráti publikovanú verziu ako doteraz.
+  const draft = opts?.draftToken
+    ? { suffix: '&status=draft', init: { headers: { Authorization: `Bearer ${opts.draftToken}` } } }
+    : { suffix: '', init: undefined };
+
   const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
-    `/blog-posts?${query}`
+    `/blog-posts?${query}${draft.suffix}`,
+    draft.init
   );
 
   return response.data[0] || null;

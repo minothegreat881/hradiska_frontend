@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { login as apiLogin, me as apiMe, type AdminUser } from './api/auth';
 import { setUnauthorizedHandler } from './api/client';
 import { rememberCredentials } from './lib/credentials';
+import { ADMIN_TOKEN_KEY } from '../lib/preview';
 
 /**
  * Držanie prihlásenia.
@@ -16,7 +17,9 @@ import { rememberCredentials } from './lib/credentials';
  * a klientovi dáva httpOnly cookie. Do tej doby je jedinou ochranou heslo.
  */
 
-const TOKEN_KEY = 'hradiska.admin.jwt';
+/* Kľúč je v `lib/preview.ts`, lebo ten istý token číta aj verejný web,
+   keď si správca otvorí náhľad konceptu (`?preview=draft`). */
+const TOKEN_KEY = ADMIN_TOKEN_KEY;
 
 interface AuthValue {
   token: string | null;

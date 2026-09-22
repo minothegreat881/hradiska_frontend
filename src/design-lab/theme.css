@@ -1709,6 +1709,17 @@ body[data-lab-theme='pecat'],
    ══════════════════════════════════════════════════════════════════════════ */
 .lart { background: var(--l-paper); }
 .lart-wait { padding: 120px 32px; text-align: center; color: var(--l-muted); background: var(--l-paper); }
+
+/* Lišta náhľadu konceptu (len pre prihláseného správcu, viď lib/preview.ts). */
+.lart-preview-bar {
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #4a3410;
+  background: #f6e2b4;
+  border-bottom: 1px solid #d8bd85;
+}
 .lart-empty { font-family: 'Inter', sans-serif; color: var(--l-muted); }
 
 /* ── 1 · Titulná fotografia ────────────────────────────────────────────── */

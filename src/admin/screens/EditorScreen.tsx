@@ -22,6 +22,7 @@ import { TagPicker } from '../components/TagPicker';
 import { LocationMap } from '../components/LocationMap';
 import { type Tag } from '../api/tags';
 import { fileUrl, type MediaFile } from '../api/media';
+import { canPair, whyNotPair } from '../editor/snapping/positionZones';
 
 interface Block {
   uid: string;
@@ -299,7 +300,15 @@ export function EditorScreen({
           {published ? "Publikovaný" : "Koncept"}
         </span>
         <div style={{ flex: 1 }} />
-        <a className="abtn" href={`/blog/${slug}`} target="_blank" rel="noreferrer">
+        {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts).
+            Rozpísané zmeny v tomto formulári v ňom ešte nie sú. */}
+        <a
+          className="abtn"
+          href={`/blog/${slug}?preview=draft`}
+          target="_blank"
+          rel="noreferrer"
+          title={dirty ? 'Náhľad ukáže posledný uložený stav — rozpísané zmeny v ňom ešte nie sú.' : 'Zobrazí uložený koncept tak, ako bude vyzerať na webe.'}
+        >
           <Eye className="w-4 h-4" /> Náhľad
         </a>
         <button className="abtn" onClick={() => save(false)} disabled={saving}>
@@ -348,10 +357,11 @@ export function EditorScreen({
             </div>
           </div>
 
-          {blocks.map(b => (
+          {blocks.map((b, i) => (
             <BlockCard
               key={b.uid}
               block={b}
+              nextBlock={blocks[i + 1]}
               onPick={() => setPicking({ target: 'block', uid: b.uid })}
               onMoveUp={() => moveBlock(b.uid, -1)}
               onMoveDown={() => moveBlock(b.uid, 1)}
@@ -563,7 +573,7 @@ export function EditorScreen({
 }
 
 // ── Blok ─────────────────────────────────────────────────────────────────────
-function BlockCard({ block, onPatch, onToggle, onDelete, onDuplicate, onPick, onMoveUp, onMoveDown }: any) {
+function BlockCard({ block, nextBlock, onPatch, onToggle, onDelete, onDuplicate, onPick, onMoveUp, onMoveDown }: any) {
   const meta = BLOCK_TYPES.find(t => t.id === block.type);
   return (
     <div className="ablock" style={{ borderLeftColor: meta?.accent }}>
@@ -591,7 +601,7 @@ function BlockCard({ block, onPatch, onToggle, onDelete, onDuplicate, onPick, on
       {!block.collapsed && (
         <div style={{ padding: 14 }}>
           {block.type === 'content.rich-text' && <RichTextBlock data={block.data} onPatch={onPatch} />}
-          {block.type === 'content.image-block' && <ImageBlock data={block.data} onPatch={onPatch} onPick={onPick} />}
+          {block.type === 'content.image-block' && <ImageBlock data={block.data} nextBlock={nextBlock} onPatch={onPatch} onPick={onPick} />}
           {block.type === 'content.quote-block' && <QuoteBlockFields data={block.data} onPatch={onPatch} />}
           {!['content.rich-text', 'content.image-block', 'content.quote-block'].includes(block.type) && (
             <div style={{ fontSize: 13, color: 'var(--ad-secondary)' }}>
@@ -608,7 +618,14 @@ function RichTextBlock({ data, onPatch }: any) {
   return <RichTextEditor body={data.body} onChange={next => onPatch({ body: next, _edited: true })} />;
 }
 
-function ImageBlock({ data, onPatch, onPick }: any) {
+function ImageBlock({ data, nextBlock, onPatch, onPick }: any) {
+  // Web páruje obrázky len pri opačných pozíciách — do náhľadu aj do hlášky
+  // ide tá istá funkcia, akú používa renderer.
+  const asLayout = (b: any) => (b ? { __component: b.type, ...b.data } : null);
+  const self = { __component: 'content.image-block', ...data };
+  const paired = canPair(self, asLayout(nextBlock));
+  const pairProblem = data.pairWithNext ? whyNotPair(self, asLayout(nextBlock)) : null;
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 190px', gap: 16 }}>
       <div>
@@ -669,11 +686,12 @@ function ImageBlock({ data, onPatch, onPick }: any) {
                 </label>
               ))}
             </div>
+            {pairProblem && <Hint tone="danger">Spárovanie sa neprejaví. {pairProblem}</Hint>}
           </div>
         </details>
       </div>
 
-      <LayoutPreview position={data.position} width={data.width} pairWithNext={data.pairWithNext} />
+      <LayoutPreview position={data.position} width={data.width} paired={paired} />
     </div>
   );
 }
@@ -723,8 +741,21 @@ function Counter({ n, max }: { n: number; max: number }) {
   );
 }
 
+/** Holý text zo Strapi Blocks — `body` je pole uzlov, nie reťazec. */
+function plainText(nodes: any): string {
+  if (!Array.isArray(nodes)) return '';
+  return nodes
+    .map((n: any) => (typeof n?.text === 'string' ? n.text : plainText(n?.children)))
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function summarize(b: Block) {
-  if (b.type === 'content.rich-text') return String(b.data.body || '').slice(0, 60) + '…';
+  if (b.type === 'content.rich-text') {
+    const t = plainText(b.data.body);
+    return t ? t.slice(0, 60) + (t.length > 60 ? '…' : '') : 'prázdny odsek';
+  }
   if (b.type === 'content.quote-block') return `„${String(b.data.text || '').slice(0, 40)}…" — ${b.data.author || '?'}`;
   if (b.type === 'content.image-block') return b.data.alt || 'bez alt textu';
   return '';

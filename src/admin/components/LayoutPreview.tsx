@@ -5,10 +5,15 @@
  *
  * `image-block` má 11 polí a bez náhľadu je nečitateľný — miniatúra stránky
  * ukazuje, kde obrázok v texte skončí. Linky = text, zlatý obdĺžnik = obrázok.
+ *
+ * Dvojicu vedľa seba kreslí LEN vtedy, keď ju vykreslí aj web. O tom rozhoduje
+ * `canPair` (admin/editor/snapping/positionZones.ts), nie samotná fajka
+ * „Spárovať s ďalším" — tá sa bez opačných pozícií ticho ignoruje.
  */
 export function LayoutPreview({
-  position, width, pairWithNext,
-}: { position: string; width: string; pairWithNext: boolean }) {
+  position, width, paired,
+}: { position: string; width: string; /** Spáruje ich web naozaj? (`canPair`) */ paired: boolean }) {
+  const pairWithNext = paired;
   const w = Number(width) || 50;
 
   const line = (key: number, pct = 100) => (

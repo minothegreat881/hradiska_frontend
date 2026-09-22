@@ -43,7 +43,7 @@ function skDate(iso?: string | null): string {
 }
 
 export function LabArticle({ slug }: { slug: string }) {
-  const { post, loading } = useBlogPost(slug);
+  const { post, loading, preview } = useBlogPost(slug);
   const [related, setRelated] = useState<RelatedCard[]>([]);
 
   useEffect(() => {
@@ -77,6 +77,15 @@ export function LabArticle({ slug }: { slug: string }) {
 
   return (
     <div className="lart">
+      {/* Náhľad konceptu z administrácie. Bežný návštevník túto lištu nikdy
+          neuvidí — objaví sa len pri `?preview=draft` s platným prihlásením. */}
+      {preview && (
+        <div className="lart-preview-bar" role="status">
+          {preview === 'draft'
+            ? 'Náhľad konceptu — takto bude článok vyzerať po publikovaní. Verejnosť zatiaľ vidí publikovanú verziu.'
+            : 'Náhľad konceptu sa nepodaril: prihlásenie do administrácie vypršalo. Zobrazená je publikovaná verzia.'}
+        </div>
+      )}
       {/* ── Titulná fotografia ───────────────────────────────────────────
           Jediná prestavaná časť rozvrhu. Predtým prúžok 224–256 px s tmavým
           prechodom, v ktorom bol nadpis orezaný na tri riadky; z fotografie

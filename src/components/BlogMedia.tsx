@@ -414,18 +414,20 @@ function CenterLayout({
 }: BlogMediaProps) {
   const effectiveWidth = getEffectiveWidth(widthPercent);
 
-  // Map width to max-width classes
-  const maxWidthClass = {
-    '30%': 'max-w-xs',
-    '40%': 'max-w-sm',
-    '50%': 'max-w-md',
-    '60%': 'max-w-lg',
-    '100%': 'max-w-full',
-  }[effectiveWidth] || 'max-w-md';
+  /* Šírka je percento textového stĺpca — rovnako ako pri obtekaných obrázkoch
+     (`FloatLayout`), takže „60 %" naozaj znamená 60 %.
+     Predtým sa tu percento prekladalo na triedy `max-w-xs/sm/md/lg`. Dve z nich
+     (`max-w-sm`, `max-w-lg`) v CSS vôbec nie sú — `index.css` je predgenerovaný
+     výstup Tailwindu a projekt nemá Tailwind plugin, ktorý by ich dogeneroval.
+     Obrázky so šírkou 40 % a 60 % preto nemali žiadny strop a vykresľovali sa
+     na celú šírku stĺpca (overené v prehliadači: 668 px z 668 px).
+     Mobilné správanie rieši `.blog-media-center` v styles/globals.css. */
+  const isFullColumn = effectiveWidth === '100%';
 
   return (
     <motion.figure
-      className={`mb-6 clear-both mx-auto ${maxWidthClass}`}
+      className={`mb-6 clear-both mx-auto blog-media-center${isFullColumn ? ' blog-media-center--full' : ''}`}
+      style={{ maxWidth: effectiveWidth }}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

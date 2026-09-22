@@ -7,6 +7,10 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { QuoteBlock } from './QuoteBlock';
 import { BlogMedia, BlogMediaAspectRatio, BlogMediaWidth } from './BlogMedia';
 import { getStrapiImageUrl, StrapiImage } from '../lib/strapi';
+/* Pravidlá rozloženia (párovanie, mobil) sú v jednom module, aby web a editor
+   nikdy nepovedali o tom istom článku niečo iné. Modul je čisté funkcie bez
+   závislostí, takže z neho do balíka webu nepríde nič z adminu. */
+import { canPair } from '../admin/editor/snapping/positionZones';
 
 // Helper: open gallery modal with specific image
 function openGalleryWithImage(imageUrl: string) {
@@ -166,14 +170,6 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
       )}
     </figure>
   );
-}
-
-// =============================================================================
-// HELPER: Check if positions are opposite (for pairing)
-// =============================================================================
-
-function arePositionsOpposite(pos1?: string, pos2?: string): boolean {
-  return (pos1 === 'left' && pos2 === 'right') || (pos1 === 'right' && pos2 === 'left');
 }
 
 // =============================================================================
@@ -773,36 +769,26 @@ export function DynamicZoneRenderer({ blocks }: DynamicZoneRendererProps) {
       const imgBlock = block as ImageBlock;
       const nextBlock = blocks[idx + 1];
 
-      // Check pairing conditions:
-      // 1. Current block has pairWithNext=true
-      // 2. Next block exists and is an image-block
-      // 3. Positions are opposite (left+right or right+left)
-      if (
-        imgBlock.pairWithNext &&
-        nextBlock &&
-        nextBlock.__component === 'content.image-block'
-      ) {
+      // Podmienky párovania drží `canPair` (snapping/positionZones.ts):
+      // pairWithNext + nasledujúci blok je obrázok + opačné pozície.
+      if (canPair(imgBlock, nextBlock)) {
         const nextImgBlock = nextBlock as ImageBlock;
         const currentPos = getPosition(imgBlock);
-        const nextPos = getPosition(nextImgBlock);
+        // Render as paired row
+        const leftBlock = currentPos === 'left' ? imgBlock : nextImgBlock;
+        const rightBlock = currentPos === 'right' ? imgBlock : nextImgBlock;
 
-        if (arePositionsOpposite(currentPos, nextPos)) {
-          // Render as paired row
-          const leftBlock = currentPos === 'left' ? imgBlock : nextImgBlock;
-          const rightBlock = currentPos === 'right' ? imgBlock : nextImgBlock;
+        renderedElements.push(
+          <PairedImageRow
+            key={`pair-${imgBlock.id || idx}-${nextImgBlock.id || idx + 1}`}
+            leftBlock={leftBlock}
+            rightBlock={rightBlock}
+          />
+        );
 
-          renderedElements.push(
-            <PairedImageRow
-              key={`pair-${imgBlock.id || idx}-${nextImgBlock.id || idx + 1}`}
-              leftBlock={leftBlock}
-              rightBlock={rightBlock}
-            />
-          );
-
-          // Skip the next block since it's already rendered
-          skipIndices.add(idx + 1);
-          continue;
-        }
+        // Skip the next block since it's already rendered
+        skipIndices.add(idx + 1);
+        continue;
       }
 
       // Render single image block

@@ -1612,6 +1612,15 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
     margin-bottom: 1.5rem !important;
   }
 
+  /* Centrované obrázky sa na mobile správajú rovnako ako obtekané: percentuálna
+     šírka zo stĺpca by tu bola neprakticky malá (60 % z ~358 px = ~215 px).
+     Výnimka je `--full` (šírka 100 %), ktorá celú šírku stĺpca drží zámerne.
+     Pravidlo je zdokumentované v admin/editor/snapping/positionZones.ts. */
+  .blog-media-center:not(.blog-media-center--full) {
+    width: 100% !important;
+    max-width: 400px !important;
+  }
+
   /* Ensure side-by-side stacks on mobile */
   .dynamic-zone-content .grid.md\\:grid-cols-2 {
     grid-template-columns: 1fr;
