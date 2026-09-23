@@ -122,6 +122,25 @@ const BLOCK_LABELS: Record<string, string> = {
 // RENDERER: content.embed — responzívny prehrávač (YouTube / Vimeo / Sketchfab / Blogger)
 // =============================================================================
 
+/**
+ * PRÁZDNY BLOK V EDITORE.
+ *
+ * Blok bez obsahu — čerstvo vložená báseň, citát, zoznam zdrojov, galéria —
+ * sa na webe nevykresľuje vôbec. V editore to znamenalo, že po vložení nebolo
+ * VIDNO NIČ: blok sa nedal vybrať (nemá box, teda ani nameraný obdĺžnik),
+ * nedal sa vyplniť ani zmazať, a pritom bránil publikovaniu („Báseň v bloku
+ * č. 3 je prázdna“). Preto má každý taký blok v editore aspoň túto výzvu.
+ * Na webe sa nezobrazí — tam sa prázdny blok naďalej preskočí.
+ */
+function EmptyBlockNotice({ title, hint }: { title: string; hint: string }) {
+  return (
+    <div className="ed-block-empty not-prose">
+      <b>{title}</b>
+      <span>{hint}</span>
+    </div>
+  );
+}
+
 function EmbedRenderer({ block }: { block: EmbedBlock }) {
   const { url, caption } = block;
   const editMode = useEditMode();
@@ -134,10 +153,10 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
     if (!editMode) return null;
     return (
       <figure className="my-8 clear-both not-prose">
-        <div className="ed-embed-empty">
-          <b>Video zatiaľ nemá adresu</b>
-          <span>Vložte odkaz na YouTube, Vimeo alebo Sketchfab do poľa „Adresa“ pod článkom.</span>
-        </div>
+        <EmptyBlockNotice
+          title="Video zatiaľ nemá adresu"
+          hint="Vložte odkaz na YouTube, Vimeo alebo Sketchfab do poľa „Adresa“ pod článkom."
+        />
         {caption && (
           <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}>
             {caption}
@@ -564,13 +583,36 @@ function RichTextRenderer({
   hasPrecedingFloat?: boolean;
 }) {
   const editMode = useEditMode();
-  return <div className="mb-6">{renderRichText(block.body, isFirstRichTextBlock, hasPrecedingFloat, editMode)}</div>;
+  const elements = renderRichText(block.body, isFirstRichTextBlock, hasPrecedingFloat, editMode);
+  // Čerstvo vložený textový blok nemá ešte ani písmeno — bez tejto výzvy by
+  // po kliknutí mimo zmizol z obrazovky a už sa nedal ani vybrať, ani zmazať.
+  const empty = !elements || (Array.isArray(elements) && elements.length === 0);
+  return (
+    <div className="mb-6">
+      {empty && editMode
+        ? <EmptyBlockNotice title="Prázdny odsek" hint="Kliknite sem a píšte." />
+        : elements}
+    </div>
+  );
 }
 
 function ImageBlockRenderer({ block, editMode }: { block: ImageBlock; editMode?: boolean }) {
   const position = getPosition(block);
   const variant = positionToVariant(position);
   const altText = block.alt || block.image?.alternativeText || block.caption || 'Obrázok';
+
+  // Blok bez vybranej fotografie — inak by tu bol prázdny rám bez rozmeru.
+  if (!block.image) {
+    if (!editMode) return null;
+    return (
+      <div className="my-8 clear-both">
+        <EmptyBlockNotice
+          title="Obrázok nie je vybraný"
+          hint="Vyberte ho z knižnice tlačidlom v lište bloku."
+        />
+      </div>
+    );
+  }
 
   return (
     <BlogMedia
@@ -592,6 +634,18 @@ function ImageBlockRenderer({ block, editMode }: { block: ImageBlock; editMode?:
 }
 
 function QuoteBlockRenderer({ block, needsClearBefore }: { block: QuoteBlockType; needsClearBefore?: boolean }) {
+  const editMode = useEditMode();
+  if (!String(block.text || '').trim()) {
+    if (!editMode) return null;
+    return (
+      <div className={needsClearBefore ? 'my-8 clear-both' : 'my-8'}>
+        <EmptyBlockNotice
+          title="Citát zatiaľ nemá text"
+          hint="Napíšte ho do poľa „Text citátu“ v paneli pod článkom. Úvodzovky doplní sadzba sama."
+        />
+      </div>
+    );
+  }
   return (
     <>
       {needsClearBefore && <div className="clear-both" />}
@@ -605,8 +659,19 @@ function QuoteBlockRenderer({ block, needsClearBefore }: { block: QuoteBlockType
 }
 
 function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; needsClearBefore?: boolean }) {
+  const editMode = useEditMode();
   const items = block.items || [];
-  if (items.length === 0 && !block.intro) return null;
+  if (items.length === 0 && !block.intro) {
+    if (!editMode) return null;
+    return (
+      <div className={needsClearBefore ? 'my-8 clear-both' : 'my-8'}>
+        <EmptyBlockNotice
+          title="Zoznam zdrojov je prázdny"
+          hint="Pridajte prvú položku tlačidlom „Pridať zdroj“ v paneli pod článkom."
+        />
+      </div>
+    );
+  }
   return (
     <>
       {needsClearBefore && <div className="clear-both" />}
@@ -654,6 +719,18 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
     '4': 'grid-cols-2 md:grid-cols-4',
   };
 
+  if (!(block.images || []).length) {
+    if (!editMode) return null;
+    return (
+      <div className={needsClearBefore ? 'my-8 clear-both' : 'my-8'}>
+        <EmptyBlockNotice
+          title="Galéria zatiaľ nemá fotografie"
+          hint="Vyberte ich z knižnice tlačidlom v paneli pod článkom."
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       {needsClearBefore && <div className="clear-both" />}
@@ -686,8 +763,19 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
 // =============================================================================
 
 function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClearBefore?: boolean }) {
+  const editMode = useEditMode();
   const stanzas = (block.text || '').split(/\n\s*\n/).map(s => s.split('\n').filter(l => l.trim().length > 0)).filter(st => st.length > 0);
-  if (stanzas.length === 0) return null;
+  if (stanzas.length === 0) {
+    if (!editMode) return null;
+    return (
+      <div className={needsClearBefore ? 'my-8 clear-both' : 'my-8'}>
+        <EmptyBlockNotice
+          title="Báseň zatiaľ nemá verše"
+          hint="Napíšte ich do poľa „Verše“ v paneli pod článkom. Prázdny riadok oddelí strofu."
+        />
+      </div>
+    );
+  }
   return (
     <div
       className="poem-block not-prose"

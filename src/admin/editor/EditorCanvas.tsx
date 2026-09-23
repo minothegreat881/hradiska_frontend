@@ -495,15 +495,17 @@ const canvasCss = `
   color: #b45309; margin-top: .1em; margin-right: .75rem;
 }
 
-/* Video bez adresy — namiesto prehrávača (ten by hlásil chybu) výzva. */
-.ed-embed-empty {
+/* Prázdny blok (video bez adresy, báseň bez veršov, galéria bez fotiek…).
+   Bez nej sa taký blok nevykreslí vôbec — a čo nie je vidieť, to sa nedá ani
+   vybrať, ani vyplniť, ani zmazať. */
+.ed-block-empty {
   display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center;
-  min-height: 160px; padding: 20px; text-align: center;
+  min-height: 96px; padding: 18px 20px; text-align: center;
   border: 1.5px dashed #d8c9ab; border-radius: 12px; background: rgba(255,253,244,.7);
   font-family: Inter, system-ui, sans-serif;
 }
-.ed-embed-empty b { font-size: 14px; font-weight: 600; color: #3b3021; }
-.ed-embed-empty span { font-size: 12.5px; color: #8a795e; }
+.ed-block-empty b { font-size: 14px; font-weight: 600; color: #3b3021; }
+.ed-block-empty span { font-size: 12.5px; color: #8a795e; }
 
 .ed-gap { position: absolute; left: 0; right: 0; height: 16px; transform: translateY(-8px); }
 /* „+" je v STREDE medzery, nie pri ľavom okraji: tam sedí úchyt vybraného

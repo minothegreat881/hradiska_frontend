@@ -564,14 +564,26 @@ export function EditorScreen({
           }}
         >
           {saveMsg.text}
-          {saveMsg.uid && (
-            <button
-              className="abtn"
-              style={{ marginLeft: 10, padding: '4px 10px', fontSize: 12.5 }}
-              onClick={() => setSelectedUid(saveMsg.uid!)}
-            >
-              Ukáž mi to
-            </button>
+          {saveMsg.uid && blocks.some(b => b.uid === saveMsg.uid) && (
+            <>
+              <button
+                className="abtn"
+                style={{ marginLeft: 10, padding: '4px 10px', fontSize: 12.5 }}
+                onClick={() => setSelectedUid(saveMsg.uid!)}
+              >
+                Ukáž mi to
+              </button>
+              {/* Prázdny blok bráni publikovaniu. Druhá cesta von je zmazať ho —
+                  bez nej sa dá z omylom vloženého bloku dostať len hľadaním
+                  v článku. */}
+              <button
+                className="abtn"
+                style={{ marginLeft: 6, padding: '4px 10px', fontSize: 12.5 }}
+                onClick={() => setAskDelete(saveMsg.uid!)}
+              >
+                Zmazať blok
+              </button>
+            </>
           )}
         </div>
       )}
