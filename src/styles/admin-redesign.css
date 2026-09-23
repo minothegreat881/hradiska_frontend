@@ -202,3 +202,75 @@
 @media (max-width: 1100px) {
   .admin .ad-empty-analytics { grid-template-columns: 1fr; gap: 22px; }
 }
+
+/* ── Kategórie a štítky ──────────────────────────────────────────────────── */
+.admin .ad-split { display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 20px; align-items: start; }
+.admin .ad-cat-row { grid-template-columns: 24px minmax(0, 1fr) 60px 16px; cursor: pointer; }
+.admin .ad-cat-row.is-over { box-shadow: inset 0 2px 0 var(--ad-amber-deep); }
+.admin .ad-cat-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin .ad-cat-slug { font-size: 12px; color: var(--ad-muted); }
+.admin .ad-cat-count { font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; color: var(--ad-secondary); }
+.admin .ad-row-grip {
+  display: flex; align-items: center; justify-content: center;
+  border: 0; background: none; color: var(--ad-muted); cursor: grab; touch-action: none; padding: 0;
+}
+.admin .ad-row-grip:active { cursor: grabbing; }
+
+.admin .ad-form { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.admin .ad-form-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--ad-line); padding-top: 14px; margin-top: 2px;
+}
+.admin .ad-link-danger:disabled { opacity: .4; cursor: not-allowed; }
+.admin .ad-empty-row {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  padding: 28px; color: var(--ad-muted); font-size: 13.5px;
+}
+.admin .ad-prefixed {
+  display: flex; align-items: center; border: 1px solid var(--ad-field-border);
+  border-radius: 8px; background: var(--ad-card); overflow: hidden;
+}
+.admin .ad-prefixed > span {
+  padding: 0 2px 0 10px; font-size: 13px; color: var(--ad-muted); white-space: nowrap;
+}
+.admin .ad-prefixed > input {
+  flex: 1; min-width: 0; border: 0; background: none; padding: 9px 10px 9px 0;
+  font: inherit; font-size: 14px; color: var(--ad-text);
+}
+.admin .ad-prefixed > input:focus { outline: none; }
+
+.admin .ad-modal-wrap {
+  position: fixed; inset: 0; z-index: 130; background: rgba(30,22,12,.45);
+  display: flex; align-items: center; justify-content: center;
+}
+.admin .ad-modal { width: min(420px, 92vw); padding: 20px; }
+.admin .ad-modal h2 { font-size: 17px; font-weight: 600; margin: 0 0 8px; }
+.admin .ad-modal p { font-size: 13.5px; color: var(--ad-secondary); line-height: 1.55; margin: 0 0 16px; }
+.admin .ad-modal > div { display: flex; gap: 8px; justify-content: flex-end; }
+
+@media (max-width: 1200px) {
+  .admin .ad-split { grid-template-columns: 1fr; }
+}
+
+/* Štítky */
+.admin .ad-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.admin .ad-search {
+  display: flex; align-items: center; gap: 8px; width: 320px; max-width: 100%;
+  border: 1px solid var(--ad-field-border); border-radius: 8px;
+  background: var(--ad-card); padding: 0 10px; height: 36px; color: var(--ad-muted);
+}
+.admin .ad-search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 13.5px; color: var(--ad-text); }
+.admin .ad-search input:focus { outline: none; }
+.admin .ad-search button { border: 0; background: none; color: var(--ad-muted); cursor: pointer; display: flex; }
+.admin .ad-tag-row { grid-template-columns: 18px minmax(0, 1.4fr) minmax(0, 1fr) 180px 34px; }
+.admin .ad-tag-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin .ad-tag-slug { font-size: 12.5px; color: var(--ad-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin .ad-tag-bar { display: flex; align-items: center; gap: 10px; }
+.admin .ad-tag-n { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--ad-secondary); min-width: 28px; text-align: right; }
+.admin .ad-notice b { font-size: 13.5px; }
+.admin .ad-choice:disabled { opacity: .6; cursor: wait; }
+
+@media (max-width: 900px) {
+  .admin .ad-tag-row { grid-template-columns: 18px minmax(0, 1fr) 120px 34px; }
+  .admin .ad-tag-slug { display: none; }
+}

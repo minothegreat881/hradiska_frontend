@@ -15,7 +15,8 @@ import { MediaScreen } from './screens/MediaScreen';
 import { CommentsScreen } from './screens/CommentsScreen';
 import { UsersScreen } from './screens/UsersScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
-import { StubScreen } from './screens/StubScreen';
+import { CategoriesScreen } from './screens/CategoriesScreen';
+import { TagsScreen } from './screens/TagsScreen';
 import { fetchNavCounts } from './api/posts';
 
 export type AdminRoute =
@@ -226,10 +227,8 @@ function AdminShell() {
           {route === "editor" && <EditorScreen articleId={editingId} onBack={() => setRoute("articles")} onSaved={setEditingId} />}
           {route === 'analytics' && <AnalyticsScreen onEdit={openEditor} />}
           {route === 'media' && <MediaScreen />}
-          {route === 'categories' && (
-            <StubScreen title="Kategórie" note={`${badges.categories ?? '…'} kategórií, poradie ťahaním cez pole \`order\`. Polia: name*, slug*, description, order.`} />
-          )}
-          {route === 'tags' && <StubScreen title="Štítky" note="Polia: name*, slug*. Zobraziť počet použití." />}
+          {route === 'categories' && <CategoriesScreen />}
+          {route === 'tags' && <TagsScreen />}
           {route === 'comments' && <CommentsScreen />}
           {route === 'users' && <UsersScreen />}
           {route === 'profile' && <ProfileScreen />}
