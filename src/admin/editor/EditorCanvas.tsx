@@ -32,6 +32,7 @@ import { MOBILE_MAX_PX } from './snapping/positionZones';
 import { EditorUIContext } from './EditorUIContext';
 import { BlockOverlay, type OverlayBlock } from './BlockOverlay';
 import { RichTextInline } from './blocks/RichTextInline';
+import { BlockPicker } from './blocks/BlockPicker';
 
 export type CanvasDevice = 'desktop' | 'mobil';
 /** `fit` = zmenšiť na šírku adminu, `full` = skutočná veľkosť + posúvanie do strán. */
@@ -299,7 +300,13 @@ export function EditorCanvas({
                           <DynamicZoneRenderer blocks={article.blocks} editMode={!noShell} />
                         </div>
                       ) : (
-                        <p className="lart-empty">Článok zatiaľ nemá žiadny blok. Pridajte prvý tlačidlom „+".</p>
+                        /* Prázdny článok: tlačidlá „+" sa kreslia len MEDZI blokmi,
+                           takže bez tejto dlaždice by sa nedal vôbec začať. */
+                        <BlockPicker
+                          variant="empty"
+                          blockTypes={blockTypes}
+                          onPick={(type) => onInsert?.(type, 0)}
+                        />
                       )}
 
                       {!noShell && onMove && (
@@ -460,13 +467,48 @@ const canvasCss = `
   text-transform: uppercase; color: #8a795e; padding: 3px 7px 5px;
 }
 .ed-menu-head button { border: none; background: none; color: #8a795e; cursor: pointer; padding: 0; }
+.ed-menu { width: 260px; }
 .ed-menu > button[role="menuitem"] {
-  display: flex; align-items: center; gap: 8px; width: 100%;
-  padding: 7px 8px; border: none; background: none; border-radius: 7px;
-  font-size: 13.5px; color: #3b3021; cursor: pointer; text-align: left;
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 7px 8px; border: none; background: none; border-radius: 8px;
+  color: #3b3021; cursor: pointer; text-align: left;
 }
 .ed-menu > button[role="menuitem"]:hover { background: #f1e6cf; }
-.ed-menu-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.ed-menu-icon {
+  width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.ed-menu-text { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
+.ed-menu-text b { font-size: 13.5px; font-weight: 600; }
+.ed-menu-text i { font-size: 11.5px; font-style: normal; color: #8a795e; }
+
+/* Prázdny článok — výber prvého bloku. */
+.ed-empty {
+  border: 1.5px dashed #d8c9ab; border-radius: 14px; padding: 22px;
+  background: rgba(255,253,244,.6); font-family: Inter, system-ui, sans-serif;
+}
+.ed-empty-head { text-align: center; margin-bottom: 16px; }
+.ed-empty-head strong { display: block; font-size: 17px; color: #3b3021; margin-bottom: 4px; }
+.ed-empty-head span { font-size: 13px; color: #8a795e; }
+.ed-empty-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 10px;
+}
+.ed-empty-card {
+  display: flex; flex-direction: column; gap: 3px; align-items: flex-start;
+  padding: 12px; border: 1px solid #e2d6bc; border-radius: 11px;
+  background: #fff; cursor: pointer; text-align: left;
+  transition: border-color .12s, box-shadow .12s, transform .12s;
+  pointer-events: auto !important;
+}
+.ed-empty-card:hover {
+  border-color: #b8792d; box-shadow: 0 6px 16px rgba(60,40,15,.12); transform: translateY(-1px);
+}
+.ed-empty-icon {
+  width: 30px; height: 30px; border-radius: 9px; color: #fff; margin-bottom: 5px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.ed-empty-label { font-size: 13.5px; font-weight: 600; color: #3b3021; }
+.ed-empty-hint { font-size: 11.5px; color: #8a795e; line-height: 1.35; }
 
 /* Vysvetlivka v pobočnom stĺpci — len v editore. */
 .ed-side-note {

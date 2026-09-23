@@ -21,12 +21,13 @@
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  GripVertical, Copy, Trash2, Plus, ArrowUp, ArrowDown, X,
+  GripVertical, Copy, Trash2, Plus, ArrowUp, ArrowDown,
   Image as ImageIcon, Columns2, Captions, Square, Sun, AlertTriangle,
 } from 'lucide-react';
 import { ImageControls } from './blocks/ImageControls';
 import { BlockFields } from './blocks/BlockFields';
 import { canPair, whyNotPair } from './snapping/positionZones';
+import { BlockPicker } from './blocks/BlockPicker';
 
 export interface OverlayBlock {
   uid: string;
@@ -360,18 +361,11 @@ export function BlockOverlay({
               každý prvok, viď poznámka vyššie). */}
           <span className="ed-gap-line pointer-events-none" />
           {menuAt === i && (
-            <div className="ed-menu" role="menu">
-              <div className="ed-menu-head">
-                Vložiť blok
-                <button onClick={() => setMenuAt(null)} aria-label="Zavrieť"><X className="w-3.5 h-3.5" /></button>
-              </div>
-              {blockTypes.map((t) => (
-                <button key={t.id} role="menuitem" onClick={() => { onInsert(t.id, i); setMenuAt(null); }}>
-                  <span className="ed-menu-dot" style={{ background: t.accent }} />
-                  {t.label}
-                </button>
-              ))}
-            </div>
+            <BlockPicker
+              blockTypes={blockTypes}
+              onPick={(type) => { onInsert(type, i); setMenuAt(null); }}
+              onClose={() => setMenuAt(null)}
+            />
           )}
         </div>
       ))}

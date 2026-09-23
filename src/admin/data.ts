@@ -8,11 +8,11 @@
 
 // ── Enumy zo Strapi ──────────────────────────────────────────────────────────
 export const BLOCK_TYPES = [
-  { id: 'content.rich-text', label: 'Rich text', accent: 'var(--ad-blk-rich)' },
+  { id: 'content.rich-text', label: 'Text', accent: 'var(--ad-blk-rich)' },
   { id: 'content.image-block', label: 'Obrázok', accent: 'var(--ad-blk-image)' },
   { id: 'content.quote-block', label: 'Citát', accent: 'var(--ad-blk-quote)' },
   { id: 'content.sources', label: 'Zdroje', accent: '#6b5a3a' },
-  { id: 'content.embed', label: 'Embed', accent: '#3f6b7a' },
+  { id: 'content.embed', label: 'Vložené video', accent: '#3f6b7a' },
   { id: 'content.poem', label: 'Báseň', accent: '#7a5c8a' },
   { id: 'content.image-gallery', label: 'Galéria', accent: '#5c7a52' },
 ] as const;
