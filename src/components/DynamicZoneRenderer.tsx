@@ -16,6 +16,7 @@ import { canPair } from '../admin/editor/snapping/positionZones';
 import { BlockShell } from '../admin/editor/BlockShell';
 import { EditModeContext, useEditMode } from './EditModeContext';
 import { BodyPhotosContext, useOpenBodyPhoto, type BodyPhoto } from './BodyPhotos';
+import { SourceLine } from './SourceLine';
 import { embedSrc } from '../lib/embed';
 
 // =============================================================================
@@ -662,66 +663,6 @@ function QuoteBlockRenderer({ block, needsClearBefore }: { block: QuoteBlockType
   );
 }
 
-/**
- * Rozobratie jedného riadku zdroja na časti, len kvôli sadzbe.
- *
- * Schéma má jedno textové pole — a tak to ostáva. Zoznam bol ale sivá stena
- * rovnakého textu, v ktorej sa autor, dielo ani rok nedali nájsť očami.
- * Z 1238 zdrojov v článkoch je väčšina písaná ako
- * „Autor: Názov, vydavateľ miesto rok“.
- *
- * Delí sa NA MIESTA V PÔVODNOM REŤAZCI, nie skladaním nového: časti sa
- * vykreslia ako jeho výseky za sebou, takže na obrazovke je vždy presne to,
- * čo je uložené — aj so zátvorkami a bodkami. Čo sa nerozpozná, ostáva ako
- * doteraz.
- */
-const SOURCE_LABELS = /^(foto|fotografie|fotky|zdroj|zdroje|text|mapa|mapy|preklad|autor|autora|kresba|video)$/i;
-
-function parseSourceLine(raw: string): { head?: string; work: string; rest?: string; tail?: string; plainHead?: boolean } | null {
-  const text = (raw || '').trim();
-  if (!text || /^https?:\/\//i.test(text)) return null;   // holý odkaz nechaj tak
-
-  // Rok na konci aj s tým, čo ho oddeľuje či obopína — „ 1988“, „, 1995“, „ (1999)“.
-  const y = text.match(/[\s,(]((?:1[0-9]|20)\d{2})\.?\)?$/);
-  const yearAt = y && y.index !== undefined ? y.index : -1;
-  const body = yearAt >= 0 ? text.slice(0, yearAt) : text;
-  const tail = yearAt >= 0 ? text.slice(yearAt) : undefined;
-
-  // Autor pred prvou dvojbodkou, ak je to krátke a nie je to adresa.
-  const c = body.indexOf(':');
-  const hasHead = c > 1 && c <= 60 && !/https?$/i.test(body.slice(0, c));
-  const head = hasHead ? body.slice(0, c + 1) : undefined;
-  const middle = hasHead ? body.slice(c + 1) : body;
-
-  // „Foto:“, „Zdroj:“ a spol. nie sú autor — časť za nimi sa nekurzívuje.
-  const plainHead = hasHead && SOURCE_LABELS.test(body.slice(0, c).trim());
-
-  let work = middle;
-  let rest: string | undefined;
-  if (hasHead && !plainHead) {
-    const k = middle.indexOf(',');
-    if (k > 2) { work = middle.slice(0, k); rest = middle.slice(k); }
-  }
-  if (!head && !tail) return null;            // nič sa nerozpoznalo
-  return { head, work, rest, tail, plainHead };
-}
-
-/** Riadok zdroja v sadzbe: autor polotučne, dielo kurzívou, rok jemnejšie. */
-function SourceLine({ text }: { text: string }) {
-  const p = parseSourceLine(text);
-  if (!p) return <>{text}</>;
-  return (
-    <>
-      {p.head && <span style={{ fontWeight: 600 }}>{p.head}</span>}
-      <span style={p.head && !p.plainHead ? { fontStyle: 'italic' } : undefined}>{p.work}</span>
-      {p.rest && <span style={{ opacity: 0.85 }}>{p.rest}</span>}
-      {p.tail && (
-        <span style={{ opacity: 0.75, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{p.tail}</span>
-      )}
-    </>
-  );
-}
-
 function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; needsClearBefore?: boolean }) {
   const editMode = useEditMode();
   const items = block.items || [];
@@ -752,19 +693,7 @@ function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; nee
             const url = (it.url || '').trim();
             return (
               <li key={it.id || j} className="text-stone-700 leading-relaxed" style={{ overflowWrap: 'anywhere', minWidth: 0 }}>
-                {url ? (
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-700 hover:text-amber-900 hover:underline break-all"
-                    style={{ overflowWrap: 'anywhere' }}
-                  >
-                    {text ? <SourceLine text={text} /> : url}
-                  </a>
-                ) : (
-                  <span><SourceLine text={text} /></span>
-                )}
+                <SourceLine text={text} url={url} />
               </li>
             );
           })}

@@ -690,7 +690,13 @@ const canvasCss = `
 }
 
 /* ── Polia ostatných blokov (Fáza 5) ────────────────────────────────────── */
-.ed-fields { position: absolute; left: 0; width: 100%; z-index: 39; pointer-events: auto !important; }
+/* Panel polí je ŠIRŠÍ NEŽ TEXTOVÝ STĹPEC. Na 668 px sa do riadka zdroja
+   zmestilo pár slov a písalo sa cez škáru; panel preto presahuje doprava
+   do priestoru pobočného stĺpca (na mobilnom plátne ostáva v šírke okna). */
+.ed-fields {
+  position: absolute; left: 0; z-index: 39; pointer-events: auto !important;
+  width: min(calc(100% + 330px), calc(100vw - 48px));
+}
 .edf {
   background: #fffdf7; border: 1px solid #d8c9ab; border-radius: 10px;
   padding: 12px 14px; box-shadow: 0 8px 22px rgba(60,40,15,.16);
@@ -729,7 +735,18 @@ const canvasCss = `
 .edf-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
 .edf-item { display: grid; grid-template-columns: 1fr 180px auto; gap: 6px; align-items: start; }
 /* Zdroj má pred sebou poradie — rovnaké číslo uvidí čitateľ v článku. */
-.edf-item-src { grid-template-columns: 20px 1fr 170px auto; }
+/* Zdroj má dva riadky: citácia na celú šírku, pod ňou odkaz. Vedľa seba
+   ostávalo na citáciu asi 300 px a na odkaz 170 px — v oboch sa písalo
+   „cez okienko". */
+.edf-item-src {
+  grid-template-columns: 20px 1fr auto;
+  grid-template-areas: "n text btns" ". url .";
+  row-gap: 4px;
+}
+.edf-item-src > .edf-item-n { grid-area: n; }
+.edf-item-src > textarea { grid-area: text; }
+.edf-item-src > input { grid-area: url; }
+.edf-item-src > .edf-item-btns { grid-area: btns; }
 .edf-item-n { font: 600 12px/2.2 Inter, system-ui, sans-serif; color: #8a795e; text-align: right; }
 .edf-item textarea, .edf-item input {
   border: 1px solid #d8c9ab; border-radius: 7px; padding: 6px 9px; font: inherit; font-size: 13px;

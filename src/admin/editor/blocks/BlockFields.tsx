@@ -12,6 +12,7 @@
 import React from 'react';
 import { Plus, X, ArrowUp, ArrowDown, Images } from 'lucide-react';
 import { parseEmbedUrl } from '../../../lib/embed';
+import { splitSourceList } from './splitSources';
 
 const EMBED_PROVIDERS: { id: string; label: string }[] = [
   { id: 'youtube', label: 'YouTube' },
@@ -187,13 +188,31 @@ function SourcesFields({ data, onPatch }: { data: any; onPatch: (p: any) => void
   }, [focusAt, items.length]);
 
   const patchItem = (i: number, p: any) => onPatch({ items: replace(items, i, { ...items[i], ...p }) });
+
+  /**
+   * Vloženie celého zoznamu naraz. Vráti `true`, ak si vkladanie prevzalo —
+   * vtedy sa do poľa nič nenapíše a zdroje pribudnú ako samostatné riadky.
+   */
+  const vlozZoznam = (i: number, raw: string): boolean => {
+    const casti = splitSourceList(raw);
+    if (casti.length < 2) return false;        // jeden zdroj — bežné vkladanie
+    const prazdny = !String(items[i]?.text || '').trim() && !String(items[i]?.url || '').trim();
+    const next = [
+      ...items.slice(0, i),
+      ...(prazdny ? [] : [items[i]]),
+      ...casti,
+      ...items.slice(i + 1),
+    ];
+    onPatch({ items: next });
+    return true;
+  };
   const addItem = () => { onPatch({ items: [...items, { text: '', url: '' }] }); setFocusAt(items.length); };
   const removeItem = (i: number) => onPatch({ items: items.filter((_: any, k: number) => k !== i) });
 
   return (
     <Panel
       title="Zdroje a literatúra"
-      hint="Jeden zdroj = jeden riadok textu (plus odkaz, ak je). Na webe je zvykom „Autor: Názov, vydavateľ miesto rok“ — tak je napísaná väčšina z 1238 zdrojov v článkoch. Enter vás posunie na odkaz a potom na ďalší zdroj."
+      hint="Celý zoznam môžete vložiť naraz — každý riadok (alebo odsek oddelený prázdnym riadkom) sa stane jedným zdrojom a samostatný odkaz sa pripojí k zdroju nad ním. Na webe je zvykom „Autor: Názov, vydavateľ miesto rok“. Enter vás posunie na odkaz a potom na ďalší zdroj."
     >
       <Field label="Nadpis" value={data.title} onChange={(v) => onPatch({ title: v })} />
       <Area label="Úvodná veta" value={data.intro} onChange={(v) => onPatch({ intro: v })} rows={2} />
@@ -209,6 +228,7 @@ function SourcesFields({ data, onPatch }: { data: any; onPatch: (p: any) => void
               rows={2}
               onChange={(v) => patchItem(i, { text: v })}
               onEnter={() => urlRefs.current[i]?.focus()}
+              onPaste={(raw) => vlozZoznam(i, raw)}
             />
             <input
               ref={(el) => { urlRefs.current[i] = el; }}
@@ -250,11 +270,13 @@ function SourcesFields({ data, onPatch }: { data: any; onPatch: (p: any) => void
  * nezalomí riadok, ale posunie na ďalšie pole.
  */
 function GrowArea({
-  value, placeholder, rows = 2, onChange, onEnter, inputRef, mono,
+  value, placeholder, rows = 2, onChange, onEnter, inputRef, mono, onPaste,
 }: {
   value: string; placeholder?: string; rows?: number;
   onChange: (v: string) => void; onEnter?: () => void;
   inputRef?: (el: HTMLTextAreaElement | null) => void; mono?: boolean;
+  /** Vráti `true`, ak si vložený text prevzalo volajúce pole (viac zdrojov naraz). */
+  onPaste?: (raw: string) => boolean;
 }) {
   const own = React.useRef<HTMLTextAreaElement | null>(null);
   const grow = (el: HTMLTextAreaElement | null) => {
@@ -273,6 +295,11 @@ function GrowArea({
       style={{ resize: 'none', overflow: 'hidden', ...(mono ? { fontFamily: 'var(--font-serif, Georgia, serif)', whiteSpace: 'pre-wrap' } : {}) }}
       onChange={(e) => onChange(e.target.value)}
       onKeyDown={(e) => { if (onEnter && e.key === 'Enter') { e.preventDefault(); onEnter(); } }}
+      onPaste={(e) => {
+        if (!onPaste) return;
+        const raw = e.clipboardData.getData('text');
+        if (onPaste(raw)) e.preventDefault();
+      }}
     />
   );
 }

@@ -884,6 +884,19 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   word-break: normal !important;
 }
 
+/* Odkaz pri zdroji — samostatná značka na konci riadka, nie celá citácia
+   ako podčiarknutá veta cez tri riadky. */
+.source-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 7px 2px; border-radius: 999px;
+  border: 1px solid var(--hr-line, #e8dcc0);
+  background: rgba(255, 253, 244, .6);
+  font-family: Inter, system-ui, sans-serif; font-size: 12px; line-height: 1.6;
+  color: #7d4f1d !important; text-decoration: none !important;
+  vertical-align: baseline; overflow-wrap: anywhere;
+}
+.source-link:hover { background: var(--hr-line, #e8dcc0); }
+
 /* Dlhý reťazec bez medzier — surová adresa, prepis nápisu, preklep — nesmie
    vytiecť zo stĺpca von z článku. `word-break: normal` vyššie hovorí, že bežné
    slová sa nelámu; toto dovolí zlom IBA tam, kde by sa text inak nezmestil.
