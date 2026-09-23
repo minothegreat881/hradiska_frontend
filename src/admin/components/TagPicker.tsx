@@ -18,6 +18,7 @@ export function TagPicker({
   const [options, setOptions] = useState<Tag[]>([]);
   const [busy, setBusy] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!token || !open) return;
@@ -37,19 +38,36 @@ export function TagPicker({
     return () => document.removeEventListener('mousedown', onDoc);
   }, [open]);
 
+  /* Po pridaní sa ponuka NEZATVÁRA a pole sa len vyprázdni — štítky sa
+     zvyknú písať viaceré za sebou a zakaždým znova otvárať ponuku bolo
+     zdĺhavé. Zatvorí ju kliknutie mimo, Escape alebo tlačidlo „+ pridať…". */
   const add = (t: Tag) => {
     if (!value.some(v => v.documentId === t.documentId)) onChange([...value, t]);
     setQ('');
-    setOpen(false);
+    inputRef.current?.focus();
   };
 
-  const create = async () => {
-    if (!token || !q.trim()) return;
+  const create = async (name: string) => {
+    if (!token || !name.trim()) return;
     setBusy(true);
     try {
-      add(await findOrCreateTag(token, q));
+      add(await findOrCreateTag(token, name));
     } catch { /* chybu ukáže uloženie článku */ }
     finally { setBusy(false); }
+  };
+
+  /* Enter musí štítok pridať VŽDY, nielen keď je názov nový.
+     Predtým platilo `if (… && !exact)`, takže po napísaní názvu, ktorý už
+     existuje, Enter neurobil nič a štítok sa dal pridať len myšou zo zoznamu.
+     Teraz: zhodný názov sa pridá zo zoznamu, nový sa vytvorí.
+     Ak zoznam ešte nedobehol (napovedanie je oneskorené o 250 ms), rozhodne
+     `findOrCreateTag` na serveri — ten existujúci štítok nájde, nezdvojí ho. */
+  const commit = async () => {
+    const name = q.trim();
+    if (!name || busy) return;
+    const hit = options.find(o => o.name.toLowerCase() === name.toLowerCase());
+    if (hit) { add(hit); return; }
+    await create(name);
   };
 
   const exact = options.some(o => o.name.toLowerCase() === q.trim().toLowerCase());
@@ -81,9 +99,15 @@ export function TagPicker({
           style={{ position: 'absolute', zIndex: 40, top: '100%', left: 0, right: 0, marginTop: 6, padding: 8, boxShadow: '0 12px 30px -14px rgba(60,40,15,.4)' }}
         >
           <input
+            ref={inputRef}
             className="afld" autoFocus value={q} onChange={e => setQ(e.target.value)}
-            placeholder="Hľadať alebo napísať nový…"
-            onKeyDown={e => { if (e.key === 'Enter' && q.trim() && !exact) { e.preventDefault(); create(); } }}
+            placeholder="Napíšte štítok a stlačte Enter…"
+            onKeyDown={e => {
+              if (e.key === 'Enter') { e.preventDefault(); commit(); }
+              if (e.key === 'Escape') { e.preventDefault(); setOpen(false); }
+              // Backspace v prázdnom poli odoberie posledný pridaný štítok.
+              if (e.key === 'Backspace' && !q && value.length) onChange(value.slice(0, -1));
+            }}
             style={{ marginBottom: 6, padding: '7px 10px', fontSize: 13 }}
           />
           <div style={{ maxHeight: 190, overflowY: 'auto' }}>
@@ -104,7 +128,7 @@ export function TagPicker({
 
           {q.trim() && !exact && (
             <button
-              className="abtn" onClick={create} disabled={busy}
+              className="abtn" onClick={() => commit()} disabled={busy}
               style={{ width: '100%', justifyContent: 'center', marginTop: 6, fontSize: 13 }}
             >
               {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
