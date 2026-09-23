@@ -732,6 +732,29 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
     '4': 'grid-cols-2 md:grid-cols-4',
   };
 
+  /* Tvar, ktorému rozumie svetelný box. `fileId` je id súboru v knižnici —
+     na to sa viažu lajky a komentáre k fotke, takže fungujú aj tu. */
+  const photos = React.useMemo(
+    () => (block.images || []).map((image: any, idx: number) => ({
+      url: getStrapiImageUrl(image),
+      caption: image.caption || image.alternativeText || '',
+      alt: image.alternativeText || image.caption || `Obrázok ${idx + 1}`,
+      fileId: image.id,
+    })),
+    [block.images],
+  );
+
+  /* Ovládanie svetelného boxu musí mať STÁLU totožnosť: vnútri si ho box
+     dáva do závislostí efektu, ktorý zamyká posúvanie stránky. Nové funkcie
+     pri každom vykreslení by ten efekt púšťali dookola a stránka by blikala. */
+  const close = React.useCallback(() => setOpenIdx(null), []);
+  const prev = React.useCallback(
+    () => setOpenIdx((i) => (i === null ? i : (i - 1 + photos.length) % photos.length)), [photos.length]);
+  const next = React.useCallback(
+    () => setOpenIdx((i) => (i === null ? i : (i + 1) % photos.length)), [photos.length]);
+
+  /* Prázdna galéria sa rieši AŽ TU, za všetkými háčikmi — skorší návrat by
+     ich pri prázdnom bloku vynechal a React by spadol. */
   if (!(block.images || []).length) {
     if (!editMode) return null;
     return (
@@ -743,15 +766,6 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
       </div>
     );
   }
-
-  /* Tvar, ktorému rozumie svetelný box. `fileId` je id súboru v knižnici —
-     na to sa viažu lajky a komentáre k fotke, takže fungujú aj tu. */
-  const photos = (block.images || []).map((image: any, idx: number) => ({
-    url: getStrapiImageUrl(image),
-    caption: image.caption || image.alternativeText || '',
-    alt: image.alternativeText || image.caption || `Obrázok ${idx + 1}`,
-    fileId: image.id,
-  }));
 
   return (
     <>
@@ -815,9 +829,9 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
               <Lightbox
                 images={photos}
                 index={openIdx}
-                onClose={() => setOpenIdx(null)}
-                onPrev={() => setOpenIdx((i) => (i === null ? i : (i - 1 + photos.length) % photos.length))}
-                onNext={() => setOpenIdx((i) => (i === null ? i : (i + 1) % photos.length))}
+                onClose={close}
+                onPrev={prev}
+                onNext={next}
               />
             )}
           </AnimatePresence>,

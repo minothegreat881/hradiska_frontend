@@ -68,11 +68,19 @@ export function Lightbox({
     window.addEventListener('keydown', onKey);
     const html = document.documentElement;
     const prevOverflow = html.style.overflow;
+    const prevPad = html.style.paddingRight;
+    /* Zamknutie posúvania schová posuvník a stránka pod svetelným boxom sa
+       tým roztiahne o jeho šírku — pri otvorení aj zatvorení to vyzeralo ako
+       bliknutie celej stránky. Miesto po posuvníku sa preto dorovná výplňou
+       (na dotykových zariadeniach je šírka 0 a nestane sa nič). */
+    const barWidth = window.innerWidth - html.clientWidth;
     html.style.overflow = 'hidden';
+    if (barWidth > 0) html.style.paddingRight = `${barWidth}px`;
     closeRef.current?.focus();
     return () => {
       window.removeEventListener('keydown', onKey);
       html.style.overflow = prevOverflow;
+      html.style.paddingRight = prevPad;
     };
   }, [onClose, onPrev, onNext, zoom]);
 
@@ -188,18 +196,21 @@ export function Lightbox({
           </button>
           {/* Rozmazané pozadie (rovnaká fotka) — FB-style letterbox pre portrét */}
           <img className="pl-photo-blur" src={current.url} alt="" aria-hidden="true" />
-          <AnimatePresence mode="wait">
-            <motion.img
-              className="pl-photo-img"
-              key={index}
-              src={current.url}
-              alt={current.caption || current.alt || `Fotka ${index + 1}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: prefersReduced ? 0 : 0.15 }}
-            />
-          </AnimatePresence>
+          {/* JEDEN `<img>`, ktorému sa mení iba `src` — žiadny `key`, žiadne
+              striedanie cez AnimatePresence.
+              Predtým tu bol prechod `mode="wait"`: stará fotka sa najprv
+              stmavila do nuly a až potom sa nová pripla. Medzi tým nebola v
+              ráme fotka žiadna a presvitlo tmavé rozmazané pozadie — to bolo
+              to bliknutie pri preklikávaní doprava/doľava. Prehliadač pritom
+              starú fotku drží na obrazovke, kým novú nedekóduje, takže
+              výmena je plynulá aj bez prechodu (susedné fotky sú navyše
+              prednačítané). */}
+          <img
+            className="pl-photo-img"
+            src={current.url}
+            alt={current.caption || current.alt || `Fotka ${index + 1}`}
+            draggable={false}
+          />
         </div>
 
         {/* Reakcie + akčná lišta + komentáre + vstup (ak fotka má fileId zo Strapi) */}
