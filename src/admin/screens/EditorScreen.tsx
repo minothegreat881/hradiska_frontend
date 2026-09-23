@@ -308,6 +308,29 @@ export function EditorScreen({
     const emptyGallery = blocks.find(b => b.type === 'content.image-gallery' && !(b.data.images || []).length);
     if (emptyGallery) return { uid: emptyGallery.uid, text: `Galéria v bloku č. ${at(emptyGallery.uid)} nemá žiadny obrázok.` };
 
+    /* POBOČNÝ STĹPEC. Strapi má v kľúčovom fakte povinný popis AJ hodnotu a v
+       udalosti rok AJ názov. Ukladanie doteraz neúplné riadky potichu
+       zahodilo, aby Strapi nevrátil chybu — v editore teda ostali na
+       obrazovke, ale do článku sa nikdy nedostali a na webe chýbala celá
+       karta. Radšej povedz, čo doplniť, než zahodiť napísané. */
+    const badFact = keyFacts.findIndex(f => !String(f.label || '').trim() || !String(f.value || '').trim());
+    if (badFact >= 0) {
+      const f = keyFacts[badFact];
+      const chyba = !String(f.label || '').trim() && !String(f.value || '').trim()
+        ? 'je prázdny — vyplňte ho alebo zmažte'
+        : (!String(f.label || '').trim() ? 'nemá popis (ľavé pole)' : 'nemá hodnotu (pravé pole)');
+      return { text: `Kľúčový fakt č. ${badFact + 1} ${chyba}. Nájdete ho v pobočnom stĺpci vedľa článku.` };
+    }
+
+    const badEvent = timeline.findIndex(t => !String(t.year || '').trim() || !String(t.title || '').trim());
+    if (badEvent >= 0) {
+      const t = timeline[badEvent];
+      const chyba = !String(t.year || '').trim() && !String(t.title || '').trim()
+        ? 'je prázdna — vyplňte ju alebo zmažte'
+        : (!String(t.year || '').trim() ? 'nemá rok' : 'nemá názov');
+      return { text: `Udalosť časovej osi č. ${badEvent + 1} ${chyba}. Nájdete ju v pobočnom stĺpci vedľa článku.` };
+    }
+
     return null;
   };
 

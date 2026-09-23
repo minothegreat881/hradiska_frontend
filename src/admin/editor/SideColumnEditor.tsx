@@ -170,18 +170,23 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
             )}
 
             <Icon className="ad-fact-icon w-4 h-4" />
+            {/* Strapi chce popis AJ hodnotu. Chýbajúcu polovicu podčiarkni hneď
+                pri písaní — neúplný fakt sa do článku neuloží a pred touto
+                značkou sa to dalo zistiť až pri ukladaní. */}
             <div className="ad-fact-fields">
               <input
-                className="ad-fact-label"
+                className={`ad-fact-label${!f.label.trim() && f.value.trim() ? ' is-missing' : ''}`}
                 value={f.label}
                 placeholder="POPIS"
+                title={!f.label.trim() && f.value.trim() ? 'Doplňte popis — bez neho sa fakt neuloží.' : undefined}
                 maxLength={MAX.label}
                 onChange={(e) => patch(f.uid, { label: e.target.value })}
               />
               <input
-                className="ad-fact-value"
+                className={`ad-fact-value${!f.value.trim() && f.label.trim() ? ' is-missing' : ''}`}
                 value={f.value}
                 placeholder="Hodnota"
+                title={!f.value.trim() && f.label.trim() ? 'Doplňte hodnotu — bez nej sa fakt neuloží.' : undefined}
                 maxLength={MAX.value}
                 onChange={(e) => patch(f.uid, { value: e.target.value })}
               />
