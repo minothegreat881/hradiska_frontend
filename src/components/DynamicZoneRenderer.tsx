@@ -13,6 +13,7 @@ import { getStrapiImageUrl, StrapiImage } from '../lib/strapi';
 import { canPair } from '../admin/editor/snapping/positionZones';
 import { BlockShell } from '../admin/editor/BlockShell';
 import { EditModeContext, useEditMode } from './EditModeContext';
+import { embedSrc } from '../lib/embed';
 
 // Helper: open gallery modal with specific image
 function openGalleryWithImage(imageUrl: string) {
@@ -122,12 +123,29 @@ const BLOCK_LABELS: Record<string, string> = {
 // =============================================================================
 
 function EmbedRenderer({ block }: { block: EmbedBlock }) {
-  const { provider, embedId, url, caption } = block;
-  const src =
-    provider === 'youtube'   ? `https://www.youtube.com/embed/${embedId}` :
-    provider === 'vimeo'     ? `https://player.vimeo.com/video/${embedId}` :
-    provider === 'sketchfab' ? `https://sketchfab.com/models/${embedId}/embed` :
-    url;
+  const { url, caption } = block;
+  const editMode = useEditMode();
+  // Prázdny blok nesmie dostať vkladací odkaz bez identifikátora — YouTube
+  // na taký odpovedá chybovou stránkou („Vyskytla sa chyba. Skúste to neskôr").
+  const src = embedSrc(block);
+
+  if (!src) {
+    // Na webe sa nenastavené video nezobrazí vôbec; v editore výzva, čo doplniť.
+    if (!editMode) return null;
+    return (
+      <figure className="my-8 clear-both not-prose">
+        <div className="ed-embed-empty">
+          <b>Video zatiaľ nemá adresu</b>
+          <span>Vložte odkaz na YouTube, Vimeo alebo Sketchfab do poľa „Adresa“ pod článkom.</span>
+        </div>
+        {caption && (
+          <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}>
+            {caption}
+          </figcaption>
+        )}
+      </figure>
+    );
+  }
 
   // Facebook post plugin má fixnú šírku a obsah zarovnaný vľavo hore — vynútený
   // pomer 16:9 by nechal väčšinu rámu prázdnu. Vykresli ho vycentrovane, prirodzenou výškou.
@@ -748,6 +766,18 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
 // MAIN RENDERER with pairing logic
 // =============================================================================
 
+/**
+ * Má blok textu aspoň jeden naozajstný odsek? Podľa toho sa vyberá blok
+ * s iniciálkou. Používa to aj editor, aby počas písania kreslil iniciálku
+ * v tom istom bloku ako hotový článok — preto je to tu, nie dvakrát.
+ */
+export const hasRealParagraph = (b: any) =>
+  b?.__component === 'content.rich-text' &&
+  (b.body || []).some((n: any) =>
+    n.type === 'paragraph' &&
+    (n.children || []).some((c: any) => ((c.text ?? c.children?.map((x: any) => x.text).join('')) || '').trim())
+  );
+
 export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererProps) {
   if (!blocks || blocks.length === 0) return null;
 
@@ -757,12 +787,6 @@ export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererPro
   // citation paragraph left over from migration. renderRichText only applies the
   // drop-cap to `type:'paragraph'` nodes, so pointing isFirstRichTextBlock at a block
   // with no real paragraph silently drops the initial letter for the whole article.
-  const hasRealParagraph = (b: any) =>
-    b.__component === 'content.rich-text' &&
-    (b.body || []).some((n: any) =>
-      n.type === 'paragraph' &&
-      (n.children || []).some((c: any) => ((c.text ?? c.children?.map((x: any) => x.text).join('')) || '').trim())
-    );
   const firstRichTextIndex = blocks.findIndex(hasRealParagraph);
 
   const renderedElements: React.ReactNode[] = [];

@@ -51,11 +51,19 @@ export function RichTextInline({
   body,
   onChange,
   onDone,
+  dropCap,
 }: {
   body: any;
   onChange: (next: any[]) => void;
   /** Klik mimo textu — editor sa zavrie a blok sa vráti do bežného zobrazenia. */
   onDone: () => void;
+  /**
+   * Prvý textový blok článku — počas písania kreslí veľkú červenú iniciálku
+   * CSS (`::first-letter`). Vykreslený článok ju robí zvlášť vloženým
+   * `<span>`-om; ten sa sem dať nedá, ProseMirror si obsah spravuje sám a
+   * písalo by sa „za" iniciálku.
+   */
+  dropCap?: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [bar, setBar] = useState<{ top: number; left: number } | null>(null);
@@ -127,7 +135,7 @@ export function RichTextInline({
   );
 
   return (
-    <div ref={wrapRef} className="ed-inline mb-6">
+    <div ref={wrapRef} className={`ed-inline mb-6${dropCap ? ' is-first' : ''}`}>
       <EditorContent editor={editor} />
       {bar && (
         <div className="ed-textbar" style={{ top: bar.top, left: bar.left }}>

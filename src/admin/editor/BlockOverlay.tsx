@@ -189,16 +189,22 @@ export function BlockOverlay({
     doc.addEventListener('pointerup', up);
   };
 
-  // ── Kreslenie ──────────────────────────────────────────────────────────────
-  const gapY = (i: number): number => {
-    const before = i > 0 ? rects[blocks[i - 1].uid] : null;
-    const after = i < blocks.length ? rects[blocks[i].uid] : null;
-    if (before && after) return (before.top + before.height + after.top) / 2;
-    if (after) return after.top - 6;
-    if (before) return before.top + before.height + 6;
-    return 0;
+  /* Kým nie je nič zmerané (prvé vykreslenie, prepnutie zariadenia), nekresli
+     medzery vôbec. Inak by všetky — vrátane vždy viditeľného „Pridať blok" —
+     na okamih sadli na nulu, teda na začiatok článku. */
+  const measured = Object.keys(rects).length > 0;
+
+  /** Spodok priestoru článku — záchrana, keď sa nedá zmerať žiadny blok. */
+  const contentBottom = (): number => {
+    const root = rootRef.current;
+    const box = root?.querySelector('.article-content') as HTMLElement | null;
+    if (!root || !box) return 0;
+    const rr = root.getBoundingClientRect();
+    const br = box.getBoundingClientRect();
+    return br.top - rr.top + br.height + 6;
   };
 
+  // ── Kreslenie ──────────────────────────────────────────────────────────────
   const selected = selectedUid ? rects[selectedUid] : null;
   const selectedIdx = blocks.findIndex((b) => b.uid === selectedUid);
   const selectedBlock = blocks[selectedIdx];
@@ -206,6 +212,57 @@ export function BlockOverlay({
   const isImage = selectedBlock?.type === 'content.image-block';
   const hasFields = !!selectedBlock && ['content.quote-block', 'content.poem', 'content.embed',
     'content.sources', 'content.image-gallery'].includes(selectedBlock.type);
+
+  /* Panel polí (a pri obrázku prúžok s alt textom) visí POD vybraným blokom a
+     je vysoký. Bez merania prekryl medzeru za blokom aj s tlačidlom „Pridať
+     blok" — po vložení videa sa tak nedalo pokračovať ďalším blokom. Meria sa
+     skutočná výška, obsah panela sa líši typ od typu. */
+  const [underEl, setUnderEl] = useState<HTMLDivElement | null>(null);
+  const [underH, setUnderH] = useState(0);
+  useLayoutEffect(() => {
+    if (!underEl) { setUnderH(0); return; }
+    const read = () => setUnderH(underEl.getBoundingClientRect().height);
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(underEl);
+    return () => ro.disconnect();
+  }, [underEl]);
+  const underBottom = underEl && selected
+    ? selected.top + selected.height + (isImage ? 6 : 10) + underH
+    : null;
+
+  /* Zvislá poloha medzery pred blokom `i` (`i === blocks.length` je koniec
+     článku). Prázdny blok — čerstvo vložený text alebo video bez adresy —
+     nemá žiadny box a teda ani nameraný obdĺžnik; preto sa hľadá najbližší
+     zmeraný sused. Predtým sa v takom prípade vracala nula a tlačidlo
+     „Pridať blok" skočilo na začiatok článku. */
+  const gapY = (i: number): number => {
+    const rectAt = (k: number) => (k >= 0 && k < blocks.length ? rects[blocks[k].uid] ?? null : null);
+    const before = rectAt(i - 1);
+    const after = rectAt(i);
+
+    let y: number | null = null;
+    if (before && after) y = (before.top + before.height + after.top) / 2;
+    else if (after) y = after.top - 6;
+    else if (before) y = before.top + before.height + 6;
+    else {
+      // Ani jeden sused sa nedá zmerať — drž sa najbližšieho zmeraného bloku.
+      for (let k = i - 2; k >= 0 && y === null; k--) {
+        const r = rectAt(k);
+        if (r) y = r.top + r.height + 6;
+      }
+      for (let k = i + 1; k < blocks.length && y === null; k++) {
+        const r = rectAt(k);
+        if (r) y = r.top - 6;
+      }
+      // Článok nemá zmeraný ani jeden blok (samé prázdne) — pod začiatok textu.
+      if (y === null) y = contentBottom();
+    }
+
+    // Medzera hneď za vybraným blokom ide pod jeho panel polí, nie pod neho.
+    if (underBottom !== null && i === selectedIdx + 1) y = Math.max(y, underBottom + 10);
+    return y;
+  };
 
   // Spárovanie posudzuje tá istá funkcia ako web (jedno pravidlo pre oboje).
   const nextBlock = blocks[selectedIdx + 1];
@@ -326,7 +383,7 @@ export function BlockOverlay({
 
       {/* Chýbajúci alternatívny text — článok sa bez neho neuloží. */}
       {selected && selectedBlock && isImage && !String(d.alt || '').trim() && (
-        <div className="ed-alt" style={{ top: selected.top + selected.height + 6, left: selected.left }}>
+        <div ref={setUnderEl} className="ed-alt" style={{ top: selected.top + selected.height + 6, left: selected.left }}>
           <AlertTriangle className="w-3.5 h-3.5" />
           <span>Chýba popis pre čítačky (alt):</span>
           <input
@@ -339,7 +396,7 @@ export function BlockOverlay({
 
       {/* Polia ostatných typov blokov (Fáza 5). */}
       {selected && selectedBlock && hasFields && (
-        <div className="ed-fields" style={{ top: selected.top + selected.height + 10, left: 0 }}>
+        <div ref={setUnderEl} className="ed-fields" style={{ top: selected.top + selected.height + 10, left: 0 }}>
           <BlockFields
             type={selectedBlock.type}
             data={d}
@@ -352,7 +409,7 @@ export function BlockOverlay({
       {/* Medzery na vkladanie. Tlačidlá medzi blokmi sa ukazujú pri prejdení
           myšou, ALE posledné je viditeľné vždy — inak po vložení prvého bloku
           nie je ako pokračovať (tenký pruh sa nedá uhádnuť). */}
-      {blocks.length > 0 && Array.from({ length: blocks.length + 1 }, (_, i) => {
+      {blocks.length > 0 && measured && Array.from({ length: blocks.length + 1 }, (_, i) => {
         const isLast = i === blocks.length;
         return (
         <div key={`gap-${i}`} className={`ed-gap${isLast ? ' is-last' : ''}`} style={{ top: gapY(i) }}>

@@ -11,6 +11,7 @@
 
 import React from 'react';
 import { Plus, X, ArrowUp, ArrowDown, Images } from 'lucide-react';
+import { parseEmbedUrl } from '../../../lib/embed';
 
 const EMBED_PROVIDERS: { id: string; label: string }[] = [
   { id: 'youtube', label: 'YouTube' },
@@ -52,9 +53,21 @@ export function BlockFields({ type, data, onPatch, onPickMedia }: BlockFieldsPro
         </Panel>
       );
 
-    case 'content.embed':
+    case 'content.embed': {
+      // Rozpoznaná adresa si sama doplní poskytovateľa aj identifikátor —
+      // bez identifikátora vracia YouTube chybovú stránku namiesto videa.
+      const known = parseEmbedUrl(data.url);
+      const pasted = String(data.url || '').trim();
       return (
-        <Panel title="Vložené video" hint="Adresa musí byť vkladacia (embed), nie odkaz na stránku videa.">
+        <Panel title="Vložené video" hint="Stačí skopírovať odkaz z prehliadača, napríklad „youtube.com/watch?v=…“. Vkladaciu adresu si editor odvodí sám.">
+          <Field
+            label="Adresa" required value={data.url}
+            placeholder="https://www.youtube.com/watch?v=…"
+            onChange={(v) => {
+              const ref = parseEmbedUrl(v);
+              onPatch(ref ? { url: v, provider: ref.provider, embedId: ref.embedId } : { url: v });
+            }}
+          />
           <Row>
             <label className="edf-field">
               <span>Poskytovateľ</span>
@@ -64,10 +77,16 @@ export function BlockFields({ type, data, onPatch, onPickMedia }: BlockFieldsPro
             </label>
             <Field label="Identifikátor" value={data.embedId} onChange={(v) => onPatch({ embedId: v })} />
           </Row>
-          <Field label="Adresa" required value={data.url} onChange={(v) => onPatch({ url: v })} />
           <Field label="Popis pod videom" value={data.caption} onChange={(v) => onPatch({ caption: v })} />
+          {pasted && !known && !String(data.embedId || '').trim() && (
+            <p className="edf-hint">
+              Z tejto adresy sa nepodarilo prečítať identifikátor videa. Vložte odkaz na stránku videa
+              (YouTube, Vimeo, Sketchfab) alebo identifikátor doplňte ručne.
+            </p>
+          )}
         </Panel>
       );
+    }
 
     case 'content.sources':
       return (
@@ -180,11 +199,16 @@ function Row({ children }: { children: React.ReactNode }) {
   return <div className="edf-row">{children}</div>;
 }
 
-function Field({ label, value, onChange, required }: any) {
+function Field({ label, value, onChange, required, placeholder }: any) {
   return (
     <label className="edf-field">
       <span>{label}{required && <b> *</b>}</span>
-      <input value={value || ''} onChange={(e) => onChange(e.target.value)} aria-invalid={required && !value} />
+      <input
+        value={value || ''}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        aria-invalid={required && !value}
+      />
     </label>
   );
 }

@@ -26,7 +26,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { DynamicZoneRenderer } from '../../components/DynamicZoneRenderer';
+import { DynamicZoneRenderer, hasRealParagraph } from '../../components/DynamicZoneRenderer';
 import { getStrapiImageUrl } from '../../lib/strapi';
 import { MOBILE_MAX_PX } from './snapping/positionZones';
 import { EditorUIContext } from './EditorUIContext';
@@ -258,10 +258,15 @@ export function EditorCanvas({
       renderInline: onBodyChange
         ? (uid: string) => {
             const b = article.blocks.find((x) => x.__uid === uid);
+            // Iniciálku má prvý textový blok so skutočným odsekom — to isté
+            // pravidlo ako na webe (`hasRealParagraph`), aby sa písmeno počas
+            // písania nestratilo ani neobjavilo inde.
+            const first = article.blocks.find(hasRealParagraph);
             return (
               <RichTextInline
                 key={uid}
                 body={b?.body}
+                dropCap={!!b && !!first && (first as any).__uid === uid}
                 onChange={(next) => onBodyChange(uid, next)}
                 onDone={() => setEditingUid(null)}
               />
@@ -477,6 +482,29 @@ const canvasCss = `
 
 /* Pruh medzi blokmi musí mať výšku, inak nie je na čo nabehnúť myšou.
    16 px sa zmestí do medzery medzi blokmi (24 px), takže neberie klikanie textu. */
+/* Iniciálka počas písania. Vykreslený článok ju robí vloženým span-om;
+   v editore to musí spraviť CSS, inak by ProseMirror písal „za" písmeno.
+   Rozmery sú odpísané z DynamicZoneRenderer (text-7xl, leading .75). */
+.ed-inline.is-first .ProseMirror > p:first-of-type {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.ed-inline.is-first .ProseMirror > p:first-of-type::first-letter {
+  float: left;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 4.5rem; font-weight: 700; line-height: .75;
+  color: #b45309; margin-top: .1em; margin-right: .75rem;
+}
+
+/* Video bez adresy — namiesto prehrávača (ten by hlásil chybu) výzva. */
+.ed-embed-empty {
+  display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center;
+  min-height: 160px; padding: 20px; text-align: center;
+  border: 1.5px dashed #d8c9ab; border-radius: 12px; background: rgba(255,253,244,.7);
+  font-family: Inter, system-ui, sans-serif;
+}
+.ed-embed-empty b { font-size: 14px; font-weight: 600; color: #3b3021; }
+.ed-embed-empty span { font-size: 12.5px; color: #8a795e; }
+
 .ed-gap { position: absolute; left: 0; right: 0; height: 16px; transform: translateY(-8px); }
 /* „+" je v STREDE medzery, nie pri ľavom okraji: tam sedí úchyt vybraného
    bloku a prekrýval by ho (odhalil test vkladania siedmich typov za sebou). */
