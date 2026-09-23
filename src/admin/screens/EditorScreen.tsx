@@ -2,20 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowLeft, Eye, GripVertical, Copy, Trash2, ChevronDown, Plus, X,
-  Bold, Italic, Link2, List, ListOrdered, ImageOff, Loader2, Monitor, Smartphone,
-  Undo2, Redo2,
+  ArrowLeft, Eye, GripVertical, Plus, X, ImageOff, Loader2,
+  Monitor, Smartphone, Undo2, Redo2,
 } from 'lucide-react';
 import {
-  BLOCK_TYPES, IMAGE_POSITIONS, IMAGE_WIDTHS, ASPECT_RATIOS,
-  KEY_FACT_ICONS, TIMELINE_TYPES, TIMELINE_TYPE_LABELS,
+  BLOCK_TYPES, KEY_FACT_ICONS, TIMELINE_TYPES, TIMELINE_TYPE_LABELS,
 } from '../data';
 import { useAuth } from '../AuthContext';
 import { getPost, listCategories, isPublished } from '../api/posts';
 import {
   createPost, updatePost, isSlugFree, verifyBlockCount, type EditorState,
 } from '../api/savePost';
-import { LayoutPreview } from '../components/LayoutPreview';
 import { Panel } from '../components/Panel';
 import { MediaPicker } from '../components/MediaPicker';
 import { RichTextEditor } from '../richtext/RichTextEditor';
@@ -23,10 +20,10 @@ import { TagPicker } from '../components/TagPicker';
 import { LocationMap } from '../components/LocationMap';
 import { type Tag } from '../api/tags';
 import { fileUrl, type MediaFile } from '../api/media';
-import { canPair, whyNotPair } from '../editor/snapping/positionZones';
-import { EditorCanvas, type CanvasDevice } from '../editor/EditorCanvas';
+import { EditorCanvas, type CanvasDevice, type CanvasZoom } from '../editor/EditorCanvas';
 import { useHistory } from '../editor/state/useHistory';
 import { useRowDrag } from '../editor/useRowDrag';
+import { saveDraft, readDraft, clearDraft, timeOf } from '../editor/state/autosave';
 
 interface Block {
   uid: string;
@@ -76,7 +73,7 @@ export function EditorScreen({
   const [loadError, setLoadError] = useState('');
   const [published, setPublished] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<{ tone: 'ok' | 'err'; text: string } | null>(null);
+  const [saveMsg, setSaveMsg] = useState<{ tone: 'ok' | 'err'; text: string; uid?: string } | null>(null);
 
   const [title, setTitle] = useState('');
   const [excerpt, setExcerpt] = useState('');
@@ -109,17 +106,32 @@ export function EditorScreen({
   const timelineDrag = useRowDrag(timeline, next => { setTimeline(next); setDirty(true); });
   const [cover, setCover] = useState<any | null>(null);
   // Kam sa má priradiť vybraný obrázok: cover alebo konkrétny blok.
-  const [picking, setPicking] = useState<{ target: 'cover' } | { target: 'block'; uid: string } | null>(null);
+  const [picking, setPicking] = useState<
+    { target: 'cover' } | { target: 'block'; uid: string; multiple?: boolean } | null
+  >(null);
 
-  /* Fáza 1: plátno beží VEDĽA starého formulára, nie namiesto neho — nech sa
-     dá oboje porovnať. Starý stĺpec zmizne až vo Fáze 6. */
-  const [view, setView] = useState<'form' | 'canvas'>('form');
   const [device, setDevice] = useState<CanvasDevice>('desktop');
+  const [zoom, setZoom] = useState<CanvasZoom>('fit');
+  /** Čas posledného úspešného uloženia do Strapi — pre stavovú lištu. */
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  /** Nájdená záloha rozpísaného článku (ponuka obnovy po páde prehliadača). */
+  const [recovery, setRecovery] = useState<{ savedAt: number; data: any } | null>(null);
 
   useEffect(() => {
     if (!token) return;
     listCategories(token).then(setCats).catch(() => { /* výber kategórie ostane prázdny */ });
   }, [token]);
+
+  /* ZÁLOHA ROZPÍSANÉHO ČLÁNKU do prehliadača každých 5 sekúnd.
+     Nie je to ukladanie do Strapi — na webe sa bez tlačidla „Uložiť koncept"
+     nezmení nič. Slúži to na prípad, keď spadne prehliadač alebo sa omylom
+     zavrie karta. Po úspešnom uložení sa záloha maže. */
+  const snapshotRef = useRef<() => any>(() => null);
+  useEffect(() => {
+    if (!dirty) return;
+    const t = setInterval(() => saveDraft(articleId, snapshotRef.current()), 5000);
+    return () => clearInterval(t);
+  }, [dirty, articleId]);
 
   /* Klávesové skratky. Poslucháč musí byť nad skoršími návratmi komponentu
      (načítavanie, chyba), inak by sa React háčiky volali podmienečne. */
@@ -176,6 +188,9 @@ export function EditorScreen({
           original: b,
         })));
         setDirty(false);
+        // Ostala po predošlej návšteve rozpísaná práca? Ponúkni ju.
+        const draft = readDraft(articleId);
+        if (draft) setRecovery(draft);
       })
       .catch(e => { if (!cancelled) setLoadError(e?.message || 'Článok sa nepodarilo načítať.'); })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -204,10 +219,15 @@ export function EditorScreen({
   }
 
   const applyPick = (files: MediaFile[]) => {
-    const f = files[0];
-    if (!f || !picking) return;
-    if (picking.target === 'cover') setCover(f);
-    else setBlocks(bs => bs.map(b => (b.uid === picking.uid ? { ...b, data: { ...b.data, image: f } } : b)));
+    if (!files.length || !picking) return;
+    if (picking.target === 'cover') { setCover(files[0]); setDirty(true); return; }
+    setBlocks(bs => bs.map(b => {
+      if (b.uid !== picking.uid) return b;
+      // Galéria zbiera viac obrázkov, ostatné bloky majú jeden.
+      return picking.multiple
+        ? { ...b, data: { ...b.data, images: [...(b.data.images || []), ...files] } }
+        : { ...b, data: { ...b.data, image: files[0] } };
+    }), 'výber obrázka');
     setDirty(true);
   };
 
@@ -229,22 +249,59 @@ export function EditorScreen({
     coverImage: cover,
   });
 
-  const validate = (): string | null => {
-    if (!title.trim()) return 'Článok musí mať názov.';
-    if (!slug.trim()) return 'Článok musí mať slug.';
-    const badImg = blocks.find(b => b.type === 'content.image-block' && !b.data.alt?.trim());
-    if (badImg) return 'Každý obrázok musí mať vyplnený alternatívny text.';
-    const badQuote = blocks.find(b => (b.type === 'content.quote-block' || b.type === 'content.poem') && !b.data.text?.trim());
-    if (badQuote) return 'Citát ani báseň nemôžu byť prázdne.';
-    const badEmbed = blocks.find(b => b.type === 'content.embed' && !b.data.url?.trim());
-    if (badEmbed) return 'Vložené video potrebuje URL.';
+  /** Prekážka uloženia. `uid` umožní na blok rovno ukázať. */
+  /** Čo sa zálohuje a čo sa dá obnoviť. */
+  const snapshot = () => ({
+    title, excerpt, slug, author, readingTime, pubDate, featured, category,
+    tags, metaTitle, metaDesc, loc, cover, keyFacts, timeline, blocks,
+  });
+  snapshotRef.current = snapshot;
+
+  const restoreDraft = (data: any) => {
+    setTitle(data.title ?? ''); setExcerpt(data.excerpt ?? ''); setSlug(data.slug ?? '');
+    setAuthor(data.author ?? ''); setReadingTime(data.readingTime ?? 1);
+    setPubDate(data.pubDate ?? ''); setFeatured(!!data.featured);
+    setCategory(data.category ?? ''); setTags(data.tags ?? []);
+    setMetaTitle(data.metaTitle ?? ''); setMetaDesc(data.metaDesc ?? '');
+    setLoc(data.loc ?? loc); setCover(data.cover ?? null);
+    setKeyFacts(data.keyFacts ?? []); setTimeline(data.timeline ?? []);
+    blocksHistory.reset(data.blocks ?? []);
+    setDirty(true);
+    setRecovery(null);
+  };
+
+  const validate = (): { text: string; uid?: string } | null => {
+    if (!title.trim()) return { text: 'Článok musí mať názov.' };
+    if (!slug.trim()) return { text: 'Článok musí mať slug (adresu na webe).' };
+
+    const at = (uid: string) => blocks.findIndex(b => b.uid === uid) + 1;
+
+    const badImg = blocks.find(b => b.type === 'content.image-block' && !String(b.data.alt || '').trim());
+    if (badImg) return { uid: badImg.uid, text: `Obrázok v bloku č. ${at(badImg.uid)} nemá popis pre čítačky (alt). Bez neho sa článok neuloží.` };
+
+    const noPic = blocks.find(b => b.type === 'content.image-block' && !b.data.image);
+    if (noPic) return { uid: noPic.uid, text: `Blok č. ${at(noPic.uid)} je obrázok bez obrázka — vyberte ho z knižnice alebo blok zmažte.` };
+
+    const badQuote = blocks.find(b => (b.type === 'content.quote-block' || b.type === 'content.poem') && !String(b.data.text || '').trim());
+    if (badQuote) return { uid: badQuote.uid, text: `${badQuote.type === 'content.poem' ? 'Báseň' : 'Citát'} v bloku č. ${at(badQuote.uid)} je prázdny.` };
+
+    const badEmbed = blocks.find(b => b.type === 'content.embed' && !String(b.data.url || '').trim());
+    if (badEmbed) return { uid: badEmbed.uid, text: `Vložené video v bloku č. ${at(badEmbed.uid)} nemá adresu.` };
+
+    const emptyGallery = blocks.find(b => b.type === 'content.image-gallery' && !(b.data.images || []).length);
+    if (emptyGallery) return { uid: emptyGallery.uid, text: `Galéria v bloku č. ${at(emptyGallery.uid)} nemá žiadny obrázok.` };
+
     return null;
   };
 
   const save = async (publish: boolean) => {
     if (!token) return;
     const problem = validate();
-    if (problem) { setSaveMsg({ tone: 'err', text: problem }); return; }
+    if (problem) {
+      setSaveMsg({ tone: 'err', text: problem.text, uid: problem.uid });
+      if (problem.uid) setSelectedUid(problem.uid);
+      return;
+    }
 
     setSaving(true);
     setSaveMsg(null);
@@ -274,6 +331,8 @@ export function EditorScreen({
       } else {
         setSaveMsg({ tone: 'ok', text: publish ? 'Publikované.' : 'Koncept uložený.' });
         setDirty(false);
+        setSavedAt(Date.now());
+        clearDraft(articleId);   // záloha v prehliadači už netreba
         if (publish) setPublished(true);
       }
     } catch (e: any) {
@@ -364,7 +423,7 @@ export function EditorScreen({
     if (ctrl && (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))) {
       e.preventDefault(); redo(); return;
     }
-    if (typing || view !== 'canvas') return;
+    if (typing) return;
 
     const i = blocks.findIndex(b => b.uid === selectedUid);
     if (e.key === 'Escape') { setSelectedUid(null); return; }
@@ -391,7 +450,14 @@ export function EditorScreen({
             {title || 'Nový článok'}
           </h1>
           <div style={{ fontSize: 12.5, color: 'var(--ad-muted)', marginTop: 3 }}>
-            {dirty ? "Neuložené zmeny" : articleId ? "Bez zmien" : "Nový článok"}
+            {/* Stavová lišta: vždy je jasné, či je práca uložená. */}
+            {saving
+              ? 'Ukladám…'
+              : dirty
+                ? 'Neuložené zmeny'
+                : savedAt
+                  ? `Uložené ${timeOf(savedAt)}`
+                  : articleId ? 'Bez zmien' : 'Nový článok'}
           </div>
         </div>
         <span className={`achip ${published ? "achip-pub" : "achip-draft"}`}>
@@ -417,14 +483,24 @@ export function EditorScreen({
           </button>
         </div>
 
-        {/* Formulár / Vizuálny — kým beží prestavba, dá sa prepnúť a porovnať. */}
-        <div className="ad-seg" role="group" aria-label="Zobrazenie editora">
-          <button className={view === 'form' ? 'is-on' : ''} onClick={() => setView('form')}>Formulár</button>
-          <button className={view === 'canvas' ? 'is-on' : ''} onClick={() => setView('canvas')}>Vizuálny</button>
+        <div className="ad-seg" role="group" aria-label="Zväčšenie náhľadu">
+            <button
+              className={zoom === 'fit' ? 'is-on' : ''}
+              onClick={() => setZoom('fit')}
+              title="Zmenšiť tak, aby sa zmestil celý"
+            >
+              Prispôsobiť
+            </button>
+            <button
+              className={zoom === 'full' ? 'is-on' : ''}
+              onClick={() => setZoom('full')}
+              title="Skutočná veľkosť — dolu sa posúva do strán"
+            >
+              100 %
+            </button>
         </div>
 
-        {view === 'canvas' && (
-          <div className="ad-seg" role="group" aria-label="Šírka náhľadu">
+        <div className="ad-seg" role="group" aria-label="Šírka náhľadu">
             <button
               className={device === 'desktop' ? 'is-on' : ''}
               onClick={() => setDevice('desktop')}
@@ -439,8 +515,7 @@ export function EditorScreen({
             >
               <Smartphone className="w-3.5 h-3.5" /> Mobil
             </button>
-          </div>
-        )}
+        </div>
 
         {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts).
             Rozpísané zmeny v tomto formulári v ňom ešte nie sú. */}
@@ -461,6 +536,18 @@ export function EditorScreen({
         </button>
       </div>
 
+      {/* Ponuka obnovy po páde prehliadača — pýta sa skôr, než sa začne písať. */}
+      {recovery && (
+        <div className="acard" role="status" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 12, background: 'var(--ad-amber-wash, #fdf6e6)', borderColor: 'var(--ad-amber-mid)' }}>
+          <span style={{ fontSize: 13.5, flex: 1 }}>
+            Našla sa rozpísaná práca z <strong>{timeOf(recovery.savedAt)}</strong>, ktorá sa neuložila.
+            Chcete ju obnoviť? Článok na webe sa tým nezmení, kým ho neuložíte.
+          </span>
+          <button className="abtn" onClick={() => { clearDraft(articleId); setRecovery(null); }}>Zahodiť</button>
+          <button className="abtn abtn-primary" onClick={() => restoreDraft(recovery.data)}>Obnoviť</button>
+        </div>
+      )}
+
       {saveMsg && (
         <div
           className="acard"
@@ -473,6 +560,15 @@ export function EditorScreen({
           }}
         >
           {saveMsg.text}
+          {saveMsg.uid && (
+            <button
+              className="abtn"
+              style={{ marginLeft: 10, padding: '4px 10px', fontSize: 12.5 }}
+              onClick={() => setSelectedUid(saveMsg.uid!)}
+            >
+              Ukáž mi to
+            </button>
+          )}
         </div>
       )}
 
@@ -499,9 +595,9 @@ export function EditorScreen({
             </div>
           </div>
 
-          {view === 'canvas' ? (
-            <EditorCanvas
+          <EditorCanvas
               device={device}
+              zoom={zoom}
               article={{
                 title,
                 excerpt,
@@ -519,47 +615,11 @@ export function EditorScreen({
               onDuplicate={duplicateBlock}
               onInsert={insertBlock}
               onKeyDown={handleKey}
+              onBodyChange={(uid, body) => patchBlock(uid, { body, _edited: true })}
+              onPatch={patchBlock}
+              onPickMedia={(uid, multiple) => setPicking({ target: 'block', uid, multiple })}
               blockTypes={BLOCK_TYPES as any}
             />
-          ) : (
-          <>
-          {blocks.map((b, i) => (
-            <BlockCard
-              key={b.uid}
-              block={b}
-              nextBlock={blocks[i + 1]}
-              onPick={() => setPicking({ target: 'block', uid: b.uid })}
-              onMoveUp={() => moveBlock(b.uid, -1)}
-              onMoveDown={() => moveBlock(b.uid, 1)}
-              onPatch={p => patchBlock(b.uid, p)}
-              onToggle={() => setBlocks(bs => bs.map(x => (x.uid === b.uid ? { ...x, collapsed: !x.collapsed } : x)), 'zbalenie bloku')}
-              onDelete={() => deleteBlock(b.uid)}
-              onDuplicate={() => duplicateBlock(b.uid)}
-            />
-          ))}
-
-          {/* Paleta blokov */}
-          <div
-            style={{
-              border: '2px dashed var(--ad-field-border)', borderRadius: 12,
-              padding: 16, background: 'rgba(253,251,244,.5)',
-            }}
-          >
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ad-secondary)', marginBottom: 10 }}>
-              <Plus className="w-3.5 h-3.5" style={{ display: 'inline', marginRight: 5 }} />
-              Pridať blok
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {BLOCK_TYPES.map(t => (
-                <button key={t.id} className="abtn" onClick={() => addBlock(t.id)} style={{ fontSize: 13 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: 2, background: t.accent }} />
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          </>
-          )}
         </div>
 
         {/* ═══ Pravý stĺpec — metadáta ═══ */}
@@ -793,6 +853,7 @@ export function EditorScreen({
         <MediaPicker
           onPick={applyPick}
           onClose={() => setPicking(null)}
+          multiple={picking.target === 'block' && !!picking.multiple}
         />
       )}
     </>
@@ -800,149 +861,6 @@ export function EditorScreen({
 }
 
 // ── Blok ─────────────────────────────────────────────────────────────────────
-function BlockCard({ block, nextBlock, onPatch, onToggle, onDelete, onDuplicate, onPick, onMoveUp, onMoveDown }: any) {
-  const meta = BLOCK_TYPES.find(t => t.id === block.type);
-  return (
-    <div className="ablock" style={{ borderLeftColor: meta?.accent }}>
-      <div className="ablock-head">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <button className="abtn abtn-icon" title="Posunúť vyššie" onClick={onMoveUp}
-                  style={{ width: 20, height: 15, padding: 0, fontSize: 9 }}>▲</button>
-          <button className="abtn abtn-icon" title="Posunúť nižšie" onClick={onMoveDown}
-                  style={{ width: 20, height: 15, padding: 0, fontSize: 9 }}>▼</button>
-        </div>
-        <span className="ablock-type">{meta?.label}</span>
-        {block.collapsed && (
-          <span style={{ fontSize: 12.5, color: 'var(--ad-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 320 }}>
-            {summarize(block)}
-          </span>
-        )}
-        <div style={{ flex: 1 }} />
-        <button className="abtn abtn-icon" title="Duplikovať" onClick={onDuplicate}><Copy className="w-3.5 h-3.5" /></button>
-        <button className="abtn abtn-icon" title="Zbaliť" onClick={onToggle}>
-          <ChevronDown className="w-3.5 h-3.5" style={{ transform: block.collapsed ? 'rotate(-90deg)' : 'none', transition: 'transform .18s' }} />
-        </button>
-        <button className="abtn abtn-icon abtn-danger" title="Zmazať" onClick={onDelete}><Trash2 className="w-3.5 h-3.5" /></button>
-      </div>
-
-      {!block.collapsed && (
-        <div style={{ padding: 14 }}>
-          {block.type === 'content.rich-text' && <RichTextBlock data={block.data} onPatch={onPatch} />}
-          {block.type === 'content.image-block' && <ImageBlock data={block.data} nextBlock={nextBlock} onPatch={onPatch} onPick={onPick} />}
-          {block.type === 'content.quote-block' && <QuoteBlockFields data={block.data} onPatch={onPatch} />}
-          {!['content.rich-text', 'content.image-block', 'content.quote-block'].includes(block.type) && (
-            <div style={{ fontSize: 13, color: 'var(--ad-secondary)' }}>
-              Polia pre „{meta?.label}" doplníme podľa schémy pri napojení.
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function RichTextBlock({ data, onPatch }: any) {
-  return <RichTextEditor body={data.body} onChange={next => onPatch({ body: next, _edited: true })} />;
-}
-
-function ImageBlock({ data, nextBlock, onPatch, onPick }: any) {
-  // Web páruje obrázky len pri opačných pozíciách — do náhľadu aj do hlášky
-  // ide tá istá funkcia, akú používa renderer.
-  const asLayout = (b: any) => (b ? { __component: b.type, ...b.data } : null);
-  const self = { __component: 'content.image-block', ...data };
-  const paired = canPair(self, asLayout(nextBlock));
-  const pairProblem = data.pairWithNext ? whyNotPair(self, asLayout(nextBlock)) : null;
-
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 190px', gap: 16 }}>
-      <div>
-        <button
-          onClick={onPick}
-          style={{
-            width: '100%', height: 104, borderRadius: 9, overflow: 'hidden', padding: 0, cursor: 'pointer',
-            border: data.image ? '1px solid var(--ad-line)' : '1px dashed var(--ad-field-border)',
-            background: 'var(--hr-wash-4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 8, color: 'var(--ad-muted)', fontSize: 13, marginBottom: 10,
-          }}
-          title="Kliknutím vyberiete obrázok"
-        >
-          {data.image
-            ? <img src={fileUrl(data.image as MediaFile, 'small')} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            : <><ImageOff className="w-4 h-4" /> Vybrať obrázok</>}
-        </button>
-        <Field label={<>Alternatívny text <span style={{ color: 'var(--ad-danger)' }}>*</span></>}>
-          <input className="afld" value={data.alt} onChange={e => onPatch({ alt: e.target.value })} placeholder="Čo je na obrázku" aria-invalid={!data.alt} />
-          {!data.alt && <Hint tone="danger">Povinné — bez toho článok neuložíš.</Hint>}
-        </Field>
-        <Field label="Popis pod obrázkom">
-          <input className="afld" value={data.caption} onChange={e => onPatch({ caption: e.target.value })} />
-        </Field>
-
-        <details style={{ marginTop: 6 }}>
-          <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--ad-amber)', fontWeight: 500 }}>
-            Rozšírené nastavenia
-          </summary>
-          <div style={{ paddingTop: 12 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-              <Field label="Pozícia">
-                <select className="afld" value={data.position} onChange={e => onPatch({ position: e.target.value })}>
-                  {IMAGE_POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </Field>
-              <Field label="Šírka (%)">
-                <select className="afld" value={data.width} onChange={e => onPatch({ width: e.target.value })}>
-                  {IMAGE_WIDTHS.map(w => <option key={w} value={w}>{w}</option>)}
-                </select>
-              </Field>
-              <Field label="Pomer strán">
-                <select className="afld" value={data.aspectRatio} onChange={e => onPatch({ aspectRatio: e.target.value })}>
-                  {ASPECT_RATIOS.map(a => <option key={a} value={a}>{a}</option>)}
-                </select>
-              </Field>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginTop: 6 }}>
-              {[
-                ['pairWithNext', 'Spárovať s ďalším'],
-                ['showCaption', 'Zobraziť popis'],
-                ['rounded', 'Zaoblenie'],
-                ['shadow', 'Tieň'],
-              ].map(([k, lbl]) => (
-                <label key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
-                  <input type="checkbox" checked={!!data[k as string]} onChange={e => onPatch({ [k as string]: e.target.checked })} />
-                  {lbl}
-                </label>
-              ))}
-            </div>
-            {pairProblem && <Hint tone="danger">Spárovanie sa neprejaví. {pairProblem}</Hint>}
-          </div>
-        </details>
-      </div>
-
-      <LayoutPreview position={data.position} width={data.width} paired={paired} />
-    </div>
-  );
-}
-
-function QuoteBlockFields({ data, onPatch }: any) {
-  return (
-    <>
-      <Field label={<>Text citátu <span style={{ color: 'var(--ad-danger)' }}>*</span></>}>
-        <textarea
-          className="afld" value={data.text} onChange={e => onPatch({ text: e.target.value })}
-          style={{ minHeight: 84, resize: 'vertical', fontFamily: 'var(--font-serif)', fontSize: 16 }}
-          aria-invalid={!data.text}
-        />
-        <Hint>Používa sa na dobové pramene — kroniky a listiny, nie modernú literatúru.</Hint>
-      </Field>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <Field label="Autor"><input className="afld" value={data.author} onChange={e => onPatch({ author: e.target.value })} /></Field>
-        <Field label="Zdroj"><input className="afld" value={data.source} onChange={e => onPatch({ source: e.target.value })} /></Field>
-      </div>
-    </>
-  );
-}
-
-// ── Pomocné ──────────────────────────────────────────────────────────────────
 function Field({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 12 }}>
@@ -966,26 +884,6 @@ function Counter({ n, max }: { n: number; max: number }) {
       {n} / {max}
     </div>
   );
-}
-
-/** Holý text zo Strapi Blocks — `body` je pole uzlov, nie reťazec. */
-function plainText(nodes: any): string {
-  if (!Array.isArray(nodes)) return '';
-  return nodes
-    .map((n: any) => (typeof n?.text === 'string' ? n.text : plainText(n?.children)))
-    .join('')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function summarize(b: Block) {
-  if (b.type === 'content.rich-text') {
-    const t = plainText(b.data.body);
-    return t ? t.slice(0, 60) + (t.length > 60 ? '…' : '') : 'prázdny odsek';
-  }
-  if (b.type === 'content.quote-block') return `„${String(b.data.text || '').slice(0, 40)}…" — ${b.data.author || '?'}`;
-  if (b.type === 'content.image-block') return b.data.alt || 'bez alt textu';
-  return '';
 }
 
 function defaultsFor(type: string): any {

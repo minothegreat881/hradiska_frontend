@@ -31,8 +31,11 @@ import { getStrapiImageUrl } from '../../lib/strapi';
 import { MOBILE_MAX_PX } from './snapping/positionZones';
 import { EditorUIContext } from './EditorUIContext';
 import { BlockOverlay, type OverlayBlock } from './BlockOverlay';
+import { RichTextInline } from './blocks/RichTextInline';
 
 export type CanvasDevice = 'desktop' | 'mobil';
+/** `fit` = zmenšiť na šírku adminu, `full` = skutočná veľkosť + posúvanie do strán. */
+export type CanvasZoom = 'fit' | 'full';
 
 /** Šírka okna, v ktorom plátno kreslí mobilnú podobu. */
 export const MOBILE_CANVAS_WIDTH = 390;
@@ -64,10 +67,12 @@ function syncStyles(target: Document) {
 
 function CanvasFrame({
   width,
+  zoom,
   onKeyDown,
   children,
 }: {
   width: number;
+  zoom: CanvasZoom;
   onKeyDown?: (e: KeyboardEvent) => void;
   children: React.ReactNode;
 }) {
@@ -114,18 +119,21 @@ function CanvasFrame({
   }, []);
 
   // Zmenšenie na dostupnú šírku. Nikdy sa nezväčšuje nad 1:1.
+  // Pri `full` sa nemení nič — plátno ostáva v skutočnej veľkosti a obal
+  // sa posúva do strán. Písanie vo Fáze 3 musí ísť v skutočnej veľkosti.
   useEffect(() => {
     const box = boxRef.current;
     if (!box) return;
+    if (zoom === 'full') { setScale(1); return; }
     const fit = () => setScale(Math.min(1, box.clientWidth / width));
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(box);
     return () => ro.disconnect();
-  }, [width]);
+  }, [width, zoom]);
 
   return (
-    <div ref={boxRef} style={{ width: '100%' }}>
+    <div ref={boxRef} style={{ width: '100%', overflowX: zoom === 'full' ? 'auto' : 'visible' }}>
       <div
         style={{
           width: width * scale,
@@ -174,6 +182,7 @@ export interface CanvasArticle {
 export interface EditorCanvasProps {
   article: CanvasArticle;
   device: CanvasDevice;
+  zoom?: CanvasZoom;
   selectedUid?: string | null;
   onSelect?: (uid: string | null) => void;
   onMove?: (uid: string, toIndex: number) => void;
@@ -181,6 +190,12 @@ export interface EditorCanvasProps {
   onDuplicate?: (uid: string) => void;
   onInsert?: (type: string, atIndex: number) => void;
   onKeyDown?: (e: KeyboardEvent) => void;
+  /** Zmena textu v bloku — ukladá sa do `data.body` a blok sa označí ako upravený. */
+  onBodyChange?: (uid: string, body: any[]) => void;
+  /** Zmena ktoréhokoľvek poľa bloku (pozícia obrázka, popis, zdroje…). */
+  onPatch?: (uid: string, patch: any) => void;
+  /** Otvorí knižnicu médií pre blok. */
+  onPickMedia?: (uid: string, multiple: boolean) => void;
   blockTypes?: { id: string; label: string; accent: string }[];
   /** Len na meranie: vykreslí bloky bez obalu `BlockShell`. */
   noShell?: boolean;
@@ -197,11 +212,12 @@ const LABELS: Record<string, string> = {
 };
 
 export function EditorCanvas({
-  article, device, selectedUid = null, onSelect, onMove, onDelete, onDuplicate, onInsert,
-  onKeyDown, blockTypes = [], noShell,
+  article, device, zoom = 'fit', selectedUid = null, onSelect, onMove, onDelete, onDuplicate, onInsert,
+  onKeyDown, onBodyChange, onPatch, onPickMedia, blockTypes = [], noShell,
 }: EditorCanvasProps) {
   const cover = article.coverImage ? getStrapiImageUrl(article.coverImage) : null;
   const [hoverUid, setHoverUid] = useState<string | null>(null);
+  const [editingUid, setEditingUid] = useState<string | null>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
   const overlayBlocks: OverlayBlock[] = useMemo(
@@ -209,6 +225,7 @@ export function EditorCanvas({
       uid: b.__uid,
       type: b.__component,
       label: LABELS[b.__component] || 'Blok',
+      data: b,
     })),
     [article.blocks]
   );
@@ -217,14 +234,37 @@ export function EditorCanvas({
     () => ({
       selectedUid,
       hoverUid,
-      select: (uid: string | null) => onSelect?.(uid),
+      editingUid,
+      select: (uid: string | null) => {
+        onSelect?.(uid);
+        // Klik do textového bloku rovno otvorí písanie; iný blok ho ukončí.
+        const b = article.blocks.find((x) => x.__uid === uid);
+        setEditingUid(b && b.__component === 'content.rich-text' && onBodyChange ? uid : null);
+      },
       hover: setHoverUid,
+      renderInline: onBodyChange
+        ? (uid: string) => {
+            const b = article.blocks.find((x) => x.__uid === uid);
+            return (
+              <RichTextInline
+                key={uid}
+                body={b?.body}
+                onChange={(next) => onBodyChange(uid, next)}
+                onDone={() => setEditingUid(null)}
+              />
+            );
+          }
+        : undefined,
     }),
-    [selectedUid, hoverUid, onSelect]
+    [selectedUid, hoverUid, editingUid, onSelect, onBodyChange, article.blocks]
   );
 
   return (
-    <CanvasFrame width={device === 'mobil' ? MOBILE_CANVAS_WIDTH : DESKTOP_CANVAS_WIDTH} onKeyDown={onKeyDown}>
+    <CanvasFrame
+      width={device === 'mobil' ? MOBILE_CANVAS_WIDTH : DESKTOP_CANVAS_WIDTH}
+      zoom={zoom}
+      onKeyDown={onKeyDown}
+    >
       <EditorUIContext.Provider value={ui}>
         {/* `lab` + `data-theme` nesú premenné šatu Pečať, rovnako ako na webe. */}
         <div className="min-h-screen lab" data-theme="pecat" onMouseDown={() => onSelect?.(null)}>
@@ -249,7 +289,7 @@ export function EditorCanvas({
                   <div className="article-body-wrapper" lang="sk" style={{ maxWidth: 668, margin: '0 auto' }}>
                     {/* Kotva pre vrstvu ovládania. `position: relative` je na nej
                         jedinou odchýlkou od webu a rozvrh nemení. */}
-                    <div ref={bodyRef} style={{ position: 'relative' }} onMouseDown={(e) => e.stopPropagation()}>
+                    <div ref={bodyRef} data-canvas-body style={{ position: 'relative' }} onMouseDown={(e) => e.stopPropagation()}>
                       {article.blocks.length > 0 ? (
                         <div className="prose prose-stone max-w-none article-content" style={{ display: 'flow-root' }}>
                           <DynamicZoneRenderer blocks={article.blocks} editMode={!noShell} />
@@ -268,6 +308,8 @@ export function EditorCanvas({
                           onDelete={(uid) => onDelete?.(uid)}
                           onDuplicate={(uid) => onDuplicate?.(uid)}
                           onInsert={(type, at) => onInsert?.(type, at)}
+                          onPatch={(uid, patch) => onPatch?.(uid, patch)}
+                          onPickMedia={(uid, multiple) => onPickMedia?.(uid, multiple)}
                           blockTypes={blockTypes}
                           rootRef={bodyRef}
                         />
@@ -291,6 +333,44 @@ export function EditorCanvas({
    ovládanie je vo vrstve nad článkom a do rozvrhu nezasahuje. */
 const canvasCss = `
 .ed-block { display: contents; }
+
+/* Písanie priamo v stránke — žiadny rám ani pozadie ako v poli formulára,
+   len jemný podklad, aby bolo vidieť, kde sa píše. */
+.ed-inline { position: relative; }
+.ed-inline .ProseMirror { outline: none; }
+.ed-inline .ProseMirror:focus { outline: none; }
+.ed-inline::before {
+  content: ''; position: absolute; inset: -8px -12px; border-radius: 8px;
+  background: rgba(255, 253, 244, .65); box-shadow: 0 0 0 1px rgba(138,83,22,.25);
+  pointer-events: none;
+}
+.ed-inline > * { position: relative; }
+/* Prázdny textový blok má na webe nulovú výšku, takže by sa doň nedalo
+   kliknúť. V editore mu preto pribudne výzva. Existujúcich článkov sa to
+   netýka — v databáze nie je ani jeden prázdny textový blok. */
+.ed-inline .ProseMirror p:only-child:empty::after,
+.ed-block[data-block-type="content.rich-text"] > div:empty::after {
+  content: 'Kliknutím začnite písať…';
+  display: block;
+  color: #a4957a;
+  font-style: italic;
+  font-size: 15px;
+  padding: 6px 0;
+}
+
+.ed-textbar {
+  position: absolute; z-index: 45; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 1px; padding: 3px;
+  background: #2f2418; border-radius: 9px; box-shadow: 0 6px 18px rgba(20,12,4,.35);
+}
+.ed-textbar button {
+  width: 28px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+  border: none; background: none; color: #f0e6d2; border-radius: 6px; cursor: pointer;
+  pointer-events: auto !important;
+}
+.ed-textbar button:hover { background: rgba(255,255,255,.14); }
+.ed-textbar button.is-on { background: #b8792d; color: #fff; }
+.ed-textbar-sep { width: 1px; height: 18px; background: rgba(255,255,255,.18); margin: 0 3px; }
 
 .ed-overlay { position: absolute; inset: 0; z-index: 30; }
 /* Tlačidlá musia klikať aj vo vrstve, ktorá sama kliknutia prepúšťa. */
@@ -338,8 +418,10 @@ const canvasCss = `
 /* Pruh medzi blokmi musí mať výšku, inak nie je na čo nabehnúť myšou.
    16 px sa zmestí do medzery medzi blokmi (24 px), takže neberie klikanie textu. */
 .ed-gap { position: absolute; left: 0; right: 0; height: 16px; transform: translateY(-8px); }
+/* „+" je v STREDE medzery, nie pri ľavom okraji: tam sedí úchyt vybraného
+   bloku a prekrýval by ho (odhalil test vkladania siedmich typov za sebou). */
 .ed-gap-btn {
-  position: absolute; left: -34px; top: -3px;
+  position: absolute; left: 50%; margin-left: -11px; top: -3px; z-index: 2;
   width: 22px; height: 22px; border-radius: 999px;
   border: 1px solid #d8c9ab; background: #fffdf7; color: #8a5316;
   display: inline-flex; align-items: center; justify-content: center;
@@ -347,13 +429,13 @@ const canvasCss = `
 }
 .ed-gap:hover .ed-gap-btn, .ed-gap-btn:focus-visible { opacity: 1; }
 .ed-gap-line {
-  position: absolute; left: 0; right: 0; top: 8px; height: 1px;
+  position: absolute; left: 0; right: 0; top: 8px; height: 1px; pointer-events: none !important;
   background: rgba(138,83,22,.35); opacity: 0; transition: opacity .12s;
 }
 .ed-gap:hover .ed-gap-line { opacity: 1; }
 
 .ed-menu {
-  position: absolute; left: -34px; top: 22px; z-index: 40;
+  position: absolute; left: 50%; margin-left: -105px; top: 22px; z-index: 40;
   width: 210px; background: #fffdf7; border: 1px solid #d8c9ab; border-radius: 10px;
   box-shadow: 0 10px 26px rgba(60,40,15,.2); padding: 5px; pointer-events: auto;
 }
@@ -371,13 +453,99 @@ const canvasCss = `
 .ed-menu > button[role="menuitem"]:hover { background: #f1e6cf; }
 .ed-menu-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
+/* ── Obrázok myšou (Fáza 4) ─────────────────────────────────────────────── */
+.ed-img-move { position: absolute; cursor: grab; pointer-events: auto !important; border-radius: 6px; }
+.ed-img-move:active { cursor: grabbing; }
+.ed-img-size {
+  position: absolute; width: 26px; height: 26px; border-radius: 999px;
+  border: 1px solid #8a5316; background: #fffdf7; color: #8a5316;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: nwse-resize; touch-action: none; z-index: 36;
+  box-shadow: 0 2px 6px rgba(60,40,15,.25);
+}
+.ed-img-tag {
+  position: absolute; z-index: 38; pointer-events: none;
+  font: 600 11.5px/1.7 Inter, system-ui, sans-serif;
+  background: #2f2418; color: #f4ead6; padding: 2px 9px; border-radius: 6px;
+}
+.ed-zones { position: absolute; inset: 0; pointer-events: none; }
+.ed-zone {
+  position: absolute; border: 1.5px dashed rgba(138,83,22,.45); border-radius: 8px;
+  background: rgba(255,247,229,.35);
+  font: 500 11px/1.4 Inter, system-ui, sans-serif; color: #8a5316;
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 6px;
+  transition: background .12s, border-color .12s;
+}
+.ed-zone.is-on { background: rgba(184,121,45,.22); border-color: #8a5316; border-style: solid; }
+.ed-zone-left { left: 0; top: 0; width: 28%; height: 100%; }
+.ed-zone-center { left: 30%; top: 26px; width: 40%; height: calc(100% - 26px); }
+.ed-zone-full { left: 30%; top: 0; width: 40%; height: 24px; padding-top: 2px; }
+.ed-zone-right { right: 0; top: 0; width: 28%; height: 100%; }
+.ed-zone-breakout { left: -6%; top: 0; width: 5%; height: 100%; }
+
+.ed-steps { position: absolute; left: 0; right: 0; pointer-events: none; }
+.ed-step { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(138,83,22,.35); }
+.ed-step.is-on { background: #8a5316; width: 2px; }
+
+.ed-alt {
+  position: absolute; z-index: 40; display: flex; align-items: center; gap: 7px;
+  background: #8f2a20; color: #fff; padding: 5px 10px; border-radius: 8px;
+  font: 500 12.5px/1.5 Inter, system-ui, sans-serif; pointer-events: auto !important;
+  box-shadow: 0 4px 12px rgba(80,20,12,.3);
+}
+.ed-alt input {
+  border: none; border-radius: 5px; padding: 3px 7px; font: inherit; width: 220px;
+  background: #fff; color: #2f2418;
+}
+
+/* ── Polia ostatných blokov (Fáza 5) ────────────────────────────────────── */
+.ed-fields { position: absolute; left: 0; width: 100%; z-index: 39; pointer-events: auto !important; }
+.edf {
+  background: #fffdf7; border: 1px solid #d8c9ab; border-radius: 10px;
+  padding: 12px 14px; box-shadow: 0 8px 22px rgba(60,40,15,.16);
+  font-family: Inter, system-ui, sans-serif;
+}
+.edf-head {
+  font: 600 11px/1.8 Inter, system-ui, sans-serif; letter-spacing: .06em;
+  text-transform: uppercase; color: #8a795e; margin-bottom: 8px;
+}
+.edf-hint { font-size: 11.5px; color: #8a795e; margin: 8px 0 0; line-height: 1.45; }
+.edf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.edf-field { display: block; margin-bottom: 9px; }
+.edf-field > span { display: block; font-size: 12px; color: #6b5a3f; margin-bottom: 3px; }
+.edf-field > span b { color: #8f2a20; }
+.edf-field input, .edf-field textarea, .edf-field select {
+  width: 100%; border: 1px solid #d8c9ab; border-radius: 7px; padding: 6px 9px;
+  font: inherit; font-size: 13.5px; color: #2f2418; background: #fff;
+}
+.edf-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.edf-item { display: grid; grid-template-columns: 1fr 180px auto; gap: 6px; align-items: start; }
+.edf-item textarea, .edf-item input {
+  border: 1px solid #d8c9ab; border-radius: 7px; padding: 6px 9px; font: inherit; font-size: 13px;
+}
+.edf-item-btns { display: flex; gap: 2px; }
+.edf-item-btns button, .edf-add {
+  border: 1px solid #d8c9ab; background: #fff; color: #5b4a2f;
+  border-radius: 7px; padding: 5px 8px; cursor: pointer; font: inherit; font-size: 12.5px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.edf-item-btns button:disabled { opacity: .35; cursor: not-allowed; }
+.edf-item-btns .edf-danger:hover { background: #f6d9d5; color: #8f2a20; }
+.edf-gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.edf-thumb { position: relative; width: 84px; }
+.edf-thumb img { width: 84px; height: 62px; object-fit: cover; border-radius: 7px; border: 1px solid #d8c9ab; }
+.edf-thumb .edf-item-btns { margin-top: 3px; }
+
+.ed-toolbar-sep { width: 1px; height: 18px; background: #e0d3b6; margin: 0 3px; align-self: center; }
+.ed-toolbar button.is-on { background: #8a5316; color: #fff; }
+
 .ed-drop {
   position: absolute; left: -6px; right: -6px; height: 3px; border-radius: 2px;
   background: #8a5316; box-shadow: 0 0 0 3px rgba(138,83,22,.18);
 }
 
 @media (max-width: ${MOBILE_MAX_PX}px) {
-  .ed-grip, .ed-gap-btn, .ed-menu { left: -28px; }
+  .ed-grip { left: -28px; }
   .ed-toolbar { top: -34px; }
 }
 `;

@@ -22,12 +22,18 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   GripVertical, Copy, Trash2, Plus, ArrowUp, ArrowDown, X,
+  Image as ImageIcon, Columns2, Captions, Square, Sun, AlertTriangle,
 } from 'lucide-react';
+import { ImageControls } from './blocks/ImageControls';
+import { BlockFields } from './blocks/BlockFields';
+import { canPair, whyNotPair } from './snapping/positionZones';
 
 export interface OverlayBlock {
   uid: string;
   type: string;
   label: string;
+  /** Blok v tvare Strapi — z neho sa berú polia na úpravu. */
+  data: any;
 }
 
 export interface BlockOverlayProps {
@@ -42,6 +48,10 @@ export interface BlockOverlayProps {
   onInsert: (type: string, atIndex: number) => void;
   /** Ponuka typov blokov pre tlačidlo „+". */
   blockTypes: { id: string; label: string; accent: string }[];
+  /** Zmena poľa vybraného bloku (pozícia, šírka, popis, text…). */
+  onPatch: (uid: string, patch: any) => void;
+  /** Otvorí knižnicu médií pre daný blok. */
+  onPickMedia: (uid: string, multiple: boolean) => void;
   /** Koreň, voči ktorému sa počítajú súradnice (obal plátna v okne iframe). */
   rootRef: React.RefObject<HTMLElement>;
 }
@@ -63,8 +73,22 @@ function measureBlock(el: Element, rootTop: number, rootLeft: number): Rect | nu
   return { top: top - rootTop, left: left - rootLeft, width: right - left, height: bottom - top };
 }
 
+/** Zhodujú sa všetky obdĺžniky? Porovnáva sa na stotinu pixela. */
+function sameRects(a: Record<string, Rect>, b: Record<string, Rect>): boolean {
+  const ka = Object.keys(a), kb = Object.keys(b);
+  if (ka.length !== kb.length) return false;
+  for (const k of ka) {
+    const x = a[k], y = b[k];
+    if (!y) return false;
+    if (Math.abs(x.top - y.top) > 0.01 || Math.abs(x.left - y.left) > 0.01
+      || Math.abs(x.width - y.width) > 0.01 || Math.abs(x.height - y.height) > 0.01) return false;
+  }
+  return true;
+}
+
 export function BlockOverlay({
   blocks, selectedUid, hoverUid, onSelect, onMove, onDelete, onDuplicate, onInsert, blockTypes, rootRef,
+  onPatch, onPickMedia,
 }: BlockOverlayProps) {
   const [rects, setRects] = useState<Record<string, Rect>>({});
   const [drag, setDrag] = useState<{ uid: string; y: number; target: number } | null>(null);
@@ -73,6 +97,10 @@ export function BlockOverlay({
   dragRef.current = drag;
 
   // ── Meranie ────────────────────────────────────────────────────────────────
+  /* Prepočet sa spúšťa pri KAŽDEJ zmene výšky blokov (ResizeObserver na deťoch
+     obalu), po načítaní obrázkov, pri zmene veľkosti okna a pri zmene počtu
+     blokov. Stav sa však prepíše len vtedy, keď sa čísla naozaj líšia — inak
+     by sa plátno prekresľovalo donekonečna (a vo Faze 3 pri každom písmene). */
   const measureAll = useCallback(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -83,7 +111,7 @@ export function BlockOverlay({
       const r = measureBlock(el, rr.top, rr.left);
       if (r) next[uid] = r;
     });
-    setRects(next);
+    setRects((prev) => (sameRects(prev, next) ? prev : next));
   }, [rootRef]);
 
   useLayoutEffect(() => { measureAll(); }, [measureAll, blocks]);
@@ -99,10 +127,19 @@ export function BlockOverlay({
     const imgs = [...root.querySelectorAll('img')];
     const onLoad = () => measureAll();
     imgs.forEach((i) => i.addEventListener('load', onLoad));
+    // Zmeny v obsahu blokov (písanie, výmena obrázka) — nové deti treba sledovať.
+    const mo = new MutationObserver(() => {
+      root.querySelectorAll('[data-block-uid] > *').forEach((el) => ro.observe(el));
+      measureAll();
+    });
+    mo.observe(root, { childList: true, subtree: true, characterData: true });
+
     win.addEventListener('resize', measureAll);
-    const t = win.setInterval(measureAll, 1000); // poistka pre písma a dobehnuté prechody
+    // Poistka pre písma a dobehnuté prechody; `sameRects` zabráni prekresleniu naprázdno.
+    const t = win.setInterval(measureAll, 1000);
     return () => {
       ro.disconnect();
+      mo.disconnect();
       imgs.forEach((i) => i.removeEventListener('load', onLoad));
       win.removeEventListener('resize', measureAll);
       win.clearInterval(t);
@@ -110,6 +147,10 @@ export function BlockOverlay({
   }, [measureAll, rootRef, blocks]);
 
   // ── Ťahanie ────────────────────────────────────────────────────────────────
+  /* SÚRADNICE A MIERKA: plátno sa navonok zmenšuje CSS transformáciou, ale
+     udalosti aj `getBoundingClientRect()` tu pochádzajú z VNÚTRA okna plátna,
+     kde mierka neplatí. Obe strany výpočtu sú teda v tej istej sústave a
+     prepočítavať mierkou netreba — overené ťahaním pri zmenšení aj pri 100 %. */
   const startDrag = (uid: string) => (e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -160,6 +201,26 @@ export function BlockOverlay({
   const selected = selectedUid ? rects[selectedUid] : null;
   const selectedIdx = blocks.findIndex((b) => b.uid === selectedUid);
   const selectedBlock = blocks[selectedIdx];
+  const d = selectedBlock?.data ?? {};
+  const isImage = selectedBlock?.type === 'content.image-block';
+  const hasFields = !!selectedBlock && ['content.quote-block', 'content.poem', 'content.embed',
+    'content.sources', 'content.image-gallery'].includes(selectedBlock.type);
+
+  // Spárovanie posudzuje tá istá funkcia ako web (jedno pravidlo pre oboje).
+  const nextBlock = blocks[selectedIdx + 1];
+  const pairPossible = isImage && canPair(
+    { ...d, __component: selectedBlock!.type, pairWithNext: true },
+    nextBlock ? { ...nextBlock.data, __component: nextBlock.type } : null
+  );
+  const pairProblem = isImage
+    ? whyNotPair(
+        { ...d, __component: selectedBlock!.type, pairWithNext: true },
+        nextBlock ? { ...nextBlock.data, __component: nextBlock.type } : null
+      )
+    : null;
+
+  /** Šírka textového stĺpca — z nej počíta ImageControls percentá. */
+  const columnWidth = rootRef.current?.getBoundingClientRect().width || 668;
 
   return (
     /* `pointer-events-none` je nutné: globals.css vynucuje pravidlom
@@ -210,7 +271,80 @@ export function BlockOverlay({
                     onClick={() => onDelete(selectedBlock.uid)}>
               <Trash2 className="w-3.5 h-3.5" />
             </button>
+
+            {isImage && (
+              <>
+                <span className="ed-toolbar-sep" />
+                <button title="Vymeniť obrázok" aria-label="Vymeniť obrázok"
+                        onClick={() => onPickMedia(selectedBlock.uid, false)}>
+                  <ImageIcon className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  className={d.pairWithNext ? 'is-on' : ''}
+                  disabled={!pairPossible && !d.pairWithNext}
+                  title={pairPossible || d.pairWithNext
+                    ? 'Spárovať s nasledujúcim obrázkom'
+                    : `Spárovať sa nedá: ${pairProblem}`}
+                  aria-label="Spárovať s ďalším"
+                  onClick={() => onPatch(selectedBlock.uid, { pairWithNext: !d.pairWithNext })}
+                >
+                  <Columns2 className="w-3.5 h-3.5" />
+                </button>
+                <button className={d.showCaption !== false ? 'is-on' : ''}
+                        title="Zobraziť popis pod obrázkom" aria-label="Zobraziť popis"
+                        onClick={() => onPatch(selectedBlock.uid, { showCaption: d.showCaption === false })}>
+                  <Captions className="w-3.5 h-3.5" />
+                </button>
+                <button className={d.rounded !== false ? 'is-on' : ''}
+                        title="Zaoblené rohy" aria-label="Zaoblené rohy"
+                        onClick={() => onPatch(selectedBlock.uid, { rounded: d.rounded === false })}>
+                  <Square className="w-3.5 h-3.5" />
+                </button>
+                <button className={d.shadow !== false ? 'is-on' : ''}
+                        title="Tieň" aria-label="Tieň"
+                        onClick={() => onPatch(selectedBlock.uid, { shadow: d.shadow === false })}>
+                  <Sun className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Obrázok: ťahanie na pozíciu a zväčšovanie za roh (Fáza 4). */}
+      {selected && selectedBlock && isImage && (
+        <ImageControls
+          rect={selected}
+          columnWidth={columnWidth}
+          position={d.position || 'center'}
+          width={d.width || '50'}
+          onChange={(patch) => onPatch(selectedBlock.uid, patch)}
+          rootRef={rootRef}
+        />
+      )}
+
+      {/* Chýbajúci alternatívny text — článok sa bez neho neuloží. */}
+      {selected && selectedBlock && isImage && !String(d.alt || '').trim() && (
+        <div className="ed-alt" style={{ top: selected.top + selected.height + 6, left: selected.left }}>
+          <AlertTriangle className="w-3.5 h-3.5" />
+          <span>Chýba popis pre čítačky (alt):</span>
+          <input
+            autoFocus={false}
+            placeholder="Čo je na obrázku"
+            onChange={(e) => onPatch(selectedBlock.uid, { alt: e.target.value })}
+          />
+        </div>
+      )}
+
+      {/* Polia ostatných typov blokov (Fáza 5). */}
+      {selected && selectedBlock && hasFields && (
+        <div className="ed-fields" style={{ top: selected.top + selected.height + 10, left: 0 }}>
+          <BlockFields
+            type={selectedBlock.type}
+            data={d}
+            onPatch={(patch) => onPatch(selectedBlock.uid, patch)}
+            onPickMedia={(multiple) => onPickMedia(selectedBlock.uid, multiple)}
+          />
         </div>
       )}
 
@@ -221,7 +355,10 @@ export function BlockOverlay({
                   onClick={() => setMenuAt(menuAt === i ? null : i)}>
             <Plus className="w-3.5 h-3.5" />
           </button>
-          <span className="ed-gap-line" />
+          {/* Čiara je len ozdoba — bez `pointer-events-none` by prekryla tlačidlo
+              „+" a to by sa nedalo kliknúť (globals.css vynucuje `auto` na
+              každý prvok, viď poznámka vyššie). */}
+          <span className="ed-gap-line pointer-events-none" />
           {menuAt === i && (
             <div className="ed-menu" role="menu">
               <div className="ed-menu-head">

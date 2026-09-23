@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 
 /**
  * Spojenie medzi plátnom a obalom bloku (`BlockShell`).
@@ -13,6 +13,10 @@ export interface EditorUI {
   hoverUid: string | null;
   select: (uid: string | null) => void;
   hover: (uid: string | null) => void;
+  /** Blok, do ktorého sa práve píše (len `content.rich-text`). */
+  editingUid: string | null;
+  /** Vykreslí inline editor namiesto obsahu bloku. */
+  renderInline?: (uid: string) => React.ReactNode;
 }
 
 const NOOP: EditorUI = {
@@ -20,6 +24,7 @@ const NOOP: EditorUI = {
   hoverUid: null,
   select: () => {},
   hover: () => {},
+  editingUid: null,
 };
 
 export const EditorUIContext = createContext<EditorUI>(NOOP);

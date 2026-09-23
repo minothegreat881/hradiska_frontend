@@ -30,6 +30,8 @@ export interface BlockShellProps {
 
 export function BlockShell({ index, uid, label, type, children }: BlockShellProps) {
   const ui = useEditorUI();
+  // Do textu sa píše priamo na mieste bloku (Fáza 3). Ostatné typy zatiaľ nie.
+  const writing = ui.editingUid === uid && type === 'content.rich-text' && !!ui.renderInline;
   return (
     <div
       className="ed-block"
@@ -41,7 +43,7 @@ export function BlockShell({ index, uid, label, type, children }: BlockShellProp
       onMouseLeave={() => ui.hover(null)}
       onMouseDown={() => ui.select(uid)}
     >
-      {children}
+      {writing ? ui.renderInline!(uid) : children}
     </div>
   );
 }
