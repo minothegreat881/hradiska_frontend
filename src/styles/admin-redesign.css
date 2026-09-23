@@ -162,3 +162,43 @@
 }
 .admin .ad-editor-head .ad-sub { gap: 5px; }
 .admin .ad-seg button[aria-label] { padding: 8px 10px; }
+
+/* ── Analytika ───────────────────────────────────────────────────────────── */
+.admin .ad-section-title { font-size: 14px; font-weight: 600; color: var(--ad-text); margin: 0 0 12px; }
+.admin .ad-note { font-size: 12px; color: var(--ad-muted); line-height: 1.5; }
+
+.admin .ad-empty-analytics {
+  display: grid; grid-template-columns: 1fr 1.2fr; gap: 32px; padding: 32px;
+}
+.admin .ad-empty-analytics h2 { font-size: 18px; font-weight: 600; margin: 0 0 8px; }
+.admin .ad-empty-analytics p { font-size: 13.5px; line-height: 1.6; color: var(--ad-secondary); margin: 0; }
+.admin .ad-empty-icon {
+  width: 44px; height: 44px; border-radius: 12px; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--ad-tint); color: var(--ad-amber-deep);
+}
+.admin .ad-choices { display: flex; flex-direction: column; gap: 10px; }
+.admin .ad-choice span > b { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 3px; }
+.admin .ad-choice span > i { font-style: normal; font-size: 12.5px; color: var(--ad-secondary); line-height: 1.5; }
+.admin .ad-radio {
+  width: 16px; height: 16px; border-radius: 999px; flex-shrink: 0; margin-top: 2px;
+  border: 1.5px solid var(--ad-field-border); background: var(--ad-card);
+}
+.admin .ad-radio.is-on { border: 5px solid var(--ad-amber-mid); }
+.admin .ad-choice-actions { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
+
+.admin .ad-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+.admin .ad-stat-label { font-size: 12.5px; color: var(--ad-secondary); }
+.admin .ad-todo { padding: 18px 20px; display: flex; flex-direction: column; gap: 2px; }
+.admin .ad-todo-row {
+  display: flex; align-items: center; gap: 12px; min-height: 46px;
+  border-top: 1px solid var(--ad-line);
+}
+.admin .ad-todo-row:first-of-type { border-top: 0; }
+.admin .ad-todo-icon { color: var(--ad-amber-deep); display: flex; }
+.admin .ad-todo-label { flex: 1; font-size: 13.5px; }
+.admin .ad-todo-n { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1100px) {
+  .admin .ad-empty-analytics { grid-template-columns: 1fr; gap: 22px; }
+}
