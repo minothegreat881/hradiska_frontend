@@ -627,7 +627,7 @@ export function EditorScreen({
           className="acard ad-editor-side"
           style={{ width: 330, flexShrink: 0, background: 'var(--ad-surface)', position: 'sticky', top: 76, maxHeight: 'calc(100vh - 96px)', overflowY: 'auto' }}
         >
-          <Panel title="Základné údaje" defaultOpen>
+          <Panel title="Publikovanie" defaultOpen>
             <Field label="Slug">
               <input className="afld" value={slug} onChange={e => { setSlug(e.target.value); touch(); }} placeholder="nazov-clanku" />
               <Hint>Generuje sa z názvu. Musí byť jedinečný.</Hint>
@@ -650,7 +650,7 @@ export function EditorScreen({
             </label>
           </Panel>
 
-          <Panel title="Cover obrázok" defaultOpen>
+          <Panel title="Titulná fotografia" defaultOpen>
             {cover ? (
               <img
                 src={fileUrl(cover as MediaFile, 'small')}
@@ -681,7 +681,7 @@ export function EditorScreen({
             </div>
           </Panel>
 
-          <Panel title="Zaradenie">
+          <Panel title="Zaradenie — kategória a štítky">
             <Field label="Kategória">
               <select className="afld" value={category} onChange={e => { setCategory(e.target.value); touch(); }}>
                 <option value="">— vyberte —</option>
@@ -693,7 +693,7 @@ export function EditorScreen({
             </Field>
           </Panel>
 
-          <Panel title="SEO">
+          <Panel title="SEO — ako sa článok ukáže vo vyhľadávaní">
             <Field label="Meta titulok">
               <input className="afld" value={metaTitle} onChange={e => { setMetaTitle(e.target.value.slice(0, 70)); touch(); }} />
               <Counter n={metaTitle.length} max={70} />
@@ -710,7 +710,7 @@ export function EditorScreen({
             </div>
           </Panel>
 
-          <Panel title="Lokalita">
+          <Panel title="Lokalita na mape">
             <LocationMap
               lat={loc.latitude} lng={loc.longitude}
               onPick={(la, ln) => { setLoc({ ...loc, latitude: String(la), longitude: String(ln) }); touch(); }}
@@ -732,7 +732,7 @@ export function EditorScreen({
             </div>
           </Panel>
 
-          <Panel title="Kľúčové fakty">
+          <Panel title="Kľúčové fakty (pobočný stĺpec)">
             <div data-row-list>
             {keyFacts.map((f, i) => (
               <div
@@ -777,7 +777,7 @@ export function EditorScreen({
             </button>
           </Panel>
 
-          <Panel title="Časová os">
+          <Panel title="Časová os (pobočný stĺpec)">
             <div data-row-list>
             {timeline.map((t, i) => (
               <div
