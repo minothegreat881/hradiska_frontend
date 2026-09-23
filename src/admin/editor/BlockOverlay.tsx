@@ -53,6 +53,8 @@ export interface BlockOverlayProps {
   onPatch: (uid: string, patch: any) => void;
   /** Otvorí knižnicu médií pre daný blok. */
   onPickMedia: (uid: string, multiple: boolean) => void;
+  /** Blok, do ktorého sa práve píše — ten rám nedostáva. */
+  editingUid?: string | null;
   /** Koreň, voči ktorému sa počítajú súradnice (obal plátna v okne iframe). */
   rootRef: React.RefObject<HTMLElement>;
 }
@@ -89,7 +91,7 @@ function sameRects(a: Record<string, Rect>, b: Record<string, Rect>): boolean {
 
 export function BlockOverlay({
   blocks, selectedUid, hoverUid, onSelect, onMove, onDelete, onDuplicate, onInsert, blockTypes, rootRef,
-  onPatch, onPickMedia,
+  onPatch, onPickMedia, editingUid,
 }: BlockOverlayProps) {
   const [rects, setRects] = useState<Record<string, Rect>>({});
   const [drag, setDrag] = useState<{ uid: string; y: number; target: number } | null>(null);
@@ -115,7 +117,10 @@ export function BlockOverlay({
     setRects((prev) => (sameRects(prev, next) ? prev : next));
   }, [rootRef]);
 
-  useLayoutEffect(() => { measureAll(); }, [measureAll, blocks]);
+  /* Prepnutie bloku na písanie a späť vymení prvky v DOM — premeraj hneď v
+     tom istom kroku, inak sa rám na jednu snímku nakreslí na starú súradnicu
+     a vyzerá to ako trhnutie. */
+  useLayoutEffect(() => { measureAll(); }, [measureAll, blocks, editingUid]);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -287,14 +292,18 @@ export function BlockOverlay({
        !important pravidlo a je v tomto projekte určená presne na toto. */
     <div className="ed-overlay pointer-events-none" aria-hidden={false}>
       {/* rámik pri prejdení myšou */}
-      {hoverUid && hoverUid !== selectedUid && rects[hoverUid] && (
+      {/* Do bloku, do ktorého sa píše, sa rám nekreslí: pri prepnutí na
+          písanie a späť sa prvok v DOM vymení a rám na jednu snímku skočil
+          na starú súradnicu — vyzeralo to ako trhnutie. Rozpísaný blok je aj
+          tak označený vlastným prerušovaným rámom editora. */}
+      {hoverUid && hoverUid !== selectedUid && hoverUid !== editingUid && rects[hoverUid] && (
         <div className="ed-frame ed-frame-hover pointer-events-none" style={boxStyle(rects[hoverUid])}>
           <span className="ed-frame-tag">{blocks.find((b) => b.uid === hoverUid)?.label}</span>
         </div>
       )}
 
       {/* rámik výberu + úchyt + lišta */}
-      {selected && selectedBlock && (
+      {selected && selectedBlock && selectedUid !== editingUid && (
         <div className="ed-frame ed-frame-selected pointer-events-none" style={boxStyle(selected)}>
           <span className="ed-frame-tag ed-frame-tag-on">{selectedBlock.label}</span>
 

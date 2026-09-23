@@ -30,10 +30,34 @@ export interface BlockShellProps {
 
 export function BlockShell({ index, uid, label, type, children }: BlockShellProps) {
   const ui = useEditorUI();
+  const boxRef = React.useRef<HTMLDivElement>(null);
+  /* Výška vykresleného bloku, odmeraná EŠTE PRED prepnutím na písanie.
+     TipTap sadzí text o kúsok inak (iniciálku kreslí CSS, nie vložený znak),
+     takže blok pri kliknutí zmenil výšku a celý článok pod ním poskočil —
+     to bolo to trhnutie. Pri písaní sa preto miesto najprv podrží a pustí sa
+     až vtedy, keď sa obsah naozaj mení. */
+  const [reserve, setReserve] = React.useState<number | null>(null);
+
   // Do textu sa píše priamo na mieste bloku (Fáza 3). Ostatné typy zatiaľ nie.
   const writing = ui.editingUid === uid && type === 'content.rich-text' && !!ui.renderInline;
+  React.useEffect(() => { if (!writing) setReserve(null); }, [writing]);
+
+  const zmeraj = () => {
+    const el = boxRef.current;
+    if (!el) return;
+    let top = Infinity, bottom = -Infinity;
+    for (const k of Array.from(el.children)) {
+      const r = k.getBoundingClientRect();
+      if (!r.height) continue;
+      top = Math.min(top, r.top);
+      bottom = Math.max(bottom, r.bottom);
+    }
+    if (Number.isFinite(top)) setReserve(Math.round(bottom - top));
+  };
+
   return (
     <div
+      ref={boxRef}
       className="ed-block"
       data-block-index={index}
       data-block-uid={uid}
@@ -41,9 +65,19 @@ export function BlockShell({ index, uid, label, type, children }: BlockShellProp
       data-block-label={label}
       onMouseEnter={() => ui.hover(uid)}
       onMouseLeave={() => ui.hover(null)}
-      onMouseDown={() => ui.select(uid)}
+      onMouseDown={() => { if (type === 'content.rich-text') zmeraj(); ui.select(uid); }}
     >
-      {writing ? ui.renderInline!(uid) : children}
+      {writing ? (
+        <div
+          className="ed-block-writing"
+          style={reserve ? { minHeight: reserve } : undefined}
+          /* Len čo sa text naozaj mení, podržané miesto pustíme — inak by
+             blok ostal privysoký po zmazaní odseku. */
+          onKeyDown={(e) => { if (reserve && e.key.length === 1) setReserve(null); }}
+        >
+          {ui.renderInline!(uid)}
+        </div>
+      ) : children}
     </div>
   );
 }

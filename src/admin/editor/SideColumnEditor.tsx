@@ -16,7 +16,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  GripVertical, Trash2, Plus, X, ChevronDown,
+  GripVertical, Trash2, Plus, ChevronDown,
   Calendar, Users, Map, Building, Crown, Sword, Shield, Scroll,
   BookOpen, Star, Flag, Mountain, Trees, Droplets, Flame, Sparkles,
   type LucideIcon,
@@ -115,6 +115,14 @@ function useReorder<T extends { uid: string }>(items: T[], onChange: (n: T[]) =>
  * podľa obsahu ukáže celý text a správa sa ako riadok: Enter nezalamuje,
  * ale posúva ďalej (`onEnter`).
  */
+/** Kurzor na KONIEC poľa — po skoku Enterom sa inak píše pred text. */
+function focusEnd(el?: HTMLTextAreaElement | null) {
+  if (!el) return;
+  el.focus();
+  const n = el.value.length;
+  try { el.setSelectionRange(n, n); } catch { /* staršie prehliadače */ }
+}
+
 function GrowField({
   className, value, placeholder, maxLength, title, onChange, onEnter, inputRef, autoFocus,
 }: {
@@ -232,7 +240,7 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
                 autoFocus={focusUid === f.uid}
                 onChange={(v) => patch(f.uid, { label: v })}
                 /* Enter v popise preskočí na hodnotu — píše sa zhora nadol. */
-                onEnter={() => valueRefs.current[f.uid]?.current?.focus()}
+                onEnter={() => focusEnd(valueRefs.current[f.uid]?.current)}
               />
               <GrowField
                 inputRef={(valueRefs.current[f.uid] ||= React.createRef<HTMLTextAreaElement>())}
@@ -267,7 +275,20 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
 
 function TimelineBox({ items, onChange }: { items: Event[]; onChange: (n: Event[]) => void }) {
   const [active, setActive] = useState<string | null>(null);
+  const [focusUid, setFocusUid] = useState<string | null>(null);
   const { start, dragUid, over } = useReorder(items, onChange);
+
+  /* Polia sa píšu PRIAMO v časovej osi, nie v plávajúcom okne.
+     Okno stálo absolútne vedľa riadka, prekrývalo článok a keď sa mu čokoľvek
+     stalo so štýlmi, ostal z neho rám s tlačidlami a nebolo do čoho písať.
+     Riadok, do ktorého sa píše na mieste, nemá ako zmiznúť — rovnako to
+     funguje v kľúčových faktoch. */
+  const titleRefs = useRef<Record<string, React.RefObject<HTMLTextAreaElement>>>({});
+  const descRefs = useRef<Record<string, React.RefObject<HTMLTextAreaElement>>>({});
+  const refFor = (
+    mapa: React.MutableRefObject<Record<string, React.RefObject<HTMLTextAreaElement>>>,
+    uid: string,
+  ) => (mapa.current[uid] ||= React.createRef<HTMLTextAreaElement>());
 
   const patch = (uid: string, p: Partial<Event>) =>
     onChange(items.map((e) => (e.uid === uid ? { ...e, ...p } : e)));
@@ -276,6 +297,7 @@ function TimelineBox({ items, onChange }: { items: Event[]; onChange: (n: Event[
     const e: Event = { uid: newUid(), year: '', title: '', description: '', type: 'event' };
     onChange([...items, e]);
     setActive(e.uid);
+    setFocusUid(e.uid);
   };
 
   return (
@@ -284,149 +306,89 @@ function TimelineBox({ items, onChange }: { items: Event[]; onChange: (n: Event[
         Časová os {items.length > 0 && <span>{items.length}</span>}
       </div>
 
-      {items.map((ev, i) => (
-        <div
-          key={ev.uid}
-          data-reorder-item
-          className={`ad-event${active === ev.uid ? ' is-active' : ''}${dragUid === ev.uid ? ' is-dragging' : ''}${over === i ? ' is-over' : ''}`}
-          onMouseDown={() => setActive(ev.uid)}
-        >
-          <div className="ad-event-rail" aria-hidden="true">
-            <span className="ad-event-dot" />
-            {i < items.length - 1 && <span className="ad-event-line" />}
-          </div>
-          <div className="ad-event-body">
-            <div className="ad-event-year">{ev.year || '—'}</div>
-            <div className="ad-event-name">
-              {ev.title || <span style={{ color: 'var(--ad-muted)' }}>Bez názvu</span>}
+      {items.map((ev, i) => {
+        const on = active === ev.uid;
+        return (
+          <div
+            key={ev.uid}
+            data-reorder-item
+            className={`ad-event${on ? ' is-active' : ''}${dragUid === ev.uid ? ' is-dragging' : ''}${over === i ? ' is-over' : ''}`}
+            onMouseDown={() => setActive(ev.uid)}
+          >
+            <div className="ad-event-rail" aria-hidden="true">
+              <span className="ad-event-dot" />
+              {i < items.length - 1 && <span className="ad-event-line" />}
+            </div>
+
+            <div className="ad-event-body">
+              {on && (
+                <div className="ad-floatbar" onMouseDown={(e) => e.stopPropagation()}>
+                  <select
+                    className="ad-floatbar-select"
+                    value={ev.type}
+                    title="Druh udalosti"
+                    onChange={(e) => patch(ev.uid, { type: e.target.value })}
+                  >
+                    {TIMELINE_TYPES.map((t) => (
+                      <option key={t} value={t}>{TIMELINE_TYPE_LABELS[t] || t}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button" title="Potiahnutím zmeníte poradie" className="ad-floatbar-grip"
+                    onPointerDown={start(ev.uid)}
+                  >
+                    <GripVertical className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button" title="Vymazať udalosť" className="is-danger"
+                    onClick={() => { onChange(items.filter((x) => x.uid !== ev.uid)); setActive(null); }}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              <GrowField
+                className="ad-event-year"
+                value={ev.year}
+                placeholder="Rok — napr. 9. storočie"
+                maxLength={MAX.year}
+                autoFocus={focusUid === ev.uid}
+                onChange={(v) => patch(ev.uid, { year: v })}
+                onEnter={() => focusEnd(refFor(titleRefs, ev.uid).current)}
+              />
+              <GrowField
+                inputRef={refFor(titleRefs, ev.uid)}
+                className="ad-event-name"
+                value={ev.title}
+                placeholder="Názov — napr. Opevnenie valmi"
+                maxLength={MAX.title}
+                onChange={(v) => patch(ev.uid, { title: v })}
+                onEnter={() => focusEnd(refFor(descRefs, ev.uid).current)}
+              />
+              {(on || ev.description) && (
+                <GrowField
+                  inputRef={refFor(descRefs, ev.uid)}
+                  className="ad-event-desc"
+                  value={ev.description}
+                  placeholder="Popis — nepovinný, na webe sa ukáže po rozkliknutí"
+                  maxLength={MAX.description}
+                  onChange={(v) => patch(ev.uid, { description: v })}
+                  onEnter={() => { if (ev.year.trim() && ev.title.trim()) add(); }}
+                />
+              )}
             </div>
           </div>
-
-          {active === ev.uid && (
-            <EventPopover
-              ev={ev}
-              onGrip={start(ev.uid)}
-              onChange={(p) => patch(ev.uid, p)}
-              onDelete={() => { onChange(items.filter((x) => x.uid !== ev.uid)); setActive(null); }}
-              onClose={() => setActive(null)}
-            />
-          )}
-        </div>
-      ))}
+        );
+      })}
 
       <button type="button" className="ad-add" onClick={add}>
         <Plus className="w-3.5 h-3.5" /> Pridať udalosť
       </button>
-    </div>
-  );
-}
-
-function EventPopover({
-  ev, onChange, onDelete, onClose, onGrip,
-}: {
-  ev: Event;
-  onChange: (p: Partial<Event>) => void;
-  onDelete: () => void;
-  onClose: () => void;
-  onGrip: (e: React.PointerEvent) => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const descRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const doc = el.ownerDocument;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    const onDown = (e: MouseEvent) => {
-      const t = e.target as Node;
-      // Klik do riadka udalosti okno nezatvára, klik inam áno.
-      if (!el.contains(t) && !el.parentElement?.contains(t)) onClose();
-    };
-    doc.addEventListener('keydown', onKey);
-    doc.addEventListener('mousedown', onDown);
-    return () => { doc.removeEventListener('keydown', onKey); doc.removeEventListener('mousedown', onDown); };
-  }, [onClose]);
-
-  const desc = ev.description || '';
-
-  return (
-    <div
-      ref={ref}
-      className="ad-popover"
-      role="dialog"
-      aria-label="Udalosť na časovej osi"
-      onMouseDown={(e) => e.stopPropagation()}
-    >
-      <div className="ad-popover-head">
-        Udalosť na časovej osi
-        <span style={{ display: 'flex', gap: 2 }}>
-          <button type="button" className="ad-pop-grip" title="Potiahnutím zmeníte poradie" onPointerDown={onGrip}>
-            <GripVertical className="w-4 h-4" />
-          </button>
-          <button type="button" className="ad-pop-x" onClick={onClose} aria-label="Zavrieť">
-            <X className="w-4 h-4" />
-          </button>
-        </span>
-      </div>
-
-      <div className="ad-popover-body">
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 10 }}>
-          <div className="ad-field">
-            <label htmlFor="ad-ev-year">Rok</label>
-            <input
-              id="ad-ev-year" className="afld" value={ev.year} autoFocus maxLength={MAX.year}
-              placeholder="napr. ~906"
-              onChange={(e) => onChange({ year: e.target.value })}
-              /* Enter posúva na ďalšie pole — vypĺňa sa zhora nadol, bez myši. */
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  (e.currentTarget.ownerDocument.getElementById('ad-ev-title') as HTMLInputElement | null)?.focus();
-                }
-              }}
-            />
-          </div>
-          <div className="ad-field">
-            <label htmlFor="ad-ev-type">Typ</label>
-            {/* Sedem hodnôt zo schémy sa do segmentu nezmestí — rozbaľovacie menu. */}
-            <select
-              id="ad-ev-type" className="afld" value={ev.type}
-              onChange={(e) => onChange({ type: e.target.value })}
-            >
-              {TIMELINE_TYPES.map((t) => (
-                <option key={t} value={t}>{TIMELINE_TYPE_LABELS[t] || t}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="ad-field">
-          <label htmlFor="ad-ev-title">Názov</label>
-          <input
-            id="ad-ev-title" className="afld" value={ev.title} maxLength={MAX.title}
-            onChange={(e) => onChange({ title: e.target.value })}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); descRef.current?.focus(); } }}
-          />
-        </div>
-
-        <div className="ad-field">
-          <label htmlFor="ad-ev-desc">Popis <small>— zobrazí sa po rozkliknutí</small></label>
-          <textarea
-            id="ad-ev-desc" ref={descRef} className="afld" rows={3} maxLength={MAX.description}
-            value={desc}
-            onChange={(e) => onChange({ description: e.target.value })}
-          />
-          <span className="ad-counter">{desc.length} / {MAX.description}</span>
-        </div>
-      </div>
-
-      <div className="ad-popover-foot">
-        <button type="button" className="ad-link-danger" onClick={onDelete}>
-          <Trash2 className="w-4 h-4" /> Vymazať
-        </button>
-        <button type="button" className="ad-btn-dark" onClick={onClose}>Hotovo</button>
-      </div>
+      <p className="ad-aside-hint">
+        Udalosť má <b>rok</b>, <b>názov</b> a nepovinný <b>popis</b>. Enter vás posunie na ďalšie
+        pole a z popisu rovno na novú udalosť; druh udalosti sa mení v lište nad ňou.
+      </p>
     </div>
   );
 }

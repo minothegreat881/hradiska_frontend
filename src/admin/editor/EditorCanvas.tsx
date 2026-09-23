@@ -352,6 +352,7 @@ export function EditorCanvas({
                           onPatch={(uid, patch) => onPatch?.(uid, patch)}
                           onPickMedia={(uid, multiple) => onPickMedia?.(uid, multiple)}
                           blockTypes={blockTypes}
+                          editingUid={editingUid}
                           rootRef={bodyRef}
                         />
                       )}
@@ -499,6 +500,13 @@ const canvasCss = `
 
 /* Pruh medzi blokmi musí mať výšku, inak nie je na čo nabehnúť myšou.
    16 px sa zmestí do medzery medzi blokmi (24 px), takže neberie klikanie textu. */
+/* ProseMirror si dáva white-space: break-spaces, aby vedel ukázať medzery
+   na konci riadka. Lenže to zalamuje inak než hotový článok: ten istý odsek
+   bol v editore o riadok vyšší (478 → 511 px) a celý článok pod ním pri
+   kliknutí poskočil. V článku medzery aj tak kolabujú, tak nech sa aj tu
+   text láme presne ako na webe. */
+.ed-inline .ProseMirror { white-space: normal; }
+
 /* Iniciálka počas písania. Vykreslený článok ju robí vloženým span-om;
    v editore to musí spraviť CSS, inak by ProseMirror písal „za" písmeno.
    Rozmery sú odpísané z DynamicZoneRenderer (text-7xl, leading .75). */
@@ -507,9 +515,11 @@ const canvasCss = `
 }
 .ed-inline.is-first .ProseMirror > p:first-of-type::first-letter {
   float: left;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: 'Fraunces', Georgia, "Times New Roman", serif;
   font-size: 4.5rem; font-weight: 700; line-height: .75;
-  color: #b45309; margin-top: .1em; margin-right: .75rem;
+  /* Tá istá farba, akú má iniciála v šate webu (Pečať) — v editore bola
+     o odtieň inde. */
+  color: var(--l-second, #b45309); margin-top: .1em; margin-right: .75rem;
 }
 
 /* Prázdny blok (video bez adresy, báseň bez veršov, galéria bez fotiek…).
