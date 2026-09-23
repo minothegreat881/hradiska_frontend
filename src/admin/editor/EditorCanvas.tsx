@@ -712,6 +712,11 @@ const canvasCss = `
 .edf-seg i { display: grid; gap: 1.5px; width: 24px; }
 .edf-seg i span { height: 9px; border-radius: 1px; background: currentColor; opacity: .45; }
 .edf-seg button.is-on i span { opacity: .8; }
+.edf-check {
+  display: flex; align-items: center; gap: 8px; margin: 2px 0 9px;
+  font: 500 12.5px Inter, system-ui, sans-serif; color: #3b3021; cursor: pointer;
+}
+.edf-check input { width: 14px; height: 14px; accent-color: #8a5316; }
 .edf-hint { font-size: 11.5px; color: #8a795e; margin: 8px 0 0; line-height: 1.45; }
 .edf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .edf-field { display: block; margin-bottom: 9px; }
@@ -723,6 +728,9 @@ const canvasCss = `
 }
 .edf-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
 .edf-item { display: grid; grid-template-columns: 1fr 180px auto; gap: 6px; align-items: start; }
+/* Zdroj má pred sebou poradie — rovnaké číslo uvidí čitateľ v článku. */
+.edf-item-src { grid-template-columns: 20px 1fr 170px auto; }
+.edf-item-n { font: 600 12px/2.2 Inter, system-ui, sans-serif; color: #8a795e; text-align: right; }
 .edf-item textarea, .edf-item input {
   border: 1px solid #d8c9ab; border-radius: 7px; padding: 6px 9px; font: inherit; font-size: 13px;
 }

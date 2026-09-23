@@ -211,7 +211,7 @@ export function BlockOverlay({
   const d = selectedBlock?.data ?? {};
   const isImage = selectedBlock?.type === 'content.image-block';
   const hasFields = !!selectedBlock && ['content.quote-block', 'content.poem', 'content.embed',
-    'content.sources', 'content.image-gallery'].includes(selectedBlock.type);
+    'content.sources', 'content.image-gallery', 'content.image-block'].includes(selectedBlock.type);
 
   /* Panel polí (a pri obrázku prúžok s alt textom) visí POD vybraným blokom a
      je vysoký. Bez merania prekryl medzeru za blokom aj s tlačidlom „Pridať
@@ -381,16 +381,15 @@ export function BlockOverlay({
         />
       )}
 
-      {/* Chýbajúci alternatívny text — článok sa bez neho neuloží. */}
+      {/* Chýbajúci alternatívny text — článok sa bez neho neuloží.
+          IBA UPOZORNENIE, žiadne pole: pole tu bolo neovládané a celý prúžok
+          sa skryl hneď po prvom písmene (podmienka „alt je prázdny"), takže
+          písanému textu zmizlo miesto pod rukami. Vypĺňa sa v paneli nižšie,
+          ktorý ostáva otvorený. */}
       {selected && selectedBlock && isImage && !String(d.alt || '').trim() && (
-        <div ref={setUnderEl} className="ed-alt" style={{ top: selected.top + selected.height + 6, left: selected.left }}>
+        <div className="ed-alt" style={{ top: selected.top + selected.height + 6, left: selected.left }}>
           <AlertTriangle className="w-3.5 h-3.5" />
-          <span>Chýba popis pre čítačky (alt):</span>
-          <input
-            autoFocus={false}
-            placeholder="Čo je na obrázku"
-            onChange={(e) => onPatch(selectedBlock.uid, { alt: e.target.value })}
-          />
+          <span>Chýba popis pre čítačky (alt) — doplňte ho v paneli pod obrázkom.</span>
         </div>
       )}
 

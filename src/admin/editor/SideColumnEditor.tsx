@@ -129,7 +129,7 @@ function GrowField({
     const el = ref.current;
     if (!el) return;
     el.style.height = '0px';
-    el.style.height = `${el.scrollHeight}px`;
+    el.style.height = `${el.scrollHeight + (el.offsetHeight - el.clientHeight)}px`;
   }, [value, ref]);
   return (
     <textarea
