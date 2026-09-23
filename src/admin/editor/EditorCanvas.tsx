@@ -387,6 +387,13 @@ export function EditorCanvas({
 const canvasCss = `
 .ed-block { display: contents; }
 
+/* Karta článku má na webe skryté pretečenie kvôli zaobleným rohom. V editore
+   by orezala ponuku „Vložiť blok" aj lišty blokov pri okraji — tu preto
+   pretečenie prepúšťa. Na rozvrh to nemá vplyv. */
+.lart-card { overflow: visible !important; }
+/* Miesto pod článkom, aby sa ponuka na konci mala kam otvoriť. */
+.article-body-wrapper { padding-bottom: 44px; }
+
 /* Písanie priamo v stránke — žiadny rám ani pozadie ako v poli formulára,
    len jemný podklad, aby bolo vidieť, kde sa píše. */
 .ed-inline { position: relative; }
@@ -492,7 +499,9 @@ const canvasCss = `
 }
 .ed-gap.is-last .ed-gap-btn:hover { background: var(--ad-active-bg, #fffaf0); border-color: #b8792d; }
 .ed-gap.is-last .ed-gap-line { display: none; }
-.ed-gap.is-last .ed-menu { left: 0; margin-left: 0; top: 38px; }
+/* Posledné tlačidlo je na konci článku — ponuka sa otvára NAHOR, inak by
+   visela na spodnej hrane plátna a musela by ho naťahovať. */
+.ed-gap.is-last .ed-menu { left: 0; margin-left: 0; top: auto; bottom: 40px; }
 .ed-gap-line {
   position: absolute; left: 0; right: 0; top: 8px; height: 1px; pointer-events: none !important;
   background: rgba(138,83,22,.35); opacity: 0; transition: opacity .12s;
