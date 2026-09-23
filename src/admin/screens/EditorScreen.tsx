@@ -452,101 +452,79 @@ export function EditorScreen({
 
   return (
     <>
-      {/* ── Horná lišta ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-        <button className="abtn abtn-icon" onClick={leave} title="Späť na zoznam">
+      {/* ── Hlavička editora ──────────────────────────────────────────────
+          Jeden riadok vysoký 60 px. Prepínače sú ikonové, aby sa všetko
+          zmestilo aj pri užšom okne. */}
+      <div className="ad-editor-head">
+        <button className="abtn abtn-icon" onClick={leave} title="Späť na zoznam" aria-label="Späť na zoznam">
           <ArrowLeft className="w-4 h-4" />
         </button>
-        <div style={{ minWidth: 0 }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {title || 'Nový článok'}
-          </h1>
-          <div style={{ fontSize: 12.5, color: 'var(--ad-muted)', marginTop: 3 }}>
-            {/* Stavová lišta: vždy je jasné, či je práca uložená. */}
-            {saving
-              ? 'Ukladám…'
-              : dirty
-                ? 'Neuložené zmeny'
-                : savedAt
-                  ? `Uložené ${timeOf(savedAt)}`
-                  : articleId ? 'Bez zmien' : 'Nový článok'}
+
+        <div className="ad-head-title">
+          <div className="ad-head-line">
+            <span className="ad-title" title={title || 'Nový článok'}>{title || 'Nový článok'}</span>
+            <span className={`achip ${published ? 'achip-pub' : 'achip-draft'}`}>
+              {published ? 'Publikovaný' : 'Koncept'}
+            </span>
+          </div>
+          <div className="ad-sub">
+            {saving ? (
+              <><Loader2 className="w-3 h-3 animate-spin" /> Ukladám…</>
+            ) : dirty ? (
+              <>
+                <span className="ad-dot" aria-hidden="true" /> Neuložené zmeny
+                {savedAt && <> · naposledy uložené {timeOf(savedAt)}</>}
+              </>
+            ) : savedAt ? (
+              <>Uložené {timeOf(savedAt)}</>
+            ) : (
+              <>{articleId ? 'Bez zmien' : 'Nový článok'}</>
+            )}
           </div>
         </div>
-        <span className={`achip ${published ? "achip-pub" : "achip-draft"}`}>
-          {published ? "Publikovaný" : "Koncept"}
-        </span>
+
         <div style={{ flex: 1 }} />
 
-        {/* Vrátenie zmien — funguje v oboch zobrazeniach, aj klávesmi Ctrl+Z / Ctrl+Y. */}
         <div className="ad-seg" role="group" aria-label="História zmien">
-          <button
-            onClick={undo}
-            disabled={!blocksHistory.canUndo}
-            title={blocksHistory.undoLabel ? `Vrátiť: ${blocksHistory.undoLabel} (Ctrl+Z)` : 'Nie je čo vrátiť'}
-          >
-            <Undo2 className="w-3.5 h-3.5" /> Vrátiť
+          <button onClick={undo} disabled={!blocksHistory.canUndo}
+                  aria-label="Vrátiť zmenu"
+                  title={blocksHistory.undoLabel ? `Vrátiť: ${blocksHistory.undoLabel} (Ctrl+Z)` : 'Nie je čo vrátiť'}>
+            <Undo2 className="w-4 h-4" />
           </button>
-          <button
-            onClick={redo}
-            disabled={!blocksHistory.canRedo}
-            title={blocksHistory.redoLabel ? `Znovu: ${blocksHistory.redoLabel} (Ctrl+Y)` : 'Nie je čo zopakovať'}
-          >
-            <Redo2 className="w-3.5 h-3.5" /> Znovu
+          <button onClick={redo} disabled={!blocksHistory.canRedo}
+                  aria-label="Zopakovať zmenu"
+                  title={blocksHistory.redoLabel ? `Znovu: ${blocksHistory.redoLabel} (Ctrl+Y)` : 'Nie je čo zopakovať'}>
+            <Redo2 className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="ad-seg" role="group" aria-label="Zväčšenie náhľadu">
-            <button
-              className={zoom === 'fit' ? 'is-on' : ''}
-              onClick={() => setZoom('fit')}
-              title="Zmenšiť tak, aby sa zmestil celý"
-            >
-              Prispôsobiť
-            </button>
-            <button
-              className={zoom === 'full' ? 'is-on' : ''}
-              onClick={() => setZoom('full')}
-              title="Skutočná veľkosť — dolu sa posúva do strán"
-            >
-              100 %
-            </button>
+        <div className="ad-seg" role="group" aria-label="Šírka a zväčšenie náhľadu">
+          <button className={device === 'desktop' ? 'is-on' : ''} onClick={() => setDevice('desktop')}
+                  aria-label="Počítač" title="Ako to vyzerá na počítači">
+            <Monitor className="w-4 h-4" />
+          </button>
+          <button className={device === 'mobil' ? 'is-on' : ''} onClick={() => setDevice('mobil')}
+                  aria-label="Mobil" title="Ako to vyzerá na telefóne (390 px) — obrázky sa správajú inak">
+            <Smartphone className="w-4 h-4" />
+          </button>
+          <button className={zoom === 'full' ? 'is-on' : ''}
+                  onClick={() => setZoom(zoom === 'full' ? 'fit' : 'full')}
+                  title={zoom === 'full' ? 'Zmenšiť tak, aby sa zmestil celý' : 'Skutočná veľkosť — posúva sa do strán'}>
+            100 %
+          </button>
         </div>
 
-        <div className="ad-seg" role="group" aria-label="Šírka náhľadu">
-            <button
-              className={device === 'desktop' ? 'is-on' : ''}
-              onClick={() => setDevice('desktop')}
-              title="Ako to vyzerá na počítači"
-            >
-              <Monitor className="w-3.5 h-3.5" /> Počítač
-            </button>
-            <button
-              className={device === 'mobil' ? 'is-on' : ''}
-              onClick={() => setDevice('mobil')}
-              title="Ako to vyzerá na telefóne (390 px) — obrázky sa správajú inak"
-            >
-              <Smartphone className="w-3.5 h-3.5" /> Mobil
-            </button>
-        </div>
+        <span className="ad-vrule" aria-hidden="true" />
 
-        <button
-          className="abtn"
-          onClick={() => setPanelOpen(o => !o)}
-          title={panelOpen ? 'Skryť pravý panel — plátno bude väčšie' : 'Zobraziť panel s údajmi článku'}
-        >
+        <button className="abtn abtn-icon" onClick={() => setPanelOpen(o => !o)}
+                aria-label={panelOpen ? 'Skryť panel s údajmi' : 'Zobraziť panel s údajmi'}
+                title={panelOpen ? 'Skryť pravý panel — plátno bude väčšie' : 'Zobraziť panel s údajmi článku'}>
           {panelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
-          {panelOpen ? 'Skryť panel' : 'Údaje článku'}
         </button>
 
-        {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts).
-            Rozpísané zmeny v tomto formulári v ňom ešte nie sú. */}
-        <a
-          className="abtn"
-          href={`/blog/${slug}?preview=draft`}
-          target="_blank"
-          rel="noreferrer"
-          title={dirty ? 'Náhľad ukáže posledný uložený stav — rozpísané zmeny v ňom ešte nie sú.' : 'Zobrazí uložený koncept tak, ako bude vyzerať na webe.'}
-        >
+        {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts). */}
+        <a className="abtn" href={`/blog/${slug}?preview=draft`} target="_blank" rel="noreferrer"
+           title={dirty ? 'Náhľad ukáže posledný uložený stav — rozpísané zmeny v ňom ešte nie sú.' : 'Zobrazí uložený koncept tak, ako bude vyzerať na webe.'}>
           <Eye className="w-4 h-4" /> Náhľad
         </a>
         <button className="abtn" onClick={() => save(false)} disabled={saving}>
