@@ -42,11 +42,14 @@
 .admin .ad-fact:hover{background:color-mix(in oklab,var(--ad-amber-mid) 6%,transparent)}
 .admin .ad-fact.is-active,.admin .ad-event.is-active{outline:1.5px solid var(--ad-amber-mid);background:var(--ad-active-bg)}
 .admin .ad-fact-icon{color:var(--ad-amber-mid);margin-top:2px;flex-shrink:0}
-.admin .ad-fact input.is-missing{box-shadow:inset 0 -1.5px 0 var(--ad-danger,#b3261e)}
-.admin .ad-fact input.is-missing::placeholder{color:var(--ad-danger,#b3261e);opacity:.75}
-.admin .ad-fact-label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ad-muted);border:0;background:none;padding:0;width:100%}
-.admin .ad-fact-value{font:15px var(--font-serif,serif);color:var(--ad-text);border:0;background:none;padding:0;width:100%}
-.admin .ad-fact input:focus{outline:none}
+.admin .ad-fact :is(input,textarea).is-missing{box-shadow:inset 0 -1.5px 0 var(--ad-danger,#b3261e)}
+.admin .ad-fact :is(input,textarea).is-missing::placeholder{color:var(--ad-danger,#b3261e);opacity:.75}
+.admin .ad-fact-label{font-size:10.5px;line-height:1.5;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ad-muted);border:0;background:none;padding:0;width:100%}
+.admin .ad-fact-value{font:15px/1.45 var(--font-serif,serif);color:var(--ad-text);border:0;background:none;padding:0;width:100%}
+.admin .ad-fact :is(input,textarea):focus{outline:none}
+/* Polia faktu sú textarea s výškou podľa obsahu — dlhá hodnota sa zalomí
+   rovnako ako na webe, namiesto aby zmizla za okrajom karty. */
+.admin .ad-fact textarea{resize:none;overflow:hidden;display:block}
 .admin .ad-floatbar{position:absolute;top:-32px;right:0;display:flex;gap:2px;background:var(--ad-text);border-radius:6px;padding:3px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:5}
 .admin .ad-floatbar button{height:22px;min-width:24px;display:flex;align-items:center;justify-content:center;gap:3px;padding:0 5px;border:0;border-radius:4px;background:none;color:var(--ad-card);cursor:pointer}
 .admin .ad-floatbar button:hover{background:rgba(255,255,255,.1)}

@@ -313,22 +313,27 @@ export function EditorScreen({
        zahodilo, aby Strapi nevrátil chybu — v editore teda ostali na
        obrazovke, ale do článku sa nikdy nedostali a na webe chýbala celá
        karta. Radšej povedz, čo doplniť, než zahodiť napísané. */
-    const badFact = keyFacts.findIndex(f => !String(f.label || '').trim() || !String(f.value || '').trim());
-    if (badFact >= 0) {
-      const f = keyFacts[badFact];
-      const chyba = !String(f.label || '').trim() && !String(f.value || '').trim()
-        ? 'je prázdny — vyplňte ho alebo zmažte'
-        : (!String(f.label || '').trim() ? 'nemá popis (ľavé pole)' : 'nemá hodnotu (pravé pole)');
-      return { text: `Kľúčový fakt č. ${badFact + 1} ${chyba}. Nájdete ho v pobočnom stĺpci vedľa článku.` };
+    /* Úplne prázdny riadok je len rozpísaný nový — ukladanie ho ticho zahodí
+       (nič sa nestratí) a nebráni uloženiu. Zastaví ho až riadok, v ktorom
+       niečo napísané JE, ale chýba mu druhá povinná polovica. */
+    const napolFakt = keyFacts.findIndex(f => {
+      const l = String(f.label || '').trim(), v = String(f.value || '').trim();
+      return (l && !v) || (v && !l);
+    });
+    if (napolFakt >= 0) {
+      const f = keyFacts[napolFakt];
+      const chyba = !String(f.label || '').trim() ? 'nemá popis (horné pole)' : 'nemá hodnotu (dolné pole)';
+      return { text: `Kľúčový fakt č. ${napolFakt + 1} ${chyba}. Nájdete ho v pobočnom stĺpci vedľa článku.` };
     }
 
-    const badEvent = timeline.findIndex(t => !String(t.year || '').trim() || !String(t.title || '').trim());
-    if (badEvent >= 0) {
-      const t = timeline[badEvent];
-      const chyba = !String(t.year || '').trim() && !String(t.title || '').trim()
-        ? 'je prázdna — vyplňte ju alebo zmažte'
-        : (!String(t.year || '').trim() ? 'nemá rok' : 'nemá názov');
-      return { text: `Udalosť časovej osi č. ${badEvent + 1} ${chyba}. Nájdete ju v pobočnom stĺpci vedľa článku.` };
+    const napolEvent = timeline.findIndex(t => {
+      const r = String(t.year || '').trim(), n = String(t.title || '').trim(), o = String(t.description || '').trim();
+      return (r || n || o) && (!r || !n);
+    });
+    if (napolEvent >= 0) {
+      const t = timeline[napolEvent];
+      const chyba = !String(t.year || '').trim() ? 'nemá rok' : 'nemá názov';
+      return { text: `Udalosť časovej osi č. ${napolEvent + 1} ${chyba}. Nájdete ju v pobočnom stĺpci vedľa článku.` };
     }
 
     return null;

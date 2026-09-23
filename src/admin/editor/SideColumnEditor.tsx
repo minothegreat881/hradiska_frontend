@@ -106,6 +106,49 @@ function useReorder<T extends { uid: string }>(items: T[], onChange: (n: T[]) =>
   return { start, dragUid, over };
 }
 
+/**
+ * Textové pole, ktoré rastie s textom a Enterom potvrdzuje.
+ *
+ * Bol tam obyčajný jednoriadkový `<input>`: dlhší fakt sa v ňom stratil za
+ * okrajom (namerané 502 px textu mimo viditeľnej časti) a Enter neurobil nič,
+ * hoci na webe sa hodnota zalamuje do viacerých riadkov. Textarea s výškou
+ * podľa obsahu ukáže celý text a správa sa ako riadok: Enter nezalamuje,
+ * ale posúva ďalej (`onEnter`).
+ */
+function GrowField({
+  className, value, placeholder, maxLength, title, onChange, onEnter, inputRef, autoFocus,
+}: {
+  className: string; value: string; placeholder: string; maxLength: number;
+  title?: string; onChange: (v: string) => void; onEnter?: () => void;
+  inputRef?: React.RefObject<HTMLTextAreaElement>;
+  autoFocus?: boolean;
+}) {
+  const own = useRef<HTMLTextAreaElement>(null);
+  const ref = inputRef || own;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = '0px';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [value, ref]);
+  return (
+    <textarea
+      ref={ref}
+      rows={1}
+      autoFocus={autoFocus}
+      className={className}
+      value={value}
+      placeholder={placeholder}
+      title={title}
+      maxLength={maxLength}
+      onChange={(e) => onChange(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') { e.preventDefault(); onEnter?.(); }
+      }}
+    />
+  );
+}
+
 // ── Kľúčové fakty ────────────────────────────────────────────────────────────
 
 function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) => void }) {
@@ -116,10 +159,16 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
   const patch = (uid: string, p: Partial<Fact>) =>
     onChange(items.map((f) => (f.uid === uid ? { ...f, ...p } : f)));
 
+  /* Odkazy na polia hodnoty — Enter v popise skáče na hodnotu a nový fakt
+     dostane kurzor rovno do popisu, nech sa dá písať bez myši. */
+  const valueRefs = useRef<Record<string, React.RefObject<HTMLTextAreaElement>>>({});
+  const [focusUid, setFocusUid] = useState<string | null>(null);
+
   const add = () => {
     const f: Fact = { uid: newUid(), icon: 'star', label: '', value: '' };
     onChange([...items, f]);
     setActive(f.uid);
+    setFocusUid(f.uid);
   };
 
   return (
@@ -174,21 +223,27 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
                 pri písaní — neúplný fakt sa do článku neuloží a pred touto
                 značkou sa to dalo zistiť až pri ukladaní. */}
             <div className="ad-fact-fields">
-              <input
+              <GrowField
                 className={`ad-fact-label${!f.label.trim() && f.value.trim() ? ' is-missing' : ''}`}
                 value={f.label}
                 placeholder="POPIS"
                 title={!f.label.trim() && f.value.trim() ? 'Doplňte popis — bez neho sa fakt neuloží.' : undefined}
                 maxLength={MAX.label}
-                onChange={(e) => patch(f.uid, { label: e.target.value })}
+                autoFocus={focusUid === f.uid}
+                onChange={(v) => patch(f.uid, { label: v })}
+                /* Enter v popise preskočí na hodnotu — píše sa zhora nadol. */
+                onEnter={() => valueRefs.current[f.uid]?.current?.focus()}
               />
-              <input
+              <GrowField
+                inputRef={(valueRefs.current[f.uid] ||= React.createRef<HTMLTextAreaElement>())}
                 className={`ad-fact-value${!f.value.trim() && f.label.trim() ? ' is-missing' : ''}`}
                 value={f.value}
                 placeholder="Hodnota"
                 title={!f.value.trim() && f.label.trim() ? 'Doplňte hodnotu — bez nej sa fakt neuloží.' : undefined}
                 maxLength={MAX.value}
-                onChange={(e) => patch(f.uid, { value: e.target.value })}
+                onChange={(v) => patch(f.uid, { value: v })}
+                /* Enter v hodnote fakt potvrdí a rovno otvorí ďalší. */
+                onEnter={() => { if (f.label.trim() && f.value.trim()) add(); }}
               />
             </div>
           </div>
@@ -317,6 +372,13 @@ function EventPopover({
               id="ad-ev-year" className="afld" value={ev.year} autoFocus maxLength={MAX.year}
               placeholder="napr. ~906"
               onChange={(e) => onChange({ year: e.target.value })}
+              /* Enter posúva na ďalšie pole — vypĺňa sa zhora nadol, bez myši. */
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  (e.currentTarget.ownerDocument.getElementById('ad-ev-title') as HTMLInputElement | null)?.focus();
+                }
+              }}
             />
           </div>
           <div className="ad-field">
