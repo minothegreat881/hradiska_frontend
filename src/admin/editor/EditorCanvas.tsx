@@ -481,13 +481,18 @@ const canvasCss = `
   display: flex; align-items: center; gap: 1px; padding: 3px;
   background: #2f2418; border-radius: 9px; box-shadow: 0 6px 18px rgba(20,12,4,.35);
 }
+/* Farba MUSÍ byť vynútená. Lištička žije vnútri článku, takže na jej
+   tlačidlá dosiahnu aj pravidlá šatu webu — prefarbili ikony na tmavú
+   (namerané rgb(45,36,24) na pozadí rgb(47,36,24), čiže neviditeľné). */
 .ed-textbar button {
   width: 28px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
-  border: none; background: none; color: #f0e6d2; border-radius: 6px; cursor: pointer;
+  border: none; background: none; border-radius: 6px; cursor: pointer;
+  color: #f7efdc !important;
   pointer-events: auto !important;
 }
-.ed-textbar button:hover { background: rgba(255,255,255,.14); }
-.ed-textbar button.is-on { background: #b8792d; color: #fff; }
+.ed-textbar button svg { color: inherit !important; stroke: currentColor !important; }
+.ed-textbar button:hover { background: rgba(255,255,255,.16); }
+.ed-textbar button.is-on { background: #c98a3c !important; color: #241a0e !important; }
 .ed-textbar-sep { width: 1px; height: 18px; background: rgba(255,255,255,.18); margin: 0 3px; }
 
 .ed-overlay { position: absolute; inset: 0; z-index: 30; }
