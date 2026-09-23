@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import { createPortal } from 'react-dom';
 import { ZoomIn } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Lightbox } from './HistoricalGallery';
 import { QuoteBlock } from './QuoteBlock';
 import { BlogMedia, BlogMediaAspectRatio, BlogMediaWidth } from './BlogMedia';
 import { getStrapiImageUrl, StrapiImage } from '../lib/strapi';
@@ -710,8 +712,19 @@ function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; nee
   );
 }
 
+/**
+ * GALÉRIA V TELE ČLÁNKU.
+ *
+ * Po kliknutí otvára ten istý svetelný box ako fotogaléria na konci článku
+ * (`Lightbox` z `HistoricalGallery`) — vrátane popisu, lajkov a komentárov
+ * k fotke. Predtým boli fotky z tohto bloku jediné na stránke, ktoré sa
+ * otvoriť nedali, a navyše boli orezané na iný pomer než všade inde.
+ * Miniatúry sú preto rovnaké ako v spodnej galérii: pomer 4:3, rámik,
+ * popis pod fotkou.
+ */
 function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGalleryBlock; needsClearBefore?: boolean }) {
   const editMode = useEditMode();
+  const [openIdx, setOpenIdx] = React.useState<number | null>(null);
   const columns = block.columns || '3';
   const gridCols = {
     '2': 'grid-cols-2',
@@ -731,6 +744,15 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
     );
   }
 
+  /* Tvar, ktorému rozumie svetelný box. `fileId` je id súboru v knižnici —
+     na to sa viažu lajky a komentáre k fotke, takže fungujú aj tu. */
+  const photos = (block.images || []).map((image: any, idx: number) => ({
+    url: getStrapiImageUrl(image),
+    caption: image.caption || image.alternativeText || '',
+    alt: image.alternativeText || image.caption || `Obrázok ${idx + 1}`,
+    fileId: image.id,
+  }));
+
   return (
     <>
       {needsClearBefore && <div className="clear-both" />}
@@ -738,22 +760,69 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
         className={`grid ${gridCols[columns]} gap-4 my-6 clear-both`}
         {...reveal(editMode, { opacity: 0 }, { opacity: 1 }, { duration: 0.5 })}
       >
-        {block.images?.map((image, idx) => (
-          <motion.div
-            key={image.id || idx}
-            className="rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+        {photos.map((photo, idx) => (
+          <motion.button
+            type="button"
+            key={block.images?.[idx]?.id || idx}
+            onClick={(e) => {
+              if (editMode) return; // v editore klik vyberá blok, neotvára fotku
+              e.preventDefault();
+              e.stopPropagation();
+              setOpenIdx(idx);
+            }}
+            aria-label={photo.caption ? `Otvoriť fotografiu: ${photo.caption}` : `Otvoriť obrázok ${idx + 1}`}
+            style={{
+              background: 'transparent', border: 0, padding: 0, font: 'inherit', color: 'inherit',
+              textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8,
+              cursor: editMode ? 'inherit' : 'zoom-in',
+            }}
             {...reveal(editMode, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1 }, { duration: 0.3, delay: idx * 0.1 })}
           >
-            <ImageWithFallback
-              src={getStrapiImageUrl(image)}
-              alt={image.alternativeText || image.caption || ''}
-              loading={editMode ? 'eager' : 'lazy'}
-              decoding="async"
-              className="w-full h-48 object-cover"
-            />
-          </motion.div>
+            <span
+              style={{
+                position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden',
+                borderRadius: 8, border: '1px solid var(--hr-line)', display: 'block', pointerEvents: 'none',
+              }}
+            >
+              <ImageWithFallback
+                src={photo.url}
+                alt={photo.alt}
+                loading={editMode ? 'eager' : 'lazy'}
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </span>
+            {photo.caption && (
+              <span
+                style={{
+                  fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, lineHeight: 1.5,
+                  color: '#7a6b56', display: '-webkit-box', WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical', overflow: 'hidden', pointerEvents: 'none',
+                }}
+              >
+                {photo.caption}
+              </span>
+            )}
+          </motion.button>
         ))}
       </motion.div>
+
+      {/* Svetelný box je ten istý komponent ako v spodnej fotogalérii. */}
+      {!editMode && typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {openIdx !== null && (
+              <Lightbox
+                images={photos}
+                index={openIdx}
+                onClose={() => setOpenIdx(null)}
+                onPrev={() => setOpenIdx((i) => (i === null ? i : (i - 1 + photos.length) % photos.length))}
+                onNext={() => setOpenIdx((i) => (i === null ? i : (i + 1) % photos.length))}
+              />
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </>
   );
 }
