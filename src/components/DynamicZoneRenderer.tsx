@@ -15,12 +15,8 @@ import { getStrapiImageUrl, StrapiImage } from '../lib/strapi';
 import { canPair } from '../admin/editor/snapping/positionZones';
 import { BlockShell } from '../admin/editor/BlockShell';
 import { EditModeContext, useEditMode } from './EditModeContext';
+import { BodyPhotosContext, useOpenBodyPhoto, type BodyPhoto } from './BodyPhotos';
 import { embedSrc } from '../lib/embed';
-
-// Helper: open gallery modal with specific image
-function openGalleryWithImage(imageUrl: string) {
-  window.dispatchEvent(new CustomEvent('openGalleryModal', { detail: { imageUrl } }));
-}
 
 // =============================================================================
 // TYPES
@@ -282,6 +278,7 @@ interface PairedImageRowProps {
 }
 
 function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps & { editMode?: boolean }) {
+  const openPhoto = useOpenBodyPhoto();
   const renderImage = (block: ImageBlock, position: 'left' | 'right') => {
     const altText = block.alt || block.image?.alternativeText || block.caption || 'Obrázok';
     const aspectRatio = block.aspectRatio || 'auto';
@@ -328,7 +325,7 @@ function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps
     return (
       <>
         <button
-          onClick={() => openGalleryWithImage(imageUrl)}
+          onClick={() => openPhoto(imageUrl)}
           className={`relative overflow-hidden ${rounded ? 'rounded-lg' : ''} ${shadow ? 'shadow-lg' : ''} w-full cursor-pointer group`}
           style={{
             paddingBottom,
@@ -724,7 +721,9 @@ function SourcesRenderer({ block, needsClearBefore }: { block: SourcesBlock; nee
  */
 function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGalleryBlock; needsClearBefore?: boolean }) {
   const editMode = useEditMode();
-  const [openIdx, setOpenIdx] = React.useState<number | null>(null);
+  /* Otvára sa spoločný svetelný box tela článku — šípkami sa tak dá prejsť
+     nielen galériou, ale všetkými fotkami článku. */
+  const openPhoto = useOpenBodyPhoto();
   const columns = block.columns || '3';
   const gridCols = {
     '2': 'grid-cols-2',
@@ -732,29 +731,6 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
     '4': 'grid-cols-2 md:grid-cols-4',
   };
 
-  /* Tvar, ktorému rozumie svetelný box. `fileId` je id súboru v knižnici —
-     na to sa viažu lajky a komentáre k fotke, takže fungujú aj tu. */
-  const photos = React.useMemo(
-    () => (block.images || []).map((image: any, idx: number) => ({
-      url: getStrapiImageUrl(image),
-      caption: image.caption || image.alternativeText || '',
-      alt: image.alternativeText || image.caption || `Obrázok ${idx + 1}`,
-      fileId: image.id,
-    })),
-    [block.images],
-  );
-
-  /* Ovládanie svetelného boxu musí mať STÁLU totožnosť: vnútri si ho box
-     dáva do závislostí efektu, ktorý zamyká posúvanie stránky. Nové funkcie
-     pri každom vykreslení by ten efekt púšťali dookola a stránka by blikala. */
-  const close = React.useCallback(() => setOpenIdx(null), []);
-  const prev = React.useCallback(
-    () => setOpenIdx((i) => (i === null ? i : (i - 1 + photos.length) % photos.length)), [photos.length]);
-  const next = React.useCallback(
-    () => setOpenIdx((i) => (i === null ? i : (i + 1) % photos.length)), [photos.length]);
-
-  /* Prázdna galéria sa rieši AŽ TU, za všetkými háčikmi — skorší návrat by
-     ich pri prázdnom bloku vynechal a React by spadol. */
   if (!(block.images || []).length) {
     if (!editMode) return null;
     return (
@@ -774,68 +750,59 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
         className={`grid ${gridCols[columns]} gap-4 my-6 clear-both`}
         {...reveal(editMode, { opacity: 0 }, { opacity: 1 }, { duration: 0.5 })}
       >
-        {photos.map((photo, idx) => (
-          <motion.button
-            type="button"
-            key={block.images?.[idx]?.id || idx}
-            onClick={(e) => {
-              if (editMode) return; // v editore klik vyberá blok, neotvára fotku
-              e.preventDefault();
-              e.stopPropagation();
-              setOpenIdx(idx);
-            }}
-            aria-label={photo.caption ? `Otvoriť fotografiu: ${photo.caption}` : `Otvoriť obrázok ${idx + 1}`}
-            style={{
-              background: 'transparent', border: 0, padding: 0, font: 'inherit', color: 'inherit',
-              textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8,
-              cursor: editMode ? 'inherit' : 'zoom-in',
-            }}
-            {...reveal(editMode, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1 }, { duration: 0.3, delay: idx * 0.1 })}
-          >
-            <span
-              style={{
-                position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden',
-                borderRadius: 8, border: '1px solid var(--hr-line)', display: 'block', pointerEvents: 'none',
+        {(block.images || []).map((image: any, idx: number) => {
+          const url = getStrapiImageUrl(image);
+          const caption = image.caption || image.alternativeText || '';
+          return (
+            <motion.button
+              type="button"
+              key={image.id || idx}
+              onClick={(e) => {
+                if (editMode) return; // v editore klik vyberá blok, neotvára fotku
+                e.preventDefault();
+                e.stopPropagation();
+                openPhoto(url);
               }}
+              aria-label={caption ? `Otvoriť fotografiu: ${caption}` : `Otvoriť obrázok ${idx + 1}`}
+              style={{
+                background: 'transparent', border: 0, padding: 0, font: 'inherit', color: 'inherit',
+                textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 8,
+                cursor: editMode ? 'inherit' : 'zoom-in',
+              }}
+              {...reveal(editMode, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1 }, { duration: 0.3, delay: idx * 0.1 })}
             >
-              <ImageWithFallback
-                src={photo.url}
-                alt={photo.alt}
-                loading={editMode ? 'eager' : 'lazy'}
-                decoding="async"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            </span>
-            {photo.caption && (
               <span
                 style={{
-                  fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, lineHeight: 1.5,
-                  color: '#7a6b56', display: '-webkit-box', WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical', overflow: 'hidden', pointerEvents: 'none',
+                  position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden',
+                  borderRadius: 8, border: '1px solid var(--hr-line)', display: 'block', pointerEvents: 'none',
                 }}
               >
-                {photo.caption}
+                <ImageWithFallback
+                  src={url}
+                  alt={image.alternativeText || caption || `Obrázok ${idx + 1}`}
+                  loading={editMode ? 'eager' : 'lazy'}
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
               </span>
-            )}
-          </motion.button>
-        ))}
+              {caption && (
+                <span
+                  style={{
+                    fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, lineHeight: 1.5,
+                    color: '#7a6b56', display: '-webkit-box', WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical', overflow: 'hidden', pointerEvents: 'none',
+                  }}
+                >
+                  {caption}
+                </span>
+              )}
+            </motion.button>
+          );
+        })}
       </motion.div>
-
-      {/* Svetelný box je ten istý komponent ako v spodnej fotogalérii. */}
-      {!editMode && typeof document !== 'undefined' &&
-        createPortal(
-          openIdx !== null
-            ? <Lightbox images={photos} index={openIdx} onClose={close} onPrev={prev} onNext={next} />
-            : null,
-          document.body,
-        )}
     </>
   );
 }
-
-// =============================================================================
-// RENDERER: content.poem — literárna báseň (centrovaná, kurzíva, verše po riadkoch)
-// =============================================================================
 
 function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClearBefore?: boolean }) {
   const editMode = useEditMode();
@@ -942,6 +909,47 @@ export const hasRealParagraph = (b: any) =>
   );
 
 export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererProps) {
+  /* Všetky fotky tela článku v poradí, v akom sú v texte: obrázky aj galérie.
+     Klik na ktorúkoľvek otvorí svetelný box a šípkami sa dá prejsť celým
+     článkom. Nezávisí to na fotogalérii na konci — tá v časti článkov
+     (napr. v Aktualitách) vôbec nie je a fotky sa predtým nedali otvoriť. */
+  const bodyPhotos = React.useMemo<BodyPhoto[]>(() => {
+    const out: BodyPhoto[] = [];
+    const add = (img: any, caption?: string, alt?: string) => {
+      const url = img ? getStrapiImageUrl(img) : '';
+      if (!url || out.some((x) => x.url === url)) return;
+      out.push({
+        url,
+        caption: caption || img?.caption || img?.alternativeText || '',
+        alt: alt || img?.alternativeText || img?.caption || '',
+        fileId: img?.id,
+      });
+    };
+    for (const b of blocks || []) {
+      if (b.__component === 'content.image-block') add((b as any).image, (b as any).caption, (b as any).alt);
+      if (b.__component === 'content.image-gallery') for (const img of (b as any).images || []) add(img);
+    }
+    return out;
+  }, [blocks]);
+
+  const [openUrl, setOpenUrl] = React.useState<string | null>(null);
+  const openPhoto = React.useCallback((url: string) => {
+    if (editMode) return;             // v editore klik vyberá blok
+    setOpenUrl(url);
+  }, [editMode]);
+  const closePhoto = React.useCallback(() => setOpenUrl(null), []);
+  const openIdx = openUrl ? bodyPhotos.findIndex((x) => x.url === openUrl) : -1;
+  const prevPhoto = React.useCallback(
+    () => setOpenUrl((u) => {
+      const i = bodyPhotos.findIndex((x) => x.url === u);
+      return i < 0 ? u : bodyPhotos[(i - 1 + bodyPhotos.length) % bodyPhotos.length].url;
+    }), [bodyPhotos]);
+  const nextPhoto = React.useCallback(
+    () => setOpenUrl((u) => {
+      const i = bodyPhotos.findIndex((x) => x.url === u);
+      return i < 0 ? u : bodyPhotos[(i + 1) % bodyPhotos.length].url;
+    }), [bodyPhotos]);
+
   if (!blocks || blocks.length === 0) return null;
 
   // Find the index of the first rich-text block that actually contains a real
@@ -1097,11 +1105,25 @@ export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererPro
 
   return (
     <EditModeContext.Provider value={!!editMode}>
-      <div className="dynamic-zone-content">
-        {renderedElements}
-        {/* Final clearfix for any trailing floats */}
-        <div className="clear-both" />
-      </div>
+      <BodyPhotosContext.Provider value={openPhoto}>
+        <div className="dynamic-zone-content">
+          {renderedElements}
+          {/* Final clearfix for any trailing floats */}
+          <div className="clear-both" />
+        </div>
+        {/* Svetelný box tela článku — ten istý komponent ako vo fotogalérii. */}
+        {!editMode && openIdx >= 0 && typeof document !== 'undefined' &&
+          createPortal(
+            <Lightbox
+              images={bodyPhotos}
+              index={openIdx}
+              onClose={closePhoto}
+              onPrev={prevPhoto}
+              onNext={nextPhoto}
+            />,
+            document.body,
+          )}
+      </BodyPhotosContext.Provider>
     </EditModeContext.Provider>
   );
 }

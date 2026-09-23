@@ -4,12 +4,7 @@ import { motion } from 'motion/react';
 import { ZoomIn } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useEditMode } from './EditModeContext';
-
-// Helper: open gallery modal with specific image
-function openGalleryWithImage(imageUrl: string) {
-  // Dispatch custom event that HistoricalGallery listens to
-  window.dispatchEvent(new CustomEvent('openGalleryModal', { detail: { imageUrl } }));
-}
+import { useOpenBodyPhoto } from './BodyPhotos';
 
 // =============================================================================
 // TYPES
@@ -198,6 +193,7 @@ function ImageWrapper({
   className = '',
   editMode = false,
 }: ImageWrapperProps) {
+  const openPhoto = useOpenBodyPhoto();
   const imgProps = decorative
     ? { alt: '', 'aria-hidden': true as const, role: 'presentation' as const }
     : { alt };
@@ -212,7 +208,7 @@ function ImageWrapper({
 
   return (
     <button
-      onClick={() => openGalleryWithImage(src)}
+      onClick={() => openPhoto(src)}
       className={`relative overflow-hidden ${roundedClass} ${shadowClass} ${className} cursor-pointer group block w-full text-left`}
       style={{ paddingBottom: paddingBottom || '66.67%' }}
       title="Kliknutím zobraziť v galérii"
