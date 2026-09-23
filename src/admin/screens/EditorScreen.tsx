@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft, Eye, ImageOff, Loader2,
   Monitor, Smartphone, Undo2, Redo2, PanelRightClose, PanelRightOpen, Landmark,
+  CircleCheck,
 } from 'lucide-react';
 import {
   BLOCK_TYPES,
@@ -249,6 +250,19 @@ export function EditorScreen({
 
   /** Prekážka uloženia. `uid` umožní na blok rovno ukázať. */
   /** Čo sa zálohuje a čo sa dá obnoviť. */
+  /* Súhrny do hlavičiek zbalených sekcií — aby sa nemuselo otvárať všetko
+     dokola len kvôli zisteniu, čo v sekcii je. */
+  const catName = cats.find(c => c.slug === category)?.name;
+  const sumZaradenie = [catName || 'bez kategórie', tags.length ? `${tags.length} ${tags.length === 1 ? 'štítok' : tags.length < 5 ? 'štítky' : 'štítkov'}` : 'bez štítkov'].join(' · ');
+  const seoOk = metaTitle.length > 0 && metaTitle.length <= 70 && metaDesc.length > 0 && metaDesc.length <= 160;
+  const sumSeo = `Titulok ${metaTitle.length}/70 · Popis ${metaDesc.length}/160`;
+  const coord = (v: string) => (v ? Number(v).toFixed(4) : '');
+  const sumLokalita = loc.name
+    ? `${loc.name}${loc.latitude && loc.longitude ? ` · ${coord(loc.latitude)}, ${coord(loc.longitude)}` : ''}`
+    : 'nezadaná';
+  const sumPublikovanie = [author || 'bez autora', pubDate || 'bez dátumu', featured ? 'odporúčaný' : null]
+    .filter(Boolean).join(' · ');
+
   const snapshot = () => ({
     title, excerpt, slug, author, readingTime, pubDate, featured, category,
     tags, metaTitle, metaDesc, loc, cover, keyFacts, timeline, blocks,
@@ -636,9 +650,9 @@ export function EditorScreen({
         {/* ═══ Pravý stĺpec — metadáta ═══ */}
         {panelOpen && <aside
           className="acard ad-editor-side"
-          style={{ width: 330, flexShrink: 0, background: 'var(--ad-surface)', position: 'sticky', top: 76, maxHeight: 'calc(100vh - 96px)', overflowY: 'auto' }}
+          style={{ width: 344, flexShrink: 0, background: 'var(--ad-surface)', position: 'sticky', top: 76, maxHeight: 'calc(100vh - 96px)', overflowY: 'auto' }}
         >
-          <Panel title="Publikovanie" defaultOpen>
+          <Panel title="Publikovanie" summary={sumPublikovanie} defaultOpen>
             <Field label="Slug">
               <input className="afld" value={slug} onChange={e => { setSlug(e.target.value); touch(); }} placeholder="nazov-clanku" />
               <Hint>Generuje sa z názvu. Musí byť jedinečný.</Hint>
@@ -661,38 +675,34 @@ export function EditorScreen({
             </label>
           </Panel>
 
-          <Panel title="Titulná fotografia" defaultOpen>
-            {cover ? (
-              <img
-                src={fileUrl(cover as MediaFile, 'small')}
-                alt=""
-                style={{ width: '100%', height: 130, objectFit: 'cover', borderRadius: 9, border: '1px solid var(--ad-line)', marginBottom: 10, display: 'block' }}
-              />
-            ) : (
-              <div
-                style={{
-                  height: 120, borderRadius: 9, border: '1px dashed var(--ad-field-border)',
-                  background: 'var(--hr-wash-4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--ad-muted)', fontSize: 13, marginBottom: 10, gap: 8,
-                }}
-              >
-                <ImageOff className="w-4 h-4" /> Bez obrázka
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="abtn" style={{ flex: 1, justifyContent: 'center' }}
-                      onClick={() => setPicking({ target: 'cover' })}>
-                {cover ? 'Vymeniť' : 'Vybrať z knižnice'}
-              </button>
-              {cover && (
-                <button className="abtn abtn-danger" onClick={() => { setCover(null); touch(); }}>
-                  Odstrániť
-                </button>
+          {/* Kompaktný riadok: náhľad 96×64, názov súboru a dva odkazy.
+              Predtým tu bol obrázok cez celú šírku panela s dvoma tlačidlami. */}
+          <Panel title="Titulná fotografia" summary={cover ? (cover.name || 'nastavená') : 'nie je'} defaultOpen>
+            <div className="ad-cover-row">
+              {cover ? (
+                <img className="ad-cover-thumb" src={fileUrl(cover as MediaFile, 'thumbnail')} alt="" />
+              ) : (
+                <div className="ad-cover-thumb is-empty"><ImageOff className="w-4 h-4" /></div>
               )}
+              <div className="ad-cover-body">
+                <div className="ad-cover-name" title={cover?.name || ''}>
+                  {cover ? (cover.name || 'Titulná fotografia') : 'Článok nemá titulnú fotografiu'}
+                </div>
+                <div className="ad-cover-links">
+                  <button type="button" onClick={() => setPicking({ target: 'cover' })}>
+                    {cover ? 'Vymeniť' : 'Vybrať z knižnice'}
+                  </button>
+                  {cover && (
+                    <button type="button" className="is-danger" onClick={() => { setCover(null); touch(); }}>
+                      Odstrániť
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </Panel>
 
-          <Panel title="Zaradenie — kategória a štítky">
+          <Panel title="Zaradenie" summary={sumZaradenie}>
             <Field label="Kategória">
               <select className="afld" value={category} onChange={e => { setCategory(e.target.value); touch(); }}>
                 <option value="">— vyberte —</option>
@@ -704,7 +714,11 @@ export function EditorScreen({
             </Field>
           </Panel>
 
-          <Panel title="SEO — ako sa článok ukáže vo vyhľadávaní">
+          <Panel
+            title="SEO"
+            summary={sumSeo}
+            status={seoOk ? <CircleCheck className="w-4 h-4" style={{ color: 'var(--ad-pub-fg)' }} /> : undefined}
+          >
             <Field label="Meta titulok">
               <input className="afld" value={metaTitle} onChange={e => { setMetaTitle(e.target.value.slice(0, 70)); touch(); }} />
               <Counter n={metaTitle.length} max={70} />
@@ -721,7 +735,7 @@ export function EditorScreen({
             </div>
           </Panel>
 
-          <Panel title="Lokalita na mape">
+          <Panel title="Lokalita na mape" summary={sumLokalita}>
             <LocationMap
               lat={loc.latitude} lng={loc.longitude}
               onPick={(la, ln) => { setLoc({ ...loc, latitude: String(la), longitude: String(ln) }); touch(); }}

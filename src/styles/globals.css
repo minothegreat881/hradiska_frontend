@@ -2406,7 +2406,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   font: inherit; font-size: 13px; font-weight: 600; color: var(--ad-panel-head);
   text-transform: uppercase; letter-spacing: .04em;
 }
-.admin .apanel-arrow { margin-left: auto; transition: transform .18s ease; }
+/* Hlavička so súhrnom: názov normálne, pod ním drobný súhrn (len zbalené). */
+.admin .apanel-head { min-height: 58px; text-align: left; }
+.admin .apanel-head-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.admin .apanel-sum {
+  font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none;
+  color: var(--ad-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.admin .apanel-arrow { margin-left: auto; transition: transform .18s ease; flex-shrink: 0; }
 .admin .apanel-head[aria-expanded='true'] .apanel-arrow { transform: rotate(180deg); }
 .admin .apanel-body { padding: 0 16px 16px; }
 
