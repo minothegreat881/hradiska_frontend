@@ -42,6 +42,8 @@ export interface EditorState {
   blocks: { type: string; data: any; original?: any }[];
   /** Objekt z GET-u alebo číselné id; pri zápise sa prevedie na id. */
   coverImage?: any | null;
+  /** Výrez titulnej fotografie (`object-position`), napr. „center 30%". */
+  coverPosition?: string;
 }
 
 /** Média z GET-u prídu ako objekt — Strapi pri zápise čaká číselné id. */
@@ -167,6 +169,7 @@ export function buildPayload(s: EditorState, opts: { includeBlocks: boolean }) {
   if (s.coverImage !== undefined) {
     data.coverImage = s.coverImage === null ? null : mediaId(s.coverImage);
   }
+  if (s.coverPosition) data.coverPosition = s.coverPosition;
 
   // Lokalita sa zapisuje len ak má povinné polia — inak by Strapi vrátil 400.
   const lat = parseFloat(s.location.latitude);

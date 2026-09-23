@@ -85,6 +85,8 @@ export interface StrapiBlogPost {
   excerpt?: string;
   content?: any; // Strapi blocks content
   coverImage?: StrapiImage;
+  /** Výrez titulnej fotografie, napr. „center 30%". */
+  coverPosition?: string;
   gallery?: StrapiImage[];
   category?: StrapiCategory;
   tags?: StrapiTag[];

@@ -34,6 +34,7 @@ import { BlockOverlay, type OverlayBlock } from './BlockOverlay';
 import { RichTextInline } from './blocks/RichTextInline';
 import { BlockPicker } from './blocks/BlockPicker';
 import { SideColumnEditor, type Fact, type Event } from './SideColumnEditor';
+import { CoverImage } from './CoverImage';
 
 export type CanvasDevice = 'desktop' | 'mobil';
 /** `fit` = zmenšiť na šírku adminu, `full` = skutočná veľkosť + posúvanie do strán. */
@@ -177,6 +178,8 @@ export interface CanvasArticle {
   readingTime?: number;
   /** Médium zo Strapi (objekt z GET-u) alebo null. */
   coverImage?: any | null;
+  /** Výrez titulnej fotografie, napr. „center 30%". */
+  coverPosition?: string;
   /** Bloky v tvare Strapi + `__uid` editora. */
   blocks: any[];
 }
@@ -201,6 +204,8 @@ export interface EditorCanvasProps {
   /** Pobočný stĺpec — upravuje sa priamo na plátne (nie v pravom paneli). */
   facts?: Fact[];
   timeline?: Event[];
+  /** Ťahanie titulnej fotografie mení jej výrez. */
+  onCoverPositionChange?: (value: string) => void;
   onFactsChange?: (next: Fact[]) => void;
   onTimelineChange?: (next: Event[]) => void;
   blockTypes?: { id: string; label: string; accent: string }[];
@@ -221,7 +226,7 @@ const LABELS: Record<string, string> = {
 export function EditorCanvas({
   article, device, zoom = 'fit', selectedUid = null, onSelect, onMove, onDelete, onDuplicate, onInsert,
   onKeyDown, onBodyChange, onPatch, onPickMedia, blockTypes = [], noShell,
-  facts = [], timeline = [], onFactsChange, onTimelineChange,
+  facts = [], timeline = [], onFactsChange, onTimelineChange, onCoverPositionChange,
 }: EditorCanvasProps) {
   const cover = article.coverImage ? getStrapiImageUrl(article.coverImage) : null;
   const [hoverUid, setHoverUid] = useState<string | null>(null);
@@ -278,8 +283,18 @@ export function EditorCanvas({
         <div className="min-h-screen lab" data-theme="pecat" onMouseDown={() => onSelect?.(null)}>
           <div className="lart">
             <header className={cover ? 'lart-hero' : 'lart-hero lart-hero-plain'}>
-              {cover && <img className="lart-hero-img" src={cover} alt="" aria-hidden="true" decoding="async" />}
-              <div className="lart-hero-veil" aria-hidden="true" />
+              {cover && (
+                <CoverImage
+                  src={cover}
+                  position={article.coverPosition || 'center center'}
+                  onChange={onCoverPositionChange}
+                />
+              )}
+              {/* `pointer-events-none`: závoj leží nad fotografiou a bral jej
+                  kliknutia, takže sa ťahanie výrezu vôbec nespustilo. Samotná
+                  vlastnosť v CSS neprejde — globals.css ju pravidlom „NUCLEAR
+                  OPTION" prebíja, trieda má vlastné !important. */}
+              <div className="lart-hero-veil pointer-events-none" aria-hidden="true" />
               <div className="lart-hero-in">
                 <h1 className="lart-title">{article.title || 'Bez názvu'}</h1>
                 {article.excerpt && <p className="lart-excerpt">{article.excerpt}</p>}
@@ -466,6 +481,18 @@ const canvasCss = `
   cursor: pointer; opacity: 0; transition: opacity .12s;
 }
 .ed-gap:hover .ed-gap-btn, .ed-gap-btn:focus-visible { opacity: 1; }
+
+/* Posledná medzera je vždy viditeľná a má popis — je to hlavná cesta,
+   ako v článku pokračovať. */
+.ed-gap.is-last { height: 40px; transform: translateY(2px); }
+.ed-gap.is-last .ed-gap-btn {
+  opacity: 1; left: 0; margin-left: 0; width: auto; top: 0; height: 32px;
+  padding: 0 12px; gap: 6px; border-radius: 8px; border-style: dashed;
+  font: 500 13px Inter, system-ui, sans-serif;
+}
+.ed-gap.is-last .ed-gap-btn:hover { background: var(--ad-active-bg, #fffaf0); border-color: #b8792d; }
+.ed-gap.is-last .ed-gap-line { display: none; }
+.ed-gap.is-last .ed-menu { left: 0; margin-left: 0; top: 38px; }
 .ed-gap-line {
   position: absolute; left: 0; right: 0; top: 8px; height: 1px; pointer-events: none !important;
   background: rgba(138,83,22,.35); opacity: 0; transition: opacity .12s;
@@ -525,6 +552,17 @@ const canvasCss = `
 }
 .ed-empty-label { font-size: 13.5px; font-weight: 600; color: #3b3021; }
 .ed-empty-hint { font-size: 11.5px; color: #8a795e; line-height: 1.35; }
+
+/* Titulná fotografia — ťahanie výrezu. */
+.lart-hero-img { pointer-events: auto !important; }
+.lart-hero-img:active { cursor: grabbing !important; }
+.ed-cover-hint {
+  position: absolute; left: 50%; top: 18px; transform: translateX(-50%);
+  z-index: 8; pointer-events: none;
+  background: rgba(20,14,6,.82); color: #f4ead6;
+  font: 500 12.5px/1.6 Inter, system-ui, sans-serif;
+  padding: 4px 12px; border-radius: 8px; white-space: nowrap;
+}
 
 /* Vysvetlivka v pobočnom stĺpci — len v editore. */
 .ed-side-note {

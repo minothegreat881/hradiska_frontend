@@ -102,6 +102,8 @@ export function EditorScreen({
   const [loc, setLoc] = useState({ name: '', latitude: '', longitude: '', region: '', country: 'Slovensko' });
 
   const [cover, setCover] = useState<any | null>(null);
+  /** Výrez titulnej fotografie — mení sa ťahaním priamo na plátne. */
+  const [coverPosition, setCoverPosition] = useState('center center');
   // Kam sa má priradiť vybraný obrázok: cover alebo konkrétny blok.
   const [picking, setPicking] = useState<
     { target: 'cover' } | { target: 'block'; uid: string; multiple?: boolean } | null
@@ -170,6 +172,7 @@ export function EditorScreen({
         setMetaTitle(d.metaTitle ?? '');
         setMetaDesc(d.metaDescription ?? '');
         setCover(d.coverImage ?? null);
+        setCoverPosition(d.coverPosition || 'center center');
         setLoc({
           name: d.location?.name ?? '',
           latitude: d.location?.latitude != null ? String(d.location.latitude) : '',
@@ -246,6 +249,7 @@ export function EditorScreen({
       original: b.type === 'content.rich-text' && !b.data?._edited ? (b as any).original : undefined,
     })),
     coverImage: cover,
+    coverPosition,
   });
 
   /** Prekážka uloženia. `uid` umožní na blok rovno ukázať. */
@@ -276,6 +280,7 @@ export function EditorScreen({
     setCategory(data.category ?? ''); setTags(data.tags ?? []);
     setMetaTitle(data.metaTitle ?? ''); setMetaDesc(data.metaDesc ?? '');
     setLoc(data.loc ?? loc); setCover(data.cover ?? null);
+    setCoverPosition(data.coverPosition || 'center center');
     setKeyFacts(data.keyFacts ?? []); setTimeline(data.timeline ?? []);
     blocksHistory.reset(data.blocks ?? []);
     setDirty(true);
@@ -603,6 +608,7 @@ export function EditorScreen({
                 authorName: author,
                 readingTime,
                 coverImage: cover,
+                coverPosition,
                 /* Plátno kreslí to isté, čo sa uloží: tvar Strapi bloku.
                    `__uid` je navyše — drží väzbu na blok vo formulári. */
                 blocks: blocks.map(b => ({ __component: b.type, id: b.cmpId, __uid: b.uid, ...b.data })),
@@ -619,6 +625,7 @@ export function EditorScreen({
               onPickMedia={(uid, multiple) => setPicking({ target: 'block', uid, multiple })}
               facts={keyFacts}
               timeline={timeline}
+              onCoverPositionChange={value => { setCoverPosition(value); touch(); }}
               onFactsChange={next => { setKeyFacts(next); touch(); }}
               onTimelineChange={next => { setTimeline(next); touch(); }}
               blockTypes={BLOCK_TYPES as any}

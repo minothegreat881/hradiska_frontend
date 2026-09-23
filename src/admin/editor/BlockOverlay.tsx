@@ -349,12 +349,17 @@ export function BlockOverlay({
         </div>
       )}
 
-      {/* medzery na vkladanie */}
-      {blocks.length > 0 && Array.from({ length: blocks.length + 1 }, (_, i) => (
-        <div key={`gap-${i}`} className="ed-gap" style={{ top: gapY(i) }}>
+      {/* Medzery na vkladanie. Tlačidlá medzi blokmi sa ukazujú pri prejdení
+          myšou, ALE posledné je viditeľné vždy — inak po vložení prvého bloku
+          nie je ako pokračovať (tenký pruh sa nedá uhádnuť). */}
+      {blocks.length > 0 && Array.from({ length: blocks.length + 1 }, (_, i) => {
+        const isLast = i === blocks.length;
+        return (
+        <div key={`gap-${i}`} className={`ed-gap${isLast ? ' is-last' : ''}`} style={{ top: gapY(i) }}>
           <button className="ed-gap-btn" title="Vložiť blok sem" aria-label="Vložiť blok sem"
                   onClick={() => setMenuAt(menuAt === i ? null : i)}>
             <Plus className="w-3.5 h-3.5" />
+            {isLast && <span>Pridať blok</span>}
           </button>
           {/* Čiara je len ozdoba — bez `pointer-events-none` by prekryla tlačidlo
               „+" a to by sa nedalo kliknúť (globals.css vynucuje `auto` na
@@ -368,7 +373,8 @@ export function BlockOverlay({
             />
           )}
         </div>
-      ))}
+        );
+      })}
 
       {/* čiara, kam blok spadne */}
       {drag && <div className="ed-drop pointer-events-none" style={{ top: gapY(drag.target) }} />}

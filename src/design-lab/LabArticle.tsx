@@ -92,7 +92,19 @@ export function LabArticle({ slug }: { slug: string }) {
           hradiska nebolo vidno nič. Závoj je hore takmer priehľadný — fotka
           je dôvod, prečo je hlavička taká vysoká. */}
       <header className={cover ? 'lart-hero' : 'lart-hero lart-hero-plain'}>
-        {cover && <img className="lart-hero-img" src={cover} alt="" aria-hidden="true" fetchPriority="high" decoding="async" />}
+        {cover && (
+          <img
+            className="lart-hero-img"
+            src={cover}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
+            /* Výrez titulnej fotografie — nastavuje sa ťahaním v editore.
+               Staršie články pole nemajú, tie ostávajú vycentrované. */
+            style={{ objectPosition: post.coverPosition || 'center center' }}
+          />
+        )}
         <div className="lart-hero-veil" aria-hidden="true" />
         <div className="lart-hero-in">
           <nav className="lart-crumbs" aria-label="Omrvinky">
