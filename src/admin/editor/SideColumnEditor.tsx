@@ -226,7 +226,7 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
               <GrowField
                 className={`ad-fact-label${!f.label.trim() && f.value.trim() ? ' is-missing' : ''}`}
                 value={f.label}
-                placeholder="POPIS"
+                placeholder="Popis — napr. Rozloha"
                 title={!f.label.trim() && f.value.trim() ? 'Doplňte popis — bez neho sa fakt neuloží.' : undefined}
                 maxLength={MAX.label}
                 autoFocus={focusUid === f.uid}
@@ -238,7 +238,7 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
                 inputRef={(valueRefs.current[f.uid] ||= React.createRef<HTMLTextAreaElement>())}
                 className={`ad-fact-value${!f.value.trim() && f.label.trim() ? ' is-missing' : ''}`}
                 value={f.value}
-                placeholder="Hodnota"
+                placeholder="Hodnota — napr. 7,4 ha"
                 title={!f.value.trim() && f.label.trim() ? 'Doplňte hodnotu — bez nej sa fakt neuloží.' : undefined}
                 maxLength={MAX.value}
                 onChange={(v) => patch(f.uid, { value: v })}
@@ -253,6 +253,12 @@ function FactsBox({ items, onChange }: { items: Fact[]; onChange: (n: Fact[]) =>
       <button type="button" className="ad-add" onClick={add}>
         <Plus className="w-3.5 h-3.5" /> Pridať fakt
       </button>
+      {/* Bez tejto vety nebolo z dvoch riadkov jasné, ktorý je ktorý —
+          horný vyzeral ako nadpis, nie ako pole na písanie. */}
+      <p className="ad-aside-hint">
+        Každý fakt má dva riadky: <b>popis</b> (názov údaja) a pod ním <b>hodnotu</b>.
+        Enter vás posunie z popisu na hodnotu a potom na ďalší fakt.
+      </p>
     </div>
   );
 }

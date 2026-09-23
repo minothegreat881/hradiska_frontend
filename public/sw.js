@@ -9,8 +9,13 @@
  */
 /* v5: zmena farby lišty (`theme-color`) a manifestu. Zvýšenie verzie zmaže
    na telefónoch celý starý cache — inak by si appka ešte dlho niesla starý
-   shell aj s hnedou lištou. */
-const CACHE = 'hradiska-v5';
+   shell aj s hnedou lištou.
+   v6: vlastné JS/CSS appky (`/assets/…`) sa už neberú z cache ako prvé.
+   Po nasadení novej verzie si prehliadač ťahal staré súbory z cache a miešal
+   ich s novou stránkou — administrácia potom vyzerala celá, ale časti
+   prestali fungovať (prázdne okno udalosti na časovej osi, do ktorého sa
+   nedalo písať). Zvýšenie verzie zároveň vyhodí starý cache. */
+const CACHE = 'hradiska-v6';
 const PRECACHE = [
   '/',
   '/offline.html',
@@ -51,6 +56,10 @@ function bypass(url, req) {
 }
 
 const isAsset = (p) => /\.(woff2?|ttf|otf|png|jpe?g|webp|svg|gif|ico|css|js)$/i.test(p);
+/* Vlastný kód appky — Vite mu dáva do názvu odtlačok obsahu, takže nová
+   verzia = nový názov. Cache je pri ňom na škodu: stačí, aby jeden súbor
+   prišiel starý, a appka je pomiešaná. */
+const isAppCode = (p) => p.startsWith('/assets/');
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
@@ -71,7 +80,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Statické súbory — cache-first + tichý update na pozadí.
+  // Kód appky — VŽDY zo siete, cache je len záchrana pri výpadku.
+  if (isAppCode(url.pathname)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Statické súbory (fonty, obrázky) — cache-first + tichý update na pozadí.
   if (isAsset(url.pathname)) {
     event.respondWith(
       caches.match(req).then((cached) => {

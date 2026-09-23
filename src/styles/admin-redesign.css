@@ -44,7 +44,7 @@
 .admin .ad-fact-icon{color:var(--ad-amber-mid);margin-top:2px;flex-shrink:0}
 .admin .ad-fact :is(input,textarea).is-missing{box-shadow:inset 0 -1.5px 0 var(--ad-danger,#b3261e)}
 .admin .ad-fact :is(input,textarea).is-missing::placeholder{color:var(--ad-danger,#b3261e);opacity:.75}
-.admin .ad-fact-label{font-size:10.5px;line-height:1.5;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ad-muted);border:0;background:none;padding:0;width:100%}
+.admin .ad-fact-label{font-size:11.5px;line-height:1.5;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ad-muted);border:0;background:none;padding:0;width:100%}
 .admin .ad-fact-value{font:15px/1.45 var(--font-serif,serif);color:var(--ad-text);border:0;background:none;padding:0;width:100%}
 .admin .ad-fact :is(input,textarea):focus{outline:none}
 /* Polia faktu sú textarea s výškou podľa obsahu — dlhá hodnota sa zalomí
@@ -287,3 +287,11 @@
 .admin .ad-drafts-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--ad-line)}
 .admin .ad-drafts-title{flex:1;min-width:0;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .admin .ad-drafts-when{font-size:12.5px;color:var(--ad-muted);white-space:nowrap}
+
+/* Pole faktu musí byť na prvý pohľad pole, nie nadpis: kým je prázdne,
+   má jemné podčiarknutie a výraznejšiu nápovedu. */
+.admin .ad-fact textarea::placeholder{color:#a8977c;opacity:1}
+.admin .ad-fact textarea:placeholder-shown{box-shadow:inset 0 -1px 0 rgba(138,83,22,.28)}
+.admin .ad-fact textarea:focus{box-shadow:inset 0 -1.5px 0 var(--ad-amber-mid)}
+.admin .ad-aside-hint{margin:8px 2px 0;font:400 11.5px/1.5 Inter,system-ui,sans-serif;color:var(--ad-muted)}
+.admin .ad-aside-hint b{font-weight:600;color:var(--ad-text)}

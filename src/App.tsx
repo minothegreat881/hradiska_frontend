@@ -1,16 +1,19 @@
 import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+/* Odkladané obrazovky cez `lazyStale` — po nasadení novej verzie sa stará
+   karta radšej raz obnoví, než by ostala visieť na chýbajúcom súbore. */
+import { lazyStale } from './lib/lazyStale';
 import './design-lab/theme.css';
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
-const ArticlePagePecat = lazy(() => import('./design-lab/LabArticle'));
+const ArticlePagePecat = lazyStale(() => import('./design-lab/LabArticle'));
 /* Časti webu, ktoré v novom šate nesú vlastnú skladbu, nie len farby. */
-const LabNav = lazy(() => import('./design-lab/LabNav').then(m => ({ default: m.LabNav })));
-const LabFooter = lazy(() => import('./design-lab/LabFooter').then(m => ({ default: m.LabFooter })));
-const LabHome = lazy(() => import('./design-lab/LabHome').then(m => ({ default: m.LabHome })));
-const LabCategories = lazy(() => import('./design-lab/LabCategories').then(m => ({ default: m.LabCategories })));
-const LabJoinUs = lazy(() => import('./design-lab/LabJoinUs').then(m => ({ default: m.LabJoinUs })));
-const GalleryPagePecat = lazy(() => import('./design-lab/LabGaleria'));
-const AktualityPagePecat = lazy(() => import('./design-lab/LabAktualityStranka'));
+const LabNav = lazyStale(() => import('./design-lab/LabNav').then(m => ({ default: m.LabNav })));
+const LabFooter = lazyStale(() => import('./design-lab/LabFooter').then(m => ({ default: m.LabFooter })));
+const LabHome = lazyStale(() => import('./design-lab/LabHome').then(m => ({ default: m.LabHome })));
+const LabCategories = lazyStale(() => import('./design-lab/LabCategories').then(m => ({ default: m.LabCategories })));
+const LabJoinUs = lazyStale(() => import('./design-lab/LabJoinUs').then(m => ({ default: m.LabJoinUs })));
+const GalleryPagePecat = lazyStale(() => import('./design-lab/LabGaleria'));
+const AktualityPagePecat = lazyStale(() => import('./design-lab/LabAktualityStranka'));
 import { SiteDetailPage } from './pages/SiteDetailPage';
 import { CategoryPage } from './pages/CategoryPage';
 import { PrivacyPage } from './pages/PrivacyPage';
@@ -27,7 +30,7 @@ import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
 
 // Admin je lazy — návštevník webu ho nikdy nestiahne, nezväčšuje hlavný bundle.
-const AdminApp = lazy(() => import('./admin/AdminApp'));
+const AdminApp = lazyStale(() => import('./admin/AdminApp'));
 
 // Mapa (Cesium/maplibre) a galéria (lightgallery) sú najťažšie závislosti.
 // Lazy → nesťahuje ich bežný návštevník článku, len kto otvorí /galeria.
