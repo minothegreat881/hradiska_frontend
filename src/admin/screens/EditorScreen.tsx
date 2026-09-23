@@ -637,6 +637,7 @@ export function EditorScreen({
               onPickMedia={(uid, multiple) => setPicking({ target: 'block', uid, multiple })}
               facts={keyFacts}
               timeline={timeline}
+              tags={tags.map(t => t.name)}
               onCoverPositionChange={value => { setCoverPosition(value); touch(); }}
               onFactsChange={next => { setKeyFacts(next); touch(); }}
               onTimelineChange={next => { setTimeline(next); touch(); }}

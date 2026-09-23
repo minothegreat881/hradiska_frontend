@@ -204,6 +204,9 @@ export interface EditorCanvasProps {
   /** Pobočný stĺpec — upravuje sa priamo na plátne (nie v pravom paneli). */
   facts?: Fact[];
   timeline?: Event[];
+  /** Štítky článku — na webe sú v pobočnom stĺpci ako karta „Témy".
+      Na plátne sa iba ukazujú; menia sa v pravom paneli. */
+  tags?: string[];
   /** Ťahanie titulnej fotografie mení jej výrez. */
   onCoverPositionChange?: (value: string) => void;
   onFactsChange?: (next: Fact[]) => void;
@@ -226,7 +229,7 @@ const LABELS: Record<string, string> = {
 export function EditorCanvas({
   article, device, zoom = 'fit', selectedUid = null, onSelect, onMove, onDelete, onDuplicate, onInsert,
   onKeyDown, onBodyChange, onPatch, onPickMedia, blockTypes = [], noShell,
-  facts = [], timeline = [], onFactsChange, onTimelineChange, onCoverPositionChange,
+  facts = [], timeline = [], tags = [], onFactsChange, onTimelineChange, onCoverPositionChange,
 }: EditorCanvasProps) {
   const cover = article.coverImage ? getStrapiImageUrl(article.coverImage) : null;
   const [hoverUid, setHoverUid] = useState<string | null>(null);
@@ -374,6 +377,20 @@ export function EditorCanvas({
                       <span>Kľúčové fakty, časová os a mapa lokality.</span>
                     </div>
                   )}
+
+                  {/* Karta „Témy" — na webe je v pobočnom stĺpci hneď pod
+                      časovou osou. Na plátne je len na pozeranie, aby bolo
+                      vidieť, čo z pravého panela sa v článku naozaj ukáže. */}
+                  <div className="ed-side-tags">
+                    <h3>Témy</h3>
+                    {tags.length > 0 ? (
+                      <div className="ed-side-chips">
+                        {tags.slice(0, 8).map((t) => <span key={t}>{t}</span>)}
+                      </div>
+                    ) : (
+                      <p>Článok nemá štítky — pridajte ich v pravom paneli, v časti Zaradenie.</p>
+                    )}
+                  </div>
                 </aside>
                 </div>
               </article>
@@ -604,6 +621,22 @@ const canvasCss = `
 }
 
 /* Vysvetlivka v pobočnom stĺpci — len v editore. */
+.ed-side-tags {
+  margin-top: 16px; padding: 16px; border-radius: 12px;
+  background: var(--hr-card, #fffdf7); border: 1px solid var(--hr-line, #e8dcc0);
+  font-family: Inter, system-ui, sans-serif;
+}
+.ed-side-tags h3 {
+  margin: 0 0 10px; font-family: Georgia, serif; font-size: 15px; font-weight: 600; color: #2d1810;
+}
+.ed-side-tags p { margin: 0; font-size: 12.5px; line-height: 1.5; color: #8a795e; }
+.ed-side-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ed-side-chips span {
+  display: inline-block; padding: 5px 12px; border-radius: 999px;
+  background: var(--hr-line, #e8dcc0); border: 1px solid var(--hr-line, #e8dcc0);
+  font-family: Georgia, serif; font-size: 12px; font-weight: 500; color: #7d4f1d;
+}
+
 .ed-side-note {
   border: 1.5px dashed #d8c9ab; border-radius: 10px; padding: 14px 16px;
   font-family: Inter, system-ui, sans-serif; color: #8a795e; background: rgba(255,253,244,.5);
