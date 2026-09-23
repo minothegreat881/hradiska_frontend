@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Plus, Pencil, Copy, Trash2, ImageOff, Search, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, Pencil, Copy, Trash2, ImageOff, Search, Loader2, AlertCircle, PenLine } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { listPosts, fetchCounts, listCategories, type PostListItem } from '../api/posts';
 import { deletePost } from '../api/savePost';
+import { listDrafts, clearDraft, whenOf, type DraftInfo } from '../editor/state/autosave';
 
 type StateFilter = 'all' | 'published' | 'draft';
 const PAGE_SIZE = 25;
@@ -29,6 +30,12 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
   const [confirmDelete, setConfirmDelete] = useState<PostListItem | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [reload, setReload] = useState(0);
+
+  /* ROZPRACOVANÉ. Kým sa článok neuloží do Strapi, žije len v prehliadači —
+     v zozname nebol nikde vidieť a po zavretí karty si naň nikto nespomenul.
+     Načítava sa z tej istej zálohy, akú ponúka editor pri otvorení článku. */
+  const [drafts, setDrafts] = useState<DraftInfo[]>([]);
+  useEffect(() => { setDrafts(listDrafts()); }, [reload]);
 
   const doDelete = async () => {
     if (!token || !confirmDelete) return;
@@ -98,6 +105,34 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
           <Plus className="w-4 h-4" /> Nový článok
         </button>
       </div>
+
+      {drafts.length > 0 && (
+        <div className="acard ad-drafts">
+          <div className="ad-drafts-head">
+            <PenLine className="w-4 h-4" />
+            <b>Rozpracované</b>
+            <span className="ad-badge">{drafts.length}</span>
+            <i>zatiaľ neuložené na server — odložené v tomto prehliadači</i>
+          </div>
+          {drafts.map((d) => (
+            <div key={d.articleId || 'novy'} className="ad-drafts-row">
+              <span className="ad-drafts-title">{d.title}</span>
+              <span className="ad-drafts-when">naposledy {whenOf(d.savedAt)}</span>
+              <button className="abtn abtn-primary" onClick={() => onEdit(d.articleId)}>Pokračovať</button>
+              <button
+                className="abtn"
+                onClick={() => {
+                  if (!window.confirm('Zahodiť rozpracovanú prácu „' + d.title + '"? Nedá sa to vrátiť.')) return;
+                  clearDraft(d.articleId);
+                  setDrafts(listDrafts());
+                }}
+              >
+                Zahodiť
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ position: 'relative', flex: '1 1 260px', minWidth: 220 }}>

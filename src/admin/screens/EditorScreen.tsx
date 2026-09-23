@@ -130,6 +130,9 @@ export function EditorScreen({
   const snapshotRef = useRef<() => any>(() => null);
   useEffect(() => {
     if (!dirty) return;
+    // Hneď pri PRVEJ zmene, nielen po piatich sekundách — kto zavrie kartu
+    // po dvoch, nemá čo stratiť.
+    saveDraft(articleId, snapshotRef.current());
     const t = setInterval(() => saveDraft(articleId, snapshotRef.current()), 5000);
     return () => clearInterval(t);
   }, [dirty, articleId]);
@@ -146,10 +149,16 @@ export function EditorScreen({
   // Varovanie pri zatvorení karty s rozpísanými zmenami.
   useEffect(() => {
     if (!dirty) return;
-    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    const warn = (e: BeforeUnloadEvent) => {
+      // Odlož prácu ešte pred varovaním — keď používateľ potvrdí odchod
+      // (alebo prehliadač spadne), nájde ju v zozname článkov.
+      saveDraft(articleId, snapshotRef.current());
+      e.preventDefault();
+      e.returnValue = '';
+    };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, [dirty]);
+  }, [dirty, articleId]);
 
   // Načítanie existujúceho článku cez deep populate — bez neho by sa časť
   // blokov a sidebaru nenačítala a pri uložení by sa prepísala prázdnymi.
@@ -388,7 +397,20 @@ export function EditorScreen({
   };
 
   const leave = () => {
-    if (dirty && !window.confirm('Máte neuložené zmeny. Naozaj chcete odísť?')) return;
+    if (dirty) {
+      // Najprv odlož, až potom sa pýtaj — nech je práca v bezpečí aj vtedy,
+      // keď používateľ odchod potvrdí.
+      saveDraft(articleId, snapshotRef.current());
+      const ist = window.confirm(
+        [
+          'Máte neuložené zmeny — na webe sa zatiaľ neprejavia.',
+          '',
+          'Ak odídete, rozpracovaná práca ostane odložená v tomto prehliadači'
+            + ' a nájdete ju v zozname článkov v časti „Rozpracované".',
+        ].join(String.fromCharCode(10))
+      );
+      if (!ist) return;
+    }
     onBack();
   };
 

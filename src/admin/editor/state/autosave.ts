@@ -22,6 +22,14 @@ export interface DraftSnapshot {
   data: any;
 }
 
+/** Jedna rozpracovaná práca v zozname článkov. */
+export interface DraftInfo {
+  /** `null` = rozpísaný nový článok, inak documentId existujúceho. */
+  articleId: string | null;
+  savedAt: number;
+  title: string;
+}
+
 const keyFor = (articleId: string | null) => PREFIX + (articleId || 'novy-clanok');
 
 export function saveDraft(articleId: string | null, data: any): void {
@@ -50,8 +58,42 @@ export function clearDraft(articleId: string | null): void {
   try { localStorage.removeItem(keyFor(articleId)); } catch { /* nevadí */ }
 }
 
+/**
+ * Všetka rozpracovaná práca odložená v tomto prehliadači.
+ *
+ * Používa ju zoznam článkov: kým sa práca neuloží do Strapi, nikde inde ju
+ * vidieť nie je a po zavretí karty si na ňu nikto nespomenie. Zoznam je
+ * zoradený od najnovšej.
+ */
+export function listDrafts(): DraftInfo[] {
+  const out: DraftInfo[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith(PREFIX)) continue;
+      const id = key.slice(PREFIX.length);
+      const snap = readDraft(id === 'novy-clanok' ? null : id);
+      if (!snap) continue;
+      out.push({
+        articleId: id === 'novy-clanok' ? null : id,
+        savedAt: snap.savedAt,
+        title: String(snap.data?.title || '').trim() || 'Bez názvu',
+      });
+    }
+  } catch { /* zakázaná pamäť prehliadača */ }
+  return out.sort((a, b) => b.savedAt - a.savedAt);
+}
+
 /** „14:32" — čas poslednej zálohy pre hlášku používateľovi. */
 export function timeOf(ts: number): string {
   const d = new Date(ts);
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+/** „dnes 14:32" / „22. 9. 14:32" — pre zoznam rozpracovaných. */
+export function whenOf(ts: number): string {
+  const d = new Date(ts);
+  const dnes = new Date();
+  const rovnakyDen = d.toDateString() === dnes.toDateString();
+  return rovnakyDen ? `dnes ${timeOf(ts)}` : `${d.getDate()}. ${d.getMonth() + 1}. ${timeOf(ts)}`;
 }
