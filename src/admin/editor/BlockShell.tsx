@@ -35,7 +35,9 @@ export function BlockShell({ index, uid, label, type, children }: BlockShellProp
      TipTap sadzí text o kúsok inak (iniciálku kreslí CSS, nie vložený znak),
      takže blok pri kliknutí zmenil výšku a celý článok pod ním poskočil —
      to bolo to trhnutie. Pri písaní sa preto miesto najprv podrží a pustí sa
-     až vtedy, keď sa obsah naozaj mení. */
+     až vtedy, keď sa obsah naozaj mení. Výška ide priamo do koreňa inline
+     editora — obal navyše by zožral spodný odstup (`mb-6`) a článok pod
+     blokom by sa posunul o 24 px hore. */
   const [reserve, setReserve] = React.useState<number | null>(null);
 
   // Do textu sa píše priamo na mieste bloku (Fáza 3). Ostatné typy zatiaľ nie.
@@ -52,7 +54,22 @@ export function BlockShell({ index, uid, label, type, children }: BlockShellProp
       top = Math.min(top, r.top);
       bottom = Math.max(bottom, r.bottom);
     }
-    if (Number.isFinite(top)) setReserve(Math.round(bottom - top));
+    if (!Number.isFinite(top)) return;
+
+    /* Presnejšie než vlastná výška: koľko miesta blok zaberá PO ZAČIATOK
+       ďalšieho bloku, mínus vlastný spodný odstup. Medzi blokmi totiž býva
+       aj zlomok pixela navyše (zlievanie odstupov, zvyšok riadkového boxu) a
+       bez neho sa celý článok posunul o 0,75 px — málo na oko, dosť na to,
+       aby text pri kliknutí „preblikol". Bez zaokrúhľovania. */
+    const dalsi = el.nextElementSibling as HTMLElement | null;
+    const dalsiVrch = dalsi?.hasAttribute('data-block-uid')
+      ? (dalsi.firstElementChild?.getBoundingClientRect().top ?? null)
+      : null;
+    const odstup = parseFloat(
+      getComputedStyle(el.firstElementChild as Element).marginBottom || '0',
+    ) || 0;
+
+    setReserve(dalsiVrch !== null ? Math.max(0, dalsiVrch - top - odstup) : bottom - top);
   };
 
   return (
@@ -66,18 +83,11 @@ export function BlockShell({ index, uid, label, type, children }: BlockShellProp
       onMouseEnter={() => ui.hover(uid)}
       onMouseLeave={() => ui.hover(null)}
       onMouseDown={() => { if (type === 'content.rich-text') zmeraj(); ui.select(uid); }}
+      /* Len čo sa text naozaj mení, podržané miesto pustíme — inak by blok
+         ostal privysoký po zmazaní odseku. */
+      onKeyDown={(e) => { if (reserve && e.key.length === 1) setReserve(null); }}
     >
-      {writing ? (
-        <div
-          className="ed-block-writing"
-          style={reserve ? { minHeight: reserve } : undefined}
-          /* Len čo sa text naozaj mení, podržané miesto pustíme — inak by
-             blok ostal privysoký po zmazaní odseku. */
-          onKeyDown={(e) => { if (reserve && e.key.length === 1) setReserve(null); }}
-        >
-          {ui.renderInline!(uid)}
-        </div>
-      ) : children}
+      {writing ? ui.renderInline!(uid, reserve ?? undefined) : children}
     </div>
   );
 }

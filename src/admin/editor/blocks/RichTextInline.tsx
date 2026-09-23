@@ -52,6 +52,7 @@ export function RichTextInline({
   onChange,
   onDone,
   dropCap,
+  minHeight,
 }: {
   body: any;
   onChange: (next: any[]) => void;
@@ -64,6 +65,8 @@ export function RichTextInline({
    * písalo by sa „za" iniciálku.
    */
   dropCap?: boolean;
+  /** Výška vykresleného bloku — drží miesto, nech článok pod ním neposkočí. */
+  minHeight?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [bar, setBar] = useState<{ top: number; left: number } | null>(null);
@@ -135,7 +138,11 @@ export function RichTextInline({
   );
 
   return (
-    <div ref={wrapRef} className={`ed-inline mb-6${dropCap ? ' is-first' : ''}`}>
+    <div
+      ref={wrapRef}
+      className={`ed-inline mb-6${dropCap ? ' is-first' : ''}`}
+      style={minHeight ? { minHeight } : undefined}
+    >
       <EditorContent editor={editor} />
       {bar && (
         <div className="ed-textbar" style={{ top: bar.top, left: bar.left }}>

@@ -15,8 +15,10 @@ export interface EditorUI {
   hover: (uid: string | null) => void;
   /** Blok, do ktorého sa práve píše (len `content.rich-text`). */
   editingUid: string | null;
-  /** Vykreslí inline editor namiesto obsahu bloku. */
-  renderInline?: (uid: string) => React.ReactNode;
+  /** Vykreslí inline editor namiesto obsahu bloku.
+   *  `minHeight` drží výšku, akú mal vykreslený blok — bez nej článok pri
+   *  prepnutí na písanie poskočí (TipTap sadzí o kúsok inak). */
+  renderInline?: (uid: string, minHeight?: number) => React.ReactNode;
 }
 
 const NOOP: EditorUI = {

@@ -57,14 +57,41 @@ export const DESKTOP_CANVAS_WIDTH = 1440;
 
 // ── iframe ───────────────────────────────────────────────────────────────────
 
-/** Prenesie štýly hlavného dokumentu do okna plátna (vrátane HMR v dev režime). */
+/**
+ * Prenesenie štýlov stránky do okna plátna (vrátane HMR pri vývoji).
+ *
+ * PRIDÁVA A ODOBERÁ PO JEDNOM. Prvá verzia najprv zmazala z hlavičky okna
+ * všetky kópie a potom ich nasypala nanovo — a medzi tým bolo plátno na
+ * okamih bez štýlov. Stačilo, aby niečo pridalo štýl do hlavičky stránky
+ * (TipTap si ich pridáva pri otvorení písania), a celý článok blikol.
+ * Pozorovateľ hlavičky sleduje len `childList` a `characterData`, takže
+ * značka `data-ed-key` na zdroji ho znova nespustí.
+ */
+let edStyleSeq = 0;
+
 function syncStyles(target: Document) {
   const head = target.head;
-  head.querySelectorAll('[data-ed-style]').forEach((n) => n.remove());
+  const zive = new Set<string>();
+
   document.head.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
-    const copy = node.cloneNode(true) as HTMLElement;
-    copy.setAttribute('data-ed-style', '');
-    head.appendChild(copy);
+    const el = node as HTMLElement;
+    let key = el.dataset.edKey;
+    if (!key) { key = String(++edStyleSeq); el.dataset.edKey = key; }
+    zive.add(key);
+
+    const kopia = head.querySelector(`[data-ed-style="${key}"]`) as HTMLElement | null;
+    if (!kopia) {
+      const nova = el.cloneNode(true) as HTMLElement;
+      nova.setAttribute('data-ed-style', key);
+      head.appendChild(nova);
+    } else if (el.tagName === 'STYLE' && kopia.textContent !== el.textContent) {
+      // Vite pri vývoji mení obsah štýlu na mieste — prepíš text, nemaž prvok.
+      kopia.textContent = el.textContent;
+    }
+  });
+
+  head.querySelectorAll('[data-ed-style]').forEach((kopia) => {
+    if (!zive.has(kopia.getAttribute('data-ed-style') || '')) kopia.remove();
   });
 }
 
@@ -102,7 +129,13 @@ function CanvasFrame({
     syncStyles(d);
     setDoc(d);
 
-    const styleObserver = new MutationObserver(() => syncStyles(d));
+    // Zhluk zmien (napr. knižnica pridá naraz viac štýlov) spoj do jedného
+    // prenesenia — inak by sa to robilo aj desaťkrát za sebou.
+    let cakaSync = 0;
+    const styleObserver = new MutationObserver(() => {
+      if (cakaSync) return;
+      cakaSync = requestAnimationFrame(() => { cakaSync = 0; syncStyles(d); });
+    });
     styleObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
 
     const sizeObserver = new ResizeObserver(() => {
@@ -115,6 +148,7 @@ function CanvasFrame({
     d.addEventListener('keydown', onKey);
 
     return () => {
+      if (cakaSync) cancelAnimationFrame(cakaSync);
       styleObserver.disconnect();
       sizeObserver.disconnect();
       d.removeEventListener('keydown', onKey);
@@ -259,7 +293,7 @@ export function EditorCanvas({
       },
       hover: setHoverUid,
       renderInline: onBodyChange
-        ? (uid: string) => {
+        ? (uid: string, minHeight?: number) => {
             const b = article.blocks.find((x) => x.__uid === uid);
             // Iniciálku má prvý textový blok so skutočným odsekom — to isté
             // pravidlo ako na webe (`hasRealParagraph`), aby sa písmeno počas
@@ -270,6 +304,7 @@ export function EditorCanvas({
                 key={uid}
                 body={b?.body}
                 dropCap={!!b && !!first && (first as any).__uid === uid}
+                minHeight={minHeight}
                 onChange={(next) => onBodyChange(uid, next)}
                 onDone={() => setEditingUid(null)}
               />
