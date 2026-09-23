@@ -452,19 +452,24 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
       if (isFirstParagraphInBlock) isFirstParagraphInBlock = false;
 
       if (shouldDropCap) {
-        // Iniciálku odober z prvého textového uzla, ZVYŠOK vykresli cez renderInline,
-        // aby sa zachovali inline odkazy (link) aj bold/italic v prvom odseku.
+        /* Iniciálku odober z prvého textového uzla, ZVYŠOK vykresli cez
+           renderInline, aby sa zachovali inline odkazy (link) aj bold/italic
+           v prvom odseku.
+           PRESKOČ ÚVODNÉ MEDZERY. Odsek, ktorý sa začína medzerou (pri
+           migrácii ich pár vzniklo, a vyrobí ju aj vlastné písanie), dal
+           doteraz do iniciálky práve tú medzeru — veľké červené písmeno tak
+           nebolo vidieť vôbec, hoci sadzba okolo sedela. */
         let firstLetter = '';
         let dropped = false;
         const restChildren = (block.children || []).map((c: any) => {
-          if (!dropped && c.type !== 'link' && typeof c.text === 'string' && c.text.length > 0) {
-            firstLetter = c.text.charAt(0);
-            dropped = true;
-            return { ...c, text: c.text.slice(1) };
-          }
-          return c;
+          if (dropped || c.type === 'link' || typeof c.text !== 'string') return c;
+          const rest = c.text.replace(/^\s+/, '');
+          if (!rest) return { ...c, text: '' };   // uzol bol samá medzera
+          firstLetter = rest.charAt(0);
+          dropped = true;
+          return { ...c, text: rest.slice(1) };
         });
-        if (!dropped) firstLetter = plainText.charAt(0);
+        if (!dropped) firstLetter = plainText.trimStart().charAt(0);
         elements.push(
           <p
             key={idx}
