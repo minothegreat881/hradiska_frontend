@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowLeft, Eye, GripVertical, Plus, X, ImageOff, Loader2,
-  Monitor, Smartphone, Undo2, Redo2, PanelRightClose, PanelRightOpen,
+  ArrowLeft, Eye, ImageOff, Loader2,
+  Monitor, Smartphone, Undo2, Redo2, PanelRightClose, PanelRightOpen, Landmark,
 } from 'lucide-react';
 import {
-  BLOCK_TYPES, KEY_FACT_ICONS, TIMELINE_TYPES, TIMELINE_TYPE_LABELS,
+  BLOCK_TYPES,
 } from '../data';
 import { useAuth } from '../AuthContext';
 import { getPost, listCategories, isPublished } from '../api/posts';
@@ -22,7 +22,6 @@ import { type Tag } from '../api/tags';
 import { fileUrl, type MediaFile } from '../api/media';
 import { EditorCanvas, type CanvasDevice, type CanvasZoom } from '../editor/EditorCanvas';
 import { useHistory } from '../editor/state/useHistory';
-import { useRowDrag } from '../editor/useRowDrag';
 import { saveDraft, readDraft, clearDraft, timeOf } from '../editor/state/autosave';
 
 interface Block {
@@ -101,9 +100,6 @@ export function EditorScreen({
   const [timeline, setTimeline] = useState<any[]>([]);
   const [loc, setLoc] = useState({ name: '', latitude: '', longitude: '', region: '', country: 'Slovensko' });
 
-  /* Úchyt pri faktoch a časovej osi bol doteraz iba obrázok — teraz naozaj ťahá. */
-  const factsDrag = useRowDrag(keyFacts, next => { setKeyFacts(next); setDirty(true); });
-  const timelineDrag = useRowDrag(timeline, next => { setTimeline(next); setDirty(true); });
   const [cover, setCover] = useState<any | null>(null);
   // Kam sa má priradiť vybraný obrázok: cover alebo konkrétny blok.
   const [picking, setPicking] = useState<
@@ -629,6 +625,10 @@ export function EditorScreen({
               onBodyChange={(uid, body) => patchBlock(uid, { body, _edited: true })}
               onPatch={patchBlock}
               onPickMedia={(uid, multiple) => setPicking({ target: 'block', uid, multiple })}
+              facts={keyFacts}
+              timeline={timeline}
+              onFactsChange={next => { setKeyFacts(next); touch(); }}
+              onTimelineChange={next => { setTimeline(next); touch(); }}
               blockTypes={BLOCK_TYPES as any}
             />
         </div>
@@ -743,95 +743,22 @@ export function EditorScreen({
             </div>
           </Panel>
 
-          <Panel title="Kľúčové fakty (pobočný stĺpec)">
-            <div data-row-list>
-            {keyFacts.map((f, i) => (
-              <div
-                key={f.uid}
-                data-row-uid={f.uid}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
-                  opacity: factsDrag.dragUid === f.uid ? 0.4 : 1,
-                  borderTop: factsDrag.overIndex === i ? '2px solid var(--ad-amber-deep)' : '2px solid transparent',
-                }}
-              >
-                <button
-                  className="ad-grip"
-                  title="Potiahnutím zmeníte poradie"
-                  aria-label="Presunúť fakt"
-                  onPointerDown={factsDrag.startDrag(f.uid)}
-                >
-                  <GripVertical className="w-3.5 h-3.5" />
-                </button>
-                <select
-                  className="afld" value={f.icon} style={{ width: 92, padding: '7px 8px', fontSize: 12 }}
-                  onChange={e => { setKeyFacts(ks => ks.map(x => x.uid === f.uid ? { ...x, icon: e.target.value } : x)); touch(); }}
-                >
-                  {KEY_FACT_ICONS.map(i => <option key={i} value={i}>{i}</option>)}
-                </select>
-                <input
-                  className="afld" value={f.label} placeholder="Popis" style={{ flex: 1, padding: '7px 9px', fontSize: 13 }}
-                  onChange={e => { setKeyFacts(ks => ks.map(x => x.uid === f.uid ? { ...x, label: e.target.value } : x)); touch(); }}
-                />
-                <input
-                  className="afld" value={f.value} placeholder="Hodnota" style={{ flex: 1, padding: '7px 9px', fontSize: 13 }}
-                  onChange={e => { setKeyFacts(ks => ks.map(x => x.uid === f.uid ? { ...x, value: e.target.value } : x)); touch(); }}
-                />
-                <button className="abtn abtn-icon abtn-danger" onClick={() => { setKeyFacts(ks => ks.filter(x => x.uid !== f.uid)); touch(); }}>
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
-            </div>
-            <button className="abtn" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setKeyFacts(ks => [...ks, { uid: newUid(), label: '', value: '', icon: 'star' }]); touch(); }}>
-              <Plus className="w-3.5 h-3.5" /> Pridať fakt
-            </button>
-          </Panel>
-
-          <Panel title="Časová os (pobočný stĺpec)">
-            <div data-row-list>
-            {timeline.map((t, i) => (
-              <div
-                key={t.uid}
-                data-row-uid={t.uid}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
-                  opacity: timelineDrag.dragUid === t.uid ? 0.4 : 1,
-                  borderTop: timelineDrag.overIndex === i ? '2px solid var(--ad-amber-deep)' : '2px solid transparent',
-                }}
-              >
-                <button
-                  className="ad-grip"
-                  title="Potiahnutím zmeníte poradie"
-                  aria-label="Presunúť udalosť"
-                  onPointerDown={timelineDrag.startDrag(t.uid)}
-                >
-                  <GripVertical className="w-3.5 h-3.5" />
-                </button>
-                <input
-                  className="afld" value={t.year} placeholder="~906" style={{ width: 68, padding: '7px 8px', fontSize: 13 }}
-                  onChange={e => { setTimeline(ts => ts.map(x => x.uid === t.uid ? { ...x, year: e.target.value } : x)); touch(); }}
-                />
-                <input
-                  className="afld" value={t.title} placeholder="Udalosť" style={{ flex: 1, padding: '7px 9px', fontSize: 13 }}
-                  onChange={e => { setTimeline(ts => ts.map(x => x.uid === t.uid ? { ...x, title: e.target.value } : x)); touch(); }}
-                />
-                <select
-                  className="afld" value={t.type} style={{ width: 104, padding: '7px 8px', fontSize: 12 }}
-                  onChange={e => { setTimeline(ts => ts.map(x => x.uid === t.uid ? { ...x, type: e.target.value } : x)); touch(); }}
-                >
-                  {TIMELINE_TYPES.map(v => <option key={v} value={v}>{TIMELINE_TYPE_LABELS[v]}</option>)}
-                </select>
-                <button className="abtn abtn-icon abtn-danger" onClick={() => { setTimeline(ts => ts.filter(x => x.uid !== t.uid)); touch(); }}>
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
-            </div>
-            <button className="abtn" style={{ width: '100%', justifyContent: 'center' }} onClick={() => { setTimeline(ts => [...ts, { uid: newUid(), year: '', title: '', description: '', type: 'event' }]); touch(); }}>
-              <Plus className="w-3.5 h-3.5" /> Pridať udalosť
-            </button>
-          </Panel>
+          {/* Kľúčové fakty a časová os sa upravujú priamo na plátne — tam, kde
+              ich uvidí čitateľ. V paneli širokom 344 px sa vyplniť nedali. */}
+          <button
+            type="button"
+            className="ad-info"
+            onClick={() => {
+              const frame = document.querySelector('iframe[title="Náhľad článku"]') as HTMLIFrameElement | null;
+              frame?.contentDocument?.querySelector('.ad-side-editor')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+          >
+            <Landmark className="w-4 h-4" style={{ flexShrink: 0, marginTop: 2, color: 'var(--ad-amber-deep)' }} />
+            <span>
+              <b>Pobočný stĺpec · {keyFacts.length} {keyFacts.length === 1 ? 'fakt' : keyFacts.length < 5 ? 'fakty' : 'faktov'}, {timeline.length} {timeline.length === 1 ? 'udalosť' : timeline.length < 5 ? 'udalosti' : 'udalostí'}</b>
+              Kľúčové fakty a časová os sa upravujú priamo v článku, na mieste, kde ich uvidí čitateľ.
+            </span>
+          </button>
         </aside>}
       </div>
 

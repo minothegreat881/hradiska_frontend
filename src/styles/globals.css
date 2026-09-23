@@ -2259,6 +2259,17 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   --ad-blk-image: #5c7a52;
   --ad-blk-quote: #7c1f24;
 
+  /* Prerobka administracie 2026-09: tony, ktore sa opakuju vo viacerych
+     miestach noveho rozhrania. Odtiene su z navrhu, nie vymyslene. */
+  --ad-aside: #f6efdf;        /* boxy v pobocnom stlpci, ako na webe */
+  --ad-aside-line: #eadfc8;   /* jemna delica ciara v boxoch */
+  --ad-rail: #e0cfae;         /* zvisla ciara casovej osi */
+  --ad-dashed: #d4c3a2;       /* prerusovany okraj tlacidiel „Pridat" */
+  --ad-active-bg: #fffaf0;    /* podklad prave upravovanej polozky */
+  --ad-tint: #f1e8d4;         /* informacne dlazdice */
+  --ad-seg-bg: #ece4d2;       /* podklad segmentoveho prepinaca */
+  --ad-on-dark: #f0a58d;      /* nebezpecna akcia na tmavej liste */
+
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   color: var(--ad-text);
   background: var(--ad-app);

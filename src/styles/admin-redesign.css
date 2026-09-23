@@ -1,0 +1,131 @@
+/* ══════════════════════════════════════════════════════════════════════════
+ * Vizuálna prerobka administrácie (návrh z Claude Design, september 2026).
+ *
+ * Bežné CSS pod prefixom `.admin` — projekt NEMÁ Tailwind build, nové utility
+ * triedy by nevznikli. Farby cez premenné `--ad-*` z globals.css.
+ *
+ * Pozor: časť tohto rozhrania žije v okne plátna editora (iframe). Tam je
+ * obal `div.admin`, aby tieto pravidlá aj premenné platili aj v ňom.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/* Admin redesign – bežné CSS pod .admin. Farby iba cez --ad-*. */
+.admin .ad-editor-head{height:60px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--ad-line)}
+.admin .ad-editor-head .ad-title{font-size:15px;font-weight:600}
+.admin .ad-editor-head .ad-sub{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ad-muted)}
+.admin .ad-dot{width:6px;height:6px;border-radius:3px;background:var(--ad-amber-mid)}
+.admin .ad-vrule{width:1px;height:28px;background:var(--ad-line)}
+
+/* Pravý panel */
+.admin .ad-panel{width:344px;flex-shrink:0;border-left:1px solid var(--ad-line);background:var(--ad-surface);overflow:auto}
+.admin .ad-sec{border-bottom:1px solid var(--ad-line)}
+.admin .ad-sec-head{width:100%;min-height:58px;display:flex;align-items:center;gap:10px;padding:0 20px;background:none;border:0;text-align:left;cursor:pointer;color:var(--ad-text)}
+.admin .ad-sec-head:hover{background:color-mix(in oklab,var(--ad-amber-mid) 6%,transparent)}
+.admin .ad-sec-title{font-size:14px;font-weight:600}
+.admin .ad-sec-sum{font-size:12px;color:var(--ad-muted);margin-top:2px}
+.admin .ad-sec-body{padding:0 20px 18px;display:flex;flex-direction:column;gap:14px}
+.admin .ad-info{margin:18px 20px;padding:14px;border-radius:10px;background:color-mix(in oklab,var(--ad-amber-mid) 14%,var(--ad-surface));display:flex;gap:10px;font-size:12.5px;line-height:1.5;color:var(--ad-secondary);cursor:pointer}
+.admin .ad-info b{display:block;color:var(--ad-text);margin-bottom:2px}
+
+/* Polia */
+.admin .ad-field{display:flex;flex-direction:column;gap:5px}
+.admin .ad-field>label{font-size:12.5px;font-weight:500;color:var(--ad-secondary)}
+.admin .ad-field>label small{font-weight:400;color:var(--ad-muted);font-size:inherit}
+.admin .ad-counter{font-size:11.5px;color:var(--ad-muted);align-self:flex-end}
+.admin .ad-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Pobočný stĺpec na plátne */
+.admin .ad-aside-box{background:var(--ad-aside);border-radius:10px;padding:16px;display:flex;flex-direction:column}
+.admin .ad-aside-title{font:600 17px var(--font-serif,serif);margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.admin .ad-aside-title span{font:400 11px Inter,sans-serif;color:var(--ad-muted)}
+.admin .ad-fact{position:relative;display:flex;gap:10px;padding:7px 8px;margin:0 -8px;border-radius:6px;border-bottom:1px solid var(--ad-aside-line);cursor:text}
+.admin .ad-fact:last-of-type{border-bottom:0}
+.admin .ad-fact:hover{background:color-mix(in oklab,var(--ad-amber-mid) 6%,transparent)}
+.admin .ad-fact.is-active,.admin .ad-event.is-active{outline:1.5px solid var(--ad-amber-mid);background:var(--ad-active-bg)}
+.admin .ad-fact-icon{color:var(--ad-amber-mid);margin-top:2px;flex-shrink:0}
+.admin .ad-fact-label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--ad-muted);border:0;background:none;padding:0;width:100%}
+.admin .ad-fact-value{font:15px var(--font-serif,serif);color:var(--ad-text);border:0;background:none;padding:0;width:100%}
+.admin .ad-fact input:focus{outline:none}
+.admin .ad-floatbar{position:absolute;top:-32px;right:0;display:flex;gap:2px;background:var(--ad-text);border-radius:6px;padding:3px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:5}
+.admin .ad-floatbar button{height:22px;min-width:24px;display:flex;align-items:center;justify-content:center;gap:3px;padding:0 5px;border:0;border-radius:4px;background:none;color:var(--ad-card);cursor:pointer}
+.admin .ad-floatbar button:hover{background:rgba(255,255,255,.1)}
+.admin .ad-floatbar .is-danger{color:var(--ad-on-dark)}
+.admin .ad-add{height:32px;margin-top:8px;border:1px dashed var(--ad-dashed);border-radius:6px;display:flex;align-items:center;gap:6px;padding:0 10px;background:none;font:500 12.5px Inter,sans-serif;color:var(--ad-amber-deep);cursor:pointer}
+.admin .ad-add:hover{background:color-mix(in oklab,var(--ad-amber-mid) 8%,transparent)}
+
+.admin .ad-event{position:relative;display:flex;gap:10px;margin:0 -8px;padding:0 8px;border-radius:6px;cursor:pointer}
+.admin .ad-event-rail{display:flex;flex-direction:column;align-items:center}
+.admin .ad-event-dot{width:9px;height:9px;border-radius:5px;background:var(--ad-amber-mid);margin-top:5px}
+.admin .ad-event-line{flex:1;width:1.5px;background:var(--ad-rail)}
+.admin .ad-event-body{padding:0 0 12px}
+.admin .ad-event-year{font:600 12.5px Inter,sans-serif;color:var(--ad-amber-deep)}
+.admin .ad-event-name{font:14.5px/1.4 var(--font-serif,serif)}
+
+/* Plávajúce okno udalosti */
+.admin .ad-popover{position:absolute;right:calc(100% + 14px);top:-40px;width:360px;background:var(--ad-card);border:1px solid var(--ad-field-border);border-radius:12px;box-shadow:0 18px 40px rgba(60,40,20,.2);font-family:Inter,sans-serif;z-index:20;cursor:default}
+.admin .ad-popover-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;font-size:14px;font-weight:600}
+.admin .ad-popover-body{display:flex;flex-direction:column;gap:12px;padding:0 16px 16px}
+.admin .ad-popover-foot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--ad-line)}
+.admin .ad-btn-dark{height:32px;padding:0 14px;border:0;border-radius:8px;background:var(--ad-text);color:var(--ad-card);font:600 13px Inter,sans-serif;cursor:pointer}
+.admin .ad-btn-dark:hover{opacity:.9}
+.admin .ad-link-danger{display:flex;align-items:center;gap:6px;border:0;background:none;color:var(--ad-danger);font-size:13px;cursor:pointer}
+
+/* Obrazovky */
+.admin .ad-page{padding:36px 40px;display:flex;flex-direction:column;gap:24px}
+.admin .ad-page-head{display:flex;align-items:flex-end;gap:16px}
+.admin .ad-page-title{font:700 30px var(--font-serif,serif)}
+.admin .ad-page-sub{font-size:14px;color:var(--ad-secondary);margin-top:6px}
+.admin .ad-stat{padding:18px;display:flex;flex-direction:column;gap:6px}
+.admin .ad-stat-n{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums}
+.admin .ad-choice{display:flex;gap:14px;padding:14px 16px;border:1px solid var(--ad-field-border);border-radius:10px;cursor:pointer;text-align:left;background:none}
+.admin .ad-choice.is-on{border:1.5px solid var(--ad-amber-mid);background:var(--ad-active-bg)}
+.admin .ad-list-row{display:grid;align-items:center;gap:12px;padding:0 18px;min-height:48px;border-bottom:1px solid var(--ad-line)}
+.admin .ad-list-row.is-selected{background:var(--ad-tint);box-shadow:inset 3px 0 0 var(--ad-danger)}
+.admin .ad-list-row:hover{background:color-mix(in oklab,var(--ad-amber-mid) 5%,transparent)}
+.admin .ad-bar{flex:1;height:6px;border-radius:3px;background:var(--ad-aside-line);overflow:hidden}
+.admin .ad-bar>i{display:block;height:100%;background:var(--ad-amber-mid);border-radius:3px}
+.admin .ad-bulkbar{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px 6px 6px 18px;background:var(--ad-text);color:var(--ad-app);border-radius:12px;box-shadow:0 14px 30px rgba(20,12,4,.3);font-size:13.5px;z-index:40}
+.admin .ad-bulkbar button{height:34px;display:flex;align-items:center;gap:6px;padding:0 12px;border:0;border-radius:8px;background:rgba(255,255,255,.08);color:inherit;cursor:pointer}
+.admin .ad-notice{display:flex;gap:14px;align-items:center;padding:14px 18px;border-radius:12px;background:color-mix(in oklab,var(--ad-amber-mid) 14%,var(--ad-app))}
+
+/* ── Doplnky k návrhu ─────────────────────────────────────────────────────
+   Veci, ktoré návrh nepokrýval, lebo vyplynuli až zo skutočných dát a z toho,
+   že pobočný stĺpec žije v okne plátna (iframe). */
+
+.admin .ad-side-editor { display: flex; flex-direction: column; gap: 20px; position: relative; }
+
+/* Polia faktu sú bez rámu, aby riadok vyzeral ako na webe; rám naznačí až
+   prejdenie myšou, nech je jasné, že sa dá písať. */
+.admin .ad-fact-fields { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.admin .ad-fact-label::placeholder,
+.admin .ad-fact-value::placeholder { color: var(--ad-muted); opacity: .7; }
+.admin .ad-fact input:focus { outline: none; }
+.admin .ad-fact.is-dragging, .admin .ad-event.is-dragging { opacity: .4; }
+.admin .ad-fact.is-over, .admin .ad-event.is-over { box-shadow: inset 0 2px 0 var(--ad-amber-deep); }
+
+/* Ponuka ikon fakt — 16 hodnôt zo schémy v mriežke. */
+.admin .ad-iconmenu {
+  position: absolute; top: 28px; left: 0; z-index: 6;
+  display: grid; grid-template-columns: repeat(8, 24px); gap: 2px;
+  padding: 4px; border-radius: 6px; background: var(--ad-text);
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+.admin .ad-iconmenu button {
+  height: 24px; display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 4px; background: none; color: var(--ad-card); cursor: pointer;
+}
+.admin .ad-iconmenu button:hover { background: rgba(255,255,255,.14); }
+.admin .ad-iconmenu button.is-on { background: var(--ad-amber-mid); }
+
+.admin .ad-floatbar-grip { cursor: grab; touch-action: none; }
+.admin .ad-floatbar-grip:active { cursor: grabbing; }
+.admin .ad-pop-grip, .admin .ad-pop-x {
+  border: 0; background: none; color: var(--ad-muted); cursor: pointer; padding: 2px;
+}
+.admin .ad-pop-grip { cursor: grab; touch-action: none; }
+.admin .ad-pop-x:hover, .admin .ad-pop-grip:hover { color: var(--ad-text); }
+
+/* Okno udalosti sa otvára vľavo od stĺpca. Pri úzkom plátne (mobilný náhľad)
+   by vytieklo mimo okna, preto sa tam prilepí pod položku. */
+@media (max-width: 767px) {
+  .admin .ad-popover { position: absolute; right: auto; left: 0; top: 100%; width: min(340px, 90vw); }
+}

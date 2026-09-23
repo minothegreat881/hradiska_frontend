@@ -33,6 +33,7 @@ import { EditorUIContext } from './EditorUIContext';
 import { BlockOverlay, type OverlayBlock } from './BlockOverlay';
 import { RichTextInline } from './blocks/RichTextInline';
 import { BlockPicker } from './blocks/BlockPicker';
+import { SideColumnEditor, type Fact, type Event } from './SideColumnEditor';
 
 export type CanvasDevice = 'desktop' | 'mobil';
 /** `fit` = zmenšiť na šírku adminu, `full` = skutočná veľkosť + posúvanie do strán. */
@@ -197,6 +198,11 @@ export interface EditorCanvasProps {
   onPatch?: (uid: string, patch: any) => void;
   /** Otvorí knižnicu médií pre blok. */
   onPickMedia?: (uid: string, multiple: boolean) => void;
+  /** Pobočný stĺpec — upravuje sa priamo na plátne (nie v pravom paneli). */
+  facts?: Fact[];
+  timeline?: Event[];
+  onFactsChange?: (next: Fact[]) => void;
+  onTimelineChange?: (next: Event[]) => void;
   blockTypes?: { id: string; label: string; accent: string }[];
   /** Len na meranie: vykreslí bloky bez obalu `BlockShell`. */
   noShell?: boolean;
@@ -215,6 +221,7 @@ const LABELS: Record<string, string> = {
 export function EditorCanvas({
   article, device, zoom = 'fit', selectedUid = null, onSelect, onMove, onDelete, onDuplicate, onInsert,
   onKeyDown, onBodyChange, onPatch, onPickMedia, blockTypes = [], noShell,
+  facts = [], timeline = [], onFactsChange, onTimelineChange,
 }: EditorCanvasProps) {
   const cover = article.coverImage ? getStrapiImageUrl(article.coverImage) : null;
   const [hoverUid, setHoverUid] = useState<string | null>(null);
@@ -334,10 +341,19 @@ export function EditorCanvas({
                     z pravého panela. Miesto mu tu ale patrí, inak by text
                     nesedel s webom. */}
                 <aside className="article-sidebar-col p-6 md:p-8">
-                  <div className="ed-side-note">
-                    <strong>Pobočný stĺpec</strong>
-                    <span>Kľúčové fakty, časová os a mapa lokality. Upravujú sa v paneli vpravo.</span>
-                  </div>
+                  {onFactsChange && onTimelineChange ? (
+                    <SideColumnEditor
+                      facts={facts}
+                      timeline={timeline}
+                      onFactsChange={onFactsChange}
+                      onTimelineChange={onTimelineChange}
+                    />
+                  ) : (
+                    <div className="ed-side-note">
+                      <strong>Pobočný stĺpec</strong>
+                      <span>Kľúčové fakty, časová os a mapa lokality.</span>
+                    </div>
+                  )}
                 </aside>
                 </div>
               </article>

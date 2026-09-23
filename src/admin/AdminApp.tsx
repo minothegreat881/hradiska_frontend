@@ -5,6 +5,7 @@ import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
   BarChart3, LogOut, Search, ExternalLink, Users,
 } from 'lucide-react';
+import '../styles/admin-redesign.css';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LoginScreen } from './screens/LoginScreen';
 import { ArticlesScreen } from './screens/ArticlesScreen';
