@@ -191,7 +191,10 @@ function SourcesFields({ data, onPatch }: { data: any; onPatch: (p: any) => void
   const removeItem = (i: number) => onPatch({ items: items.filter((_: any, k: number) => k !== i) });
 
   return (
-    <Panel title="Zdroje a literatúra" hint="Enter vás posunie na odkaz a potom rovno na ďalší zdroj.">
+    <Panel
+      title="Zdroje a literatúra"
+      hint="Jeden zdroj = jeden riadok textu (plus odkaz, ak je). Na webe je zvykom „Autor: Názov, vydavateľ miesto rok“ — tak je napísaná väčšina z 1238 zdrojov v článkoch. Enter vás posunie na odkaz a potom na ďalší zdroj."
+    >
       <Field label="Nadpis" value={data.title} onChange={(v) => onPatch({ title: v })} />
       <Area label="Úvodná veta" value={data.intro} onChange={(v) => onPatch({ intro: v })} rows={2} />
 
@@ -202,7 +205,7 @@ function SourcesFields({ data, onPatch }: { data: any; onPatch: (p: any) => void
             <GrowArea
               inputRef={(el) => { textRefs.current[i] = el; }}
               value={it.text || ''}
-              placeholder="Autor, názov, rok…"
+              placeholder="Bialeková, D.: Pramene k dejinám osídlenia Slovenska II. Nitra 1989"
               rows={2}
               onChange={(v) => patchItem(i, { text: v })}
               onEnter={() => urlRefs.current[i]?.focus()}
