@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { createPortal } from 'react-dom';
 import { ZoomIn } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -824,17 +824,9 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
       {/* Svetelný box je ten istý komponent ako v spodnej fotogalérii. */}
       {!editMode && typeof document !== 'undefined' &&
         createPortal(
-          <AnimatePresence>
-            {openIdx !== null && (
-              <Lightbox
-                images={photos}
-                index={openIdx}
-                onClose={close}
-                onPrev={prev}
-                onNext={next}
-              />
-            )}
-          </AnimatePresence>,
+          openIdx !== null
+            ? <Lightbox images={photos} index={openIdx} onClose={close} onPrev={prev} onNext={next} />
+            : null,
           document.body,
         )}
     </>

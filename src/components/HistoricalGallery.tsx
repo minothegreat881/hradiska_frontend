@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X, Maximize2, Share2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PhotoDiscussion } from './PhotoDiscussion';
@@ -53,9 +52,6 @@ export function Lightbox({
   const touchX = useRef<number | null>(null);
   const sheetY = useRef<number | null>(null);
   const sheetDragged = useRef(false);
-  const prefersReduced =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   const current = images[index];
 
   // Klávesnica (Esc / ←/→) + zámok scrollu pozadia + úvodný focus na ✕
@@ -117,16 +113,22 @@ export function Lightbox({
     if (Math.abs(dx) > 50) { if (dx > 0) onPrev(); else onNext(); }
   };
 
+  /* PREKRYTIE SA NEANIMUJE CEZ REACT.
+     Predtým to bol `motion.div` v `AnimatePresence` s prechodom
+     priehľadnosti. Namerané snímka po snímke: pri otvorení šla
+     priehľadnosť 0 → 0,12 → 0,48 → SPÄŤ NA 0 → 1 a pri zatvorení
+     1 → … → 0 → NA JEDNU SNÍMKU SPÄŤ 1 → koniec. To čierne žmurknutie
+     na vstupe aj výstupe bolo presne toto — prvok sa pritom nevytváral
+     nanovo (overené značkou na prvku), len mu niekto prepísal hodnotu
+     uprostred prechodu.
+     Objavenie preto rieši CSS (`animation`), ktoré React prerušiť nevie,
+     a zatvorenie je okamžité. */
   return (
-    <motion.div
+    <div
       className="pl-overlay"
       role="dialog"
       aria-modal="true"
       aria-label="Prehliadač fotky"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: prefersReduced ? 0 : 0.2 }}
       onClick={onClose}
     >
       <div className={`pl-card${commentsOpen ? ' pl-comments-open' : ''}`} onClick={(e) => e.stopPropagation()}>
@@ -284,7 +286,7 @@ export function Lightbox({
           />
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -407,11 +409,9 @@ export function HistoricalGallery({ images, title = 'Fotogaléria' }: Historical
 
       {typeof document !== 'undefined' &&
         createPortal(
-          <AnimatePresence>
-            {modalIndex !== null && (
-              <Lightbox images={images} index={modalIndex} onClose={close} onPrev={prev} onNext={next} />
-            )}
-          </AnimatePresence>,
+          modalIndex !== null
+            ? <Lightbox images={images} index={modalIndex} onClose={close} onPrev={prev} onNext={next} />
+            : null,
           document.body,
         )}
     </section>

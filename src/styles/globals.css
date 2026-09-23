@@ -1041,6 +1041,13 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   background: rgba(15, 10, 5, 0.9);
   display: flex; align-items: stretch; justify-content: center;
   overflow: hidden; padding: 0;
+  /* Objavenie robí CSS, nie React: prechod cez `motion` sa dal prerušiť
+     prekreslením a na vstupe aj výstupe to čierne žmurklo. */
+  animation: pl-overlay-in 0.18s ease-out;
+}
+@keyframes pl-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .pl-overlay { animation: none; }
 }
 @media (min-width: 560px) and (orientation: landscape) {
   .pl-overlay { align-items: center; padding: 16px; }
