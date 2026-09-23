@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 /* Odkladané obrazovky cez `lazyStale` — po nasadení novej verzie sa stará
    karta radšej raz obnoví, než by ostala visieť na chýbajúcom súbore. */
 import { lazyStale } from './lib/lazyStale';
+/* Pripomienky (klik na prvok → poznámka) — vykreslí sa len prihlásenému
+   redaktorovi, čitateľ z nástroja nestiahne nič. */
+import { PripomienkyDock } from './pripomienky/PripomienkyDock';
 import './design-lab/theme.css';
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
@@ -251,6 +254,7 @@ function App() {
       <LabFooter />
 
       {/* GDPR cookie-consent — fixed dole, neblokuje scroll; späť sa otvorí z pätičky */}
+      <PripomienkyDock />
       <CookieBanner />
 
       {/* PWA — ponuka „Nainštalovať appku" (až po zapojení a cookie lište) */}

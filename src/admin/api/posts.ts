@@ -155,14 +155,16 @@ export async function fetchNavCounts(token: string) {
   // „comments" badge = koľko treba MODEROVAŤ (čaká na schválenie + nahlásené),
   // nie celkový počet. Foto-komentáre sú auto-viditeľné (bez fronty na schválenie),
   // takže do počtu na moderáciu neprispievajú.
-  const [articles, categories, tags, waiting, reported] = await Promise.all([
+  // „pripomienky" badge = len NOVÉ; rozrobené a vybavené nevolajú po pozornosti.
+  const [articles, categories, tags, waiting, reported, pripomienky] = await Promise.all([
     total('/api/blog-posts?status=draft'),
     total('/api/blog-categories'),
     total('/api/blog-tags'),
     total('/api/blog-comments?filters[status][$eq]=waiting'),
     total('/api/blog-comments?filters[status][$eq]=reported'),
+    total('/api/pripomienky?filters[stav][$eq]=nova'),
   ]);
-  return { articles, categories, tags, comments: waiting + reported };
+  return { articles, categories, tags, comments: waiting + reported, pripomienky };
 }
 
 // ── Detail na editáciu ───────────────────────────────────────────────────────

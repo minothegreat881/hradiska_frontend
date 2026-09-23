@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
-  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit,
+  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus,
 } from 'lucide-react';
 import '../styles/admin-redesign.css';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LoginScreen } from './screens/LoginScreen';
 import { ArticlesScreen } from './screens/ArticlesScreen';
 import { DraftsScreen } from './screens/DraftsScreen';
+import { PripomienkyScreen } from './screens/PripomienkyScreen';
 import { EditorScreen } from './screens/EditorScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { MediaScreen } from './screens/MediaScreen';
@@ -21,7 +22,7 @@ import { TagsScreen } from './screens/TagsScreen';
 import { fetchNavCounts } from './api/posts';
 
 export type AdminRoute =
-  | 'articles' | 'drafts' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'users' | 'analytics' | 'profile';
+  | 'articles' | 'drafts' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'pripomienky' | 'users' | 'analytics' | 'profile';
 
 // Badge sa dopĺňa dynamicky z reálnych počtov (viď `badges` v AdminShell) — žiadne statické čísla.
 const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any }[] }[] = [
@@ -40,6 +41,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
       { id: 'categories', label: 'Kategórie', icon: FolderTree },
       { id: 'tags', label: 'Štítky', icon: Tag },
       { id: 'comments', label: 'Komentáre', icon: MessageSquare },
+      { id: 'pripomienky', label: 'Pripomienky', icon: MessageSquarePlus },
       { id: 'users', label: 'Používatelia', icon: Users },
     ],
   },
@@ -51,7 +53,8 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
 
 const ROUTE_LABELS: Record<AdminRoute, string> = {
   articles: 'Články', drafts: 'Koncepty', editor: 'Editor článku', media: 'Médiá',
-  categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', users: 'Používatelia', analytics: 'Analytika',
+  categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', pripomienky: 'Pripomienky',
+  users: 'Používatelia', analytics: 'Analytika',
   profile: 'Môj profil',
 };
 
@@ -73,7 +76,7 @@ function AdminShell() {
   useEffect(() => {
     if (!token) return;
     fetchNavCounts(token)
-      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments || undefined }))
+      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments || undefined, pripomienky: c.pripomienky || undefined }))
       .catch(() => {});
   }, [token, route]);
 
@@ -233,6 +236,7 @@ function AdminShell() {
           {route === 'categories' && <CategoriesScreen />}
           {route === 'tags' && <TagsScreen />}
           {route === 'comments' && <CommentsScreen />}
+          {route === 'pripomienky' && <PripomienkyScreen />}
           {route === 'users' && <UsersScreen />}
           {route === 'profile' && <ProfileScreen />}
         </main>

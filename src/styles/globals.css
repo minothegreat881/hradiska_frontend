@@ -2700,3 +2700,19 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   .pwa-card { width: 100%; max-width: calc(100vw - 20px); }
 }
 @media (prefers-reduced-motion: reduce) { .pwa-card { animation: none; } }
+
+/* ── Pripomienky: plávajúce tlačidlo ──────────────────────────────────────
+   Vykresľuje sa len prihlásenému redaktorovi (viď PripomienkyDock). Zvyšné
+   štýly nástroja sú v `pripomienky.css`, ktoré sa načíta až s ním. */
+.pr-dock {
+  /* Nad cookie lištou (9999) aj nad ponukou inštalácie (9998) — inak sa na
+     tlačidlo v pravom dolnom rohu nedá kliknúť. */
+  position: fixed; right: 16px; bottom: 16px; z-index: 10005;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 13px; border-radius: 999px;
+  border: 1px solid var(--hr-line, #e8dcc0); background: #fffdf7;
+  color: #8a5316; font: 600 13px Inter, system-ui, sans-serif;
+  box-shadow: 0 10px 26px rgba(40, 24, 8, .22); cursor: pointer;
+}
+.pr-dock:hover { border-color: #b8792d; background: #fff; }
+@media (max-width: 640px) { .pr-dock span { display: none; } .pr-dock { padding: 11px; } }
