@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft, Eye, GripVertical, Plus, X, ImageOff, Loader2,
-  Monitor, Smartphone, Undo2, Redo2,
+  Monitor, Smartphone, Undo2, Redo2, PanelRightClose, PanelRightOpen,
 } from 'lucide-react';
 import {
   BLOCK_TYPES, KEY_FACT_ICONS, TIMELINE_TYPES, TIMELINE_TYPE_LABELS,
@@ -112,6 +112,8 @@ export function EditorScreen({
 
   const [device, setDevice] = useState<CanvasDevice>('desktop');
   const [zoom, setZoom] = useState<CanvasZoom>('fit');
+  /** Skrytý pravý panel = širšie plátno, teda väčšie písmo pri práci. */
+  const [panelOpen, setPanelOpen] = useState(true);
   /** Čas posledného úspešného uloženia do Strapi — pre stavovú lištu. */
   const [savedAt, setSavedAt] = useState<number | null>(null);
   /** Nájdená záloha rozpísaného článku (ponuka obnovy po páde prehliadača). */
@@ -517,6 +519,15 @@ export function EditorScreen({
             </button>
         </div>
 
+        <button
+          className="abtn"
+          onClick={() => setPanelOpen(o => !o)}
+          title={panelOpen ? 'Skryť pravý panel — plátno bude väčšie' : 'Zobraziť panel s údajmi článku'}
+        >
+          {panelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+          {panelOpen ? 'Skryť panel' : 'Údaje článku'}
+        </button>
+
         {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts).
             Rozpísané zmeny v tomto formulári v ňom ešte nie sú. */}
         <a
@@ -623,7 +634,7 @@ export function EditorScreen({
         </div>
 
         {/* ═══ Pravý stĺpec — metadáta ═══ */}
-        <aside
+        {panelOpen && <aside
           className="acard ad-editor-side"
           style={{ width: 330, flexShrink: 0, background: 'var(--ad-surface)', position: 'sticky', top: 76, maxHeight: 'calc(100vh - 96px)', overflowY: 'auto' }}
         >
@@ -821,7 +832,7 @@ export function EditorScreen({
               <Plus className="w-3.5 h-3.5" /> Pridať udalosť
             </button>
           </Panel>
-        </aside>
+        </aside>}
       </div>
 
       {askDelete && (() => {

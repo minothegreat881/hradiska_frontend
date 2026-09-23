@@ -285,7 +285,11 @@ export function EditorCanvas({
 
             <section className="py-8 md:py-12 container mx-auto px-4 relative z-10">
               <article className="lart-card rounded-xl overflow-hidden">
-                <div className="p-6 md:p-8">
+                {/* 12-stĺpcový grid ako na webe: text v ľavých ôsmich, pobočný
+                    stĺpec v pravých štyroch. Bez neho by text sedel v strede
+                    karty — na webe je o ~230 px viac vľavo (namerané). */}
+                <div className="grid-layout article-grid">
+                <div className="p-6 md:p-8 article-main-col">
                   <div className="article-body-wrapper" lang="sk" style={{ maxWidth: 668, margin: '0 auto' }}>
                     {/* Kotva pre vrstvu ovládania. `position: relative` je na nej
                         jedinou odchýlkou od webu a rozvrh nemení. */}
@@ -317,6 +321,17 @@ export function EditorCanvas({
                     </div>
                     <div className="clear-both" />
                   </div>
+                </div>
+
+                {/* Pobočný stĺpec sa needituje na plátne — drží metadáta
+                    z pravého panela. Miesto mu tu ale patrí, inak by text
+                    nesedel s webom. */}
+                <aside className="article-sidebar-col p-6 md:p-8">
+                  <div className="ed-side-note">
+                    <strong>Pobočný stĺpec</strong>
+                    <span>Kľúčové fakty, časová os a mapa lokality. Upravujú sa v paneli vpravo.</span>
+                  </div>
+                </aside>
                 </div>
               </article>
             </section>
@@ -452,6 +467,14 @@ const canvasCss = `
 }
 .ed-menu > button[role="menuitem"]:hover { background: #f1e6cf; }
 .ed-menu-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* Vysvetlivka v pobočnom stĺpci — len v editore. */
+.ed-side-note {
+  border: 1.5px dashed #d8c9ab; border-radius: 10px; padding: 14px 16px;
+  font-family: Inter, system-ui, sans-serif; color: #8a795e; background: rgba(255,253,244,.5);
+}
+.ed-side-note strong { display: block; font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 5px; }
+.ed-side-note span { font-size: 12.5px; line-height: 1.5; }
 
 /* ── Obrázok myšou (Fáza 4) ─────────────────────────────────────────────── */
 .ed-img-move { position: absolute; cursor: grab; pointer-events: auto !important; border-radius: 6px; }
