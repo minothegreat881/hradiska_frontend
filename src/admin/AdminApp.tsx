@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
-  BarChart3, LogOut, Search, ExternalLink, Users,
+  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit,
 } from 'lucide-react';
 import '../styles/admin-redesign.css';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LoginScreen } from './screens/LoginScreen';
 import { ArticlesScreen } from './screens/ArticlesScreen';
+import { DraftsScreen } from './screens/DraftsScreen';
 import { EditorScreen } from './screens/EditorScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { MediaScreen } from './screens/MediaScreen';
@@ -20,7 +21,7 @@ import { TagsScreen } from './screens/TagsScreen';
 import { fetchNavCounts } from './api/posts';
 
 export type AdminRoute =
-  | 'articles' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'users' | 'analytics' | 'profile';
+  | 'articles' | 'drafts' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'users' | 'analytics' | 'profile';
 
 // Badge sa dopĺňa dynamicky z reálnych počtov (viď `badges` v AdminShell) — žiadne statické čísla.
 const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any }[] }[] = [
@@ -28,6 +29,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
     label: 'Obsah',
     items: [
       { id: 'articles', label: 'Články', icon: FileText },
+      { id: 'drafts', label: 'Koncepty', icon: FileEdit },
       { id: 'editor', label: 'Editor', icon: PenSquare },
       { id: 'media', label: 'Médiá', icon: ImageIcon },
     ],
@@ -48,7 +50,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
 ];
 
 const ROUTE_LABELS: Record<AdminRoute, string> = {
-  articles: 'Články', editor: 'Editor článku', media: 'Médiá',
+  articles: 'Články', drafts: 'Koncepty', editor: 'Editor článku', media: 'Médiá',
   categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', users: 'Používatelia', analytics: 'Analytika',
   profile: 'Môj profil',
 };
@@ -224,6 +226,7 @@ function AdminShell() {
 
         <main style={{ flex: 1, padding: 24, minWidth: 0 }}>
           {route === 'articles' && <ArticlesScreen onEdit={openEditor} />}
+          {route === 'drafts' && <DraftsScreen onEdit={openEditor} />}
           {route === "editor" && <EditorScreen articleId={editingId} onBack={() => setRoute("articles")} onSaved={setEditingId} />}
           {route === 'analytics' && <AnalyticsScreen onEdit={openEditor} />}
           {route === 'media' && <MediaScreen />}
