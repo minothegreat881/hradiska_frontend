@@ -667,6 +667,18 @@ const canvasCss = `
   font: 600 11px/1.8 Inter, system-ui, sans-serif; letter-spacing: .06em;
   text-transform: uppercase; color: #8a795e; margin-bottom: 8px;
 }
+.edf-seg { display: flex; gap: 6px; }
+.edf-seg button {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 10px; border: 1px solid #d8c9ab; border-radius: 8px;
+  background: #fffdf7; color: #3b3021; cursor: pointer;
+  font: 500 12.5px Inter, system-ui, sans-serif;
+}
+.edf-seg button:hover { border-color: #b8792d; }
+.edf-seg button.is-on { background: #f1e6cf; border-color: #b8792d; }
+.edf-seg i { display: grid; gap: 1.5px; width: 24px; }
+.edf-seg i span { height: 9px; border-radius: 1px; background: currentColor; opacity: .45; }
+.edf-seg button.is-on i span { opacity: .8; }
 .edf-hint { font-size: 11.5px; color: #8a795e; margin: 8px 0 0; line-height: 1.45; }
 .edf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .edf-field { display: block; margin-bottom: 9px; }

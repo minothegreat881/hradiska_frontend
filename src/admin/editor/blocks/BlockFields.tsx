@@ -132,12 +132,26 @@ export function BlockFields({ type, data, onPatch, onPickMedia }: BlockFieldsPro
 
     case 'content.image-gallery':
       return (
-        <Panel title="Galéria" hint="Obrázky sa zobrazia v mriežke; poradie určuje zoznam.">
+        <Panel title="Galéria" hint="Fotografie sa poukladajú do radov; poradie určuje zoznam nižšie.">
           <label className="edf-field">
-            <span>Stĺpce</span>
-            <select value={data.columns || '3'} onChange={(e) => onPatch({ columns: e.target.value })}>
-              {['2', '3', '4'].map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <span>Koľko fotografií v rade</span>
+            {/* Namiesto rozbaľovacieho zoznamu s číslami — na tlačidle je vidieť,
+                ako bude rad vyzerať. */}
+            <div className="edf-seg" role="group" aria-label="Počet fotografií v rade">
+              {['2', '3', '4'].map((c) => (
+                <button
+                  key={c}
+                  className={String(data.columns || '3') === c ? 'is-on' : ''}
+                  aria-pressed={String(data.columns || '3') === c}
+                  onClick={() => onPatch({ columns: c })}
+                >
+                  <i style={{ gridTemplateColumns: `repeat(${c}, 1fr)` }}>
+                    {Array.from({ length: Number(c) }, (_, k) => <span key={k} />)}
+                  </i>
+                  {c}
+                </button>
+              ))}
+            </div>
           </label>
           <div className="edf-gallery">
             {(data.images || []).map((img: any, i: number) => (

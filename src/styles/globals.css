@@ -1640,11 +1640,15 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   }
 }
 
-/* Clear float utility - ensure proper clearing */
+/* Zrušenie obtekania.
+   NESMIE hovoriť o `display`. Trieda sa dáva aj na mriežky — galéria má
+   `grid ... clear-both` — a `display: block` (rovnaká špecifickosť ako
+   `.grid`, ale neskôr v poradí) im zrušil rozvrhnutie do stĺpcov: fotky
+   galérie sa poukladali pod seba na celú šírku namiesto radov. Všetky prvky
+   s touto triedou sú blokové už samy od seba (div, figure, section, h2).
+   `content` na bežnom prvku aj tak nič nerobilo. */
 .clear-both {
   clear: both;
-  display: block;
-  content: "";
 }
 
 /* Dynamic zone content flow */
