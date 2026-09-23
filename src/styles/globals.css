@@ -884,6 +884,19 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   word-break: normal !important;
 }
 
+/* Dlhý reťazec bez medzier — surová adresa, prepis nápisu, preklep — nesmie
+   vytiecť zo stĺpca von z článku. `word-break: normal` vyššie hovorí, že bežné
+   slová sa nelámu; toto dovolí zlom IBA tam, kde by sa text inak nezmestil.
+   Platí na všetko v tele článku — básne aj citáty sú `not-prose` a majú
+   farby aj sadzbu vlastné, dedenie ich nechytí. */
+.article-content,
+.article-content *,
+.article-caption,
+.lart-title,
+.lart-excerpt {
+  overflow-wrap: break-word;
+}
+
 .article-content p {
   font-size: 16.5px;
   line-height: 1.75;
