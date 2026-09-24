@@ -87,6 +87,22 @@ export function kotvaPre(el: Element, klik?: { x: number; y: number }): Kotva {
 }
 
 /**
+ * Kotva na VOĽNÉ MIESTO — keď redaktor klikne mimo akéhokoľvek prvku
+ * (pozadie stránky). Pripne sa na telo dokumentu a poloha sa uloží ako
+ * zlomok jeho rozmerov, takže špendlík ostane tam, kde ho niekto pichol.
+ */
+export function kotvaVolna(klientX: number, klientY: number): Kotva {
+  const r = document.body.getBoundingClientRect();
+  return {
+    selektor: 'body',
+    otisokTextu: '',
+    popisPrvku: 'voľné miesto na stránke',
+    x: r.width ? Math.min(1, Math.max(0, (klientX - r.left) / r.width)) : 0.5,
+    y: r.height ? Math.min(1, Math.max(0, (klientY - r.top) / r.height)) : 0.5,
+  };
+}
+
+/**
  * Nájdenie prvku podľa kotvy. Najprv selektor (a overí sa odtlačkom textu),
  * potom hľadanie podľa odtlačku po celej stránke. Keď sa prvok nenájde,
  * pripomienka sa v paneli ukáže ako „prvok sa nenašiel" — nezahodí sa.

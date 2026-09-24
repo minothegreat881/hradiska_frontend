@@ -19,7 +19,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X, MousePointerClick, Check, Trash2, Copy, MapPin, AlertTriangle, FileText } from 'lucide-react';
-import { kotvaPre, najdiPodlaKotvy, popisPrvku, type Kotva } from './kotva';
+import { kotvaPre, kotvaVolna, najdiPodlaKotvy, popisPrvku, type Kotva } from './kotva';
 import { preStranku, jedna, pridaj, zmenStav, zmaz, type Druh, type Pripomienka, type Stav } from './api';
 import '../styles/pripomienky.css';
 
@@ -49,7 +49,7 @@ const STAVY: Record<Stav, string> = {
 export function Nastroj({ onZavri }: { onZavri: () => void }) {
   const [zoznam, setZoznam] = useState<Pripomienka[]>([]);
   const [rezim, setRezim] = useState(false);
-  const [hover, setHover] = useState<{ ramik: Ramik; popis: string } | null>(null);
+  const [hover, setHover] = useState<{ ramik: Ramik; popis: string; volne?: boolean } | null>(null);
   const [koncept, setKoncept] = useState<{ kotva: Kotva; ramik: Ramik; text: string; druh: Druh } | null>(null);
   const [otvorena, setOtvorena] = useState<string | null>(null);
   const [miesta, setMiesta] = useState<Record<string, Ramik | null>>({});
@@ -106,7 +106,17 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
 
     const pohyb = (e: MouseEvent) => {
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      if (!el || nasUI(el) || el === document.body || el === document.documentElement) { setHover(null); return; }
+      if (!el || nasUI(el)) { setHover(null); return; }
+      // Pozadie stránky: rámovať celú stránku nemá zmysel, ukáž terčík na
+      // mieste kurzora — pripomienka sa dá pripnúť aj tam.
+      if (el === document.body || el === document.documentElement) {
+        setHover({
+          ramik: { top: e.clientY + window.scrollY - 12, left: e.clientX + window.scrollX - 12, width: 24, height: 24 },
+          popis: 'voľné miesto na stránke',
+          volne: true,
+        });
+        return;
+      }
       setHover({ ramik: ramikPre(el), popis: popisPrvku(el) });
     };
 
@@ -116,9 +126,10 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
       // Klik nesmie prejsť na stránku — inak by odkaz odnavigoval preč.
       e.preventDefault();
       e.stopPropagation();
+      const volne = el === document.body || el === document.documentElement;
       setKoncept({
-        kotva: kotvaPre(el, { x: e.clientX, y: e.clientY }),
-        ramik: ramikPre(el),
+        kotva: volne ? kotvaVolna(e.clientX, e.clientY) : kotvaPre(el, { x: e.clientX, y: e.clientY }),
+        ramik: volne ? ramikPre(document.body) : ramikPre(el),
         text: '',
         druh: 'chyba',
       });
@@ -213,11 +224,16 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
   const miestoOtvorenej = otvorenaP ? miesta[otvorenaP.documentId] : null;
 
   return (
-    <div className="pr-ui">
+    /* `pointer-events-none` je NUTNÉ: bez nej globálne pravidlo v
+       `globals.css` vnúti vrstve `pointer-events: auto`, vrstva zakryje celú
+       obrazovku a `elementFromPoint` vracia ju samu — klikať sa potom dalo
+       len na to, čo bolo POD prvou obrazovkou. Presne tak to aj vyzeralo:
+       titulka, zdieľanie a prvý odsek neboli klikateľné. */
+    <div className="pr-ui pointer-events-none">
       {/* Zvýraznenie prvku pod kurzorom */}
       {rezim && hover && (
         <div
-          className="pr-hover pointer-events-none"
+          className={`pr-hover pointer-events-none${hover.volne ? ' je-volne' : ''}`}
           style={{ top: hover.ramik.top, left: hover.ramik.left, width: hover.ramik.width, height: hover.ramik.height }}
         >
           <span className="pr-hover-menovka">{hover.popis}</span>

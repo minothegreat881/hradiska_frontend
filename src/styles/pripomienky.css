@@ -14,6 +14,19 @@
   inset: 0;
   z-index: 10000;
   font-family: Inter, system-ui, sans-serif;
+  /* Vrstva sama NESMIE brať kliknutia — inak leží nad stránkou a `elementFromPoint`
+     vracia ju, nie prvok pod ňou. Berú ich len jej ovládacie prvky nižšie. */
+  pointer-events: none;
+}
+.pr-spendlik,
+.pr-bublina,
+.pr-panel { pointer-events: auto; }
+
+/* Terčík pre voľné miesto (klik mimo akéhokoľvek prvku). */
+.pr-hover.je-volne {
+  border-radius: 999px;
+  border-style: dashed;
+  background: rgba(201, 72, 58, 0.14);
 }
 
 /* Kurzor v režime výberu — kríž namiesto šípky, nech je jasné, čo sa deje. */
