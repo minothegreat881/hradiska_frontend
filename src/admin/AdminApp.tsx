@@ -11,6 +11,7 @@ import { LoginScreen } from './screens/LoginScreen';
 import { ArticlesScreen } from './screens/ArticlesScreen';
 import { DraftsScreen } from './screens/DraftsScreen';
 import { PripomienkyScreen } from './screens/PripomienkyScreen';
+import { maNeulozeneZmeny, odlozTeraz } from './editor/state/rozpracovane';
 import { EditorScreen } from './screens/EditorScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { MediaScreen } from './screens/MediaScreen';
@@ -106,6 +107,25 @@ function AdminShell() {
 
   const openEditor = (id: string | null) => { setEditingId(id); setRoute('editor'); };
 
+  /* Odchod z editora cez ľavú ponuku. Editor sa tým odmontuje, preto sa
+     rozpísaná práca najprv odloží a redaktor sa dozvie, kde ju nájde —
+     predtým obrazovka len zmizla a vyzeralo to, že sa práca stratila. */
+  const prejdiNa = (id: AdminRoute) => {
+    if (route === 'editor' && maNeulozeneZmeny()) {
+      odlozTeraz();
+      const ist = window.confirm(
+        [
+          'V článku máte neuložené zmeny — na webe sa zatiaľ neprejavia.',
+          '',
+          'Odložil som ich do tohto prehliadača. Nájdete ich v časti „Koncepty" '
+            + 'a po otvorení článku sa vás editor spýta, či ich má vrátiť.',
+        ].join(String.fromCharCode(10)),
+      );
+      if (!ist) return;
+    }
+    setRoute(id);
+  };
+
   return (
     <div className="admin" style={{ display: 'flex', minHeight: '100vh' }}>
       {/* ───────── Sidebar ───────── */}
@@ -153,7 +173,7 @@ function AdminShell() {
                     key={it.id}
                     className="ad-nav"
                     aria-current={active ? 'page' : undefined}
-                    onClick={() => (it.id === 'editor' ? openEditor(editingId) : setRoute(it.id))}
+                    onClick={() => (it.id === 'editor' ? openEditor(editingId) : prejdiNa(it.id))}
                   >
                     <Icon className="w-4 h-4" style={{ flexShrink: 0 }} />
                     {it.label}

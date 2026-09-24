@@ -24,6 +24,7 @@ import { fileUrl, type MediaFile } from '../api/media';
 import { EditorCanvas, type CanvasDevice, type CanvasZoom } from '../editor/EditorCanvas';
 import { useHistory } from '../editor/state/useHistory';
 import { saveDraft, readDraft, clearDraft, timeOf } from '../editor/state/autosave';
+import { nastavNeulozene, nastavOdkladac } from '../editor/state/rozpracovane';
 
 interface Block {
   uid: string;
@@ -128,13 +129,30 @@ export function EditorScreen({
      nezmení nič. Slúži to na prípad, keď spadne prehliadač alebo sa omylom
      zavrie karta. Po úspešnom uložení sa záloha maže. */
   const snapshotRef = useRef<() => any>(() => null);
+  const dirtyRef = useRef(false);
+  dirtyRef.current = dirty;
+
   useEffect(() => {
     if (!dirty) return;
     // Hneď pri PRVEJ zmene, nielen po piatich sekundách — kto zavrie kartu
     // po dvoch, nemá čo stratiť.
     saveDraft(articleId, snapshotRef.current());
     const t = setInterval(() => saveDraft(articleId, snapshotRef.current()), 5000);
-    return () => clearInterval(t);
+    // A ešte raz pri odchode z editora — inak by sa stratilo posledných
+    // pár sekúnd písania (prepnutie v ľavej ponuke editor jednoducho
+    // odmontuje, nič sa nepýta).
+    return () => {
+      clearInterval(t);
+      if (dirtyRef.current) saveDraft(articleId, snapshotRef.current());
+    };
+  }, [dirty, articleId]);
+
+  /* Ponuka administrácie sa pred prepnutím pýta, či je niečo rozpísané —
+     a vie si vyžiadať okamžité odloženie. */
+  useEffect(() => {
+    nastavNeulozene(dirty);
+    nastavOdkladac(() => { if (dirtyRef.current) saveDraft(articleId, snapshotRef.current()); });
+    return () => { nastavNeulozene(false); nastavOdkladac(null); };
   }, [dirty, articleId]);
 
   /* Klávesové skratky. Poslucháč musí byť nad skoršími návratmi komponentu
@@ -278,7 +296,7 @@ export function EditorScreen({
 
   const snapshot = () => ({
     title, excerpt, slug, author, readingTime, pubDate, featured, category,
-    tags, metaTitle, metaDesc, loc, cover, keyFacts, timeline, blocks,
+    tags, metaTitle, metaDesc, loc, cover, coverPosition, keyFacts, timeline, blocks,
   });
   snapshotRef.current = snapshot;
 
@@ -591,14 +609,30 @@ export function EditorScreen({
       </div>
 
       {/* Ponuka obnovy po páde prehliadača — pýta sa skôr, než sa začne písať. */}
+      {/* Ponuka obnovy bola pruh medzi ostatnými — dalo sa ju prehliadnuť a
+          potom to vyzeralo, že sa práca stratila. Teraz je to dialóg cez
+          obrazovku: buď obnoviť, alebo vedome zahodiť. */}
       {recovery && (
-        <div className="acard" role="status" style={{ padding: '12px 16px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 12, background: 'var(--ad-amber-wash, #fdf6e6)', borderColor: 'var(--ad-amber-mid)' }}>
-          <span style={{ fontSize: 13.5, flex: 1 }}>
-            Našla sa rozpísaná práca z <strong>{timeOf(recovery.savedAt)}</strong>, ktorá sa neuložila.
-            Chcete ju obnoviť? Článok na webe sa tým nezmení, kým ho neuložíte.
-          </span>
-          <button className="abtn" onClick={() => { clearDraft(articleId); setRecovery(null); }}>Zahodiť</button>
-          <button className="abtn abtn-primary" onClick={() => restoreDraft(recovery.data)}>Obnoviť</button>
+        <div className="ad-modal-wrap">
+          <div className="acard ad-modal" style={{ width: 'min(520px, 92vw)' }}>
+            <h2>Máte tu rozpísanú prácu</h2>
+            <p>
+              Z <strong>{timeOf(recovery.savedAt)}</strong> sa našli zmeny, ktoré sa nestihli uložiť
+              na server — odložil ich prehliadač. Chcete ich vrátiť do editora?
+              {recovery.data?.title ? <> Ide o článok „{String(recovery.data.title).slice(0, 80)}".</> : null}
+            </p>
+            <p style={{ color: 'var(--ad-muted)', fontSize: 12.5 }}>
+              Článok na webe sa nezmení, kým ho neuložíte. Ak zahodíte, otvorí sa uložená verzia.
+            </p>
+            <div>
+              <button className="abtn" onClick={() => { clearDraft(articleId); setRecovery(null); }}>
+                Zahodiť rozpísané
+              </button>
+              <button className="abtn abtn-primary" onClick={() => restoreDraft(recovery.data)}>
+                Obnoviť rozpísané
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
