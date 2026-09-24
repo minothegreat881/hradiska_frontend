@@ -176,7 +176,7 @@ export function PripomienkyScreen() {
                 </span>
                 {p.stav !== 'nova' && <span className="achip">{STAV_LABEL[p.stav]}</span>}
                 <span style={{ fontSize: 12, color: 'var(--ad-muted)' }}>
-                  {p.autor || 'redakcia'} · {kedy(p.createdAt)}
+                  {p.autor || 'hosť'} · {kedy(p.createdAt)}
                   {p.zariadenie === 'mobil' ? ' · mobil' : ''}
                 </span>
               </div>

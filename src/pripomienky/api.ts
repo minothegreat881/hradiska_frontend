@@ -3,9 +3,10 @@
 /**
  * Volania na Strapi pre pripomienky.
  *
- * Token je ADMIN token redaktora (`hradiska.admin.jwt`) — ten istý, ktorým sa
- * prihlasuje do administrácie. O tom, či ho naozaj má, rozhoduje server:
- * bez práv vráti 403 a nástroj sa jednoducho neukáže.
+ * Písať a čítať smie KTOKOĽVEK, aj neprihlásený — web je zatiaľ technický a
+ * testeri naň dostávajú odkaz. Keď je v prehliadači uložené prihlásenie do
+ * administrácie (`hradiska.admin.jwt`), pošle sa a redaktor navyše smie meniť
+ * stav a mazať. O právach rozhoduje server, nie toto.
  */
 
 import { ADMIN_TOKEN_KEY } from '../lib/preview';
@@ -110,11 +111,11 @@ export const zmenStav = (documentId: string, stav: Stav) =>
 export const zmaz = (documentId: string) =>
   zavolaj(`/api/pripomienky/${documentId}`, { method: 'DELETE' });
 
-/** Mám vôbec právo? Server rozhodne — 200 áno, čokoľvek iné nie. */
-export async function somRedaktor(): Promise<boolean> {
-  if (!adminToken()) return false;
-  try {
-    await zavolaj('/api/pripomienky?pagination[pageSize]=1');
-    return true;
-  } catch { return false; }
-}
+/**
+ * Je to redaktor? Podľa uloženého prihlásenia do administrácie.
+ *
+ * Slúži LEN na to, čo sa ukáže v rozhraní (meniť stav, mazať, odkaz do
+ * administrácie). O skutočnom práve rozhoduje server: hosťovi vráti na tie
+ * akcie 403, nech si v prehliadači nastaví čokoľvek.
+ */
+export const jeRedaktor = (): boolean => !!adminToken();

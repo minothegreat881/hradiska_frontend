@@ -41,7 +41,7 @@ const zoRiadku = (r: any): AdminPripomienka => ({
   popisPrvku: r.popisPrvku ?? null,
   zariadenie: r.zariadenie ?? null,
   sirkaOkna: r.sirkaOkna ?? null,
-  autor: r.user?.username ?? null,
+  autor: r.user?.username ?? null,   // null = hosť (neprihlásený)
   createdAt: r.createdAt,
 });
 

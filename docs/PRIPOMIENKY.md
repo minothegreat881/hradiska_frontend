@@ -15,15 +15,24 @@ Dva druhy v jednom nástroji:
 
 ## Kto to vidí
 
-Iba **prihlásený redaktor** (rola `authenticated` v Strapi). Čitateľ si nestiahne ani
-tlačidlo — overené na zostavenej verzii: anonymné okno stiahne 0 súborov nástroja.
-O právach rozhoduje server: verejná ani členská rola nemá na `api::pripomienka` nič.
+**Ktokoľvek, kto má odkaz na stránku** — web je zatiaľ technický, verejnosť naň nechodí
+a testeri naň dostávajú odkaz. Hosť smie pripomienku napísať aj čítať; **meniť stav a
+mazať smie len redakcia** (rola `authenticated`). Rozhoduje o tom server, nie prehliadač:
+PUT/DELETE bez prihlásenia vráti 403 (overené).
+
+Ochrana pred zaplavením: hosť má 10 pripomienok za minútu na IP, prihlásený 20 na účet
+(overené: jedenásty zápis hosťa vráti 429). Neprihlásenému sa z autora vracia len
+prezývka — `populate` sa mu prepisuje, aby sa cez reláciu nedal vytiahnuť e-mail účtu.
+
+Keby sa web otvoril verejnosti, stačí z `setupPublicPermissions`
+(`hradiska-strapi/src/index.ts`) odobrať `api::pripomienka.pripomienka.create` a `.find`;
+zvyšok kódu ostáva a nástroj sa vráti len redakcii.
 
 ## Ako to funguje
 
 | kde | súbor |
 |---|---|
-| plávajúce tlačidlo (jediné, čo sa načíta dopredu) | `src/pripomienky/PripomienkyDock.tsx` |
+| plávajúce tlačidlo (jediné, čo sa načíta dopredu; vidí ho každý) | `src/pripomienky/PripomienkyDock.tsx` |
 | samotný nástroj (lazy — až po kliknutí) | `src/pripomienky/Nastroj.tsx` |
 | zapamätanie prvku | `src/pripomienky/kotva.ts` |
 | volania na Strapi z webu | `src/pripomienky/api.ts` |

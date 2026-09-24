@@ -3,9 +3,10 @@
 /**
  * NÁSTROJ NA PRIPOMIENKY — kliknem na prvok, napíšem poznámku.
  *
- * Celý žije len pre prihláseného redaktora a načíta sa až po kliknutí na
- * plávajúce tlačidlo (viď `PripomienkyDock`), takže bežný návštevník z neho
- * nestiahne ani bajt.
+ * Napísať pripomienku môže KTOKOĽVEK, kto má odkaz na stránku. Prihlásený
+ * redaktor má navyše zmenu stavu, mazanie a odkaz do administrácie — a keby
+ * si niekto ten príznak v prehliadači podvrhol, server mu tie akcie odmietne.
+ * Nástroj sa načíta až po kliknutí na plávajúce tlačidlo (`PripomienkyDock`).
  *
  * Tri časti:
  *   • REŽIM VÝBERU — prvok pod kurzorom sa orámuje, klik otvorí bublinu.
@@ -20,7 +21,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X, MousePointerClick, Check, Trash2, Copy, MapPin, AlertTriangle, FileText } from 'lucide-react';
 import { kotvaPre, kotvaVolna, najdiPodlaKotvy, popisPrvku, type Kotva } from './kotva';
-import { preStranku, jedna, pridaj, zmenStav, zmaz, type Druh, type Pripomienka, type Stav } from './api';
+import { preStranku, jedna, pridaj, zmenStav, zmaz, jeRedaktor, type Druh, type Pripomienka, type Stav } from './api';
 import '../styles/pripomienky.css';
 
 interface Ramik { top: number; left: number; width: number; height: number }
@@ -56,6 +57,8 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
   const [uklada, setUklada] = useState(false);
   const [sprava, setSprava] = useState('');
   const textRef = useRef<HTMLTextAreaElement>(null);
+  /* Len pre rozhranie — čo sa komu ukáže. Práva stráži server. */
+  const redaktor = jeRedaktor();
 
   // ── Načítanie a rozmiestnenie ──────────────────────────────────────────────
   const prepocitaj = useCallback((polozky: Pripomienka[]) => {
@@ -276,23 +279,29 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
             <span className={`pr-znacka${otvorenaP.druh === 'obsah' ? ' je-obsah' : ''}`}>
               {otvorenaP.druh === 'obsah' ? 'obsah' : 'chyba'}
             </span>
-            <span className="pr-bublina-autor">{otvorenaP.autor || 'redakcia'}</span>
+            <span className="pr-bublina-autor">{otvorenaP.autor || 'hosť'}</span>
             <button className="pr-x" onClick={() => setOtvorena(null)} aria-label="Zavrieť">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
           <p className="pr-bublina-text">{otvorenaP.text}</p>
-          <div className="pr-bublina-nohy">
-            <button className="pr-btn" onClick={() => zmen(otvorenaP, otvorenaP.stav === 'riesi-sa' ? 'nova' : 'riesi-sa')}>
-              {otvorenaP.stav === 'riesi-sa' ? 'Späť na novú' : 'Rieši sa'}
-            </button>
-            <button className="pr-btn je-hlavne" onClick={() => zmen(otvorenaP, 'hotova')}>
-              <Check className="w-3.5 h-3.5" /> Hotová
-            </button>
-            <button className="pr-btn je-nebezpecne" onClick={() => vymaz(otvorenaP)} aria-label="Zmazať">
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          {redaktor ? (
+            <div className="pr-bublina-nohy">
+              <button className="pr-btn" onClick={() => zmen(otvorenaP, otvorenaP.stav === 'riesi-sa' ? 'nova' : 'riesi-sa')}>
+                {otvorenaP.stav === 'riesi-sa' ? 'Späť na novú' : 'Rieši sa'}
+              </button>
+              <button className="pr-btn je-hlavne" onClick={() => zmen(otvorenaP, 'hotova')}>
+                <Check className="w-3.5 h-3.5" /> Hotová
+              </button>
+              <button className="pr-btn je-nebezpecne" onClick={() => vymaz(otvorenaP)} aria-label="Zmazať">
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <p className="pr-tip" style={{ margin: 0 }}>
+              {otvorenaP.stav === 'riesi-sa' ? 'Redakcia to už rieši.' : 'Čaká na redakciu.'}
+            </p>
+          )}
         </div>
       )}
 
@@ -389,8 +398,13 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
           <button className="pr-btn" onClick={skopiruj} disabled={!zoznam.length}>
             <Copy className="w-3.5 h-3.5" /> Kopírovať pre vývojára
           </button>
-          <a className="pr-btn" href="/admin" target="_blank" rel="noreferrer">Všetky v admine</a>
+          {redaktor && <a className="pr-btn" href="/admin" target="_blank" rel="noreferrer">Všetky v admine</a>}
         </div>
+        {!redaktor && (
+          <p className="pr-tip" style={{ margin: '6px 2px 0' }}>
+            Píšete ako hosť — pripomienku uvidí redakcia.
+          </p>
+        )}
       </div>
     </div>
   );
