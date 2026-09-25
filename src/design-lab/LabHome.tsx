@@ -15,6 +15,7 @@ import { HeroSearch } from '../components/HeroSearch';
 import { InkEffect } from '../components/InkEffect';
 import LabAktuality from './LabAktuality';
 import LabMapa from './LabMapa';
+import LabKategorieRychle from './LabKategorieRychle';
 
 export function LabHome() {
   return (
@@ -46,6 +47,10 @@ export function LabHome() {
         </p>
 
         <h1 className="lhero-titul">Slovanské hradiská</h1>
+
+        {/* Rozcestník kategórií hneď pod titulkom — deväť kresieb, po ktorých
+            sa dá vojsť do webu skôr, než návštevník začne čítať. */}
+        <LabKategorieRychle />
 
         <figure className="lhero-tabula">
           {/* Pasparta je vlastný prvok, popiska leží POD ňou na papieri —

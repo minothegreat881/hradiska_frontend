@@ -1035,6 +1035,46 @@ body[data-lab-theme='pecat'],
    s mapou. Deväť tmavých dlaždíc pod ním by z polovice stránky spravilo
    jednu súvislú tmavú plochu.
    ══════════════════════════════════════════════════════════════════════════ */
+/* ── Rozcestník kategórií pod titulkom ──────────────────────────────────
+   Deväť kresieb v dvoch radoch (5 + 4) s názvom pod obrázkom. Rad sa láme
+   sám (`flex-wrap`), takže na užšom okne prejde na tri a potom na dva
+   v rade bez ďalších medzidotazov. Obrázky majú jednotnú výšku a orezávajú
+   sa na stred — kresby sú na šírku, takže sa tým nič podstatné nestratí. */
+.lkat { max-width: 1160px; margin: 0 auto 44px; padding: 0 24px; }
+.lkat-rad {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 28px 26px; margin: 0; padding: 0; list-style: none;
+}
+.lkat-rad > li { width: 190px; }
+.lkat-polozka {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-decoration: none; color: inherit;
+}
+.lkat-ram {
+  display: block; width: 100%; aspect-ratio: 3 / 2; overflow: hidden;
+  border-radius: 3px; background: var(--l-card);
+  box-shadow: 0 1px 0 var(--l-line), 0 6px 16px -12px rgba(40, 24, 8, .5);
+}
+.lkat-obraz {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .5s cubic-bezier(.22, .61, .36, 1);
+}
+.lkat-polozka:hover .lkat-obraz { transform: scale(1.04); }
+.lkat-nazov {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14.5px; line-height: 1.3; text-align: center;
+  color: var(--l-ink); text-wrap: balance;
+}
+.lkat-polozka:hover .lkat-nazov { color: var(--l-second); }
+
+@media (max-width: 900px) { .lkat-rad > li { width: 160px; } }
+@media (max-width: 640px) {
+  .lkat { padding: 0 16px; }
+  .lkat-rad { gap: 20px 16px; }
+  .lkat-rad > li { width: calc(50% - 8px); }
+  .lkat-nazov { font-size: 13.5px; }
+}
+
 .lcat { background: var(--l-paper); border-bottom: 1px solid var(--l-line); }
 .lcat-wrap { max-width: 1280px; margin: 0 auto; padding: 88px 32px 96px; }
 
