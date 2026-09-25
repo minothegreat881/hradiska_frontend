@@ -1758,20 +1758,20 @@ body[data-lab-theme='pecat'],
    nie ako dva nálezy položené vedľa seba. */
 .lfoot-nalez--nadoba { width: 104px; height: 104px; margin: 34px 0 0 -18px; }
 
-/* Nález na konci ľavého stĺpca. Stojí v toku textu, nie nalepený do rohu,
-   takže sa nemá o čo zavadiť pri žiadnej šírke okna. Maľba má vlastný
-   červený záter cez celú plochu — vypĺňa medailón, nie je v ňom položená. */
-.lfoot-nalez--vlavo { width: 128px; height: 128px; margin-top: 26px; overflow: hidden; }
+/* Nález v ľavom stĺpci — stojí naľavo od ikon sietí, v jednom riadku s nimi.
+   Je v toku textu, nie nalepený do rohu, takže sa nemá o čo zavadiť pri
+   žiadnej šírke okna. Maľba má vlastný červený záter cez celú plochu —
+   vypĺňa medailón, nie je v ňom položená. */
+.lfoot-nalez--vlavo { width: 84px; height: 84px; overflow: hidden; flex: none; order: -1; }
 .lfoot-nalez--vlavo picture { display: contents; }
 .lfoot-nalez--vlavo img { width: 100%; height: 100%; object-fit: cover; }
-/* Ikony sietí a nález pod nimi. Na širokom okne pod sebou. */
-.lfoot-spodok { display: flex; flex-direction: column; align-items: flex-start; }
+/* Nález a ikony sietí v jednom riadku, nález vľavo (`order: -1` — v značke
+   stojí až za ikonami, aby ho čítačka nebrala pred nimi). */
+.lfoot-spodok { display: flex; align-items: center; gap: 16px; }
 
 @media (max-width: 640px) {
-  /* Na telefóne stoja ikony sietí a nález v jednom riadku — nález sám
-     zaberal celý riadok a pätička tým narástla o svoju výšku. */
-  .lfoot-spodok { flex-direction: row; align-items: center; justify-content: space-between; gap: 14px; width: 100%; }
-  .lfoot-nalez--vlavo { width: 88px; height: 88px; margin-top: 0; flex: none; }
+  .lfoot-spodok { gap: 12px; }
+  .lfoot-nalez--vlavo { width: 72px; height: 72px; }
 }
 
 .lfoot-wrap {
