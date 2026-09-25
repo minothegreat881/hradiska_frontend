@@ -112,130 +112,21 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                 role="img"
                 aria-label={categoryName}
               />
-              {/* 2. Vertikálny scrim, 3. vignette, 4. zlatý rám */}
-              <div className="ch-scrim" aria-hidden="true" />
-              <div className="ch-vignette" aria-hidden="true" />
+              {/* Zlatý rám. Scrim ani vignette tu už nie sú — kryli kresbu
+                  kvôli textu, ktorý na fotke nestojí. */}
               <div className="ch-frame" aria-hidden="true" />
+            </div>
 
-              {/* Obsah vľavo */}
-              <div className="ch-content">
-                <span
-                  style={{
-                    alignSelf: 'flex-start',
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                    color: 'var(--ch-chip-text)',
-                    background: 'var(--ch-chip-bg)',
-                    border: '1px solid var(--ch-chip-border)',
-                    backdropFilter: 'blur(3px)',
-                    WebkitBackdropFilter: 'blur(3px)',
-                    padding: '6px 15px',
-                    borderRadius: 999,
-                  }}
-                >
-                  Kategória
-                </span>
-
-                <div
-                  aria-hidden="true"
-                  style={{ width: 64, height: 2, background: 'var(--ch-gold)', margin: '22px 0 20px' }}
-                />
-
-                <h1
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 'clamp(34px, 4vw, 52px)',
-                    fontWeight: 700,
-                    letterSpacing: '0.01em',
-                    color: 'var(--ch-title)',
-                    lineHeight: 1.04,
-                    textShadow: '0 2px 18px rgba(0,0,0,.5)',
-                    margin: 0,
-                  }}
-                >
-                  {categoryName}
-                </h1>
-
-                {categoryDescription && (
-                  <p
-                    style={{
-                      fontFamily: 'var(--font-serif)',
-                      fontStyle: 'italic',
-                      fontSize: 22,
-                      color: 'var(--ch-sub)',
-                      maxWidth: 440,
-                      lineHeight: 1.4,
-                      margin: '14px 0 0',
-                    }}
-                  >
-                    {categoryDescription}
-                  </p>
-                )}
-
-                <div
-                  className="flex items-center flex-wrap"
-                  style={{ marginTop: 26, gap: 14 }}
-                >
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: 13,
-                      color: 'var(--ch-pill-text)',
-                      background: 'var(--ch-pill-bg)',
-                      padding: '8px 16px',
-                      borderRadius: 999,
-                    }}
-                  >
-                    {categoryArticles.length}{' '}
-                    {categoryArticles.length === 1
-                      ? 'článok'
-                      : categoryArticles.length < 5
-                      ? 'články'
-                      : 'článkov'}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    style={{ width: 5, height: 5, borderRadius: 999, background: 'var(--hr-line-soft)' }}
-                  />
-                  <span
-                    style={{ fontFamily: 'var(--font-serif)', fontSize: 17, color: 'var(--ch-meta)' }}
-                  >
-                    Preskúmajte všetky lokality nižšie
-                  </span>
-                </div>
-              </div>
-
-              {/* Scroll cue */}
-              <div
-                className="ch-cue"
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  bottom: 16,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 4,
-                  color: 'var(--hr-on-photo-3)',
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 10,
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Posúvajte nadol
-                </span>
-                <span className="ch-cue-arrow" style={{ fontSize: 16, lineHeight: 1 }}>⌄</span>
-              </div>
+            {/* Vyhradený priestor pre text POD fotkou. Predtým ležal nadpis
+                aj popis priamo na kresbe a polovicu jej zakrýval tmavý
+                závoj; na papieri má text vlastné miesto a kresba ostáva
+                celá. */}
+            <div className="cat-uvod">
+              <span className="cat-uvod-linka" aria-hidden="true" />
+              <h1 className="cat-uvod-titul">{categoryName}</h1>
+              {categoryDescription && (
+                <p className="cat-uvod-popis">{categoryDescription}</p>
+              )}
             </div>
           </motion.div>
         </div>

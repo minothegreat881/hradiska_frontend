@@ -2058,27 +2058,6 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   box-shadow: 0 30px 66px -28px rgba(40, 26, 10, 0.55);
 }
 
-/* Vertikálny scrim zľava — text vľavo čitateľný, fotka vpravo dýcha. */
-.cat-hero .ch-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(16, 11, 6, 0.9) 0%,
-    rgba(16, 11, 6, 0.72) 34%,
-    rgba(16, 11, 6, 0.28) 60%,
-    rgba(16, 11, 6, 0) 82%
-  );
-  pointer-events: none;
-}
-
-.cat-hero .ch-vignette {
-  position: absolute;
-  inset: 0;
-  box-shadow: inset 0 0 120px 24px rgba(16, 11, 6, 0.5);
-  pointer-events: none;
-}
-
 .cat-hero .ch-frame {
   position: absolute;
   inset: 14px;
@@ -2087,48 +2066,44 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   pointer-events: none;
 }
 
-.cat-hero .ch-content {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 60%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 56px;
+/* Vyhradený priestor pre text pod fotkou.
+   Šírka je zámerne užšia než fotka: popis je súvislá veta a nad ~70 znakov
+   na riadok sa čítanie láme. */
+.cat-uvod {
+  max-width: 760px;
+  padding: 34px 0 6px;
+}
+.cat-uvod-linka {
+  display: block;
+  width: 64px;
+  height: 2px;
+  background: var(--hr-accent, #8f2c22);
+  margin-bottom: 22px;
+}
+.cat-uvod-titul {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: 0.01em;
+  color: var(--hr-ink);
+  text-wrap: balance;
+}
+.cat-uvod-popis {
+  margin: 16px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.5;
+  color: var(--hr-body);
 }
 
-/* Scroll cue */
-@keyframes scrollNudge {
-  0%, 100% { transform: translateY(0); opacity: 0.9; }
-  50%      { transform: translateY(6px); opacity: 0.5; }
-}
-.cat-hero .ch-cue-arrow { animation: scrollNudge 1.6s ease-in-out infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .cat-hero .ch-cue-arrow { animation: none; }
-}
-
-/* Mobil: scrim zdola, obsah cez celú šírku a zarovnaný dole. */
 @media (max-width: 760px) {
-  .cat-hero { height: 380px; }
-  .cat-hero .ch-scrim {
-    background: linear-gradient(
-      180deg,
-      rgba(16, 11, 6, 0.25) 0%,
-      rgba(16, 11, 6, 0.55) 45%,
-      rgba(16, 11, 6, 0.92) 100%
-    );
-  }
-  .cat-hero .ch-content {
-    width: 100%;
-    justify-content: flex-end;
-    padding: 0 26px 34px;
-  }
-}
-@media (max-width: 600px) {
-  .cat-hero .ch-cue { display: none; }
+  .cat-hero { height: 300px; }
+  .cat-uvod { padding-top: 26px; }
+  .cat-uvod-linka { margin-bottom: 16px; }
+  .cat-uvod-popis { font-size: 18px; }
 }
 
 /* ============================================================================
