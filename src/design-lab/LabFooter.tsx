@@ -154,16 +154,6 @@ export function LabFooter() {
               ))}
             </div>
 
-            {/* Meč z listu značiek na konci ľavého stĺpca — rovnaká maľba
-                ako náušnica a nádoba vpravo, len položená. Papierová
-                podložka je aj tu: na tmavom pozadí by z perových obrysov
-                nezostalo nič. */}
-            <span className="lfoot-mec" aria-hidden="true">
-              <picture>
-                <source srcSet="/znak_mec.webp" type="image/webp" />
-                <img src="/znak_mec.png" alt="" width={520} height={143} loading="lazy" decoding="async" />
-              </picture>
-            </span>
           </div>
 
           <div className="lfoot-cols">
