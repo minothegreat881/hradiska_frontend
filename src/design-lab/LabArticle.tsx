@@ -34,7 +34,7 @@ import { HistoricalGallery } from '../components/HistoricalGallery';
 import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
 import { ArticleCard } from '../components/ArticleCard';
-import LabKategorieRychle from './LabKategorieRychle';
+import LabKategorieLista from './LabKategorieLista';
 import { lazyStale } from '../lib/lazyStale';
 
 /* Mapa sa dotiahne až keď na ňu príde rad. Je to najťažší komponent webu
@@ -92,12 +92,11 @@ export function LabArticle({ slug }: { slug: string }) {
             : 'Náhľad konceptu sa nepodaril: prihlásenie do administrácie vypršalo. Zobrazená je publikovaná verzia.'}
         </div>
       )}
-      {/* Rozcestník kategórií. Tá istá deviatka ako na domovskej: článok je
-          na webe najčastejšie prvou stránkou z vyhľadávača, takže odtiaľto
-          musí viesť cesta ďalej skôr, než návštevník začne čítať. */}
-      <div className="lart-dlazdice">
-        <LabKategorieRychle />
-      </div>
+      {/* Lišta kategórií. Tá istá deviatka ako na domovskej, len úzka:
+          článok je na webe najčastejšie prvou stránkou z vyhľadávača, takže
+          odtiaľto musí viesť cesta ďalej — ale nesmie odtlačiť text pod
+          okraj obrazovky. Kategória článku je v nej zvýraznená. */}
+      <LabKategorieLista aktivna={post.category?.slug} />
 
       {/* ── Titulná fotografia ───────────────────────────────────────────
           Jediná prestavaná časť rozvrhu. Predtým prúžok 224–256 px s tmavým

@@ -1252,10 +1252,100 @@ body[data-lab-theme='pecat'],
   .dob-clanok:hover .dob-obraz { transform: none; }
 }
 
-/* Dlaždice na stránke článku: rovnaký pás, len s vlastným odstupom hore
-   aj dole — nesedí pod titulkom, ale nad titulnou fotografiou článku. */
-.lart-dlazdice { padding: 26px 0 30px; }
-@media (max-width: 720px) { .lart-dlazdice { padding: 16px 0 20px; } }
+/* ── Lišta kategórií na začiatku článku ─────────────────────────────────
+   Handoff „Úvod článku – mini dlaždice nad titulnou fotkou" (09/2026).
+   V článku sú veľké dlaždice zbytočné: nad titulnou fotkou by to boli dve
+   veľké obrazové plochy za sebou a text by začal až pod okrajom obrazovky.
+   Tu je z tej istej deviatky úzky pás s obrázkom 84 × 56 px, bez počtov. */
+.cat-rail {
+  background: var(--l-paper);
+  border-bottom: 1px solid var(--l-line);
+}
+.cat-rail-pas {
+  max-width: 1320px; margin: 0 auto;
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: 14px;
+  padding: 18px 28px 16px;
+}
+.cat-rail-predel {
+  align-self: stretch; width: 1px; flex: none;
+  background: var(--l-line-2);
+  margin: 4px 10px;
+}
+
+.cat-mini {
+  width: 100px; flex: none;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  text-decoration: none; color: inherit;
+  scroll-snap-align: center;
+}
+.cat-mini-ram {
+  display: block; width: 84px; height: 56px;
+  border-radius: 12px; overflow: hidden; background: var(--l-card);
+  box-shadow: 0 0 0 1px var(--l-line);
+  transition: transform .38s cubic-bezier(.2, .8, .2, 1), box-shadow .38s cubic-bezier(.2, .8, .2, 1);
+}
+.cat-mini-obraz {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: saturate(.55) sepia(.18);
+  transition: filter .38s ease;
+}
+.cat-mini-nazov {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12.5px; font-weight: 600; line-height: 1.2;
+  text-align: center; color: var(--l-ink);
+  /* Najdlhší názov („Všeobecne o hradiskách") potrebuje dva riadky;
+     tretí by lištu rozhojdal do nerovnakých výšok. */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color .3s;
+}
+
+.cat-mini:hover .cat-mini-ram {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px var(--l-line), 0 10px 18px -10px rgba(70, 45, 20, .5);
+}
+.cat-mini:hover .cat-mini-obraz { filter: none; }
+.cat-mini:hover .cat-mini-nazov { color: var(--l-second-deep); }
+
+/* Kategória otvoreného článku. Dvojitý prstenec: vnútorný v papieri drží
+   odstup od obrázka, vonkajší je samotné zvýraznenie. */
+.cat-mini.is-active .cat-mini-ram {
+  box-shadow: 0 0 0 2px var(--l-paper), 0 0 0 4px var(--l-second-deep);
+}
+.cat-mini.is-active .cat-mini-obraz { filter: none; }
+.cat-mini.is-active .cat-mini-nazov { font-weight: 700; color: var(--l-second-deep); }
+
+.cat-mini:focus-visible {
+  outline: 2px solid var(--l-second-deep);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+/* Na užšom okne sa lišta NEZALAMUJE, posúva sa. Zalomená by z jedného
+   riadka spravila tri a zožrala by presne tú výšku, kvôli ktorej vznikla. */
+@media (max-width: 1060px) {
+  .cat-rail-pas {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
+  }
+  .cat-rail-pas::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 600px) {
+  .cat-rail-pas { padding: 12px 16px; gap: 10px; }
+  .cat-mini { width: 80px; }
+  .cat-mini-ram { width: 68px; height: 45px; border-radius: 10px; }
+  .cat-mini-nazov { font-size: 11.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-mini-ram { transition: box-shadow .2s ease; }
+  .cat-mini:hover .cat-mini-ram { transform: none; }
+}
 
 /* Mapa pod komentármi článku. */
 .lart-mapa { position: relative; z-index: 5; }

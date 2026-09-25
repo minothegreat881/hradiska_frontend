@@ -14,10 +14,8 @@
  * s predlohou. Rovnako sa drží pečatná červená z tokenov (`--l-second-deep`)
  * namiesto `#a3302a` — je to to isté rodisko farby, len naladené na papier.
  *
- * Názvy sú SKRÁTENÉ („Hospodárska", „Svätyne"), aby sa vošli pod obrázok.
- * Skutočné názvy kategórií v Strapi sa tým nemenia. Predloha volala povesti
- * „Legendy" — to ale nie je skratka toho istého slova a kategória sa tak
- * nevolá ani v hlavičke webu, takže dlaždica nesie názov „Povesti".
+ * Zoznam kategórií, ich skrátené názvy aj poradie žijú v `data/rozcestnik.ts`,
+ * lebo tú istú deviatku vykresľuje aj lišta na stránke článku.
  *
  * Počty pod názvom sa ťahajú zo Strapi (`getCategoryPostCounts`), nie sú
  * napísané natvrdo — číslo v predlohe je stav z jedného dňa. Kým odpoveď
@@ -26,46 +24,19 @@
 
 import { useEffect, useState } from 'react';
 import { hradiskaCategories, variant } from '../data/categories';
+import {
+  ROZCESTNIK_TYPY as TYPY,
+  ROZCESTNIK_PRAMENE as PRAMENE,
+  tvarPoctu,
+  zakladStrapi,
+  type PolozkaRozcestnika as Polozka,
+} from '../data/rozcestnik';
 import { getCategoryPostCounts } from '../lib/strapi';
-
-/** Skrátený názov a tvary počítaného podstatného mena: 1 / 2–4 / 5 a viac. */
-interface Polozka {
-  slug: string;
-  label: string;
-  tvary: [string, string, string];
-}
-
-const TYPY: Polozka[] = [
-  { slug: 'kniezacie-sidla', label: 'Kniežacie sídla', tvary: ['hradisko', 'hradiská', 'hradísk'] },
-  { slug: 'mocenske-centra', label: 'Mocenské centrá', tvary: ['hradisko', 'hradiská', 'hradísk'] },
-  { slug: 'strazna-funkcia', label: 'Hospodárska', tvary: ['hradisko', 'hradiská', 'hradísk'] },
-  { slug: 'refugia', label: 'Refúgiá', tvary: ['hradisko', 'hradiská', 'hradísk'] },
-  { slug: 'staroveke-sidla', label: 'Staroveké hradiská', tvary: ['hradisko', 'hradiská', 'hradísk'] },
-];
-
-const PRAMENE: Polozka[] = [
-  { slug: 'listiny-a-pisomne-zdroje', label: 'Listiny a pís. zdroje', tvary: ['prameň', 'pramene', 'prameňov'] },
-  { slug: 'vseobecne-o-hradiskach', label: 'Všeobecne o hradiskách', tvary: ['text', 'texty', 'textov'] },
-  { slug: 'povesti', label: 'Povesti', tvary: ['povesť', 'povesti', 'povestí'] },
-  { slug: 'svatyne-a-sakralne-objekty', label: 'Svätyne', tvary: ['svätyňa', 'svätyne', 'svätýň'] },
-];
-
-/** Slovenčina počíta v troch tvaroch: 1 hradisko, 2 hradiská, 5 hradísk. */
-function tvarPoctu(n: number, [jedno, malo, vela]: [string, string, string]): string {
-  if (n === 1) return jedno;
-  if (n >= 2 && n <= 4) return malo;
-  return vela;
-}
-
-function zakladUrl(): string {
-  if (!import.meta.env.PROD) return import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
-  return typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi';
-}
 
 function Dlazdica({ d, pocet, poradie }: { d: Polozka; pocet?: number; poradie: number }) {
   const k = hradiskaCategories.find((c) => c.slug === d.slug);
   if (!k) return null;
-  const base = zakladUrl();
+  const base = zakladStrapi();
 
   return (
     <a
