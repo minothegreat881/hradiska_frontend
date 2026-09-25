@@ -1753,6 +1753,14 @@ body[data-lab-theme='pecat'],
    nie ako dva nálezy položené vedľa seba. */
 .lfoot-nalez--nadoba { width: 104px; height: 104px; margin: 34px 0 0 -18px; }
 
+/* Nález na konci ľavého stĺpca. Stojí v toku textu, nie nalepený do rohu,
+   takže sa nemá o čo zavadiť pri žiadnej šírke okna. Maľba má vlastný
+   červený záter cez celú plochu — vypĺňa medailón, nie je v ňom položená. */
+.lfoot-nalez--vlavo { width: 128px; height: 128px; margin-top: 26px; overflow: hidden; }
+.lfoot-nalez--vlavo picture { display: contents; }
+.lfoot-nalez--vlavo img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 640px) { .lfoot-nalez--vlavo { width: 104px; height: 104px; margin-top: 20px; } }
+
 .lfoot-wrap {
   position: relative; z-index: 1;
   max-width: 1200px; margin: 0 auto;

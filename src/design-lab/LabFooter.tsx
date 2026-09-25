@@ -154,6 +154,15 @@ export function LabFooter() {
               ))}
             </div>
 
+            {/* Náušnica z druhého listu značiek na konci ľavého stĺpca.
+                Na rozdiel od nálezov vpravo má maľba vlastný červený záter,
+                ktorý vypĺňa celý medailón — preto `cover`, nie `contain`. */}
+            <span className="lfoot-nalez lfoot-nalez--vlavo" aria-hidden="true">
+              <picture>
+                <source srcSet="/znak_nausnica2.webp" type="image/webp" />
+                <img src="/znak_nausnica2.png" alt="" width={360} height={287} loading="lazy" decoding="async" />
+              </picture>
+            </span>
           </div>
 
           <div className="lfoot-cols">
