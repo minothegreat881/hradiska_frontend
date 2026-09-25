@@ -160,8 +160,8 @@ export function LabNav() {
               sivý štvorec pôvodného súboru vyzeral ako nalepený štítok. */}
           <span className="lnav-mark">
             <picture>
-              <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
-              <img src="/logo_hradiska_small.png" alt="" aria-hidden="true" />
+              <source srcSet="/znak_minca.webp" type="image/webp" />
+              <img src="/znak_minca.png" alt="" aria-hidden="true" />
             </picture>
           </span>
           <span>Hradiská</span>

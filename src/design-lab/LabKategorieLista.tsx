@@ -51,6 +51,27 @@ function Mini({ slug, label, aktivna }: { slug: string; label: string; aktivna: 
 
 export function LabKategorieLista({ aktivna }: { aktivna?: string }) {
   const pas = useRef<HTMLDivElement>(null);
+  const zaciatok = useRef<{ x: number; y: number; posun: number } | null>(null);
+
+  /* Na telefóne sa pás posúva prstom. Prehliadač po rýchlom švihu aj tak
+     pošle klik na dlaždicu, na ktorej prst skončil, takže sa stačilo
+     rýchlejšie posunúť a stránka odskočila do kategórie.
+     Klik sa preto prijme len vtedy, keď ani prst, ani pás medzitým
+     nešli nikam: 10 px je bežná tolerancia pre chvenie ruky a posun pásu
+     chytí aj zotrvačné dobiehanie, pri ktorom prst stojí. */
+  const stlacenie = (e: React.PointerEvent) => {
+    zaciatok.current = { x: e.clientX, y: e.clientY, posun: pas.current?.scrollLeft ?? 0 };
+  };
+  const klik = (e: React.MouseEvent) => {
+    const z = zaciatok.current;
+    if (!z) return;
+    const prstPohol = Math.abs(e.clientX - z.x) > 10 || Math.abs(e.clientY - z.y) > 10;
+    const pasPohol = Math.abs((pas.current?.scrollLeft ?? 0) - z.posun) > 2;
+    if (prstPohol || pasPohol) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
 
   // Na úzkom okne sa lišta nezalamuje, ale posúva. Aktívnu dlaždicu treba
   // dorolovať do zorného poľa — `scrollLeft` na samotnom páse, nie
@@ -66,7 +87,7 @@ export function LabKategorieLista({ aktivna }: { aktivna?: string }) {
 
   return (
     <nav className="cat-rail" aria-label="Kategórie hradísk">
-      <div className="cat-rail-pas" ref={pas}>
+      <div className="cat-rail-pas" ref={pas} onPointerDown={stlacenie} onClickCapture={klik}>
         {ROZCESTNIK_TYPY.map((p) => (
           <Mini key={p.slug} slug={p.slug} label={p.label} aktivna={p.slug === aktivna} />
         ))}

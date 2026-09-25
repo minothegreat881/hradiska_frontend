@@ -1792,8 +1792,11 @@ body[data-lab-theme='pecat'],
 .lfoot-logo {
   width: 44px; height: 44px; flex-shrink: 0;
   object-fit: contain;
-  border-radius: 12px;
-  background: #fff;
+  /* Kruh, nie zaoblený štvorec: značka je odteraz minca a tá je okrúhla.
+     Podklad je papier ako v hlavičke, nie biela — na tmavej pätičke by
+     biely štvorček svietil ako nálepka. */
+  border-radius: 999px;
+  background: var(--l-paper);
   padding: 3px;
   border: 1px solid var(--l-on-dark-line);
   transition: border-color 180ms ease;
@@ -2470,9 +2473,24 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lnav-burger {
     display: grid; place-items: center;
     width: 44px; height: 44px; margin-left: 2px;
+    /* `padding: 8px 16px !important` zo spoločného pravidla pre tlačidlá
+       v hlavičke stláčalo vnútro na 10 px. Čiarky krížika sú absolútne
+       na `left: 0` a široké 18 px, takže prečnievali len doprava a krížik
+       sedel o 4 px vedľa stredu kruhu (namerané na pixeloch). */
     background: none; border: 1px solid var(--l-line); border-radius: 10px;
     cursor: pointer;
   }
+  /* Cez `.lnav-right`, inak pravidlo neprebije `.lnav-right button`, ktoré je
+     špecifickejšie než samotná trieda — `!important` tu nestačí.
+     `justify-content`, lebo spoločné pravidlo robí z tlačidla flex a v ňom
+     `place-items` vodorovne nerobí nič: čiarky potom sedeli pri ľavom
+     okraji kruhu. */
+  .lnav-right .lnav-burger {
+    padding: 0 !important;
+    justify-content: center;
+    align-items: center;
+  }
+  .lnav-burger-i { flex: none; }
   .lnav-burger:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; }
   /* `currentColor`, nie pevná atramentová: pri nabehnutí myšou sa tlačidlo
      zatmaví a čiarky sa musia prefarbiť s ním, inak z krížika nezostane nič. */

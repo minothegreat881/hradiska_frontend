@@ -116,10 +116,10 @@ export function LabFooter() {
           <div className="lfoot-brand">
             <a className="lfoot-id" href="/">
               <picture style={{ display: 'contents' }}>
-                <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+                <source srcSet="/znak_minca.webp" type="image/webp" />
                 <img
                   className="lfoot-logo"
-                  src="/logo_slovanske_hradiska_256.jpg"
+                  src="/znak_minca.png"
                   alt=""
                   aria-hidden="true"
                   width={44}
