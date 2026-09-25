@@ -42,20 +42,6 @@ export function LabHome() {
 
         <h1 className="lhero-titul">Slovanské hradiská</h1>
 
-        {/* Značka pod titulkom. Nesie ten istý nápis ako titulok, preto je
-            pre čítačky skrytá — počuť ho dvakrát by bolo na obtiaž. */}
-        <picture className="lhero-znak">
-          <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
-          <img
-            src="/logo_hradiska_small.png"
-            alt=""
-            aria-hidden="true"
-            width={440}
-            height={434}
-            decoding="async"
-          />
-        </picture>
-
         {/* Rozcestník kategórií hneď pod titulkom — deväť kresieb, po ktorých
             sa dá vojsť do webu skôr, než návštevník začne čítať. */}
         <LabKategorieRychle />

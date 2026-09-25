@@ -3299,7 +3299,7 @@ body[data-lab-theme] .pl-act {
 .lhero-nadciara span { width: 44px; height: 2px; background: var(--l-second-deep); flex: none; }
 
 .lhero-titul {
-  margin: 18px 0 22px;
+  margin: 18px 0 44px;
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 700;
   /* Handoff pýta clamp(52px, 8vw, 124px). Fraunces je širšia než DM Serif
@@ -3312,17 +3312,6 @@ body[data-lab-theme] .pl-act {
   color: var(--l-ink);
   text-wrap: balance;
 }
-
-/* Značka pod titulkom. Logo má priehľadné pozadie, takže leží priamo na
-   papieri — žiadna podložka ani rám. Šírka sa drží pod šírkou jednej
-   kresby v rozcestníku (190 px), aby bola značka znamienkom, nie druhým
-   obrazom nad hero fotkou. */
-.lhero-znak {
-  display: block;
-  width: min(190px, 44vw);
-  margin: 0 auto 34px;
-}
-.lhero-znak img { display: block; width: 100%; height: auto; }
 
 /* Výzva nad hľadaním. Je to `h2`, nie ozdobný riadok — nasleduje po `h1`
    a čítačka z nej má pochopiť, že tu sa stránka láme na druhú úlohu. */
@@ -3364,8 +3353,7 @@ body[data-lab-theme] .pl-act {
   .parchment > .lhero-sekcia { padding: 32px 16px 36px; }
   .lhero-nadciara { font-size: 11px; gap: 10px; }
   .lhero-nadciara span { width: 22px; }
-  .lhero-titul { margin: 14px 0 16px; }
-  .lhero-znak { width: 140px; margin-bottom: 24px; }
+  .lhero-titul { margin: 14px 0 28px; }
   .lhero-vyzva { margin-top: 34px; }
   .lhero-hladanie { margin-top: 14px; }
 }
