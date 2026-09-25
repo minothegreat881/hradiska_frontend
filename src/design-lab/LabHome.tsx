@@ -5,7 +5,8 @@
  *
  * Skladba:
  *
- *   titulná fotografia → searchbar → zápisy z kroniky → mapa
+ *   titulok a značka → dlaždice kategórií → hľadanie → mapa →
+ *   zápisy z kroniky
  *
  * Kategórie a „Pridajte sa k nám" vykresľuje `App` hneď za ňou ako
  * samostatné komponenty, takže poradie stránky ostáva zachované.
@@ -22,18 +23,11 @@ export function LabHome() {
     <div className="min-h-screen parchment relative">
       <InkEffect />
 
-      {/* Titulná časť podľa handoffu „Múzejná tabuľa" (návrh 2b).
-
-          Oproti variantu 2a je titulok NAD obrazom a snímka nemá cez seba
-          nič — žiadny text, žiadny závoj, žiadne vysvetlené pole. Obraz je
-          v pasparte s popiskou, teda presne tak, ako visí obrazová príloha
-          v múzeu. Web je encyklopédia, takže tomuto rozvrhnutiu rozumie lepšie
-          než banneru s nápisom cez fotografiu.
-
-          Vedľajší zisk je technický: v centrovanom stĺpci s bočným odsadením
-          96 px a paspartou 14 px vychádza obraz pri návrhovej šírke na
-          ~1220 px, čo je presne rozlíšenie predlohy (1217). Nikde sa neťahá
-          nahor, takže ostáva ostrý.
+      {/* Titulná časť. Pôvodne tu pod titulkom visela rekonštrukcia hradiska
+          v pasparte (handoff „Múzejná tabuľa", návrh 2b). Odišla: odkedy sú
+          pod titulkom dlaždice kategórií, bol to druhý veľký obraz v rade
+          a odtláčal hľadanie aj mapu pod prehyb. Súbor ostáva — je to
+          og:image webu.
 
           Písmo a farby sú z tokenov webu (Fraunces, pečatná červená), nie
           z handoffu (Playfair Display, #b3402a) — inak by domovská stránka
@@ -66,26 +60,9 @@ export function LabHome() {
             sa dá vojsť do webu skôr, než návštevník začne čítať. */}
         <LabKategorieRychle />
 
-        <figure className="lhero-tabula">
-          {/* Pasparta je vlastný prvok, popiska leží POD ňou na papieri —
-              tak, ako visí obrazová príloha pod rámom, nie v ňom. `figure`
-              obopína oboje, aby popiska ostala viazaná na obraz aj pre
-              čítačky. */}
-          <div className="lhero-ram">
-            <picture>
-              <source srcSet="/img_header_hradiska_04.webp" type="image/webp" />
-              <img
-                src="/img_header_hradiska_04.jpg"
-                alt="Rekonštrukcia slovanského hradiska: opevnená akropola nad riekou, pod ňou podhradie s obydliami za palisádou"
-                width={1217}
-                height={761}
-                fetchPriority="high"
-                decoding="async"
-                className="lhero-obraz"
-              />
-            </picture>
-          </div>
-        </figure>
+        {/* Hľadanie potrebuje vetu, inak je to pole bez zadania. „Vo svojom
+            okolí" je zároveň jediná výzva, ktorá vedie k mape hneď pod ňou. */}
+        <h2 className="lhero-vyzva">Nájdi hradisko vo svojom okolí</h2>
 
         <div className="lhero-hladanie">
           <HeroSearch />
@@ -104,13 +81,15 @@ export function LabHome() {
         </nav>
       </section>
 
-      <LabAktuality />
-
       {/* Mapa. Tá istá, aká beží v produkcii — po odsúhlasení nahradila 3D
-          scénu v Three.js aj na ostrej domovskej. */}
+          scénu v Three.js aj na ostrej domovskej. Stojí hneď pod hľadaním,
+          lebo odpovedá na tú istú otázku — „kde mám hradisko blízko" — len
+          ukázaním namiesto vypísaním. */}
       <section className="relative" style={{ zIndex: 5 }}>
         <LabMapa />
       </section>
+
+      <LabAktuality />
     </div>
   );
 }

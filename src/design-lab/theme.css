@@ -3324,36 +3324,25 @@ body[data-lab-theme] .pl-act {
 }
 .lhero-znak img { display: block; width: 100%; height: auto; }
 
-/* Pasparta. Obraz v nej vychádza pri návrhovej šírke na ~1220 px, teda
-   presne na rozlíšenie predlohy — nikde sa neťahá nahor. */
-/* Tabuľa je užšia než stĺpec. V plnej šírke stĺpca vychádzal obraz na
-   1218 px a zabral takmer celú prvú obrazovku — titulok pri ňom pôsobil ako
-   popisok. Užší formát ho vráti na miesto obrazovej prílohy. Zároveň je
-   1012 px pod rozlíšením predlohy (1217), takže sa obraz zmenšuje, nie
-   naťahuje — ostrosť tým ide hore, nie dole. */
-.lhero-tabula { max-width: 1040px; margin: 0 auto; }
-.lhero-ram {
-  padding: 14px;
-  border: 1px solid var(--l-line-2);
-  border-radius: 6px;
-  background: var(--l-card);
-  box-shadow: 0 18px 40px -22px rgba(74, 52, 18, .35);
-}
-.lhero-obraz { display: block; width: 100%; height: auto; border-radius: 2px; }
-.lhero-tabula figcaption {
-  margin-top: 16px;
+/* Výzva nad hľadaním. Je to `h2`, nie ozdobný riadok — nasleduje po `h1`
+   a čítačka z nej má pochopiť, že tu sa stránka láme na druhú úlohu. */
+.lhero-vyzva {
+  margin: 56px 0 0;
   font-family: 'Fraunces', Georgia, serif;
-  font-style: italic;
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--l-muted);
+  font-weight: 600;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -.005em;
+  color: var(--l-ink);
+  text-wrap: balance;
 }
 
 /* Šírku drží tento obal, nie trieda `max-w-[...]` na komponente: tá sa
    z Tailwindu negenerovala a bar sa rozťahoval cez celý pás. */
 .lhero-hladanie {
   width: min(760px, 100%);
-  margin: 36px auto 0;
+  /* Blízko k výzve nad ňou — veta a pole sú jedna vec, nie dve. */
+  margin: 18px auto 0;
 }
 
 .lhero-rychle {
@@ -3377,9 +3366,8 @@ body[data-lab-theme] .pl-act {
   .lhero-nadciara span { width: 22px; }
   .lhero-titul { margin: 14px 0 16px; }
   .lhero-znak { width: 140px; margin-bottom: 24px; }
-  .lhero-ram { padding: 8px; }
-  .lhero-tabula figcaption { margin-top: 12px; font-size: 13.5px; }
-  .lhero-hladanie { margin-top: 26px; }
+  .lhero-vyzva { margin-top: 34px; }
+  .lhero-hladanie { margin-top: 14px; }
 }
 
 /* Tlačidlo „Hľadať" v paneli hľadania (handoff 2a: 52 px, padding 0 30px). */
