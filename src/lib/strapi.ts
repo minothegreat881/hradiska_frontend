@@ -201,6 +201,40 @@ export async function getCategoryBySlug(slug: string): Promise<StrapiCategory | 
 }
 
 /**
+ * Počty publikovaných článkov pre zadané kategórie.
+ *
+ * Dlaždice na domovskej píšu pod názov „29 hradísk". Číslo sa nesmie písať
+ * natvrdo — zostarne pri prvom novom článku a nikto si nespomenie, že ho
+ * treba prepísať.
+ *
+ * Ťahá sa `pageSize=1` a číta iba `meta.pagination.total`, takže odpoveď je
+ * jeden článok, nie celá kategória. `useNavigationData` na to isté používa
+ * `pageSize=50`, lebo z nich stavia rozbaľovaciu ponuku — tu by to bolo
+ * zbytočných pár stoviek kilobajtov.
+ *
+ * Kategória, ktorá zlyhá, sa v zázname jednoducho neobjaví — dlaždica potom
+ * ostane bez čísla, čo je poctivejšie než ukázať nulu.
+ */
+export async function getCategoryPostCounts(slugs: string[]): Promise<Record<string, number>> {
+  const dvojice = await Promise.all(
+    slugs.map(async (slug) => {
+      try {
+        const r = await fetchStrapi<StrapiResponse<unknown[]>>(
+          `/blog-posts?filters[category][slug][$eq]=${encodeURIComponent(slug)}` +
+            '&pagination[page]=1&pagination[pageSize]=1&fields[0]=id'
+        );
+        const total = r.meta?.pagination?.total;
+        return typeof total === 'number' ? ([slug, total] as const) : null;
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  return Object.fromEntries(dvojice.filter(Boolean) as (readonly [string, number])[]);
+}
+
+/**
  * Get all blog posts with optional filters
  */
 export async function getBlogPosts(options?: {

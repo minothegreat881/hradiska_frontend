@@ -1,80 +1,130 @@
 'use client';
 
 /**
- * ROZCESTNÍK KATEGÓRIÍ pod titulkom domovskej stránky.
+ * DLAŽDICE KATEGÓRIÍ pod titulkom domovskej stránky.
  *
- * Deväť kresieb v dvoch radoch (5 + 4) s názvom pod obrázkom — nič viac.
- * Žiadna karta, rámik ani popis: je to rozcestník, po ktorom sa preklikáva,
- * nie čítanie. Podrobná sekcia „Kategórie hradísk" nižšie na stránke ostáva.
+ * Podľa handoffu „Homepage – hlavička, titulok a dlaždice" (09/2026): päť
+ * dlaždíc s TYPMI hradísk, pod nimi oddeľovač „Pramene a tradícia" a štyri
+ * dlaždice s prameňmi, tradíciou a svätyňami. Spodný rad má rovnako široké
+ * dlaždice ako horný — preto tá počítaná šírka stĺpca, nie `1fr`.
  *
- * Názvy sú tu SKRÁTENÉ („Hospodárska", „Legendy", „Svätyne"), aby sa vošli
- * pod obrázok a rad zostal čitateľný. Skutočné názvy kategórií v Strapi ani
- * inde na webe sa tým nemenia — mení sa len popiska v tomto rozcestníku.
+ * Z handoffu sa NEPREBERÁ písmo (DM Serif Display + Manrope z Google Fonts).
+ * Fonty webu sú self-hostované kvôli GDPR a celý šat stojí na Fraunces +
+ * Inter; dve stránky s iným atramentom by boli horšie než presná zhoda
+ * s predlohou. Rovnako sa drží pečatná červená z tokenov (`--l-second-deep`)
+ * namiesto `#a3302a` — je to to isté rodisko farby, len naladené na papier.
  *
- * Obrázky sa berú z toho istého zoznamu ako veľké dlaždice
- * (`src/data/categories.ts`), takže keď pribudne nová kresba, netreba
- * meniť dve miesta. Ťahá sa zmenšenina `small_` (500 px) — obrázok má
- * na obrazovke ~230 px.
+ * Názvy sú SKRÁTENÉ („Hospodárska", „Legendy", „Svätyne") presne ako
+ * v predlohe. Skutočné názvy kategórií v Strapi sa tým nemenia.
+ *
+ * Počty pod názvom sa ťahajú zo Strapi (`getCategoryPostCounts`), nie sú
+ * napísané natvrdo — číslo v predlohe je stav z jedného dňa. Kým odpoveď
+ * nedorazí, riadok s počtom sa nevykreslí; nepodsúva sa nula.
  */
 
-import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
 import { hradiskaCategories, variant } from '../data/categories';
+import { getCategoryPostCounts } from '../lib/strapi';
 
-/** Poradie a skrátené názvy podľa predlohy. */
-const VYBER: { slug: string; label: string }[] = [
-  { slug: 'kniezacie-sidla', label: 'Kniežacie sídla' },
-  { slug: 'mocenske-centra', label: 'Mocenské centrá' },
-  { slug: 'strazna-funkcia', label: 'Hospodárska' },
-  { slug: 'refugia', label: 'Refúgiá' },
-  { slug: 'staroveke-sidla', label: 'Staroveké hradiská' },
-  { slug: 'listiny-a-pisomne-zdroje', label: 'Listiny a pís. zdroje' },
-  { slug: 'vseobecne-o-hradiskach', label: 'Všeobecne o hradiskách' },
-  { slug: 'povesti', label: 'Legendy' },
-  { slug: 'svatyne-a-sakralne-objekty', label: 'Svätyne' },
+/** Skrátený názov a tvary počítaného podstatného mena: 1 / 2–4 / 5 a viac. */
+interface Polozka {
+  slug: string;
+  label: string;
+  tvary: [string, string, string];
+}
+
+const TYPY: Polozka[] = [
+  { slug: 'kniezacie-sidla', label: 'Kniežacie sídla', tvary: ['hradisko', 'hradiská', 'hradísk'] },
+  { slug: 'mocenske-centra', label: 'Mocenské centrá', tvary: ['hradisko', 'hradiská', 'hradísk'] },
+  { slug: 'strazna-funkcia', label: 'Hospodárska', tvary: ['hradisko', 'hradiská', 'hradísk'] },
+  { slug: 'refugia', label: 'Refúgiá', tvary: ['hradisko', 'hradiská', 'hradísk'] },
+  { slug: 'staroveke-sidla', label: 'Staroveké hradiská', tvary: ['hradisko', 'hradiská', 'hradísk'] },
 ];
 
-export function LabKategorieRychle() {
-  const base = import.meta.env.PROD
-    ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi')
-    : import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+const PRAMENE: Polozka[] = [
+  { slug: 'listiny-a-pisomne-zdroje', label: 'Listiny a pís. zdroje', tvary: ['prameň', 'pramene', 'prameňov'] },
+  { slug: 'vseobecne-o-hradiskach', label: 'Všeobecne o hradiskách', tvary: ['text', 'texty', 'textov'] },
+  { slug: 'povesti', label: 'Legendy', tvary: ['povesť', 'povesti', 'povestí'] },
+  { slug: 'svatyne-a-sakralne-objekty', label: 'Svätyne', tvary: ['svätyňa', 'svätyne', 'svätýň'] },
+];
 
-  const polozky = VYBER
-    .map(({ slug, label }) => {
-      const k = hradiskaCategories.find((c) => c.slug === slug);
-      return k ? { slug, label, image: k.image, popis: k.label } : null;
-    })
-    .filter(Boolean) as { slug: string; label: string; image: string; popis: string }[];
+/** Slovenčina počíta v troch tvaroch: 1 hradisko, 2 hradiská, 5 hradísk. */
+function tvarPoctu(n: number, [jedno, malo, vela]: [string, string, string]): string {
+  if (n === 1) return jedno;
+  if (n >= 2 && n <= 4) return malo;
+  return vela;
+}
+
+function zakladUrl(): string {
+  if (!import.meta.env.PROD) return import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
+  return typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi';
+}
+
+function Dlazdica({ d, pocet, poradie }: { d: Polozka; pocet?: number; poradie: number }) {
+  const k = hradiskaCategories.find((c) => c.slug === d.slug);
+  if (!k) return null;
+  const base = zakladUrl();
+
+  return (
+    <a
+      className="lkat-dlazdica"
+      href={`/category/${d.slug}`}
+      title={k.label}
+      style={{ ['--lkat-poradie' as string]: String(poradie) }}
+    >
+      <span className="lkat-ram">
+        <img
+          className="lkat-obraz"
+          src={`${base}${variant(k.image, 'small')}`}
+          srcSet={`${base}${variant(k.image, 'small')} 500w, ${base}${variant(k.image, 'medium')} 750w`}
+          sizes="(max-width: 720px) 45vw, 240px"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+      </span>
+      <span className="lkat-text">
+        <span className="lkat-nazov">{d.label}</span>
+        {typeof pocet === 'number' && pocet > 0 && (
+          <span className="lkat-pocet">
+            <b>{pocet}</b> {tvarPoctu(pocet, d.tvary)}
+          </span>
+        )}
+      </span>
+    </a>
+  );
+}
+
+export function LabKategorieRychle() {
+  const [pocty, setPocty] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let zrusene = false;
+    getCategoryPostCounts([...TYPY, ...PRAMENE].map((d) => d.slug))
+      .then((p) => { if (!zrusene) setPocty(p); })
+      .catch(() => { /* bez počtov sa dlaždice zobrazia tak či tak */ });
+    return () => { zrusene = true; };
+  }, []);
 
   return (
     <nav className="lkat" aria-label="Kategórie hradísk">
-      <ul className="lkat-rad">
-        {polozky.map((p, i) => (
-          <li key={p.slug}>
-            <motion.a
-              className="lkat-polozka"
-              href={`/category/${p.slug}`}
-              title={p.popis}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: Math.min(i, 5) * 0.04 }}
-            >
-              <span className="lkat-ram">
-                <img
-                  className="lkat-obraz"
-                  src={`${base}${variant(p.image, 'small')}`}
-                  srcSet={`${base}${variant(p.image, 'small')} 500w, ${base}${variant(p.image, 'medium')} 750w`}
-                  sizes="(max-width: 640px) 45vw, 230px"
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
-              </span>
-              <span className="lkat-nazov">{p.label}</span>
-            </motion.a>
-          </li>
+      <div className="lkat-rad lkat-rad--typy">
+        {TYPY.map((d, i) => (
+          <Dlazdica key={d.slug} d={d} pocet={pocty[d.slug]} poradie={i} />
         ))}
-      </ul>
+      </div>
+
+      <div className="lkat-predel">
+        <span aria-hidden="true" />
+        Pramene a tradícia
+        <span aria-hidden="true" />
+      </div>
+
+      <div className="lkat-rad lkat-rad--pramene">
+        {PRAMENE.map((d, i) => (
+          <Dlazdica key={d.slug} d={d} pocet={pocty[d.slug]} poradie={i + 5} />
+        ))}
+      </div>
     </nav>
   );
 }
