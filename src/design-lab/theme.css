@@ -1234,32 +1234,35 @@ body[data-lab-theme='pecat'],
 
 /* ── Skúška: znak kategórie „Strážna a hospodárska funkcia" ─────────────
    Karty aj titulná fotografia dostanú do pravého horného rohu prekrížené
-   kopije — tú istú maľbu, aká stojí nad titulkom domovskej. Pod kurzorom sa
-   obraz priblíži výraznejšie než na bežnej karte (1.12 namiesto 1.025)
-   a znak sa zväčší s ním.
+   kopije — tú istú maľbu, aká stojí nad titulkom domovskej.
 
-   Platí len pre jednu kategóriu; zapína ju stránka kategórie triedou, nie
-   samotný článok, takže rovnaký článok v „Mohlo by vás zaujímať" ostáva
-   obyčajný. */
+   Maľba visela na fotke nasucho a musel ju držať tieň; na svetlej snímke
+   sa aj tak strácala. Teraz sedí v bielom kruhu ako odznak — to je ten
+   istý nápad ako značka v hlavičke a nálezy v pätičke, a na akejkoľvek
+   fotke sa číta rovnako.
+
+   Pod kurzorom sa obraz priblíži výraznejšie než na bežnej karte
+   a odznak sa zväčší s ním. Platí len pre jednu kategóriu; zapína ju
+   stránka kategórie triedou, nie samotný článok, takže rovnaký článok
+   v „Mohlo by vás zaujímať" ostáva obyčajný. */
 .acard-znak,
 .ch-znak {
   position: absolute; z-index: 3;
-  display: block;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(40, 26, 10, .12), 0 6px 16px -8px rgba(20, 14, 6, .55);
   pointer-events: none;
   transform-origin: top right;
   transition: transform .55s cubic-bezier(.2, .8, .2, 1);
 }
+.acard-znak picture,
+.ch-znak picture { display: contents; }
 .acard-znak img,
-.ch-znak img {
-  display: block; width: 100%; height: auto;
-  /* Maľba je svetlá oceľ a bledý záter — na tmavej fotke (les, letecká
-     snímka) by sa stratila. Tieň ju odlepí od podkladu bez toho, aby k nej
-     musel pribudnúť rámik. */
-  filter: drop-shadow(0 2px 7px rgba(20, 14, 6, .55));
-}
+.ch-znak img { display: block; width: 74%; height: auto; }
 
-.acard-znak { top: 8px; right: 8px; width: 66px; }
-.acard--znak:hover .acard-znak { transform: scale(1.45); }
+.acard-znak { top: 10px; right: 10px; width: 54px; height: 54px; }
+.acard--znak:hover .acard-znak { transform: scale(1.35); }
 /* Trieda je zámerne zdvojená: pravidlo `.lab .parchment a:hover img` (bod 4
    vyššie) prifarbuje priblíženie 1.045 každému obrázku v odkaze a je
    špecifickejšie než jedna trieda s dvoma ďalšími. Bez zdvojenia by tu
@@ -1267,15 +1270,15 @@ body[data-lab-theme='pecat'],
 .acard--znak.acard--znak:hover .acard-obraz { transform: scale(1.12); filter: none; }
 
 /* Titulná fotografia kategórie. Fotka je pozadie vlastného prvku, takže sa
-   dá priblížiť bez toho, aby sa hýbal rám aj znak. */
+   dá priblížiť bez toho, aby sa hýbal rám aj odznak. */
 .cat-hero .ch-foto { transition: transform .8s cubic-bezier(.2, .8, .2, 1); }
 .cat-hero--znak:hover .ch-foto { transform: scale(1.06); }
-.ch-znak { top: 22px; right: 22px; width: 132px; }
-.cat-hero--znak:hover .ch-znak { transform: scale(1.3); }
+.ch-znak { top: 24px; right: 24px; width: 96px; height: 96px; }
+.cat-hero--znak:hover .ch-znak { transform: scale(1.22); }
 
 @media (max-width: 760px) {
-  .acard-znak { width: 52px; }
-  .ch-znak { top: 14px; right: 14px; width: 92px; }
+  .acard-znak { top: 8px; right: 8px; width: 46px; height: 46px; }
+  .ch-znak { top: 14px; right: 14px; width: 70px; height: 70px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
