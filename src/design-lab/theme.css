@@ -1349,13 +1349,16 @@ body[data-lab-theme='pecat'],
 }
 /* Vrstevnice v prázdne naľavo od textu (ten istý motív ako v pätičke).
    Na úzkom okne by liezli pod text, tak sa zhasnú. */
-.ljoin-rings {
-  position: absolute; left: -230px; top: -110px;
-  width: 620px; height: 620px;
-  color: var(--l-second); opacity: .3;
-  pointer-events: none;
+/* Minca nad nadčiarou. Biely papier okolo maľby je odstránený priamo
+   v obrázku, takže sa kreslí na papier bez podložky — rovnako ako kopije
+   v hlavičke domovskej. */
+.ljoin-znak {
+  display: block;
+  width: 118px;
+  margin: 0 0 18px -10px;   /* maľba má okolo seba vlastný vzduch */
 }
-@media (max-width: 1180px) { .ljoin-rings { display: none; } }
+.ljoin-znak img { display: block; width: 100%; height: auto; }
+@media (max-width: 980px) { .ljoin-znak { width: 96px; margin-bottom: 14px; } }
 
 .ljoin-wrap { max-width: 1280px; margin: 0 auto; padding: 96px 32px 104px; position: relative; z-index: 1; }
 .ljoin-top {

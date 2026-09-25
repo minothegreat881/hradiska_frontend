@@ -71,31 +71,20 @@ export function LabJoinUs() {
 
   return (
     <section className="ljoin">
-      {/* Vrstevnice — ten istý motív ako v pätičke, aby to bol jeden šat a nie
-          dve samostatné nápady. Vylieva sa za ľavú hranu, do prázdna vedľa textu. */}
-      <div className="ljoin-rings" aria-hidden="true">
-        <svg viewBox="0 0 400 400" width="100%" height="100%">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <ellipse
-              key={i}
-              cx="200"
-              cy="200"
-              rx={58 + i * 31}
-              ry={42 + i * 26}
-              transform={`rotate(${-16 + i * 3.5} 200 200)`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              opacity={0.4 - i * 0.055}
-            />
-          ))}
-        </svg>
-      </div>
-
       <div className="ljoin-wrap">
         {/* ── Prvý pohyb: dôvod × formulár ────────────────────────────── */}
         <div className="ljoin-top">
           <div className="ljoin-left">
+            {/* Minca s koníkom (akvarel, 2026) — výrez z listu značiek, ten
+                istý zdroj ako kopije nad titulkom domovskej. Nahradila
+                vrstevnicové kruhy: tie boli len ozdobný tvar, toto je vec
+                z hradiska. Stojí v toku textu, nie ako vodoznak za ním —
+                nemá čo zavadzať nadpisu. */}
+            <picture className="ljoin-znak">
+              <source srcSet="/znak_minca.webp" type="image/webp" />
+              <img src="/znak_minca.png" alt="" aria-hidden="true" width={600} height={666} loading="lazy" decoding="async" />
+            </picture>
+
             <span className="ljoin-eyebrow">Buďme hrdí na naše dejiny</span>
             <h2 className="ljoin-title">Staňte sa našimi spolupracovníkmi</h2>
 
