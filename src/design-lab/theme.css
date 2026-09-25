@@ -1264,7 +1264,7 @@ body[data-lab-theme='pecat'],
 .cat-rail-pas {
   max-width: 1320px; margin: 0 auto;
   display: flex; align-items: flex-start; justify-content: center;
-  gap: 14px;
+  gap: 12px;
   padding: 18px 28px 16px;
 }
 .cat-rail-predel {
@@ -1273,14 +1273,19 @@ body[data-lab-theme='pecat'],
   margin: 4px 10px;
 }
 
+/* Šírka položky je vypočítaná, nie odhadnutá: v kontajneri 1320 px zostáva
+   po odsadení 1264 px a deväť položiek s ôsmimi medzerami po 12 px
+   a oddeľovačom (1 + 2 × 10 px) presne vyplní riadok. Handoff mal 100 px,
+   ale v tej šírke ostávala na oboch stranách tretina riadka prázdna
+   a z obrázka nebolo nič vidieť. */
 .cat-mini {
-  width: 100px; flex: none;
+  width: 126px; flex: none;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   text-decoration: none; color: inherit;
   scroll-snap-align: center;
 }
 .cat-mini-ram {
-  display: block; width: 84px; height: 56px;
+  display: block; width: 120px; height: 80px;
   border-radius: 12px; overflow: hidden; background: var(--l-card);
   box-shadow: 0 0 0 1px var(--l-line);
   transition: transform .38s cubic-bezier(.2, .8, .2, 1), box-shadow .38s cubic-bezier(.2, .8, .2, 1);
@@ -1292,7 +1297,7 @@ body[data-lab-theme='pecat'],
 }
 .cat-mini-nazov {
   font-family: 'Inter', system-ui, sans-serif;
-  font-size: 12.5px; font-weight: 600; line-height: 1.2;
+  font-size: 13.5px; font-weight: 600; line-height: 1.25;
   text-align: center; color: var(--l-ink);
   /* Najdlhší názov („Všeobecne o hradiskách") potrebuje dva riadky;
      tretí by lištu rozhojdal do nerovnakých výšok. */
@@ -1337,9 +1342,9 @@ body[data-lab-theme='pecat'],
 }
 @media (max-width: 600px) {
   .cat-rail-pas { padding: 12px 16px; gap: 10px; }
-  .cat-mini { width: 80px; }
-  .cat-mini-ram { width: 68px; height: 45px; border-radius: 10px; }
-  .cat-mini-nazov { font-size: 11.5px; }
+  .cat-mini { width: 96px; }
+  .cat-mini-ram { width: 90px; height: 60px; border-radius: 10px; }
+  .cat-mini-nazov { font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1712,15 +1717,28 @@ body[data-lab-theme='pecat'],
 
 /* Vrstevnice v pozadí. Tlmené natoľko, aby sa dali prehliadnuť — nesmú
    súperiť s textom, len prerušiť prázdnu plochu vpravo. */
-.lfoot-rings {
+/* Nálezy vpravo v pätičke: náušnica a nádoba v papierových medailónoch.
+   Kruh je ten istý nápad ako značka v hlavičke — svetlý podklad, vlások
+   po obvode. Bez neho by sa perové obrysy malieb na tmavom pozadí
+   stratili a ostali by z nich len farebné škvrny. */
+.lfoot-nalezy {
   position: absolute;
-  right: -90px; top: 50%;
-  width: 520px; height: 520px;
-  transform: translateY(-50%);
-  color: var(--l-second);
-  opacity: .5;
+  right: 46px; top: 50%;
+  transform: translateY(-58%);
+  display: flex; align-items: center;
   pointer-events: none;
 }
+.lfoot-nalez {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: var(--l-paper);
+  box-shadow: 0 0 0 1px rgba(243, 237, 225, .22), 0 18px 34px -18px rgba(0, 0, 0, .55);
+}
+.lfoot-nalez img { display: block; width: 76%; height: 76%; object-fit: contain; }
+.lfoot-nalez--nausnica { width: 132px; height: 132px; }
+/* Menší a nižšie — dva rovnaké kruhy vedľa seba by vyzerali ako ovládanie,
+   nie ako dva nálezy položené vedľa seba. */
+.lfoot-nalez--nadoba { width: 104px; height: 104px; margin: 34px 0 0 -18px; }
 
 .lfoot-wrap {
   position: relative; z-index: 1;
@@ -1894,14 +1912,14 @@ body[data-lab-theme='pecat'],
 /* ── Užšie okná ──────────────────────────────────────────────────────── */
 @media (max-width: 1000px) {
   .lfoot-top { grid-template-columns: 1fr; gap: 40px; }
-  .lfoot-rings { right: -170px; opacity: .35; }
+  .lfoot-nalezy { right: 18px; transform: translateY(-58%) scale(.82); }
 }
 @media (max-width: 640px) {
   .lfoot-wrap { padding: 46px 22px 0; }
   .lfoot-top { gap: 34px; padding-bottom: 34px; }
   .lfoot-cols { grid-template-columns: 1fr 1fr; gap: 28px 18px; }
   .lfoot-desc { margin-bottom: 18px; }
-  .lfoot-rings { display: none; }
+  .lfoot-nalezy { display: none; }
   /* Šípka drží pravý horný roh pruhu, aj keď sa odkazy zalomia do dvoch
      riadkov — preto `align-self`, nie zvislé centrovanie. */
   .lfoot-bar { gap: 14px 18px; }

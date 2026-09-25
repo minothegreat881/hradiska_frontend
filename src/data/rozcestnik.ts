@@ -6,9 +6,9 @@
  * sa poradie ani názvy nerozišli — handoff to žiada výslovne („nedupľikuj
  * zoznam, použi spoločný zdroj").
  *
- * Názvy sú SKRÁTENÉ oproti Strapi („Hospodárska" namiesto „Strážna
- * a hospodárska funkcia"), aby sa vošli pod obrázok. Skutočné názvy
- * kategórií sa tým nemenia.
+ * Názvy sú SKRÁTENÉ oproti Strapi („Hospodárska funkcia" namiesto „Strážna
+ * a hospodárska funkcia", „Svätyne" namiesto „Svätyne a sakrálne objekty"),
+ * aby sa vošli pod obrázok. Skutočné názvy kategórií sa tým nemenia.
  *
  * `tvary` sú tri tvary počítaného podstatného mena pre riadok s počtom
  * („1 prameň / 2 pramene / 5 prameňov"). Lišta na stránke článku počty
@@ -28,7 +28,7 @@ const HRADISKO: [string, string, string] = ['hradisko', 'hradiská', 'hradísk']
 export const ROZCESTNIK_TYPY: PolozkaRozcestnika[] = [
   { slug: 'kniezacie-sidla', label: 'Kniežacie sídla', tvary: HRADISKO },
   { slug: 'mocenske-centra', label: 'Mocenské centrá', tvary: HRADISKO },
-  { slug: 'strazna-funkcia', label: 'Hospodárska', tvary: HRADISKO },
+  { slug: 'strazna-funkcia', label: 'Hospodárska funkcia', tvary: HRADISKO },
   { slug: 'refugia', label: 'Refúgiá', tvary: HRADISKO },
   { slug: 'staroveke-sidla', label: 'Staroveké hradiská', tvary: HRADISKO },
 ];

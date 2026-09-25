@@ -90,25 +90,24 @@ export function LabFooter() {
 
   return (
     <footer className="lfoot">
-      {/* Vrstevnice — takto je hradisko zakreslené na mape. Nie ozdoba pre
-          ozdobu: je to jediná kresba, ktorá o obsahu stránky niečo hovorí. */}
-      <div className="lfoot-rings" aria-hidden="true">
-        <svg viewBox="0 0 400 400" width="100%" height="100%">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <ellipse
-              key={i}
-              cx="200"
-              cy="200"
-              rx={58 + i * 31}
-              ry={42 + i * 26}
-              transform={`rotate(${-16 + i * 3.5} 200 200)`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              opacity={0.36 - i * 0.05}
-            />
-          ))}
-        </svg>
+      {/* Nálezy namiesto vrstevníc. Dve maľby z listu značiek — náušnica
+          (kolt) a keramická nádoba — v medailónoch vyplnených papierom.
+          Papier tu nie je ozdoba: maľba má čierne perové obrysy, ktoré by
+          sa na tmavej pätičke stratili, takže potrebuje svetlý podklad —
+          rovnaký kruh, v akom sedí logo v hlavičke. */}
+      <div className="lfoot-nalezy" aria-hidden="true">
+        <span className="lfoot-nalez lfoot-nalez--nausnica">
+          <picture>
+            <source srcSet="/znak_nausnica.webp" type="image/webp" />
+            <img src="/znak_nausnica.png" alt="" width={340} height={329} loading="lazy" decoding="async" />
+          </picture>
+        </span>
+        <span className="lfoot-nalez lfoot-nalez--nadoba">
+          <picture>
+            <source srcSet="/znak_nadoba.webp" type="image/webp" />
+            <img src="/znak_nadoba.png" alt="" width={340} height={341} loading="lazy" decoding="async" />
+          </picture>
+        </span>
       </div>
 
       <div className="lfoot-wrap">
