@@ -35,6 +35,15 @@ export function LabHome() {
           mala iný atrament než zvyšok webu a fonty by sa museli ťahať
           z Google CDN, ktoré sme kvôli GDPR zrušili. */}
       <section className="lhero-sekcia">
+        {/* Prekrížené kopije z listu maliarky (akvarel, 2026). Kreslí sa
+            cez `mix-blend-mode: multiply`, takže biely papier okolo maľby
+            splynie s papierovým pozadím stránky a ostanú len farby —
+            vyrezávať pozadie by pri akvareli zožralo aj svetlé ťahy. */}
+        <picture className="lhero-znak">
+          <source srcSet="/znak_kopije.webp" type="image/webp" />
+          <img src="/znak_kopije.png" alt="" aria-hidden="true" width={560} height={320} decoding="async" />
+        </picture>
+
         <p className="lhero-nadciara">
           <span aria-hidden="true" />
           Encyklopédia hradísk Slovenska

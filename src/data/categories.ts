@@ -12,11 +12,11 @@
  *
  * `image` je cesta k obrázku v Strapi médiách.
  *
- * Sedem kategórií má od 09/2026 vlastnú KRESBU (akvarel, jednotná šírka
- * 1400 px). „Svätyne" a „Všeobecne o hradiskách" na kresbu ešte čakajú —
- * dovtedy majú fotku z článku a v zozname stoja hneď za kreslenými, aby sa
- * dali vymeniť bez ďalšieho presúvania. Zvyšné tri majú fotku z článku
- * v tej istej kategórii (nie stock).
+ * Deväť kategórií má od 09/2026 vlastnú KRESBU (akvarel, jednotná šírka
+ * 1400 px) — presne tých deväť, ktoré majú dlaždicu na domovskej.
+ * „Svätyne" dostali kresbu obetiska s idolmi, „Všeobecne o hradiskách"
+ * kniežací dvorec. Zvyšné tri kategórie majú fotku z článku v tej istej
+ * kategórii (nie stock).
  *
  * Kategória `ostatne` tu nie je — v Strapi má 0 publikovaných článkov.
  */
@@ -104,16 +104,13 @@ export const hradiskaCategories: HradiskaCategory[] = [
     image: '/uploads/kategoria_povesti_648825b6bb.jpg',
   },
 
-  /* ── Čakajú na kresbu ──────────────────────────────────────────────
-     Zatiaľ majú fotku z článku. Keď kresby prídu, nahradí sa obrázok
-     a tieto dve dlaždice patria hore k ostatným kresleným. */
   {
     slug: 'svatyne-a-sakralne-objekty',
     label: 'Svätyne a sakrálne objekty',
     description:
       'Kultové miesta pohanské aj kresťanské — obetiská, mohylníky, posvätné háje a najstaršie stojace kostoly. Vrátane mytológie a pohrebných zvyklostí Slovanov.',
     icon: 'church',
-    image: '/uploads/lupis2_cd92eedea0.png',
+    image: '/uploads/kategoria_svatyne_f3996d12ed.jpg',
   },
   {
     slug: 'vseobecne-o-hradiskach',
@@ -121,7 +118,7 @@ export const hradiskaCategories: HradiskaCategory[] = [
     description:
       'Články, ktoré sa neviažu na jednu lokalitu — konštrukcia valov, remeslá, vojenstvo, každodenný život a širšie dejinné súvislosti slovanského osídlenia.',
     icon: 'book',
-    image: '/uploads/geograf_vyznaceni_merhanos_a55eccde8b.jpg',
+    image: '/uploads/kategoria_vseobecne_o_hradiskach_c802cece35.jpg',
   },
 
   /* ── Fotky z článkov ──────────────────────────────────────────────── */

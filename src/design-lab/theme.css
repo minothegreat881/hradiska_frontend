@@ -1118,7 +1118,10 @@ body[data-lab-theme='pecat'],
 /* Oddeľovač medzi radmi. */
 .lkat-predel {
   display: flex; align-items: center; justify-content: center; gap: 16px;
-  margin: 56px 0 26px;
+  /* `auto` po stranách, nie 0: pravidlo `.lkat > *` centruje deti obalu
+     automatickým okrajom a `margin: 56px 0 26px` ho prebíjalo — oddeľovač
+     potom visel pri ľavom okraji, kým oba rady dlaždíc stáli v strede. */
+  margin: 56px auto 26px;
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 12.5px; font-weight: 700; letter-spacing: .18em;
   text-transform: uppercase; color: var(--l-muted-2);
@@ -1268,7 +1271,7 @@ body[data-lab-theme='pecat'],
   .lkat-rad { gap: 20px 16px; }
   .lkat-rad--typy, .lkat-rad--pramene { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lkat-ram { border-radius: 14px; }
-  .lkat-predel { margin: 34px 0 20px; font-size: 11.5px; gap: 12px; }
+  .lkat-predel { margin: 34px auto 20px; font-size: 11.5px; gap: 12px; }
   .lkat-predel span { width: 24px; }
 }
 
@@ -3294,6 +3297,18 @@ body[data-lab-theme] .pl-act {
   text-align: center;
 }
 
+/* Znak nad nadčiarou: prekrížené kopije.
+   Biely papier okolo maľby je odstránený priamo v obrázku (priehľadnosť
+   vypočítaná ako pri `multiply`), nie blend módom — hero sekcia má vlastný
+   stohovací kontext a v ňom nie je pod znakom nič, s čím by sa dalo
+   násobiť, takže blend by nechal biely obdĺžnik (namerané). */
+.lhero-znak {
+  display: block;
+  width: min(150px, 34vw);
+  margin: 0 auto 6px;
+}
+.lhero-znak img { display: block; width: 100%; height: auto; }
+
 /* Nadčiara: popis medzi dvomi krátkymi červenými linkami. */
 .lhero-nadciara {
   display: flex;
@@ -3366,6 +3381,7 @@ body[data-lab-theme] .pl-act {
   .parchment > .lhero-sekcia { padding: 32px 16px 36px; }
   .lhero-nadciara { font-size: 11px; gap: 10px; }
   .lhero-nadciara span { width: 22px; }
+  .lhero-znak { width: 110px; }
   .lhero-titul { margin: 14px 0 28px; }
   .lhero-vyzva { margin-top: 34px; }
   .lhero-hladanie { margin-top: 14px; }
