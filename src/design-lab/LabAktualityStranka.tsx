@@ -114,7 +114,7 @@ export function LabAktualityStranka() {
               <span className="lakt-rok-ciara" aria-hidden="true" />
             </div>
             <div className="lakt-mriezka">
-              {polozky.map(z => <ArticleCard key={z.documentId} article={naKartu(z)} />)}
+              {polozky.map(z => <ArticleCard key={z.documentId} article={naKartu(z)} stitok={false} />)}
             </div>
           </section>
         ))}

@@ -5,6 +5,12 @@ import { Article } from '../data/mock-data';
 
 interface ArticleCardProps {
   article: Article;
+  /**
+   * Štítok s kategóriou. Na stránke kategórie a v aktualitách ho netreba —
+   * všetky karty sú z tej istej kategórie a štítok by len opakoval nadpis
+   * stránky. Zmysel má tam, kde sa miešajú (napr. „Mohlo by vás zaujímať").
+   */
+  stitok?: boolean;
 }
 
 // Fallback labely, ak Strapi nedodá display name kategórie (article.categoryName).
@@ -25,7 +31,7 @@ function prettifySlug(slug: string): string {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 }
 
-export function ArticleCard({ article }: ArticleCardProps) {
+export function ArticleCard({ article, stitok = true }: ArticleCardProps) {
   const categoryLabel =
     (article as any).categoryName ||
     CATEGORY_LABELS[article.category] ||
@@ -42,172 +48,49 @@ export function ArticleCard({ article }: ArticleCardProps) {
   return (
     <a
       href={`/blog/${article.slug}`}
-      className="article-card"
-      aria-label={categoryLabel ? `${article.title} — ${categoryLabel}` : article.title}
+      className="acard"
+      aria-label={stitok && categoryLabel ? `${article.title} — ${categoryLabel}` : article.title}
     >
-      {/* 1. Fotka — pozadie karty (vlastný element kvôli hover zoomu) */}
-      <div
-        data-img
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundColor: 'var(--card-img-fallback)',
-          backgroundImage: article.coverImage ? `url("${article.coverImage}")` : undefined,
-          backgroundSize: 'cover',
-          // Hrady bývajú na kopci — ťažisko mierne nad stredom.
-          backgroundPosition: 'center 32%',
-          backgroundRepeat: 'no-repeat',
-        }}
-      />
-
-      {/* 1b. Keď fotka chýba, nastúpi značka združenia. Prázdna tmavá plocha
-             pôsobila ako chyba načítania; logo hovorí, že fotku k tomuto
-             zápisu jednoducho nemáme. */}
-      {!article.coverImage && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute', inset: 0, display: 'grid', placeItems: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          <picture>
-            <source srcSet="/logo_hradiska_small.webp" type="image/webp" />
-            <img
-              src="/logo_hradiska_small.png"
-              alt=""
-              width={256}
-              height={256}
-              loading="lazy"
-              decoding="async"
-              /* Značka je tmavá a karta bez fotky tiež — v pôvodných farbách
-                 by na nej nebola vidieť. Prekresľuje sa preto na svetlú
-                 siluetu a zostáva vodoznakom, nie obrázkom. */
-              style={{
-                width: '52%', maxWidth: 168, height: 'auto',
-                opacity: 0.22, filter: 'brightness(0) invert(1)',
-              }}
-            />
-          </picture>
-        </span>
-      )}
-
-      {/* 2. Scrim — horná tretina číra, spodok takmer nepriehľadný */}
-      <div
-        aria-hidden="true"
-        style={{ position: 'absolute', inset: 0, background: 'var(--card-scrim)' }}
-      />
-
-      {/* 3. Chip kategórie — vľavo hore */}
-      {categoryLabel && (
-        <span
-          style={{
-            position: 'absolute',
-            top: 14,
-            left: 14,
-            zIndex: 2,
-            fontFamily: 'var(--font-heading)',
-            fontSize: 10,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: 'var(--card-chip-text)',
-            background: 'var(--card-chip-bg)',
-            border: '1px solid var(--card-chip-border)',
-            backdropFilter: 'blur(3px)',
-            WebkitBackdropFilter: 'blur(3px)',
-            padding: '5px 11px',
-            borderRadius: 999,
-          }}
-        >
-          {categoryLabel}
-        </span>
-      )}
-
-      {/* 4. Textový blok — dole na scrime */}
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 2,
-          padding: '20px 20px 18px',
-        }}
-      >
-        {/* Nadpis */}
-        <h3
-          data-title
-          style={{
-            margin: '0 0 8px',
-            fontFamily: 'var(--font-serif)',
-            fontSize: 24,
-            fontWeight: 700,
-            lineHeight: 1.14,
-            color: 'var(--card-title)',
-            textWrap: 'pretty',
-          }}
-        >
-          {article.title}
-        </h3>
-
-        {/* Excerpt — orezaný na 2 riadky */}
-        {article.excerpt && (
-          <p
-            style={{
-              margin: '0 0 12px',
-              fontFamily: 'var(--font-serif)',
-              fontSize: 16,
-              lineHeight: 1.42,
-              color: 'var(--card-excerpt)',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {article.excerpt}
-          </p>
+      {/* Obraz v zaoblenom ráme. Text naň nelezie, takže nepotrebuje závoj
+          a fotka ostáva celá — to bol dôvod prestavby. */}
+      <span className="acard-ram">
+        {article.coverImage ? (
+          <img className="acard-obraz" src={article.coverImage} alt="" loading="lazy" decoding="async" />
+        ) : (
+          /* Bez fotky nasadne značka. Prázdny rám pôsobil ako chyba
+             načítania; minca hovorí, že fotku k zápisu jednoducho nemáme. */
+          <span className="acard-bezfotky" aria-hidden="true">
+            <picture>
+              <source srcSet="/znak_minca.webp" type="image/webp" />
+              <img src="/znak_minca.png" alt="" width={600} height={666} loading="lazy" decoding="async" />
+            </picture>
+          </span>
         )}
 
-        {/* Meta riadok — nad hornou linkou */}
-        <div
-          style={{
-            borderTop: '1px solid var(--card-meta-line)',
-            paddingTop: 11,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            fontFamily: 'var(--font-heading)',
-            fontSize: 11,
-            letterSpacing: '0.04em',
-            color: 'var(--card-meta)',
-          }}
-        >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+        {stitok && categoryLabel && <span className="acard-stitok">{categoryLabel}</span>}
+      </span>
+
+      <span className="acard-telo">
+        <h3 className="acard-titul" data-title>{article.title}</h3>
+
+        {article.excerpt && <p className="acard-perex">{article.excerpt}</p>}
+
+        <span className="acard-meta">
+          <span className="acard-meta-skupina">
+            <span className="acard-meta-polozka">
               <Calendar style={{ width: 12, height: 12, opacity: 0.85 }} />
               {dateLabel}
             </span>
-            <span
-              aria-hidden="true"
-              style={{ width: 3, height: 3, borderRadius: 999, background: 'var(--card-dot)' }}
-            />
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <span aria-hidden="true" className="acard-bodka" />
+            <span className="acard-meta-polozka">
               <Clock style={{ width: 12, height: 12, opacity: 0.85 }} />
               {article.readTime} min
             </span>
           </span>
 
-          {/* Šípka — čisto vizuálny prvok */}
-          <ArrowRight
-            data-arrow
-            aria-hidden="true"
-            style={{ width: 16, height: 16, color: 'var(--card-arrow)', flexShrink: 0 }}
-          />
-        </div>
-      </div>
+          <ArrowRight data-arrow aria-hidden="true" style={{ width: 16, height: 16, flexShrink: 0 }} />
+        </span>
+      </span>
     </a>
   );
 }

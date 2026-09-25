@@ -232,7 +232,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   článkami to pôsobilo, že sa stránka donekonečna načítava. Zoznam sa má dať
                   prezerať naraz, nie sa odhaľovať. */}
               {categoryArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
+                <ArticleCard key={article.id} article={article} stitok={false} />
               ))}
             </div>
           </div>
