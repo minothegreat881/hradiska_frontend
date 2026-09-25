@@ -38,7 +38,7 @@ function Mini({ slug, label, aktivna }: { slug: string; label: string; aktivna: 
           className="cat-mini-obraz"
           src={`${base}${variant(k.image, 'thumbnail')}`}
           srcSet={`${base}${variant(k.image, 'thumbnail')} 245w, ${base}${variant(k.image, 'small')} 500w`}
-          sizes="120px"
+          sizes="(max-width: 600px) 96px, (max-width: 1060px) 126px, 156px"
           alt=""
           loading="lazy"
           decoding="async"
