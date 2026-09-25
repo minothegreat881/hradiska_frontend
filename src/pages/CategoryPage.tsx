@@ -69,6 +69,12 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   // Use Strapi articles, or empty array if error/none
   const categoryArticles = strapiArticles || [];
 
+  /* Skúška zatiaľ len pre jednu kategóriu: karty aj titulná fotografia
+     dostanú prekrížené kopije a výraznejšie priblíženie pod kurzorom.
+     Keď sa to osvedčí, dá sa znak doplniť ku každej kategórii; dovtedy
+     tu stojí jeden slug, nie zoznam. */
+  const skusobnyZnak = categorySlug === 'strazna-funkcia';
+
   return (
     <div className="min-h-screen parchment">
       {/* Hero — varianta 5A „Vľavo, vertikálny scrim" */}
@@ -98,9 +104,10 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
             </nav>
 
             {/* Hero karta */}
-            <div className="cat-hero">
+            <div className={skusobnyZnak ? 'cat-hero cat-hero--znak' : 'cat-hero'}>
               {/* 1. Fotka */}
               <div
+                className="ch-foto"
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -115,6 +122,15 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
               {/* Zlatý rám. Scrim ani vignette tu už nie sú — kryli kresbu
                   kvôli textu, ktorý na fotke nestojí. */}
               <div className="ch-frame" aria-hidden="true" />
+
+              {skusobnyZnak && (
+                <span className="ch-znak" aria-hidden="true">
+                  <picture>
+                    <source srcSet="/znak_kopije.webp" type="image/webp" />
+                    <img src="/znak_kopije.png" alt="" width={560} height={320} decoding="async" />
+                  </picture>
+                </span>
+              )}
             </div>
 
             {/* Vyhradený priestor pre text POD fotkou. Predtým ležal nadpis
@@ -232,7 +248,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   článkami to pôsobilo, že sa stránka donekonečna načítava. Zoznam sa má dať
                   prezerať naraz, nie sa odhaľovať. */}
               {categoryArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} stitok={false} />
+                <ArticleCard key={article.id} article={article} stitok={false} znak={skusobnyZnak} />
               ))}
             </div>
           </div>

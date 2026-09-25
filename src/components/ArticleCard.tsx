@@ -11,6 +11,14 @@ interface ArticleCardProps {
    * stránky. Zmysel má tam, kde sa miešajú (napr. „Mohlo by vás zaujímať").
    */
   stitok?: boolean;
+  /**
+   * Skúška pre kategóriu „Strážna a hospodárska funkcia": karta dostane do
+   * pravého horného rohu prekrížené kopije a pod kurzorom sa priblíži
+   * výraznejšie než inde — aj obraz, aj znak. Zapína to stránka kategórie,
+   * nie samotný článok: rovnaký článok v „Mohlo by vás zaujímať" ostáva
+   * obyčajný.
+   */
+  znak?: boolean;
 }
 
 // Fallback labely, ak Strapi nedodá display name kategórie (article.categoryName).
@@ -31,7 +39,7 @@ function prettifySlug(slug: string): string {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 }
 
-export function ArticleCard({ article, stitok = true }: ArticleCardProps) {
+export function ArticleCard({ article, stitok = true, znak = false }: ArticleCardProps) {
   const categoryLabel =
     (article as any).categoryName ||
     CATEGORY_LABELS[article.category] ||
@@ -48,7 +56,7 @@ export function ArticleCard({ article, stitok = true }: ArticleCardProps) {
   return (
     <a
       href={`/blog/${article.slug}`}
-      className="acard"
+      className={znak ? 'acard acard--znak' : 'acard'}
       aria-label={stitok && categoryLabel ? `${article.title} — ${categoryLabel}` : article.title}
     >
       {/* Obraz v zaoblenom ráme. Text naň nelezie, takže nepotrebuje závoj
@@ -68,6 +76,15 @@ export function ArticleCard({ article, stitok = true }: ArticleCardProps) {
         )}
 
         {stitok && categoryLabel && <span className="acard-stitok">{categoryLabel}</span>}
+
+        {znak && (
+          <span className="acard-znak" aria-hidden="true">
+            <picture>
+              <source srcSet="/znak_kopije.webp" type="image/webp" />
+              <img src="/znak_kopije.png" alt="" width={560} height={320} loading="lazy" decoding="async" />
+            </picture>
+          </span>
+        )}
       </span>
 
       <span className="acard-telo">
