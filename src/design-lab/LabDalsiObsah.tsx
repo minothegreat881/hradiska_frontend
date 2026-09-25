@@ -14,8 +14,9 @@
  *     takže by sa tie isté štyri príspevky ukázali dvakrát za sebou.
  *
  * Poradie aj obsah sa berú zo Strapi. Handoff mal názvy článkov ukážkové,
- * tu sú skutočné a najnovšie — jeden dotaz na kategóriu vráti aj štvoricu
- * aj celkový počet (`meta.pagination.total`).
+ * tu sú skutočné a najnovšie — jeden dotaz na kategóriu vráti aj výber aj
+ * celkový počet (`meta.pagination.total`). Do ukážky idú len články
+ * s obrázkom; prázdny rám je núdzové riešenie pre kategóriu, kde iné nie sú.
  *
  * Z predlohy sa nepreberá písmo (DM Serif Display + Manrope z Google Fonts):
  * fonty webu sú self-hostované kvôli GDPR, šat stojí na Fraunces + Inter.
@@ -66,13 +67,20 @@ export function LabDalsiObsah() {
     Promise.all(
       KATEGORIE.map(async ({ slug, label }): Promise<Skupina | null> => {
         try {
-          const { posts, pagination } = await getBlogPosts({ categorySlug: slug, pageSize: 4 });
-          if (!posts.length) return null;
+          // Ťahá sa dvanásť, ukazujú sa štyri. Do ukážky idú len články
+          // S OBRÁZKOM — prázdny rám je núdzové riešenie, nie výkladná skriňa.
+          // Dvanásť stačí: aj v najhoršej kategórii sú medzi nimi štyri
+          // ilustrované (namerané). Počet v kapsule ostáva CELKOVÝ počet
+          // článkov kategórie, nie počet tých s obrázkom.
+          const { posts, pagination } = await getBlogPosts({ categorySlug: slug, pageSize: 12 });
+          const sObrazkom = posts.filter((p) => p.coverImage);
+          const vyber = (sObrazkom.length ? sObrazkom : posts).slice(0, 4);
+          if (!vyber.length) return null;
           return {
             slug,
             label,
             pocet: pagination?.total ?? posts.length,
-            clanky: posts.map((p) => ({
+            clanky: vyber.map((p) => ({
               slug: p.slug,
               title: p.title,
               obrazok: p.coverImage ? getStrapiImageUrl(p.coverImage, 'small') : null,

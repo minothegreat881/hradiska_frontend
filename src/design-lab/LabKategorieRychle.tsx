@@ -14,8 +14,10 @@
  * s predlohou. Rovnako sa drží pečatná červená z tokenov (`--l-second-deep`)
  * namiesto `#a3302a` — je to to isté rodisko farby, len naladené na papier.
  *
- * Názvy sú SKRÁTENÉ („Hospodárska", „Legendy", „Svätyne") presne ako
- * v predlohe. Skutočné názvy kategórií v Strapi sa tým nemenia.
+ * Názvy sú SKRÁTENÉ („Hospodárska", „Svätyne"), aby sa vošli pod obrázok.
+ * Skutočné názvy kategórií v Strapi sa tým nemenia. Predloha volala povesti
+ * „Legendy" — to ale nie je skratka toho istého slova a kategória sa tak
+ * nevolá ani v hlavičke webu, takže dlaždica nesie názov „Povesti".
  *
  * Počty pod názvom sa ťahajú zo Strapi (`getCategoryPostCounts`), nie sú
  * napísané natvrdo — číslo v predlohe je stav z jedného dňa. Kým odpoveď
@@ -44,7 +46,7 @@ const TYPY: Polozka[] = [
 const PRAMENE: Polozka[] = [
   { slug: 'listiny-a-pisomne-zdroje', label: 'Listiny a pís. zdroje', tvary: ['prameň', 'pramene', 'prameňov'] },
   { slug: 'vseobecne-o-hradiskach', label: 'Všeobecne o hradiskách', tvary: ['text', 'texty', 'textov'] },
-  { slug: 'povesti', label: 'Legendy', tvary: ['povesť', 'povesti', 'povestí'] },
+  { slug: 'povesti', label: 'Povesti', tvary: ['povesť', 'povesti', 'povestí'] },
   { slug: 'svatyne-a-sakralne-objekty', label: 'Svätyne', tvary: ['svätyňa', 'svätyne', 'svätýň'] },
 ];
 

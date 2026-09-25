@@ -13,7 +13,6 @@ const ArticlePagePecat = lazyStale(() => import('./design-lab/LabArticle'));
 const LabNav = lazyStale(() => import('./design-lab/LabNav').then(m => ({ default: m.LabNav })));
 const LabFooter = lazyStale(() => import('./design-lab/LabFooter').then(m => ({ default: m.LabFooter })));
 const LabHome = lazyStale(() => import('./design-lab/LabHome').then(m => ({ default: m.LabHome })));
-const LabCategories = lazyStale(() => import('./design-lab/LabCategories').then(m => ({ default: m.LabCategories })));
 const LabJoinUs = lazyStale(() => import('./design-lab/LabJoinUs').then(m => ({ default: m.LabJoinUs })));
 const GalleryPagePecat = lazyStale(() => import('./design-lab/LabGaleria'));
 const AktualityPagePecat = lazyStale(() => import('./design-lab/LabAktualityStranka'));
@@ -236,7 +235,7 @@ function App() {
           Načítavam…
         </div>
       }>
-        {route === 'home' && <><LabHome /><LabCategories /><LabJoinUs /></>}
+        {route === 'home' && <><LabHome /><LabJoinUs /></>}
         {route === 'galeria' && <GalleryPagePecat />}
         {route === 'aktuality' && <AktualityPagePecat />}
         {route === 'privacy' && <PrivacyPage />}

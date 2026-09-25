@@ -1019,21 +1019,10 @@ body[data-lab-theme='pecat'],
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   KATEGÓRIE HRADÍSK (LabCategories.tsx)
-   Pôvodná sekcia z `HomePage` sa skrýva a nahrádza touto — je to jediná
-   sekcia domovskej, ktorá má na `<section>` spodný vlások, takže sa dá
-   zamerať bez zásahu do produkčného súboru.
-
-   POZNÁMKA  pôvodná sekcia sa už neskrýva cez CSS — labová domovská
-   (`LabHome.tsx`) ju jednoducho nevykresľuje.
-
-   MYŠLIENKA  deväť rovnakých dlaždíc nemalo poradie čítania. Prvá kategória
-   je preto vstupná brána cez dva stĺpce a dva riadky, s textom priamo na
-   fotografii; zvyšných osem sú tiché biele dlaždice okolo nej.
-
-   Prečo nie všetkých deväť na fotke: hneď nad touto sekciou je tmavý pás
-   s mapou. Deväť tmavých dlaždíc pod ním by z polovice stránky spravilo
-   jednu súvislú tmavú plochu.
+   DOMOVSKÁ: KATEGÓRIE
+   Dlaždice pod titulkom a sekcia „Ďalší obsah" pod mapou. Spolu pokrývajú
+   všetky kategórie webu; pôvodná sekcia „Kategórie hradísk" (LabCategories)
+   tým stratila zmysel a je zmazaná aj so svojimi pravidlami.
    ══════════════════════════════════════════════════════════════════════════ */
 /* ── Dlaždice kategórií pod titulkom ────────────────────────────────────
    Handoff „Homepage – hlavička, titulok a dlaždice" (09/2026): päť typov
@@ -1274,119 +1263,6 @@ body[data-lab-theme='pecat'],
   .lkat-dlazdica:hover { transform: none; }
   .lkat-obraz { transition: filter .2s ease; }
   .lkat-dlazdica:hover .lkat-obraz { transform: none; }
-}
-
-.lcat { background: var(--l-paper); border-bottom: 1px solid var(--l-line); }
-.lcat-wrap { max-width: 1280px; margin: 0 auto; padding: 88px 32px 96px; }
-
-/* Hlavička: názov vľavo, veta vpravo — namiesto vycentrovaného nadpisu so
-   zlatou ozdôbkou pod ním. Obidve časti sedia na spoločnej účiare. */
-.lcat-head {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 44px; align-items: end;
-}
-.lcat-title {
-  margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 700;
-  font-size: clamp(30px, 3.6vw, 46px); line-height: 1.05; letter-spacing: -.025em;
-  color: var(--l-ink); text-wrap: balance;
-}
-.lcat-intro {
-  margin: 0; font-family: 'Inter', sans-serif; font-size: 17px; line-height: 1.62;
-  color: var(--l-muted); max-width: 52ch;
-}
-.lcat-rule { height: 1px; background: var(--l-line); margin: 28px 0 36px; }
-@media (max-width: 860px) {
-  .lcat-head { grid-template-columns: 1fr; gap: 14px; align-items: start; }
-  .lcat-rule { margin: 22px 0 26px; }
-}
-
-.lcat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-.lcat-img { transition: transform .55s cubic-bezier(.22, .61, .36, 1); }
-
-/* ── Vstupná brána ─────────────────────────────────────────────────────── */
-.lcat-lead {
-  position: relative; display: block; overflow: hidden;
-  grid-column: span 2; grid-row: span 2; min-height: 460px;
-  border-radius: 16px; background: var(--l-dark);
-  text-decoration: none;
-}
-.lcat-lead .lcat-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* Závoj musí byť dosť silný, aby sa text dal čítať aj na svetlej oblohe. */
-.lcat-veil {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(18, 16, 14, 0) 28%, rgba(18, 16, 14, .58) 62%, rgba(18, 16, 14, .92) 100%);
-}
-.lcat-lead-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 34px; }
-.lcat-lead-name {
-  margin: 0; font-size: clamp(26px, 3vw, 36px); line-height: 1.1;
-  letter-spacing: -.022em; color: #fff;
-}
-.lcat-lead-desc {
-  margin: 12px 0 0; max-width: 54ch;
-  font-family: 'Inter', sans-serif; font-size: 15.5px; line-height: 1.6;
-  color: rgba(255, 255, 255, .86);
-}
-
-/* ── Ostatné dlaždice ──────────────────────────────────────────────────── */
-.lcat-tile {
-  display: flex; flex-direction: column; overflow: hidden;
-  background: var(--l-card); border: 1px solid var(--l-line); border-radius: 16px;
-  text-decoration: none;
-  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
-}
-.lcat-photo { position: relative; flex-shrink: 0; aspect-ratio: 16 / 10; overflow: hidden; }
-.lcat-photo .lcat-img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.lcat-body { display: flex; flex-direction: column; flex: 1; padding: 20px 22px 22px; }
-/* Dvojtriedny zápis: názov je `h3` a `.lab h3` (Fraunces) by vyhral
-   špecificitou. Fraunces nesie nadpisy sekcií, nie názvy v mriežke. */
-.lcat .lcat-name {
-  margin: 0; font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 600;
-  letter-spacing: -.005em; line-height: 1.3; color: var(--l-ink);
-}
-/* Popis sa NEOREZÁVA. Pôvodné `line-clamp: 3` končilo skoro každú kategóriu
-   v polovici vety; rovnakú výšku dlaždíc drží mriežka, nie sekanie textu. */
-.lcat-desc {
-  margin: 9px 0 18px;
-  font-family: 'Inter', sans-serif; font-size: 14.8px; line-height: 1.6;
-  color: var(--l-body);
-}
-
-.lcat-go {
-  margin-top: auto; display: inline-flex; align-items: center; gap: 8px;
-  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
-  letter-spacing: .12em; text-transform: uppercase;
-  color: var(--l-second-deep);
-}
-.lcat-go-on-photo { margin-top: 18px; color: #fff; }
-.lcat-arrow { transition: transform .18s ease; }
-
-.lcat-tile:hover {
-  transform: translateY(-3px); border-color: var(--l-second);
-  box-shadow: 0 24px 50px -34px rgba(20, 18, 15, .5);
-}
-.lcat-tile:hover .lcat-img,
-.lcat-lead:hover .lcat-img { transform: scale(1.045); }
-.lcat-tile:hover .lcat-arrow,
-.lcat-lead:hover .lcat-arrow { transform: translateX(4px); }
-.lcat-lead:focus-visible,
-.lcat-tile:focus-visible { outline: 2px solid var(--l-second); outline-offset: 3px; }
-
-@media (max-width: 1100px) {
-  .lcat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lcat-lead { grid-row: span 1; min-height: 400px; }
-}
-@media (max-width: 640px) {
-  .lcat-wrap { padding: 56px 20px 64px; }
-  .lcat-grid { grid-template-columns: 1fr; gap: 18px; }
-  .lcat-lead { grid-column: span 1; min-height: 340px; }
-  .lcat-lead-body { padding: 22px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lcat-img, .lcat-arrow, .lcat-tile { transition: border-color .18s ease; }
-  .lcat-tile:hover { transform: none; }
-  .lcat-tile:hover .lcat-img, .lcat-lead:hover .lcat-img { transform: none; }
-  .lcat-tile:hover .lcat-arrow, .lcat-lead:hover .lcat-arrow { transform: none; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -2504,12 +2380,8 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lakv-knob-year { opacity: 1; }
 }
 
-/* ── Domovská: kategórie a výzva ───────────────────────────────────────── */
+/* ── Domovská: výzva „Pridajte sa k nám" ───────────────────────────────── */
 @media (max-width: 640px) {
-  .lcat-wrap { padding: 44px 16px 52px; }
-  .lcat-lead { min-height: 300px; }
-  .lcat-lead-body { padding: 18px; }
-  .lcat-body { padding: 16px 16px 18px; }
   .ljoin-wrap { padding: 46px 16px 54px; }
   .ljoin-card { padding: 20px 18px; }
   .ljoin-mail { padding: 16px 0; }
