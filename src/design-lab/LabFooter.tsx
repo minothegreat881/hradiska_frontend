@@ -137,6 +137,9 @@ export function LabFooter() {
               Slovenska.
             </p>
 
+            {/* Ikony sietí a nález sú jeden celok: na širokom okne pod sebou,
+                na telefóne vedľa seba — inak by nález zabral celý riadok. */}
+            <div className="lfoot-spodok">
             <div className="lfoot-soc">
               {SOCIALS.map((s) => (
                 <a
@@ -163,6 +166,7 @@ export function LabFooter() {
                 <img src="/znak_nausnica2.png" alt="" width={360} height={287} loading="lazy" decoding="async" />
               </picture>
             </span>
+            </div>
           </div>
 
           <div className="lfoot-cols">

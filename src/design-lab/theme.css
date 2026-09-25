@@ -718,11 +718,16 @@ body[data-lab-theme='pecat'],
   font-weight: 500 !important;
   transition: background .18s ease, border-color .18s ease, color .18s ease;
 }
-.lnav-right a:hover,
-.lnav-right button:hover {
-  background: var(--l-accent) !important;
-  border-color: var(--l-accent) !important;
-  color: var(--l-card) !important;
+/* Iba pre skutočný kurzor. Na dotyku `:hover` po klepnutí ostane visieť,
+   takže tlačidlo ponuky ostalo čierne aj po otvorení — a krížik v ňom,
+   kreslený atramentovou farbou, na tmavom podklade zmizol (namerané). */
+@media (hover: hover) and (pointer: fine) {
+  .lnav-right a:hover,
+  .lnav-right button:hover {
+    background: var(--l-accent) !important;
+    border-color: var(--l-accent) !important;
+    color: var(--l-card) !important;
+  }
 }
 /* Odkazy Galéria/Aktuality ostávajú textové — pilulku má len účet. */
 .lnav-right .lnav-link {
@@ -1759,7 +1764,15 @@ body[data-lab-theme='pecat'],
 .lfoot-nalez--vlavo { width: 128px; height: 128px; margin-top: 26px; overflow: hidden; }
 .lfoot-nalez--vlavo picture { display: contents; }
 .lfoot-nalez--vlavo img { width: 100%; height: 100%; object-fit: cover; }
-@media (max-width: 640px) { .lfoot-nalez--vlavo { width: 104px; height: 104px; margin-top: 20px; } }
+/* Ikony sietí a nález pod nimi. Na širokom okne pod sebou. */
+.lfoot-spodok { display: flex; flex-direction: column; align-items: flex-start; }
+
+@media (max-width: 640px) {
+  /* Na telefóne stoja ikony sietí a nález v jednom riadku — nález sám
+     zaberal celý riadok a pätička tým narástla o svoju výšku. */
+  .lfoot-spodok { flex-direction: row; align-items: center; justify-content: space-between; gap: 14px; width: 100%; }
+  .lfoot-nalez--vlavo { width: 88px; height: 88px; margin-top: 0; flex: none; }
+}
 
 .lfoot-wrap {
   position: relative; z-index: 1;
@@ -1936,16 +1949,21 @@ body[data-lab-theme='pecat'],
   .lfoot-nalezy { right: 18px; transform: translateY(-58%) scale(.82); }
 }
 @media (max-width: 640px) {
-  .lfoot-wrap { padding: 46px 22px 0; }
-  .lfoot-top { gap: 34px; padding-bottom: 34px; }
+  .lfoot-wrap { padding: 38px 22px 0; }
+  .lfoot-top { gap: 28px; padding-bottom: 28px; }
   .lfoot-cols { grid-template-columns: 1fr 1fr; gap: 28px 18px; }
   .lfoot-desc { margin-bottom: 18px; }
   .lfoot-nalezy { display: none; }
   /* Šípka drží pravý horný roh pruhu, aj keď sa odkazy zalomia do dvoch
      riadkov — preto `align-self`, nie zvislé centrovanie. */
-  .lfoot-bar { gap: 14px 18px; }
+  /* Služobný riadok zaberal na telefóne 207 px: tri odkazy pod sebou,
+     pod nimi ©-riadok cez dva riadky. Menšie písmo a tesnejšie medzery
+     ho stlačia, poradie ostáva (odkazy, potom ©). */
+  .lfoot-bar { gap: 10px 16px; padding: 16px 0 22px; }
   .lfoot-up { align-self: start; }
-  .lfoot-legal { gap: 8px 18px; }
+  .lfoot-legal { gap: 6px 16px; }
+  .lfoot-legal a, .lfoot-legal button, .lfoot-copy { font-size: 12.5px; }
+  .lfoot-copy { line-height: 1.5; }
 }
 @media (max-width: 380px) {
   .lfoot-cols { grid-template-columns: 1fr; gap: 24px; }
@@ -2456,10 +2474,12 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
     cursor: pointer;
   }
   .lnav-burger:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; }
-  .lnav-burger-i { position: relative; width: 18px; height: 2px; background: var(--l-ink); border-radius: 2px; }
+  /* `currentColor`, nie pevná atramentová: pri nabehnutí myšou sa tlačidlo
+     zatmaví a čiarky sa musia prefarbiť s ním, inak z krížika nezostane nič. */
+  .lnav-burger-i { position: relative; width: 18px; height: 2px; background: currentColor; border-radius: 2px; }
   .lnav-burger-i::before, .lnav-burger-i::after {
     content: ''; position: absolute; left: 0; width: 18px; height: 2px;
-    background: var(--l-ink); border-radius: 2px;
+    background: currentColor; border-radius: 2px;
     transition: transform .18s ease, top .18s ease;
   }
   .lnav-burger-i::before { top: -6px; }
