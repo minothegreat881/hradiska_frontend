@@ -51,10 +51,86 @@ const ACCOUNT_ROUTES: Record<string, AccountMode> = {
 
 
 
+/**
+ * Cesta z adresy — ČISTÁ funkcia, žiadny stav.
+ *
+ * Predtým sa počiatočná cesta nastavovala na `'home'` a až efekt po pripojení
+ * ju opravil podľa adresy. Znamenalo to, že KAŽDÁ stránka na okamih vykreslila
+ * domovskú — a tým stiahla jej kód aj s mapou a knižnicou MapLibre. Namerané
+ * na `/category/refugia`: 274 kB MapLibre + 38 kB mapy + 9 kB domovskej, na
+ * stránke, ktorá mapu nikdy neukáže.
+ *
+ * Adresa je známa hneď pri prvom vykreslení, takže sa z nej dá vychádzať rovno.
+ */
+export function urcCestu(path: string, search: string): { route: Route; params: Record<string, string>; accountMode: AccountMode | null } {
+  const searchParams = new URLSearchParams(search);
+  const vysledok: { route: Route; params: Record<string, string>; accountMode: AccountMode | null } = {
+    route: 'home',
+    params: {},
+    accountMode: null,
+  };
+
+
+      if (path === '/' || path === '') {
+        vysledok.route = ('home');
+      } else if (path === '/admin' || path.startsWith('/admin/')) {
+        vysledok.route = ('admin');
+      } else if (ACCOUNT_ROUTES[path]) {
+        vysledok.route = ('account');
+        vysledok.accountMode = (ACCOUNT_ROUTES[path]);
+      } else if (path === '/hladat' || path === '/vyhladavanie') {
+        vysledok.route = ('hladat');
+        vysledok.params = ({ q: searchParams.get('q') || '' });
+      } else if (path === '/aktuality' || path.startsWith('/aktuality/')) {
+        vysledok.route = ('aktuality');
+      } else if (path === '/ochrana-osobnych-udajov' || path === '/privacy') {
+        vysledok.route = ('privacy');
+      } else if (path === '/podmienky-pouzivania' || path === '/podmienky') {
+        vysledok.route = ('terms');
+      } else if (path === '/hradiska' || path.startsWith('/hradiska/')) {
+        vysledok.route = ('category');
+        vysledok.params = ({ slug: 'hradiska' });
+      } else if (path === '/kultura' || path.startsWith('/kultura/')) {
+        vysledok.route = ('category');
+        vysledok.params = ({ slug: 'kultura' });
+      } else if (path === '/archeologia' || path.startsWith('/archeologia/')) {
+        vysledok.route = ('category');
+        vysledok.params = ({ slug: 'archeologia' });
+      } else if (path === '/pramene' || path.startsWith('/pramene/')) {
+        vysledok.route = ('category');
+        vysledok.params = ({ slug: 'pramene' });
+      } else if (path === '/pravek' || path.startsWith('/pravek/')) {
+        vysledok.route = ('category');
+        vysledok.params = ({ slug: 'pravek' });
+      } else if (path.startsWith('/galeria')) {
+        vysledok.route = ('galeria');
+      } else if (path.startsWith('/sites/')) {
+        vysledok.route = ('site');
+        vysledok.params = ({ slug: path.replace('/sites/', '') });
+      } else if (path.startsWith('/category/')) {
+        vysledok.route = ('category');
+        vysledok.params = ({ slug: path.replace('/category/', '') });
+        // `/blog` (statická šablóna nad mock dátami) bola zmazaná — články sa
+        // prehliadajú cez kategórie. Samotná cesta spadne nižšie na domovskú.
+        // POZOR: `/blog/<slug>` ostáva, detail článku ide cez ňu.
+      } else if (path.startsWith('/blog/')) {
+        vysledok.route = ('article');
+        vysledok.params = ({ slug: path.replace('/blog/', '') });
+      } else {
+        // Neznáma cesta → poriadna 404 (nie tiché zobrazenie domovskej = soft 404).
+        vysledok.route = ('notfound');
+      }
+    
+  return vysledok;
+}
+
 function App() {
-  const [route, setRoute] = useState<Route>('home');
-  const [accountMode, setAccountMode] = useState<AccountMode>('login');
-  const [params, setParams] = useState<Record<string, string>>({});
+  /* Počiatočný stav sa počíta z adresy, nie z 'home' — inak by každá stránka
+     na okamih vykreslila domovskú a stiahla jej kód aj s mapou (viď `urcCestu`). */
+  const [uvod] = useState(() => urcCestu(window.location.pathname, window.location.search));
+  const [route, setRoute] = useState<Route>(uvod.route);
+  const [accountMode, setAccountMode] = useState<AccountMode>(uvod.accountMode ?? 'login');
+  const [params, setParams] = useState<Record<string, string>>(uvod.params);
   const [pathname, setPathname] = useState(window.location.pathname);
   // true on initial load and browser back/forward (restore old scroll position),
   // false right after a link click (that already scrolls to top itself).
@@ -70,57 +146,10 @@ function App() {
     const handleNavigation = () => {
       const path = window.location.pathname;
       setPathname(path);
-      const searchParams = new URLSearchParams(window.location.search);
-
-      if (path === '/' || path === '') {
-        setRoute('home');
-      } else if (path === '/admin' || path.startsWith('/admin/')) {
-        setRoute('admin');
-      } else if (ACCOUNT_ROUTES[path]) {
-        setRoute('account');
-        setAccountMode(ACCOUNT_ROUTES[path]);
-      } else if (path === '/hladat' || path === '/vyhladavanie') {
-        setRoute('hladat');
-        setParams({ q: searchParams.get('q') || '' });
-      } else if (path === '/aktuality' || path.startsWith('/aktuality/')) {
-        setRoute('aktuality');
-      } else if (path === '/ochrana-osobnych-udajov' || path === '/privacy') {
-        setRoute('privacy');
-      } else if (path === '/podmienky-pouzivania' || path === '/podmienky') {
-        setRoute('terms');
-      } else if (path === '/hradiska' || path.startsWith('/hradiska/')) {
-        setRoute('category');
-        setParams({ slug: 'hradiska' });
-      } else if (path === '/kultura' || path.startsWith('/kultura/')) {
-        setRoute('category');
-        setParams({ slug: 'kultura' });
-      } else if (path === '/archeologia' || path.startsWith('/archeologia/')) {
-        setRoute('category');
-        setParams({ slug: 'archeologia' });
-      } else if (path === '/pramene' || path.startsWith('/pramene/')) {
-        setRoute('category');
-        setParams({ slug: 'pramene' });
-      } else if (path === '/pravek' || path.startsWith('/pravek/')) {
-        setRoute('category');
-        setParams({ slug: 'pravek' });
-      } else if (path.startsWith('/galeria')) {
-        setRoute('galeria');
-      } else if (path.startsWith('/sites/')) {
-        setRoute('site');
-        setParams({ slug: path.replace('/sites/', '') });
-      } else if (path.startsWith('/category/')) {
-        setRoute('category');
-        setParams({ slug: path.replace('/category/', '') });
-        // `/blog` (statická šablóna nad mock dátami) bola zmazaná — články sa
-        // prehliadajú cez kategórie. Samotná cesta spadne nižšie na domovskú.
-        // POZOR: `/blog/<slug>` ostáva, detail článku ide cez ňu.
-      } else if (path.startsWith('/blog/')) {
-        setRoute('article');
-        setParams({ slug: path.replace('/blog/', '') });
-      } else {
-        // Neznáma cesta → poriadna 404 (nie tiché zobrazenie domovskej = soft 404).
-        setRoute('notfound');
-      }
+      const v = urcCestu(path, window.location.search);
+      setRoute(v.route);
+      setParams(v.params);
+      if (v.accountMode) setAccountMode(v.accountMode);
     };
 
     handleNavigation();

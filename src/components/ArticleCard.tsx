@@ -70,7 +70,7 @@ export function ArticleCard({ article, stitok = true, znak = false }: ArticleCar
           <span className="acard-bezfotky" aria-hidden="true">
             <picture>
               <source srcSet="/znak_minca.webp" type="image/webp" />
-              <img src="/znak_minca.png" alt="" width={600} height={666} loading="lazy" decoding="async" />
+              <img src="/znak_minca.png" alt="" width={160} height={178} loading="lazy" decoding="async" />
             </picture>
           </span>
         )}
@@ -81,7 +81,7 @@ export function ArticleCard({ article, stitok = true, znak = false }: ArticleCar
           <span className="acard-znak" aria-hidden="true">
             <picture>
               <source srcSet="/znak_kopije.webp" type="image/webp" />
-              <img src="/znak_kopije.png" alt="" width={560} height={320} loading="lazy" decoding="async" />
+              <img src="/znak_kopije.png" alt="" width={320} height={183} loading="lazy" decoding="async" />
             </picture>
           </span>
         )}

@@ -41,7 +41,7 @@ export function LabHome() {
             vyrezávať pozadie by pri akvareli zožralo aj svetlé ťahy. */}
         <picture className="lhero-znak">
           <source srcSet="/znak_kopije.webp" type="image/webp" />
-          <img src="/znak_kopije.png" alt="" aria-hidden="true" width={560} height={320} decoding="async" />
+          <img src="/znak_kopije.png" alt="" aria-hidden="true" width={320} height={183} decoding="async" />
         </picture>
 
         <p className="lhero-nadciara">

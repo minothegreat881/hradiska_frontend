@@ -17,6 +17,46 @@
           "value": "public, max-age=86400, stale-while-revalidate=604800"
         }
       ]
+    },
+    {
+      "comment": "Obrazky zo Strapi maju v nazve hash obsahu a nikdy sa nemenia. Bez tohto chodili s 'max-age=0' a kazda navsteva ich stahovala nanovo (namerane 369 kB na domovskej, 496 kB na clanku).",
+      "source": "/strapi/uploads/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "comment": "Subory appky maju hash v nazve, takze sa nikdy nemenia pod rovnakou adresou. Predtym mali 'max-age=0, must-revalidate' a pri kazdom zobrazeni islo 7-15 podmienenych poziadaviek navyse.",
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "comment": "Self-hostovane pisma sa nemenia. Rovnaky dovod ako pri /assets.",
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "comment": "Znaky a titulne obrazky v public/ sa menia len s nasadenim; tyzden s revalidaciou je bezpecny kompromis.",
+      "source": "/(znak_[^/]+|logo_[^/]+|img_header_[^/]+)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=2592000"
+        }
+      ]
     }
   ]
 }

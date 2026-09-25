@@ -66,7 +66,7 @@ const SHORT: Record<string, string> = {
 const shortLabel = (i: NavigationItem) => SHORT[catSlug(i)] ?? i.label;
 
 export function LabNav() {
-  const { items, loading } = useNavigationData();
+  const { items, loading, nacitajClanky } = useNavigationData();
   /**
    * Otvorená roletka. Drží sa aj vodorovná poloha tlačidla, lebo panel sa
    * NEVYKRESĽUJE vnútri radu, ale až na úrovni celej lišty.
@@ -179,7 +179,12 @@ export function LabNav() {
                   key={cat.label}
                   cat={cat}
                   open={open?.label === cat.label}
-                  onToggle={(left) => setOpen(prev => (prev?.label === cat.label ? null : { label: cat.label, left }))}
+                  onToggle={(left) => {
+                    // Zoznam článkov sa ťahá až tu — pri štarte stránky má
+                    // hlavička len počty (viď `useNavigationData`).
+                    nacitajClanky(catSlug(cat));
+                    setOpen(prev => (prev?.label === cat.label ? null : { label: cat.label, left }));
+                  }}
                 />
               ))}
             </div>
@@ -218,7 +223,10 @@ export function LabNav() {
                       className="lnav-m-btn"
                       data-open={isOpen ? 'true' : undefined}
                       aria-expanded={isOpen}
-                      onClick={() => setOpenMobileCat(prev => (prev === cat.label ? null : cat.label))}
+                      onClick={() => {
+                        nacitajClanky(catSlug(cat));
+                        setOpenMobileCat(prev => (prev === cat.label ? null : cat.label));
+                      }}
                     >
                       <span>{cat.label}</span>
                       {typeof cat.count === 'number' && cat.count > 0 && <span className="lnav-m-count">{cat.count}</span>}
@@ -258,7 +266,7 @@ export function LabNav() {
         <MegaPonuka
           kategorie={{ primarne: rows[0].items, dalsie: rows[1].items }}
           aktivna={openCat}
-          onKategoria={(c) => setOpen({ label: c.label, left: 0 })}
+          onKategoria={(c) => { nacitajClanky(catSlug(c)); setOpen({ label: c.label, left: 0 }); }}
           onZavri={() => setOpen(null)}
           zoskupenie={zoskupenie}
           onZoskupenie={setZoskupenie}

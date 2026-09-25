@@ -82,7 +82,7 @@ export function LabJoinUs() {
                 nemá čo zavadzať nadpisu. */}
             <picture className="ljoin-znak">
               <source srcSet="/znak_minca.webp" type="image/webp" />
-              <img src="/znak_minca.png" alt="" aria-hidden="true" width={600} height={666} loading="lazy" decoding="async" />
+              <img src="/znak_minca.png" alt="" aria-hidden="true" width={160} height={178} loading="lazy" decoding="async" />
             </picture>
 
             <span className="ljoin-eyebrow">Buďme hrdí na naše dejiny</span>

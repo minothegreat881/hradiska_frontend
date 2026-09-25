@@ -311,7 +311,10 @@ export function MapaHradisk() {
   useEffect(() => {
     const STRAPI = strapiBase();
     const inCats = new Set(CATS.map(c => c.slug));
-    fetch(`${STRAPI}/api/search-index`)
+    /* `?bezTextu=1` — mapa potrebuje súradnice, názov a náhľad, nie plné
+       znenia článkov. Plný index má 3,39 MB pred kompresiou (1,19 MB po nej),
+       z toho 2,77 MB sú texty, ktoré tu nemá kto čítať. */
+    fetch(`${STRAPI}/api/search-index?bezTextu=1`)
       .then(r => r.json())
       .then(j => {
         const out: Loc[] = (j.items || [])

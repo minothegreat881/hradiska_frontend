@@ -24,7 +24,7 @@
  * Prvý skúšaný článok: `mikulcice-kopcany`.
  */
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useBlogPost } from '../hooks/useStrapi';
 import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
@@ -208,12 +208,10 @@ export function LabArticle({ slug }: { slug: string }) {
       </section>
 
       {/* Mapa hradísk pod komentármi — posledná vec, ktorú článok ponúkne:
-          „a kde sú ďalšie". */}
-      <section className="lart-mapa">
-        <Suspense fallback={null}>
-          <LabMapa />
-        </Suspense>
-      </section>
+          „a kde sú ďalšie". Vykreslí sa až vtedy, keď sa k nej čitateľ
+          priblíži: mapa si stiahne 44 dlaždíc podkladu (486 kB namerané)
+          a väčšina čitateľov k nej nedôjde. */}
+      <MapaAzKedTreba />
 
       {related.length > 0 && (
         <section className="lart-more">
@@ -227,6 +225,40 @@ export function LabArticle({ slug }: { slug: string }) {
         </section>
       )}
     </div>
+  );
+}
+
+/**
+ * Mapa sa pripojí, až keď sa k nej doroluje.
+ *
+ * Miesto si drží prázdna sekcia, takže sa stránka pod ňou nehýbe. Pozorovateľ
+ * sa spúšťa 600 px dopredu — kým čitateľ doroluje, mapa je pripravená.
+ */
+function MapaAzKedTreba() {
+  const kotva = useRef<HTMLElement>(null);
+  const [zobrazit, setZobrazit] = useState(false);
+
+  useEffect(() => {
+    if (zobrazit) return;
+    const el = kotva.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') { setZobrazit(true); return; }
+    const io = new IntersectionObserver(
+      (zaznamy) => { if (zaznamy.some((z) => z.isIntersecting)) { setZobrazit(true); io.disconnect(); } },
+      { rootMargin: '600px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [zobrazit]);
+
+  return (
+    <section className="lart-mapa" ref={kotva}>
+      {zobrazit && (
+        <Suspense fallback={null}>
+          <LabMapa />
+        </Suspense>
+      )}
+    </section>
   );
 }
 

@@ -127,7 +127,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                 <span className="ch-znak" aria-hidden="true">
                   <picture>
                     <source srcSet="/znak_kopije.webp" type="image/webp" />
-                    <img src="/znak_kopije.png" alt="" width={560} height={320} decoding="async" />
+                    <img src="/znak_kopije.png" alt="" width={320} height={183} decoding="async" />
                   </picture>
                 </span>
               )}

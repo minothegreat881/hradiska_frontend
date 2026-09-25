@@ -99,13 +99,13 @@ export function LabFooter() {
         <span className="lfoot-nalez lfoot-nalez--nausnica">
           <picture>
             <source srcSet="/znak_nausnica.webp" type="image/webp" />
-            <img src="/znak_nausnica.png" alt="" width={340} height={329} loading="lazy" decoding="async" />
+            <img src="/znak_nausnica.png" alt="" width={280} height={271} loading="lazy" decoding="async" />
           </picture>
         </span>
         <span className="lfoot-nalez lfoot-nalez--nadoba">
           <picture>
             <source srcSet="/znak_nadoba.webp" type="image/webp" />
-            <img src="/znak_nadoba.png" alt="" width={340} height={341} loading="lazy" decoding="async" />
+            <img src="/znak_nadoba.png" alt="" width={240} height={241} loading="lazy" decoding="async" />
           </picture>
         </span>
       </div>
@@ -122,8 +122,8 @@ export function LabFooter() {
                   src="/znak_minca.png"
                   alt=""
                   aria-hidden="true"
-                  width={44}
-                  height={44}
+                  width={160}
+                  height={178}
                 />
               </picture>
               <span>
@@ -163,7 +163,7 @@ export function LabFooter() {
             <span className="lfoot-nalez lfoot-nalez--vlavo" aria-hidden="true">
               <picture>
                 <source srcSet="/znak_nausnica2.webp" type="image/webp" />
-                <img src="/znak_nausnica2.png" alt="" width={360} height={287} loading="lazy" decoding="async" />
+                <img src="/znak_nausnica2.png" alt="" width={200} height={159} loading="lazy" decoding="async" />
               </picture>
             </span>
             </div>
