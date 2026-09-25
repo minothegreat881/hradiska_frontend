@@ -23,6 +23,16 @@ import {
   getBlogPosts, getDomovskaGaleria, getKronikaAll, getKronikaIntro, getKronikaPhotos,
   getStrapiImageUrl, KRONIKA_INTRO_SLUG, KronikaItem, KronikaPhoto, StrapiImage,
 } from '../lib/strapi';
+import { hradiskaCategories, variant } from '../data/categories';
+import { zakladStrapi } from '../data/rozcestnik';
+
+/* Obraz v ľavom hornom bloku sekcie. Kresba strážnej a hospodárskej funkcie
+   z toho istého zoznamu, z ktorého žijú dlaždice na domovskej — keď sa tam
+   obrázok vymení, vymení sa aj tu. */
+const obrazokSekcie = (() => {
+  const k = hradiskaCategories.find((c) => c.slug === 'strazna-funkcia');
+  return k ? `${zakladStrapi()}${variant(k.image, 'large')}` : '/logo_hradiska_full.png';
+})();
 
 const GOLD_GRAD = 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))';
 const GLASS: React.CSSProperties = {
@@ -280,13 +290,20 @@ export default function LabAktuality() {
           <a href="/aktuality" className="lakv-more">CELÁ KRONIKA →</a>
         </div>
 
-        {/* horný rad: logo + pripnutý zápis */}
+        {/* horný rad: kresba + pripnutý zápis */}
         <div className="lakv-top" style={{ marginBottom: 30 }}>
           <div className="lakv-logo" style={{ position: 'relative', aspectRatio: '900 / 886', alignSelf: 'start', borderRadius: 30, overflow: 'hidden', border: '1px solid var(--hr-line-soft)', background: 'radial-gradient(ellipse at 50% 38%, var(--hr-wash-1) 0%, var(--hr-wash-2) 55%, var(--hr-wash-3) 100%)', boxShadow: '0 24px 56px -26px rgba(40,26,10,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <picture style={{ display: 'flex', width: '100%', height: '100%' }}>
-              <source srcSet="/logo_hradiska_full.webp" type="image/webp" />
-              <img src="/logo_hradiska_full.png" alt="Slovanské hradiská" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            </picture>
+            {/* Kresba strážnej a hospodárskej funkcie namiesto loga. Berie sa
+                zo zoznamu kategórií, takže keď sa tam obrázok vymení, vymení
+                sa aj tu. */}
+            <img
+              src={obrazokSekcie}
+              alt=""
+              aria-hidden="true"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              loading="lazy"
+              decoding="async"
+            />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

@@ -944,6 +944,11 @@ body[data-lab-theme='pecat'],
 }
 .lakv-tile { transition: transform .2s ease; }
 .lakv-tile:hover { transform: translateY(-4px); }
+/* Pripnutý zápis („Prečo to vlastne robím?") je blok textu cez pol sekcie.
+   Pri prejdení myšou sa celý posunul nahor a pôsobilo to ako preklep, nie
+   ako odozva — ostáva statický. Malé dlaždice zápisov sa dvíhajú ďalej,
+   tam je to obrázok veľkosti karty. */
+.lakv-pinned.lakv-tile:hover { transform: none; }
 .lakv-tile img { transition: transform .5s ease; }
 .lakv-tile:hover img { transform: scale(1.05); }
 
@@ -1725,6 +1730,18 @@ body[data-lab-theme='pecat'],
 
 /* Vrstevnice v pozadí. Tlmené natoľko, aby sa dali prehliadnuť — nesmú
    súperiť s textom, len prerušiť prázdnu plochu vpravo. */
+/* Meč na konci ľavého stĺpca pätičky. V toku textu, nie nalepený do rohu —
+   tak sa nemá o čo zavadiť pri žiadnej šírke okna. */
+.lfoot-mec {
+  display: flex; align-items: center; justify-content: center;
+  width: 248px; height: 78px; margin-top: 26px;
+  border-radius: 999px;
+  background: var(--l-paper);
+  box-shadow: 0 0 0 1px rgba(243, 237, 225, .22), 0 18px 34px -18px rgba(0, 0, 0, .55);
+}
+.lfoot-mec img { display: block; width: 84%; height: auto; }
+@media (max-width: 640px) { .lfoot-mec { width: 210px; height: 66px; margin-top: 20px; } }
+
 /* Nálezy vpravo v pätičke: náušnica a nádoba v papierových medailónoch.
    Kruh je ten istý nápad ako značka v hlavičke — svetlý podklad, vlások
    po obvode. Bez neho by sa perové obrysy malieb na tmavom pozadí
