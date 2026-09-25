@@ -21,6 +21,7 @@ import { ProfileScreen } from './screens/ProfileScreen';
 import { CategoriesScreen } from './screens/CategoriesScreen';
 import { TagsScreen } from './screens/TagsScreen';
 import { fetchNavCounts } from './api/posts';
+import { StavPosty } from './components/StavPosty';
 
 export type AdminRoute =
   | 'articles' | 'drafts' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'pripomienky' | 'users' | 'analytics' | 'profile';
@@ -248,6 +249,10 @@ function AdminShell() {
         </header>
 
         <main style={{ flex: 1, padding: 24, minWidth: 0 }}>
+          {/* Budíček pošty. Ukáže sa len vtedy, keď odosielanie nefunguje —
+              inak by z neho po týždni bola tapeta, ktorú nikto nečíta. */}
+          {token && <StavPosty token={token} />}
+
           {route === 'articles' && <ArticlesScreen onEdit={openEditor} />}
           {route === 'drafts' && <DraftsScreen onEdit={openEditor} />}
           {route === "editor" && <EditorScreen articleId={editingId} onBack={() => setRoute("articles")} onSaved={setEditingId} />}
