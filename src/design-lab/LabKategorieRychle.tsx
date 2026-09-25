@@ -3,14 +3,10 @@
 /**
  * DLAŽDICE KATEGÓRIÍ pod titulkom domovskej stránky.
  *
- * Podľa handoffu „Homepage – hlavička, titulok a dlaždice" (09/2026):
- * dlaždice s TYPMI hradísk, pod nimi oddeľovač „Pramene a tradícia" a štyri
- * dlaždice s prameňmi, tradíciou a svätyňami.
- *
- * Predloha mala v hornom rade päť dlaždíc; „Mocenské centrá" z neho na
- * žiadosť odišli, takže sú rady dva po štyroch. Šírka dlaždice sa napriek
- * tomu naďalej počíta z PÄŤSTĹPCOVÉHO radu a rady sa centrujú — inak by
- * dlaždice narástli a celý blok by prestal sedieť s predlohou.
+ * Podľa handoffu „Homepage – hlavička, titulok a dlaždice" (09/2026): päť
+ * dlaždíc s TYPMI hradísk, pod nimi oddeľovač „Pramene a tradícia" a štyri
+ * dlaždice s prameňmi, tradíciou a svätyňami. Spodný rad má rovnako široké
+ * dlaždice ako horný — preto tá počítaná šírka stĺpca, nie `1fr`.
  *
  * Z handoffu sa NEPREBERÁ písmo (DM Serif Display + Manrope z Google Fonts).
  * Fonty webu sú self-hostované kvôli GDPR a celý šat stojí na Fraunces +
@@ -39,6 +35,7 @@ interface Polozka {
 
 const TYPY: Polozka[] = [
   { slug: 'kniezacie-sidla', label: 'Kniežacie sídla', tvary: ['hradisko', 'hradiská', 'hradísk'] },
+  { slug: 'mocenske-centra', label: 'Mocenské centrá', tvary: ['hradisko', 'hradiská', 'hradísk'] },
   { slug: 'strazna-funkcia', label: 'Hospodárska', tvary: ['hradisko', 'hradiská', 'hradísk'] },
   { slug: 'refugia', label: 'Refúgiá', tvary: ['hradisko', 'hradiská', 'hradísk'] },
   { slug: 'staroveke-sidla', label: 'Staroveké hradiská', tvary: ['hradisko', 'hradiská', 'hradísk'] },

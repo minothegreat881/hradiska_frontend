@@ -5,7 +5,7 @@
  *
  * Skladba:
  *
- *   titulok a značka → dlaždice kategórií → hľadanie → mapa →
+ *   titulok → dlaždice kategórií → hľadanie → mapa → ďalší obsah →
  *   zápisy z kroniky
  *
  * Kategórie a „Pridajte sa k nám" vykresľuje `App` hneď za ňou ako
@@ -17,6 +17,7 @@ import { InkEffect } from '../components/InkEffect';
 import LabAktuality from './LabAktuality';
 import LabMapa from './LabMapa';
 import LabKategorieRychle from './LabKategorieRychle';
+import LabDalsiObsah from './LabDalsiObsah';
 
 export function LabHome() {
   return (
@@ -74,6 +75,10 @@ export function LabHome() {
       <section className="relative" style={{ zIndex: 5 }}>
         <LabMapa />
       </section>
+
+      {/* Kategórie, ktoré nemajú dlaždicu nad mapou — každá s radom štyroch
+          najnovších článkov. */}
+      <LabDalsiObsah />
 
       <LabAktuality />
     </div>

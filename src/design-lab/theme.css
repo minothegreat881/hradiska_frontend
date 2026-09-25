@@ -1060,15 +1060,9 @@ body[data-lab-theme='pecat'],
   margin-right: auto;
 }
 
-.lkat-rad {
-  display: grid;
-  gap: 28px 24px;
-  justify-content: center;
-  /* Oba rady majú štyri dlaždice, ale šírka sa naďalej počíta z PÄŤ
-     stĺpcov a štyroch medzier po 24 px — tak vyzerá dlaždica presne ako
-     v predlohe. Pri `repeat(4, 1fr)` by narástla o tretinu. */
-  grid-template-columns: repeat(4, calc((100% - 96px) / 5));
-}
+.lkat-rad { display: grid; gap: 28px 24px; justify-content: center; }
+.lkat-rad--typy { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.lkat-rad--pramene { grid-template-columns: repeat(4, calc((100% - 96px) / 5)); }
 
 .lkat-dlazdica {
   display: flex; flex-direction: column; gap: 14px; min-width: 0;
@@ -1137,6 +1131,130 @@ body[data-lab-theme='pecat'],
 }
 .lkat-predel span { width: 36px; height: 1px; background: var(--l-line-2); flex: none; }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   ĎALŠÍ OBSAH — kategórie bez dlaždice
+   Handoff „Homepage – sekcia Ďalší obsah" (09/2026). Karta článku je tá istá
+   ako dlaždica kategórie: zaoblený rám 3:2, pritlmený obrázok, pod kurzorom
+   plná farba a zdvih. Priblíženie je tu rovnako krotké ako pri dlaždiciach
+   (1.025, nie 1.06 z predlohy) — nech sa celá stránka správa rovnako.
+   ══════════════════════════════════════════════════════════════════════════ */
+.dob {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 28px 96px;
+}
+
+.dob-predel {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  margin: 88px 0 30px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--l-muted-2);
+}
+.dob-predel span { width: 36px; height: 1px; background: var(--l-line-2); flex: none; }
+
+.dob-zoznam { display: flex; flex-direction: column; gap: 44px; }
+
+.dob-kategoria {
+  animation: dob-nabeh .8s ease backwards;
+  animation-delay: calc(.9s + var(--dob-poradie, 0) * .07s);
+}
+
+.dob-hlavicka {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--l-line-2);
+}
+.dob-titul {
+  display: flex; align-items: center; gap: 12px;
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600; font-size: 28px; line-height: 1.1;
+  color: var(--l-ink);
+}
+.dob-pocet {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 11.5px; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--l-paper-2); color: var(--l-muted);
+}
+.dob-vsetky {
+  flex: none;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13.5px; font-weight: 700; white-space: nowrap;
+  color: var(--l-second-deep); text-decoration: none;
+  transition: color .25s;
+}
+.dob-vsetky:hover { color: var(--l-ink); }
+
+/* Nikdy 2 × 2: štyri vedľa seba ostávajú aj na tablete. */
+.dob-mriezka {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px; margin-top: 22px;
+}
+
+.dob-clanok {
+  display: flex; flex-direction: column; gap: 12px; min-width: 0;
+  text-decoration: none; color: inherit;
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1);
+}
+.dob-ram {
+  position: relative; display: block; aspect-ratio: 3 / 2;
+  border-radius: 20px; overflow: hidden; background: var(--l-paper-2);
+  box-shadow: 0 2px 6px -2px rgba(70, 45, 20, .18), 0 0 0 1px var(--l-line);
+  transition: box-shadow .5s;
+}
+.dob-obraz {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  filter: saturate(.55) sepia(.18);
+  transition: transform 1.1s cubic-bezier(.2, .8, .2, 1), filter .6s ease;
+}
+.dob-nazov {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px; font-weight: 700; line-height: 1.3;
+  color: var(--l-ink); text-wrap: pretty;
+  transition: color .3s;
+}
+
+.dob-clanok:hover { transform: translateY(-6px); }
+.dob-clanok:hover .dob-ram { box-shadow: 0 26px 44px -22px rgba(70, 45, 20, .42); }
+.dob-clanok:hover .dob-obraz { transform: scale(1.025); filter: none; }
+.dob-clanok:hover .dob-nazov { color: var(--l-second-deep); }
+
+.dob-clanok:focus-visible {
+  outline: 2px solid var(--l-second-deep);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+@keyframes dob-nabeh {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 900px) {
+  .dob-titul { font-size: 23px; }
+  .dob-nazov { font-size: 15px; }
+  .dob-mriezka { gap: 16px; }
+}
+@media (max-width: 600px) {
+  .dob { padding: 0 16px 64px; }
+  .dob-predel { margin: 56px 0 24px; font-size: 11.5px; gap: 12px; }
+  .dob-predel span { width: 24px; }
+  .dob-zoznam { gap: 34px; }
+  .dob-mriezka { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .dob-ram { border-radius: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dob-kategoria { animation: none; }
+  .dob-clanok { transition: none; }
+  .dob-clanok:hover { transform: none; }
+  .dob-obraz { transition: filter .2s ease; }
+  .dob-clanok:hover .dob-obraz { transform: none; }
+}
+
 @keyframes lkat-nabeh {
   from { opacity: 0; transform: translateY(22px); }
   to { opacity: 1; transform: none; }
@@ -1145,7 +1263,7 @@ body[data-lab-theme='pecat'],
 @media (max-width: 720px) {
   .lkat { margin: 0 -16px; padding: 0 16px 4px; }
   .lkat-rad { gap: 20px 16px; }
-  .lkat-rad { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lkat-rad--typy, .lkat-rad--pramene { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lkat-ram { border-radius: 14px; }
   .lkat-predel { margin: 34px 0 20px; font-size: 11.5px; gap: 12px; }
   .lkat-predel span { width: 24px; }
