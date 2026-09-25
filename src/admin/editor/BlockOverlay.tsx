@@ -302,8 +302,14 @@ export function BlockOverlay({
         </div>
       )}
 
-      {/* rámik výberu + úchyt + lišta */}
-      {selected && selectedBlock && selectedUid !== editingUid && (
+      {/* Rámik výberu + úchyt + lišta.
+
+         Lišta sa predtým skrývala vo chvíli, keď sa do bloku kliklo a začalo
+         písať (`selectedUid !== editingUid`). Presne vtedy ju ale človek
+         potrebuje najviac: blok si otvorí, zistí, že ho chce zmazať — a nemá
+         čím. Meranie rámika si so zmenami textu poradí samo (ResizeObserver
+         aj MutationObserver vyššie), takže nebol dôvod ju skrývať. */}
+      {selected && selectedBlock && (
         <div className="ed-frame ed-frame-selected pointer-events-none" style={boxStyle(selected)}>
           <span className="ed-frame-tag ed-frame-tag-on">{selectedBlock.label}</span>
 
