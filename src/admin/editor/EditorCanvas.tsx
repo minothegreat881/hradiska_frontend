@@ -495,6 +495,16 @@ const canvasCss = `
 .ed-textbar button.is-on { background: #c98a3c !important; color: #241a0e !important; }
 .ed-textbar-sep { width: 1px; height: 18px; background: rgba(255,255,255,.18); margin: 0 3px; }
 
+/* Vložené prehrávače (YouTube, Vimeo, Sketchfab) sú vlastné okná. Klik do
+   nich zhltne prehrávač, takže sa blok nikdy neoznačil — a keďže sa
+   neoznačil, nedal sa ani presunúť, ani zmazať. V editore preto kliknutia
+   prepúšťajú; prehráva sa na webe, tu sa s blokom pracuje.
+
+   To isté platí pre mapu a všetko ostatné, čo si prinesie vlastné okno —
+   pravidlo je zámerne na prvku iframe, nie na jednom type bloku.
+   (Bez spätných úvodzoviek: tento blok je vnútri šablónového reťazca.) */
+.ed-block iframe { pointer-events: none !important; }
+
 .ed-overlay { position: absolute; inset: 0; z-index: 30; }
 /* Tlačidlá musia klikať aj vo vrstve, ktorá sama kliknutia prepúšťa. */
 .ed-overlay button { pointer-events: auto !important; font: inherit; }
