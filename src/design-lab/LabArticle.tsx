@@ -24,7 +24,7 @@
  * Prvý skúšaný článok: `mikulcice-kopcany`.
  */
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useBlogPost } from '../hooks/useStrapi';
 import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
@@ -34,6 +34,12 @@ import { HistoricalGallery } from '../components/HistoricalGallery';
 import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
 import { ArticleCard } from '../components/ArticleCard';
+import LabKategorieRychle from './LabKategorieRychle';
+import { lazyStale } from '../lib/lazyStale';
+
+/* Mapa sa dotiahne až keď na ňu príde rad. Je to najťažší komponent webu
+   a na stránke článku stojí úplne dole — nikto na ňu nečaká, kým číta. */
+const LabMapa = lazyStale(() => import('./LabMapa'));
 
 function skDate(iso?: string | null): string {
   if (!iso) return '';
@@ -86,6 +92,13 @@ export function LabArticle({ slug }: { slug: string }) {
             : 'Náhľad konceptu sa nepodaril: prihlásenie do administrácie vypršalo. Zobrazená je publikovaná verzia.'}
         </div>
       )}
+      {/* Rozcestník kategórií. Tá istá deviatka ako na domovskej: článok je
+          na webe najčastejšie prvou stránkou z vyhľadávača, takže odtiaľto
+          musí viesť cesta ďalej skôr, než návštevník začne čítať. */}
+      <div className="lart-dlazdice">
+        <LabKategorieRychle />
+      </div>
+
       {/* ── Titulná fotografia ───────────────────────────────────────────
           Jediná prestavaná časť rozvrhu. Predtým prúžok 224–256 px s tmavým
           prechodom, v ktorom bol nadpis orezaný na tri riadky; z fotografie
@@ -193,6 +206,14 @@ export function LabArticle({ slug }: { slug: string }) {
             </div>
           </div>
         </article>
+      </section>
+
+      {/* Mapa hradísk pod komentármi — posledná vec, ktorú článok ponúkne:
+          „a kde sú ďalšie". */}
+      <section className="lart-mapa">
+        <Suspense fallback={null}>
+          <LabMapa />
+        </Suspense>
       </section>
 
       {related.length > 0 && (

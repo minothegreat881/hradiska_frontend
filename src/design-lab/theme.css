@@ -1039,10 +1039,15 @@ body[data-lab-theme='pecat'],
   /* Hero sekcia má široké plávajúce okraje (`clamp(20px, 6.7vw, 96px)`) —
      tie sú pre titulok, nie pre mriežku. Dlaždice by v nich pri 1024 px
      schudli na 147 px namiesto 174 px z predlohy, preto sa okraj odráta
-     a mriežka si drží vlastný kontajner 1320 px / 28 px podľa handoffu. */
-  margin: 0 calc(-1 * clamp(20px, 6.7vw, 96px));
+     a mriežka si drží vlastný kontajner 1320 px / 28 px podľa handoffu.
+
+     Odrátava sa cez premennú, nie natvrdo: dlaždice stoja aj na stránke
+     článku, kde žiadny taký okraj nie je a záporný okraj by vysunul
+     mriežku z okna a spravil vodorovné rolovanie. */
+  margin: 0 calc(-1 * var(--lkat-vyrovnanie, 0px));
   padding: 0 28px 4px;
 }
+.lhero-sekcia .lkat { --lkat-vyrovnanie: clamp(20px, 6.7vw, 96px); }
 .lkat > * {
   max-width: 1264px;   /* 1320 kontajnera mínus 2 × 28 px odsadenia */
   margin-left: auto;
@@ -1244,13 +1249,22 @@ body[data-lab-theme='pecat'],
   .dob-clanok:hover .dob-obraz { transform: none; }
 }
 
+/* Dlaždice na stránke článku: rovnaký pás, len s vlastným odstupom hore
+   aj dole — nesedí pod titulkom, ale nad titulnou fotografiou článku. */
+.lart-dlazdice { padding: 26px 0 30px; }
+@media (max-width: 720px) { .lart-dlazdice { padding: 16px 0 20px; } }
+
+/* Mapa pod komentármi článku. */
+.lart-mapa { position: relative; z-index: 5; }
+
 @keyframes lkat-nabeh {
   from { opacity: 0; transform: translateY(22px); }
   to { opacity: 1; transform: none; }
 }
 
 @media (max-width: 720px) {
-  .lkat { margin: 0 -16px; padding: 0 16px 4px; }
+  .lkat { padding: 0 16px 4px; }
+  .lhero-sekcia .lkat { --lkat-vyrovnanie: 16px; }
   .lkat-rad { gap: 20px 16px; }
   .lkat-rad--typy, .lkat-rad--pramene { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lkat-ram { border-radius: 14px; }
