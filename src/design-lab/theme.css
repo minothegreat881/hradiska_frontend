@@ -2196,9 +2196,24 @@ body[data-lab-theme='pecat'],
   .lart-hero-img { transition: none; }
 }
 
+/* Stĺpec titulky má to isté odsadenie ako stĺpec tela článku (`p-6 md:p-8`).
+   Vlastné pravidlo, nie tie triedy: projekt má Tailwind predgenerovaný,
+   takže `md:px-8` v ňom nie je a ticho by sa neuplatnilo (namerané: 24 px
+   namiesto 40 a titulka o 17 px vedľa). Premenné aj zlom sú tie isté. */
+/* Telo článku sedí v karte s 1 px rámikom, takže jeho stĺpec začína o pixel
+   ďalej. Priehľadný rámik tej istej hrúbky ten rozdiel zrovná bez toho, aby
+   tu čokoľvek pribudlo vidieť. */
+.lart-hero-textwrap > .article-grid { border: 1px solid transparent; }
+.lart-hero-textcol { padding-left: var(--spacing-6); padding-right: var(--spacing-6); }
+@media (width >= 48rem) {
+  .lart-hero-textcol { padding-left: var(--spacing-8); padding-right: var(--spacing-8); }
+}
+
+/* Šírka obalu je rovnaká ako v tele článku (`article-body-wrapper`), aby
+   nadpis, perex aj text začínali a končili na tej istej zvislici. */
 .lart-hero-text {
   box-sizing: border-box;
-  max-width: 780px; margin: 0 auto; padding: 40px 0 48px;
+  max-width: 668px; margin: 0 auto; padding: 40px 0 48px;
   display: flex; flex-direction: column; gap: 16px;
 }
 .lart-crumbs {
@@ -2226,12 +2241,15 @@ body[data-lab-theme='pecat'],
 }
 .lart-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--l-second); flex-shrink: 0; }
 
+/* Vodorovné odsadenie nesie stĺpec rozvrhu (`px-6 md:px-8`), tu ostáva len
+   zvislé — inak by sa odsadenie spočítalo dvakrát a text by sa rozišiel
+   s telom článku. */
 @media (max-width: 840px) {
-  .lart-hero-text { padding: 32px 24px 40px; }
+  .lart-hero-text { padding: 32px 0 40px; }
 }
 @media (max-width: 600px) {
   .lart-hero-media { height: 260px; }
-  .lart-hero-text { padding: 24px 18px 32px; gap: 12px; }
+  .lart-hero-text { padding: 24px 0 32px; gap: 12px; }
   .lart-excerpt { font-size: 16px; }
 }
 

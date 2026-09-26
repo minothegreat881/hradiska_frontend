@@ -212,6 +212,14 @@ export function LabArticle({ slug }: { slug: string }) {
           </div>
         )}
 
+        {/* Text titulky ide cez TEN ISTÝ rozvrh ako telo článku: rovnaký
+            kontajner, rovnaký 12-stĺpcový grid, rovnaký stĺpec aj rovnako
+            široký obal. Kým bol len vycentrovaný na šírku okna, nadpis
+            začínal o 173 px vpravo od textu článku (namerané pri 1440 px).
+            Žiadny prepočet — o zarovnanie sa stará ten istý rozvrh. */}
+        <div className="lart-hero-textwrap container mx-auto px-4">
+          <div className="grid-layout article-grid">
+            <div className="article-main-col lart-hero-textcol">
         <div className="lart-hero-text">
           <nav className="lart-crumbs" aria-label="Omrvinky">
             <a href="/">Domov</a>
@@ -232,6 +240,9 @@ export function LabArticle({ slug }: { slug: string }) {
             </time>
             <span className="lart-meta-dot" aria-hidden="true" />
             <span>{post.readingTime} min čítania</span>
+          </div>
+        </div>
+            </div>
           </div>
         </div>
       </header>

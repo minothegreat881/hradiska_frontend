@@ -338,6 +338,11 @@ export function EditorCanvas({
                   />
                 </div>
               )}
+              {/* Rovnaký rozvrh ako na webe — bez neho by nadpis v náhľade
+                  začínal inde než text článku pod ním. */}
+              <div className="lart-hero-textwrap container mx-auto px-4">
+                <div className="grid-layout article-grid">
+                  <div className="article-main-col lart-hero-textcol">
               <div className="lart-hero-text">
                 <h1 className="lart-title">{article.title || 'Bez názvu'}</h1>
                 {article.excerpt && <p className="lart-excerpt">{article.excerpt}</p>}
@@ -345,6 +350,9 @@ export function EditorCanvas({
                   <span>{article.authorName || 'Hradiská.sk'}</span>
                   <span className="lart-meta-dot" aria-hidden="true" />
                   <span>{article.readingTime || 1} min čítania</span>
+                </div>
+              </div>
+                  </div>
                 </div>
               </div>
             </header>
