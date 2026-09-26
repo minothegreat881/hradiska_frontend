@@ -187,7 +187,7 @@ export function LabArticle({ slug }: { slug: string }) {
         )}
         {cover && (
           <img
-            className={ostraTu ? 'lart-hero-img je-tu' : 'lart-hero-img'}
+            className={ostraTu ? 'lart-hero-img' : 'lart-hero-img caka'}
             src={cover}
             srcSet={coverSada}
             sizes={coverSada ? '100vw' : undefined}

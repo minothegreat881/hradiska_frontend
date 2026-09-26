@@ -2167,9 +2167,14 @@ body[data-lab-theme='pecat'],
 }
 .lart-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* Ostrá fotografia sa prelínaním položí na rozmazanú miniatúru. Náhly
-   výmen by bol viditeľnejší než samotné čakanie. */
-.lart-hero-img { opacity: 0; transition: opacity .4s ease; }
-.lart-hero-img.je-tu { opacity: 1; }
+   výmen by bol viditeľnejší než samotné čakanie.
+
+   SKRYTIE SA MUSÍ VYPÝTAŤ, nie zdediť. Tie isté triedy používa aj plátno
+   v administrácii (CoverImage.tsx), ktoré o prelínaní nič nevie — kým bolo
+   `opacity: 0` na samotnej `.lart-hero-img`, titulná fotografia v editore
+   zmizla úplne, hoci na webe bola v poriadku. */
+.lart-hero-img.caka { opacity: 0; }
+.lart-hero-img { transition: opacity .4s ease; }
 /* Miniatúra je 245 px široká na ploche 1440 px — rozostrenie z nej spraví
    farebný podklad, nie obrázok. Zväčšenie skryje mäkké okraje rozostrenia. */
 .lart-hero-mini {
