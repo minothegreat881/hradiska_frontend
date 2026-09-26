@@ -137,8 +137,8 @@ export function LabFooter() {
               Slovenska.
             </p>
 
-            {/* Ikony sietí a nález sú jeden celok: na širokom okne pod sebou,
-                na telefóne vedľa seba — inak by nález zabral celý riadok. */}
+            {/* Náušnica, ktorá tu stála vedľa ikon, sa presťahovala do päty
+                registra v roletke kategórií (`.lprh-znak`). */}
             <div className="lfoot-spodok">
             <div className="lfoot-soc">
               {SOCIALS.map((s) => (
@@ -156,16 +156,6 @@ export function LabFooter() {
                 </a>
               ))}
             </div>
-
-            {/* Náušnica z druhého listu značiek na konci ľavého stĺpca.
-                Na rozdiel od nálezov vpravo má maľba vlastný červený záter,
-                ktorý vypĺňa celý medailón — preto `cover`, nie `contain`. */}
-            <span className="lfoot-nalez lfoot-nalez--vlavo" aria-hidden="true">
-              <picture>
-                <source srcSet="/znak_nausnica2.webp" type="image/webp" />
-                <img src="/znak_nausnica2.png" alt="" width={200} height={159} loading="lazy" decoding="async" />
-              </picture>
-            </span>
             </div>
           </div>
 

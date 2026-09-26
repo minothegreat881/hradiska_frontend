@@ -1911,20 +1911,12 @@ body[data-lab-theme='pecat'],
    nie ako dva nálezy položené vedľa seba. */
 .lfoot-nalez--nadoba { width: 104px; height: 104px; margin: 34px 0 0 -18px; }
 
-/* Nález v ľavom stĺpci — stojí naľavo od ikon sietí, v jednom riadku s nimi.
-   Je v toku textu, nie nalepený do rohu, takže sa nemá o čo zavadiť pri
-   žiadnej šírke okna. Maľba má vlastný červený záter cez celú plochu —
-   vypĺňa medailón, nie je v ňom položená. */
-.lfoot-nalez--vlavo { width: 84px; height: 84px; overflow: hidden; flex: none; order: -1; }
-.lfoot-nalez--vlavo picture { display: contents; }
-.lfoot-nalez--vlavo img { width: 100%; height: 100%; object-fit: cover; }
-/* Nález a ikony sietí v jednom riadku, nález vľavo (`order: -1` — v značke
-   stojí až za ikonami, aby ho čítačka nebrala pred nimi). */
+/* Riadok s ikonami sietí. Náušnica, ktorá tu stála naľavo od nich, je teraz
+   v päte registra v roletke kategórií (`.lprh-znak`). */
 .lfoot-spodok { display: flex; align-items: center; gap: 16px; }
 
 @media (max-width: 640px) {
   .lfoot-spodok { gap: 12px; }
-  .lfoot-nalez--vlavo { width: 72px; height: 72px; }
 }
 
 .lfoot-wrap {
@@ -3796,7 +3788,15 @@ body[data-lab-theme] .pl-act {
   background: var(--l-card);
   box-shadow: 0 24px 60px rgba(40, 34, 22, .15);
   overflow: hidden;
-  animation: lnav-in .16s ease-out;
+  /* Vlastný nábeh, nie spoločný `lnav-in`. Ten animuje `transform` a tým
+     prepísal vodorovné vycentrovanie (`translateX(-50%)`), takže roletka
+     sa na dve desatiny sekundy objavila posunutá a až potom skočila do
+     stredu. Posun v osi X musí byť v každej snímke. */
+  animation: lprh-in .16s ease-out;
+}
+@keyframes lprh-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  to   { opacity: 1; transform: translateX(-50%); }
 }
 
 /* Ľavý register — všetky kategórie naraz, aby sa dalo preskakovať bez
@@ -3804,16 +3804,34 @@ body[data-lab-theme] .pl-act {
 .lprh-register {
   flex: none;
   width: 264px;
-  padding: 14px 0;
-  overflow-y: auto;
+  display: flex; flex-direction: column;
   background: var(--l-paper);
   border-right: 1px solid var(--l-line);
 }
+/* Posúva sa len zoznam; päta so značkou stojí. */
+.lprh-register-zoznam { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 0; }
+
+/* Nadpisy oddielov v tehlovej — register má dve časti a musí byť na prvý
+   pohľad vidieť, kde jedna končí. Linka pod nadpisom je z tej istej farby,
+   len pritlmená, aby nekričala nad položkami. */
 .lprh-register-h {
-  margin: 12px 22px 6px;
-  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
-  letter-spacing: .14em; text-transform: uppercase; color: var(--l-muted);
+  margin: 12px 22px 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--l-second-light);
+  font-family: var(--mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--l-second-deep);
 }
+/* Druhý oddiel dostane nad sebou vzduch, nie len nadpis. */
+.lprh-register-zoznam > div + div .lprh-register-h { margin-top: 20px; }
+
+/* Náušnica v päte roletky. Stojí v prázdnom priestore medzi odkazom a
+   súhrnom — nie v ľavom registri, kde by uzavrela dve kategórie za posuvník.
+   Bez medailónu a bez tieňa: maľba má vlastný rozpitý záter s mäkkými
+   okrajmi, ktorý na papierovom podklade sedí sám o sebe; kruhový výrez by ju
+   orezal a ostal by z nej len zlatý stred. */
+.lprh-znak { flex: none; display: flex; align-items: center; margin: 0 auto; }
+.lprh-znak picture { display: contents; }
+.lprh-znak img { display: block; width: 88px; height: auto; }
 .lprh-register button {
   position: relative;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -3898,7 +3916,8 @@ body[data-lab-theme] .pl-act {
 
 .lprh-pata {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 15px 28px; border-top: 1px solid var(--l-line); background: var(--l-paper);
+  /* Nižšie odsadenie než pri holej lište — výšku päty teraz určuje maľba. */
+  padding: 9px 28px; border-top: 1px solid var(--l-line); background: var(--l-paper);
 }
 .lprh-pata a {
   font-family: var(--mono); font-size: 12px; font-weight: 600;
@@ -3935,6 +3954,9 @@ body[data-lab-theme] .pl-act {
 @media (max-width: 1040px) {
   .lprh { flex-direction: column; max-height: 80vh; }
   .lprh-register { width: auto; border-right: 0; border-bottom: 1px solid var(--l-line); }
+  /* Na úzkom okne je päta úzka — ozdoba by v nej zabrala celý riadok. */
+  .lprh-znak { display: none; }
+  .lprh-pata { padding: 15px 28px; }
   .lprh-telo { column-count: 1; }
   .lprh-hladat { width: 100%; margin-left: 0; }
 }

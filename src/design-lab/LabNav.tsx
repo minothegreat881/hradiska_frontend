@@ -167,8 +167,12 @@ export function LabNav() {
           <span>Hradiská</span>
         </a>
 
+        {/* V hlavičke je len prvý rad — typy hradísk. Druhý rad („Ďalší
+            obsah") z nej odišiel: to isté je v roletke, kde má aj miesto na
+            poriadny register. Hlavička tým získala riadok a prestala sa
+            zalamovať. */}
         <div className="lnav-cats" ref={catsRef} data-overflow={overflow ? 'true' : undefined} data-scrolled={scrolled ? 'true' : undefined}>
-          {rows.map(row => (
+          {rows.slice(0, 1).map(row => (
             <div className="lnav-cats-row" key={row.label} data-secondary={row.label === 'Ďalší obsah' ? 'true' : undefined}>
               {/* Názov nesie len druhý rad — ten sa vysúva a treba povedať, čo
                   pribudlo. Prvý rad je hlavná navigácia a popisovať ju je šum;

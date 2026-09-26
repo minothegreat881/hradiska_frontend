@@ -278,23 +278,25 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
   return (
     <div className="lprh" role="dialog" aria-label={`Prehľad kategórie ${aktivna.label}`}>
       <nav className="lprh-register" aria-label="Kategórie">
-        {([['Typy hradísk', kategorie.primarne], ['Ďalší obsah', kategorie.dalsie]] as const).map(([nadpis, zoznam]) => (
-          <div key={nadpis}>
-            <p className="lprh-register-h">{nadpis}</p>
-            {zoznam.map((c) => (
-              <button
-                key={c.label}
-                type="button"
-                className={c.label === aktivna.label ? 'is-on' : undefined}
-                aria-current={c.label === aktivna.label ? 'true' : undefined}
-                onClick={() => onKategoria(c)}
-              >
-                <span>{c.label}</span>
-                {typeof c.count === 'number' && c.count > 0 && <span className="lprh-pocet">{c.count}</span>}
-              </button>
-            ))}
-          </div>
-        ))}
+        <div className="lprh-register-zoznam">
+          {([['Typy hradísk', kategorie.primarne], ['Ďalší obsah', kategorie.dalsie]] as const).map(([nadpis, zoznam]) => (
+            <div key={nadpis}>
+              <p className="lprh-register-h">{nadpis}</p>
+              {zoznam.map((c) => (
+                <button
+                  key={c.label}
+                  type="button"
+                  className={c.label === aktivna.label ? 'is-on' : undefined}
+                  aria-current={c.label === aktivna.label ? 'true' : undefined}
+                  onClick={() => onKategoria(c)}
+                >
+                  <span>{c.label}</span>
+                  {typeof c.count === 'number' && c.count > 0 && <span className="lprh-pocet">{c.count}</span>}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
       </nav>
 
       <div className="lprh-hlavne">
@@ -332,6 +334,15 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
               Zobraziť všetky{typeof aktivna.count === 'number' ? ` (${aktivna.count})` : ''} <span aria-hidden="true">→</span>
             </a>
           )}
+          {/* Náušnica z listu značiek — predtým stála vo footeri webu. V päte
+              roletky je medzi odkazom a súhrnom prázdne miesto, ktoré ju
+              unesie bez toho, aby ubrala riadok registru naľavo. */}
+          <span className="lprh-znak" aria-hidden="true">
+            <picture>
+              <source srcSet="/znak_nausnica2.webp" type="image/webp" />
+              <img src="/znak_nausnica2.png" alt="" width={200} height={159} loading="lazy" decoding="async" />
+            </picture>
+          </span>
           <span>{pocetLokalit} lokalít v {kategorie.primarne.length} kategóriách</span>
         </footer>
       </div>
