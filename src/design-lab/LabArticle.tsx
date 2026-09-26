@@ -78,9 +78,34 @@ function KostraClanku() {
   );
 }
 
+/**
+ * Titulná fotografia v niekoľkých veľkostiach.
+ *
+ * Doteraz sa všade ťahal originál: pri článku o Mikulčiciach 2 497 kB PNG
+ * (2712 × 1536) na plochu 1440 × 522, a na telefóne to isté. Strapi ku
+ * každej fotografii generuje menšie formáty, len sa nepoužívali.
+ *
+ * `sizes="100vw"` — hlavička je cez celú šírku okna, takže prehliadač si
+ * vyberie podľa nej a podľa hustoty displeja.
+ */
+function sadaZdrojov(obrazok: any, original: string): string | undefined {
+  const f = obrazok?.formats;
+  if (!f) return undefined;
+  const kusy: string[] = [];
+  for (const k of ['small', 'medium', 'large'] as const) {
+    if (f[k]?.url && f[k]?.width) kusy.push(`${getStrapiImageUrl(obrazok, k)} ${f[k].width}w`);
+  }
+  if (obrazok?.width) kusy.push(`${original} ${obrazok.width}w`);
+  return kusy.length > 1 ? kusy.join(', ') : undefined;
+}
+
 export function LabArticle({ slug }: { slug: string }) {
   const { post, loading, preview } = useBlogPost(slug);
   const [related, setRelated] = useState<RelatedCard[]>([]);
+  /* Kým nie je ostrá fotografia stiahnutá, drží miesto jej rozmazaná
+     miniatúra. Pri zmene článku sa príznak vracia na začiatok. */
+  const [ostraTu, setOstraTu] = useState(false);
+  useEffect(() => { setOstraTu(false); }, [slug]);
 
   useEffect(() => {
     let alive = true;
@@ -94,6 +119,10 @@ export function LabArticle({ slug }: { slug: string }) {
 
   const article = convertStrapiPostToArticle(post);
   const cover = post.coverImage ? getStrapiImageUrl(post.coverImage) : null;
+  const miniatura = post.coverImage?.formats?.thumbnail?.url
+    ? getStrapiImageUrl(post.coverImage, 'thumbnail')
+    : null;
+  const coverSada = cover ? sadaZdrojov(post.coverImage, cover) : undefined;
 
   const timelineData = (post.timeline || []).map(t => ({
     year: t.year, title: t.title, description: t.description, type: 'local' as const,
@@ -134,14 +163,38 @@ export function LabArticle({ slug }: { slug: string }) {
           hradiska nebolo vidno nič. Závoj je hore takmer priehľadný — fotka
           je dôvod, prečo je hlavička taká vysoká. */}
       <header className={cover ? 'lart-hero' : 'lart-hero lart-hero-plain'}>
+        {/* Rozmazaná miniatúra pod ostrou fotografiou. Bez nej bolo na jej
+            mieste niekoľko sekúnd tmavé prázdno (pri Mikulčiciach 2,4 s) —
+            čitateľ videl vyhradený priestor a text, ale nie obrázok.
+            Miniatúra má pár desiatok kilobajtov a je tam prakticky hneď,
+            takže priestor od začiatku drží farba samotnej fotografie. */}
+        {cover && miniatura && !ostraTu && (
+          <img
+            className="lart-hero-mini"
+            src={miniatura}
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            style={{ objectPosition: post.coverPosition || 'center center' }}
+          />
+        )}
         {cover && (
           <img
-            className="lart-hero-img"
+            className={ostraTu ? 'lart-hero-img je-tu' : 'lart-hero-img'}
             src={cover}
+            srcSet={coverSada}
+            sizes={coverSada ? '100vw' : undefined}
             alt=""
             aria-hidden="true"
             fetchPriority="high"
             decoding="async"
+            onLoad={() => setOstraTu(true)}
+            /* Keď sa fotografia nestiahne, nech ostane vidieť aspoň to, čo
+               je — inak by hlavička zostala priehľadná navždy. */
+            onError={() => setOstraTu(true)}
+            /* Fotografia z vyrovnávacej pamäte býva hotová skôr, než sa stihne
+               pripojiť `onLoad`. */
+            ref={(el) => { if (el && el.complete && el.naturalWidth > 0) setOstraTu(true); }}
             /* Výrez titulnej fotografie — nastavuje sa ťahaním v editore.
                Staršie články pole nemajú, tie ostávajú vycentrované. */
             style={{ objectPosition: post.coverPosition || 'center center' }}
