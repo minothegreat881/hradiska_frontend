@@ -15,7 +15,7 @@
  * stojí formulárový `richtext/RichTextEditor.tsx`.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { mergeAttributes } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
@@ -69,7 +69,14 @@ export function RichTextInline({
   minHeight?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [bar, setBar] = useState<{ top: number; left: number } | null>(null);
+  /* Lištička s formátovaním. Ukazuje sa po celý čas písania, nie až pri
+     označení textu — kto chce začať tučným, nemá čo označiť.
+
+     POZOR na súradnice: `.ed-inline` má `position: relative`, takže lištička
+     sa umiestňuje voči BLOKU, nie voči plátnu. Predtým sa počítala voči
+     `[data-canvas-body]` a o tú istú vzdialenosť sa aj posunula — pri bloku
+     v polovici článku skončila tisíce pixelov pod obrazovkou, takže vyzerala,
+     že formátovanie v editore vôbec nie je. */
 
   const editor = useEditor({
     extensions: [
@@ -91,15 +98,6 @@ export function RichTextInline({
     content: strapiToTiptap(body),
     autofocus: 'end',
     onUpdate: ({ editor }) => onChange(tiptapToStrapi(editor.getJSON())),
-    onSelectionUpdate: ({ editor }) => {
-      const { from, to, empty } = editor.state.selection;
-      const root = wrapRef.current?.closest('[data-canvas-body]') as HTMLElement | null;
-      if (empty || !root) { setBar(null); return; }
-      const a = editor.view.coordsAtPos(from);
-      const b = editor.view.coordsAtPos(to);
-      const rr = root.getBoundingClientRect();
-      setBar({ top: Math.min(a.top, b.top) - rr.top - 44, left: (a.left + b.left) / 2 - rr.left });
-    },
   });
 
   // Klik mimo bloku ukončí písanie.
@@ -144,8 +142,7 @@ export function RichTextInline({
       style={minHeight ? { minHeight } : undefined}
     >
       <EditorContent editor={editor} />
-      {bar && (
-        <div className="ed-textbar" style={{ top: bar.top, left: bar.left }}>
+      <div className="ed-textbar">
           <B on={editor.isActive('bold')} act={() => editor.chain().focus().toggleBold().run()} title="Tučné">
             <Bold className="w-3.5 h-3.5" />
           </B>
@@ -175,8 +172,7 @@ export function RichTextInline({
               <Unlink className="w-3.5 h-3.5" />
             </B>
           )}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

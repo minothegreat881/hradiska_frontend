@@ -476,8 +476,12 @@ const canvasCss = `
   padding: 6px 0;
 }
 
+/* Lištička je ukotvená k ĽAVÉMU HORNÉMU rohu práve písaného bloku: obal
+   .ed-inline je position: relative. Ovládanie bloku (presun, kópia, kôš)
+   sedí v tom istom riadku vpravo, takže sa nestretnú.
+   POZOR: v tomto reťazci nesmú byť spätné apostrofy, je to šablóna JS. */
 .ed-textbar {
-  position: absolute; z-index: 45; transform: translateX(-50%);
+  position: absolute; z-index: 45; top: -42px; left: 0;
   display: flex; align-items: center; gap: 1px; padding: 3px;
   background: #2f2418; border-radius: 9px; box-shadow: 0 6px 18px rgba(20,12,4,.35);
 }
@@ -490,7 +494,13 @@ const canvasCss = `
   color: #f7efdc !important;
   pointer-events: auto !important;
 }
-.ed-textbar button svg { color: inherit !important; stroke: currentColor !important; }
+/* Vynútiť treba aj SAMOTNÉ ČIARY ikony, nie len obal. Šat webu farbí
+   priamo path/line/circle, takže ikony vychádzali tmavé na tmavej lištičke
+   (namerané: path mal stroke rgb(45,36,24) na pozadí #2f2418, čiže z lišty
+   boli vidieť len oddeľovače). */
+.ed-textbar button svg,
+.ed-textbar button svg * { color: inherit !important; stroke: currentColor !important; }
+.ed-textbar button svg { width: 16px; height: 16px; }
 .ed-textbar button:hover { background: rgba(255,255,255,.16); }
 .ed-textbar button.is-on { background: #c98a3c !important; color: #241a0e !important; }
 .ed-textbar-sep { width: 1px; height: 18px; background: rgba(255,255,255,.18); margin: 0 3px; }
