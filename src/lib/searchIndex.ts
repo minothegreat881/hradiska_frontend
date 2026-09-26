@@ -66,6 +66,39 @@ async function loadIndex(): Promise<LoadedIndex> {
   return { mini, bySlug };
 }
 
+/**
+ * Zoznam článkov BEZ plných textov — na súvisiace články stačí.
+ *
+ * „Mohlo by vás zaujímať" porovnáva názov, značky, lokalitu a perex; telo
+ * článku naň nepotrebuje. Ťahalo si však celý index, teda 1,19 MB pri
+ * otvorení každého článku (namerané). Ľahká podoba má 69 kB.
+ *
+ * Plný index si ďalej berie hľadanie — ale až vtedy, keď niekto naozaj hľadá.
+ */
+let lahkyPromise: Promise<Map<string, IndexDoc>> | null = null;
+
+export function getSearchIndexLite(): Promise<Map<string, IndexDoc>> {
+  if (!lahkyPromise) {
+    lahkyPromise = fetch(`${STRAPI_URL}/api/search-index?bezTextu=1`, {
+      headers: { 'ngrok-skip-browser-warning': 'true' },
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error(`search-index HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((json) => {
+        const m = new Map<string, IndexDoc>();
+        for (const it of (json.items || []) as IndexDoc[]) m.set(it.slug, it);
+        return m;
+      })
+      .catch((e) => {
+        lahkyPromise = null;
+        throw e;
+      });
+  }
+  return lahkyPromise;
+}
+
 /** Lenivo (singleton) načíta a postaví index. Ďalšie volania sú okamžité. */
 export function getSearchIndex(): Promise<LoadedIndex> {
   if (!loadPromise) loadPromise = loadIndex().catch((e) => { loadPromise = null; throw e; });

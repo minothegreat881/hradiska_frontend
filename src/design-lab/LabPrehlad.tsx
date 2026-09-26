@@ -25,7 +25,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import lokalityData from '../data/lokality.json';
-import { getSearchIndex, type IndexDoc } from '../lib/searchIndex';
+import { getSearchIndexLite, type IndexDoc } from '../lib/searchIndex';
 import type { NavigationItem } from '../data/navigation-structure';
 
 export interface Lokalita {
@@ -149,8 +149,10 @@ export function useClankyKategorie(slug: string) {
   const [vsetky, setVsetky] = useState<IndexDoc[] | null>(null);
   useEffect(() => {
     let zrusene = false;
-    getSearchIndex()
-      .then(({ bySlug }) => { if (!zrusene) setVsetky([...bySlug.values()]); })
+    // Ľahký index (bez plných textov) — zoznam potrebuje názov, perex,
+    // náhľad a dátum, nie telo článku.
+    getSearchIndexLite()
+      .then((bySlug) => { if (!zrusene) setVsetky([...bySlug.values()]); })
       .catch(() => { if (!zrusene) setVsetky([]); });
     return () => { zrusene = true; };
   }, []);

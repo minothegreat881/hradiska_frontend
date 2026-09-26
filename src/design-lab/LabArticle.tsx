@@ -240,15 +240,24 @@ function MapaAzKedTreba() {
 
   useEffect(() => {
     if (zobrazit) return;
-    const el = kotva.current;
-    if (!el) return;
     if (typeof IntersectionObserver === 'undefined') { setZobrazit(true); return; }
-    const io = new IntersectionObserver(
-      (zaznamy) => { if (zaznamy.some((z) => z.isIntersecting)) { setZobrazit(true); io.disconnect(); } },
-      { rootMargin: '600px' }
-    );
-    io.observe(el);
-    return () => io.disconnect();
+
+    /* Pozorovateľ sa zapína až po dosadení textu a obrázkov. Hneď po načítaní
+       je telo článku ešte krátke, takže kotva sedí pár stoviek pixelov pod
+       okrajom — pozorovateľ by sa spustil a mapa by sa stiahla aj tomu, kto
+       k nej nikdy nedoroluje (namerané: 44 dlaždíc podkladu). */
+    let io: IntersectionObserver | null = null;
+    const cas = window.setTimeout(() => {
+      const el = kotva.current;
+      if (!el) return;
+      io = new IntersectionObserver(
+        (zaznamy) => { if (zaznamy.some((z) => z.isIntersecting)) { setZobrazit(true); io?.disconnect(); } },
+        { rootMargin: '400px' }
+      );
+      io.observe(el);
+    }, 1500);
+
+    return () => { window.clearTimeout(cas); io?.disconnect(); };
   }, [zobrazit]);
 
   return (

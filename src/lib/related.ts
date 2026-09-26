@@ -2,12 +2,13 @@
  * Odporúčací systém „Súvisiace / Mohlo by vás zaujímať".
  *
  * Cieľ: adresné, tematicky podobné články — nie len „prvé N z kategórie".
- * Postup: MiniSearch (už načítaný pre vyhľadávanie) sa dopytuje kľúčovými slovami
+ * Postup: MiniSearch nad ĽAHKÝM indexom (bez plných textov) sa dopytuje kľúčovými slovami
  * SAMOTNÉHO článku (názov + tagy + lokalita + excerpt) → dostaneme články s najväčším
  * prekryvom slov. Skóre potom doladíme boostom za rovnakú kategóriu, lokalitu a tagy.
  * Výsledok je deduplikovaný a bez samotného článku.
  */
-import { getSearchIndex, fold, type IndexDoc } from './searchIndex';
+import MiniSearch from 'minisearch';
+import { getSearchIndexLite, fold, type IndexDoc } from './searchIndex';
 
 const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
 
@@ -68,10 +69,41 @@ function keyTerms(doc: IndexDoc): string {
  * Vráti až `limit` tematicky najbližších článkov k danému slugu.
  * Ak MiniSearch nájde málo (veľmi krátky/ojedinelý článok), doplní z rovnakej kategórie.
  */
+/* Vlastný MiniSearch nad ľahkým indexom.
+   Predtým sa použil ten, ktorý si stavia hľadanie — lenže ten ťahá plné
+   znenia článkov (1,19 MB) a na odporúčanie stačí názov, značky, lokalita
+   a perex. Postaviť index nad 365 krátkymi záznamami je otázka milisekúnd. */
+let lahkyIndex: Promise<{ mini: MiniSearch<IndexDoc>; bySlug: Map<string, IndexDoc> }> | null = null;
+
+function indexPreOdporucanie() {
+  if (!lahkyIndex) {
+    lahkyIndex = getSearchIndexLite()
+      .then((bySlug) => {
+        const mini = new MiniSearch<IndexDoc>({
+          idField: 'slug',
+          fields: ['title', 'tags', 'place', 'excerpt', 'categoryName'],
+          storeFields: [],
+          processTerm: (term) => fold(term),
+          extractField: (doc, field) => {
+            const v = (doc as any)[field];
+            return Array.isArray(v) ? v.join(' ') : v == null ? '' : String(v);
+          },
+        });
+        mini.addAll([...bySlug.values()]);
+        return { mini, bySlug };
+      })
+      .catch((e) => {
+        lahkyIndex = null;
+        throw e;
+      });
+  }
+  return lahkyIndex;
+}
+
 export async function getRelated(slug: string, limit = 6): Promise<RelatedCard[]> {
   let idx;
   try {
-    idx = await getSearchIndex();
+    idx = await indexPreOdporucanie();
   } catch {
     return [];
   }
