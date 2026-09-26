@@ -3875,8 +3875,25 @@ body[data-lab-theme] .pl-act {
 
 .lprh-hlava {
   display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
-  padding: 20px 28px; border-bottom: 1px solid var(--l-line);
+  /* Vpravo o krížik viac — inak by sadol na prepínač zoskupenia. */
+  padding: 20px 68px 20px 28px; border-bottom: 1px solid var(--l-line);
 }
+
+/* Krížik v pravom hornom rohu panela. */
+.lprh-zavri {
+  position: absolute; top: 14px; right: 14px; z-index: 3;
+  width: 34px; height: 34px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--l-line-2); border-radius: 999px;
+  background: var(--l-paper); color: var(--l-muted); cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.lprh-zavri svg { width: 17px; height: 17px; }
+.lprh-zavri:hover {
+  background: var(--l-paper-2); color: var(--l-second-deep);
+  border-color: var(--l-second-light);
+}
+.lprh-zavri:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; }
 .lprh-hlava h2 {
   margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 700;
   font-size: 24px; color: var(--l-ink);

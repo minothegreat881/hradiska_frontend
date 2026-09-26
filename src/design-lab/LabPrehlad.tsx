@@ -24,6 +24,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { X } from 'lucide-react';
 import lokalityData from '../data/lokality.json';
 import { getSearchIndexLite, type IndexDoc } from '../lib/searchIndex';
 import type { NavigationItem } from '../data/navigation-structure';
@@ -277,6 +278,13 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
 
   return (
     <div className="lprh" role="dialog" aria-label={`Prehľad kategórie ${aktivna.label}`}>
+      {/* Zavretie v pravom hornom rohu panela — tam ho oko hľadá. Miesto mu
+          robí odsadenie hlavičky sprava, takže sa neprekrýva s prepínačom
+          zoskupenia ani na najužšom okne, kde sa hlavička zalamuje. */}
+      <button type="button" className="lprh-zavri" onClick={onZavri} aria-label="Zavrieť prehľad">
+        <X aria-hidden="true" />
+      </button>
+
       <nav className="lprh-register" aria-label="Kategórie">
         <div className="lprh-register-zoznam">
           {([['Typy hradísk', kategorie.primarne], ['Ďalší obsah', kategorie.dalsie]] as const).map(([nadpis, zoznam]) => (
