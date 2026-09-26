@@ -44,6 +44,40 @@ function skDate(iso?: string | null): string {
   return `${d.getDate()}. ${m[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+/**
+ * KOSTRA ČLÁNKU počas načítania.
+ *
+ * Predtým tu bol jeden riadok textu „Načítavam článok…" vysoký 270 px.
+ * Stránka mala v tej chvíli 900 px a pätička sedela v strede obrazovky;
+ * keď dáta dorazili, dokument narástol na 30 000 px a všetko odskočilo
+ * (namerané: pätička na 361 px → 28 609 px za jednu snímku).
+ *
+ * Kostra preto drží miesto, ktoré článok aj tak zaberie: lištu kategórií,
+ * titulnú fotografiu v jej skutočnej výške a začiatok textového stĺpca.
+ * Pätička tým ostáva pod okrajom obrazovky a po dotiahnutí článku sa
+ * nepohne nič, čo už bolo vidieť.
+ */
+function KostraClanku() {
+  return (
+    <div className="lart lart-kostra" aria-busy="true">
+      <span className="sr-only">Načítavam článok…</span>
+      <LabKategorieLista />
+      <div className="lart-kostra-hero" aria-hidden="true">
+        <div className="lart-kostra-hero-in">
+          <span className="lart-kostra-pruh lart-kostra-pruh--omrvinky" />
+          <span className="lart-kostra-pruh lart-kostra-pruh--nadpis" />
+          <span className="lart-kostra-pruh lart-kostra-pruh--nadpis2" />
+        </div>
+      </div>
+      <div className="lart-kostra-telo" aria-hidden="true">
+        {[100, 96, 99, 92, 97, 62].map((sirka, i) => (
+          <span key={i} className="lart-kostra-riadok" style={{ width: `${sirka}%` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function LabArticle({ slug }: { slug: string }) {
   const { post, loading, preview } = useBlogPost(slug);
   const [related, setRelated] = useState<RelatedCard[]>([]);
@@ -55,7 +89,7 @@ export function LabArticle({ slug }: { slug: string }) {
     return () => { alive = false; };
   }, [slug]);
 
-  if (loading) return <div className="lart-wait">Načítavam článok…</div>;
+  if (loading) return <KostraClanku />;
   if (!post) return <div className="lart-wait">Článok sa nenašiel.</div>;
 
   const article = convertStrapiPostToArticle(post);

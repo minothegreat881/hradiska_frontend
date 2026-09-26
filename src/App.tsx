@@ -260,7 +260,9 @@ function App() {
       <LabNav />
 
       <Suspense fallback={
-        <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--hr-muted)', fontFamily: 'var(--font-serif, Georgia, serif)', fontSize: 15 }}>
+        /* Celá výška okna, nie 60 vh: pri nižšej hodnote sa počas načítania
+           vysunie do obrazu pätička a po dotiahnutí stránky zasa odskočí. */
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--hr-muted)', fontFamily: 'var(--font-serif, Georgia, serif)', fontSize: 15 }}>
           Načítavam…
         </div>
       }>
