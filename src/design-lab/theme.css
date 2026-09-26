@@ -288,14 +288,16 @@
 
 /* Značka: logo v kruhu vyplnenom papierom, obopnuté vláskom. */
 .lnav-brand { display: flex; align-items: center; gap: 14px; text-decoration: none; flex-shrink: 0; }
+/* Značka bez medailónu — v hlavičke stojí samotná maľba mince. Kruh okolo
+   nej bol rám navyše: minca je okrúhla sama a ďalší prstenec z nej robil
+   odznak. Maľba má priehľadné pozadie, takže sedí priamo na lište. */
 .lnav-mark {
-  width: 74px; height: 74px; flex-shrink: 0; border-radius: 999px;
-  background: var(--l-card); border: 1px solid var(--l-line);
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
-  transition: border-color .2s ease, transform .3s ease;
+  width: 74px; height: 74px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .3s ease;
 }
-.lnav-brand:hover .lnav-mark { border-color: var(--l-accent); transform: scale(1.04); }
-.lnav-mark img { width: 82%; height: 82%; object-fit: contain; display: block; }
+.lnav-brand:hover .lnav-mark { transform: scale(1.04); }
+.lnav-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .lnav-brand span {
   font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 700;
   letter-spacing: -.02em; color: var(--l-ink); white-space: nowrap; line-height: 1;
@@ -620,15 +622,9 @@ body[data-lab-theme='pecat'],
    čoho sa dotkneš. Všetko sa vypína pri `prefers-reduced-motion`.
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* Značka: kruh dostane pri nabehnutí prstenec v akcente a logo sa nadýchne. */
+/* Značka: pri nabehnutí sa minca len nadýchne. Prstenec v akcente, ktorý tu
+   bol predtým, odišiel spolu s medailónom. */
 .lnav-mark { position: relative; }
-.lnav-mark::after {
-  content: ''; position: absolute; inset: -4px; border-radius: 999px;
-  border: 1px solid var(--l-accent); opacity: 0; transform: scale(.92);
-  transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1);
-  pointer-events: none;
-}
-.lnav-brand:hover .lnav-mark::after { opacity: .45; transform: scale(1); }
 .lnav-mark img { transition: transform .4s cubic-bezier(.22,.61,.36,1); }
 .lnav-brand:hover .lnav-mark img { transform: scale(1.06); }
 
@@ -675,7 +671,7 @@ body[data-lab-theme='pecat'],
 .lnav[data-expanded] { box-shadow: 0 10px 30px -22px rgba(30,24,18,.5); }
 
 @media (prefers-reduced-motion: reduce) {
-  .lnav-mark::after, .lnav-mark img, .lnav-brand span::after,
+  .lnav-mark, .lnav-mark img, .lnav-brand span::after,
   .lnav-cat-btn, .lnav-panel-list a, .lnav-panel-list a::before, .lnav { transition: none; }
   .lnav-panel-list a { animation: none; }
   .lnav-cat-btn:hover { transform: none; }
