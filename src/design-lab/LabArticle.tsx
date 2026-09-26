@@ -25,6 +25,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useBlogPost } from '../hooks/useStrapi';
 import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
@@ -45,35 +46,18 @@ function skDate(iso?: string | null): string {
 }
 
 /**
- * KOSTRA ČLÁNKU počas načítania.
+ * ČAKANIE NA ČLÁNOK.
  *
- * Predtým tu bol jeden riadok textu „Načítavam článok…" vysoký 270 px.
- * Stránka mala v tej chvíli 900 px a pätička sedela v strede obrazovky;
- * keď dáta dorazili, dokument narástol na 30 000 px a všetko odskočilo
- * (namerané: pätička na 361 px → 28 609 px za jednu snímku).
- *
- * Kostra preto drží miesto, ktoré článok aj tak zaberie: lištu kategórií,
- * titulnú fotografiu v jej skutočnej výške a začiatok textového stĺpca.
- * Pätička tým ostáva pod okrajom obrazovky a po dotiahnutí článku sa
- * nepohne nič, čo už bolo vidieť.
+ * Kým nie je pohromade všetko, z čoho stránka vzniká — text aj titulná
+ * fotografia — nemá zmysel ukazovať polovičný článok. Namiesto toho tu
+ * stojí točiaca sa ikona cez celú výšku okna, takže sa nevysunie do obrazu
+ * pätička a po dotiahnutí sa článok objaví naraz a hotový.
  */
-function KostraClanku() {
+function CakanieNaClanok() {
   return (
-    <div className="lart lart-kostra" aria-busy="true">
+    <div className="lart-cakanie" role="status" aria-live="polite">
+      <Loader2 className="lart-cakanie-ikona animate-spin" aria-hidden="true" />
       <span className="sr-only">Načítavam článok…</span>
-      <LabKategorieLista />
-      <div className="lart-kostra-hero" aria-hidden="true">
-        <div className="lart-kostra-hero-in">
-          <span className="lart-kostra-pruh lart-kostra-pruh--omrvinky" />
-          <span className="lart-kostra-pruh lart-kostra-pruh--nadpis" />
-          <span className="lart-kostra-pruh lart-kostra-pruh--nadpis2" />
-        </div>
-      </div>
-      <div className="lart-kostra-telo" aria-hidden="true">
-        {[100, 96, 99, 92, 97, 62].map((sirka, i) => (
-          <span key={i} className="lart-kostra-riadok" style={{ width: `${sirka}%` }} />
-        ))}
-      </div>
     </div>
   );
 }
@@ -102,10 +86,38 @@ function sadaZdrojov(obrazok: any, original: string): string | undefined {
 export function LabArticle({ slug }: { slug: string }) {
   const { post, loading, preview } = useBlogPost(slug);
   const [related, setRelated] = useState<RelatedCard[]>([]);
-  /* Kým nie je ostrá fotografia stiahnutá, drží miesto jej rozmazaná
-     miniatúra. Pri zmene článku sa príznak vracia na začiatok. */
+  /* Poistka pre prípad, že sa fotografia nestihne — viď `.lart-hero-mini`. */
   const [ostraTu, setOstraTu] = useState(false);
   useEffect(() => { setOstraTu(false); }, [slug]);
+
+  const cover = post?.coverImage ? getStrapiImageUrl(post.coverImage) : null;
+  const miniatura = post?.coverImage?.formats?.thumbnail?.url
+    ? getStrapiImageUrl(post.coverImage, 'thumbnail')
+    : null;
+  const coverSada = cover ? sadaZdrojov(post.coverImage, cover) : undefined;
+
+  /* Titulná fotografia sa sťahuje EŠTE PRED vykreslením článku, nie až
+     počas neho. Prehliadač ju potom v hlavičke berie z vyrovnávacej pamäte,
+     takže stránka nabehne naraz a hotová — nie po častiach.
+     Sťahuje sa presne tá veľkosť, ktorú si prehliadač vyberie aj v samotnej
+     hlavičke (`srcset` + `sizes`), aby sa neťahala dvakrát.
+     Poistka: po štyroch sekundách ide článok von tak či tak. Fotografia sa
+     môže ťahať aj desať sekúnd a dovtedy držať čitateľa pri točiacej sa
+     ikone by bolo horšie než ju dokresliť. */
+  const [fotkaPripravena, setFotkaPripravena] = useState(false);
+  useEffect(() => {
+    setFotkaPripravena(false);
+    if (!post) return;
+    if (!cover) { setFotkaPripravena(true); return; }
+    let zive = true;
+    const hotovo = () => { if (zive) setFotkaPripravena(true); };
+    const i = new Image();
+    if (coverSada) { i.sizes = '100vw'; i.srcset = coverSada; }
+    i.src = cover;
+    if (i.complete) hotovo(); else { i.onload = hotovo; i.onerror = hotovo; }
+    const poistka = setTimeout(hotovo, 4000);
+    return () => { zive = false; clearTimeout(poistka); i.onload = null; i.onerror = null; };
+  }, [post?.documentId, cover, coverSada]);
 
   useEffect(() => {
     let alive = true;
@@ -114,15 +126,10 @@ export function LabArticle({ slug }: { slug: string }) {
     return () => { alive = false; };
   }, [slug]);
 
-  if (loading) return <KostraClanku />;
+  if (loading || (post && !fotkaPripravena)) return <CakanieNaClanok />;
   if (!post) return <div className="lart-wait">Článok sa nenašiel.</div>;
 
   const article = convertStrapiPostToArticle(post);
-  const cover = post.coverImage ? getStrapiImageUrl(post.coverImage) : null;
-  const miniatura = post.coverImage?.formats?.thumbnail?.url
-    ? getStrapiImageUrl(post.coverImage, 'thumbnail')
-    : null;
-  const coverSada = cover ? sadaZdrojov(post.coverImage, cover) : undefined;
 
   const timelineData = (post.timeline || []).map(t => ({
     year: t.year, title: t.title, description: t.description, type: 'local' as const,
