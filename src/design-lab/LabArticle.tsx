@@ -164,55 +164,61 @@ export function LabArticle({ slug }: { slug: string }) {
           okraj obrazovky. Kategória článku je v nej zvýraznená. */}
       <LabKategorieLista aktivna={post.category?.slug} />
 
-      {/* ── Titulná fotografia ───────────────────────────────────────────
-          Jediná prestavaná časť rozvrhu. Predtým prúžok 224–256 px s tmavým
-          prechodom, v ktorom bol nadpis orezaný na tri riadky; z fotografie
-          hradiska nebolo vidno nič. Závoj je hore takmer priehľadný — fotka
-          je dôvod, prečo je hlavička taká vysoká. */}
-      <header className={cover ? 'lart-hero' : 'lart-hero lart-hero-plain'}>
-        {/* Rozmazaná miniatúra pod ostrou fotografiou. Bez nej bolo na jej
-            mieste niekoľko sekúnd tmavé prázdno (pri Mikulčiciach 2,4 s) —
-            čitateľ videl vyhradený priestor a text, ale nie obrázok.
-            Miniatúra má pár desiatok kilobajtov a je tam prakticky hneď,
-            takže priestor od začiatku drží farba samotnej fotografie. */}
-        {cover && miniatura && !ostraTu && (
-          <img
-            className="lart-hero-mini"
-            src={miniatura}
-            alt=""
-            aria-hidden="true"
-            decoding="async"
-            style={{ objectPosition: post.coverPosition || 'center center' }}
-          />
-        )}
+      {/* ── Titulka článku (handoff „text pod fotkou", 09/2026) ─────────
+          Nadpis, perex aj údaje stáli PRIAMO NA fotografii pod tmavým
+          závojom. Na oblohe a na suchej tráve sa aj tak strácali a závoj
+          zároveň zhoršoval samotnú fotografiu. Fotografia je odteraz čistá
+          — bez textu aj bez závoja — a text stojí pod ňou na papieri
+          v stĺpci širokom 780 px, kde je kontrast vždy rovnaký.
+          Článok bez obálky fotografiu jednoducho nevykreslí a text začína
+          hneď pod lištou kategórií. */}
+      <header className="lart-hero">
         {cover && (
-          <img
-            className={ostraTu ? 'lart-hero-img' : 'lart-hero-img caka'}
-            src={cover}
-            srcSet={coverSada}
-            sizes={coverSada ? '100vw' : undefined}
-            alt=""
-            aria-hidden="true"
-            fetchPriority="high"
-            decoding="async"
-            onLoad={() => setOstraTu(true)}
-            /* Keď sa fotografia nestiahne, nech ostane vidieť aspoň to, čo
-               je — inak by hlavička zostala priehľadná navždy. */
-            onError={() => setOstraTu(true)}
-            /* Fotografia z vyrovnávacej pamäte býva hotová skôr, než sa stihne
-               pripojiť `onLoad`. */
-            ref={(el) => { if (el && el.complete && el.naturalWidth > 0) setOstraTu(true); }}
-            /* Výrez titulnej fotografie — nastavuje sa ťahaním v editore.
-               Staršie články pole nemajú, tie ostávajú vycentrované. */
-            style={{ objectPosition: post.coverPosition || 'center center' }}
-          />
+          <div className="lart-hero-media">
+            {/* Rozmazaná miniatúra pod ostrou fotografiou. Bez nej bolo na jej
+                mieste niekoľko sekúnd prázdno (pri Mikulčiciach 2,4 s).
+                Miniatúra má pár desiatok kilobajtov a je tam prakticky hneď. */}
+            {miniatura && !ostraTu && (
+              <img
+                className="lart-hero-mini"
+                src={miniatura}
+                alt=""
+                aria-hidden="true"
+                decoding="async"
+                style={{ objectPosition: post.coverPosition || 'center center' }}
+              />
+            )}
+            <img
+              className={ostraTu ? 'lart-hero-img' : 'lart-hero-img caka'}
+              src={cover}
+              srcSet={coverSada}
+              sizes={coverSada ? '100vw' : undefined}
+              /* Fotografia už nie je podklad pod textom, ale obsah — patrí jej
+                 zmysluplný popis. */
+              alt={(post.coverImage as any)?.alternativeText || post.title}
+              fetchPriority="high"
+              decoding="async"
+              onLoad={() => setOstraTu(true)}
+              /* Keď sa fotografia nestiahne, nech ostane vidieť aspoň to, čo
+                 je — inak by ostala priehľadná navždy. */
+              onError={() => setOstraTu(true)}
+              /* Fotografia z vyrovnávacej pamäte býva hotová skôr, než sa stihne
+                 pripojiť `onLoad`. */
+              ref={(el) => { if (el && el.complete && el.naturalWidth > 0) setOstraTu(true); }}
+              /* Výrez titulnej fotografie — nastavuje sa ťahaním v editore.
+                 Staršie články pole nemajú, tie ostávajú vycentrované. */
+              style={{ objectPosition: post.coverPosition || 'center center' }}
+            />
+          </div>
         )}
-        <div className="lart-hero-veil" aria-hidden="true" />
-        <div className="lart-hero-in">
+
+        <div className="lart-hero-text">
           <nav className="lart-crumbs" aria-label="Omrvinky">
             <a href="/">Domov</a>
             <span aria-hidden="true">›</span>
-            {post.category && <a href={`/category/${post.category.slug}`}>{post.category.name}</a>}
+            {post.category && (
+              <a className="je-tu" href={`/category/${post.category.slug}`}>{post.category.name}</a>
+            )}
           </nav>
           <h1 className="lart-title">{post.title}</h1>
           {post.excerpt && post.excerpt.trim() !== post.title.trim() && (
@@ -221,7 +227,9 @@ export function LabArticle({ slug }: { slug: string }) {
           <div className="lart-meta">
             <span>{post.authorName || 'Hradiská.sk'}</span>
             <span className="lart-meta-dot" aria-hidden="true" />
-            <span>{skDate(post.originalPublishedDate || post.publishedAt)}</span>
+            <time dateTime={(post.originalPublishedDate || post.publishedAt || '').slice(0, 10)}>
+              {skDate(post.originalPublishedDate || post.publishedAt)}
+            </time>
             <span className="lart-meta-dot" aria-hidden="true" />
             <span>{post.readingTime} min čítania</span>
           </div>

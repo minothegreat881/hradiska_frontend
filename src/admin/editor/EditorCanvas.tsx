@@ -325,20 +325,20 @@ export function EditorCanvas({
         {/* `lab` + `data-theme` nesú premenné šatu Pečať, rovnako ako na webe. */}
         <div className="min-h-screen lab" data-theme="pecat" onMouseDown={() => onSelect?.(null)}>
           <div className="lart">
-            <header className={cover ? 'lart-hero' : 'lart-hero lart-hero-plain'}>
+            {/* Titulka rovnaká ako na webe: čistá fotografia, text pod ňou
+                na papieri. Kým bol text na fotografii, náhľad ukazoval niečo
+                iné než čitateľ nakoniec uvidel. */}
+            <header className="lart-hero">
               {cover && (
-                <CoverImage
-                  src={cover}
-                  position={article.coverPosition || 'center center'}
-                  onChange={onCoverPositionChange}
-                />
+                <div className="lart-hero-media">
+                  <CoverImage
+                    src={cover}
+                    position={article.coverPosition || 'center center'}
+                    onChange={onCoverPositionChange}
+                  />
+                </div>
               )}
-              {/* `pointer-events-none`: závoj leží nad fotografiou a bral jej
-                  kliknutia, takže sa ťahanie výrezu vôbec nespustilo. Samotná
-                  vlastnosť v CSS neprejde — globals.css ju pravidlom „NUCLEAR
-                  OPTION" prebíja, trieda má vlastné !important. */}
-              <div className="lart-hero-veil pointer-events-none" aria-hidden="true" />
-              <div className="lart-hero-in">
+              <div className="lart-hero-text">
                 <h1 className="lart-title">{article.title || 'Bez názvu'}</h1>
                 {article.excerpt && <p className="lart-excerpt">{article.excerpt}</p>}
                 <div className="lart-meta">

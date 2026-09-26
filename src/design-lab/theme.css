@@ -2160,14 +2160,25 @@ body[data-lab-theme='pecat'],
 }
 .lart-empty { font-family: 'Inter', sans-serif; color: var(--l-muted); }
 
-/* ── 1 · Titulná fotografia ────────────────────────────────────────────── */
-.lart-hero {
-  position: relative; display: flex; align-items: flex-end;
-  height: clamp(380px, 58vh, 640px); overflow: hidden; background: var(--l-dark);
+/* ── 1 · Titulka článku ─────────────────────────────────────────────────
+   Nadpis, perex aj údaje stáli priamo NA fotografii pod tmavým závojom.
+   Na oblohe a na suchej tráve sa aj tak strácali a závoj zároveň kazil
+   samotnú fotografiu. Fotografia je odteraz čistá a text stojí pod ňou na
+   papieri v stĺpci 780 px, kde je kontrast vždy rovnaký.
+
+   Písmo sa z predlohy nepreberá (DM Serif Display + Manrope z Google Fonts).
+   Web má vlastné self-hostované Fraunces a Inter — rovnaké pravidlo ako pri
+   dlaždiciach na domovskej. */
+.lart-hero { background: var(--l-paper); }
+
+.lart-hero-media {
+  position: relative; height: 460px; overflow: hidden;
+  /* Farba, kým fotografia nie je — nie biela, aby neblikla. */
+  background: #cfc4b3;
 }
 .lart-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* Ostrá fotografia sa prelínaním položí na rozmazanú miniatúru. Náhly
-   výmen by bol viditeľnejší než samotné čakanie.
+/* Ostrá fotografia sa prelínaním položí na rozmazanú miniatúru. Náhla
+   výmena by bola viditeľnejšia než samotné čakanie.
 
    SKRYTIE SA MUSÍ VYPÝTAŤ, nie zdediť. Tie isté triedy používa aj plátno
    v administrácii (CoverImage.tsx), ktoré o prelínaní nič nevie — kým bolo
@@ -2184,31 +2195,45 @@ body[data-lab-theme='pecat'],
 @media (prefers-reduced-motion: reduce) {
   .lart-hero-img { transition: none; }
 }
-/* Hore takmer priehľadný — fotografia je dôvod, prečo je hlavička vysoká. */
-.lart-hero-veil {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(15,17,22,.10) 0%, rgba(15,17,22,.30) 42%, rgba(15,17,22,.72) 74%, rgba(15,17,22,.94) 100%);
+
+.lart-hero-text {
+  box-sizing: border-box;
+  max-width: 780px; margin: 0 auto; padding: 40px 0 48px;
+  display: flex; flex-direction: column; gap: 16px;
 }
-.lart-hero-in { position: relative; width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 32px 46px; }
-.lart-crumbs { display: flex; align-items: center; gap: 9px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,.62); }
+.lart-crumbs {
+  display: flex; align-items: center; gap: 9px;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: var(--l-muted);
+}
 .lart-crumbs a { color: inherit; text-decoration: none; transition: color .15s ease; }
-.lart-crumbs a:hover { color: #fff; }
+.lart-crumbs a:hover { color: var(--l-second-deep); }
+.lart-crumbs a.je-tu { color: var(--l-second-deep); font-weight: 600; }
 .lart .lart-title {
-  margin: 15px 0 0;
+  margin: 0;
   font-family: 'Fraunces', Georgia, serif; font-weight: 700;
-  font-size: clamp(32px, 5vw, 58px); line-height: 1.04; letter-spacing: -.03em;
-  color: #fff; text-wrap: balance;
+  font-size: clamp(36px, 5vw, 60px); line-height: 1.03; letter-spacing: -.03em;
+  color: var(--l-ink); text-wrap: balance;
 }
-.lart-excerpt { margin: 15px 0 0; max-width: 62ch; font-family: 'Inter', sans-serif; font-size: 17px; line-height: 1.56; color: rgba(255,255,255,.84); }
-.lart-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 20px; font-family: 'Inter', sans-serif; font-size: 13px; color: rgba(255,255,255,.72); }
+.lart-excerpt {
+  margin: 0; max-width: 720px;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 17px; line-height: 1.6;
+  color: var(--l-body); text-wrap: pretty;
+}
+.lart-meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--l-line);
+  font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: var(--l-muted);
+}
 .lart-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--l-second); flex-shrink: 0; }
-/* 80 z 364 článkov nemá obálku — vtedy hlavička na papieri, nie tmavá plocha. */
-.lart-hero-plain { height: auto; background: var(--l-paper-2); border-bottom: 1px solid var(--l-line); }
-.lart-hero-plain .lart-hero-veil { display: none; }
-.lart-hero-plain .lart-hero-in { padding-top: 46px; }
-.lart .lart-hero-plain .lart-title { color: var(--l-ink); }
-.lart-hero-plain .lart-excerpt { color: var(--l-body); }
-.lart-hero-plain .lart-meta, .lart-hero-plain .lart-crumbs { color: var(--l-muted); }
+
+@media (max-width: 840px) {
+  .lart-hero-text { padding: 32px 24px 40px; }
+}
+@media (max-width: 600px) {
+  .lart-hero-media { height: 260px; }
+  .lart-hero-text { padding: 24px 18px 32px; gap: 12px; }
+  .lart-excerpt { font-size: 16px; }
+}
 
 /* ── 2 · Zdieľanie na začiatku ─────────────────────────────────────────── */
 .lart-topshare { max-width: 1180px; margin: 0 auto 22px; }
@@ -2330,10 +2355,6 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 }
 .lart-more-s { margin: 10px 0 30px; font-family: 'Inter', sans-serif; font-size: 16px; color: var(--l-muted); }
 
-@media (max-width: 860px) {
-  .lart-hero { height: clamp(320px, 46vh, 460px); }
-  .lart-hero-in { padding: 0 22px 32px; }
-}
 
 /* ── Doladenie: to, čo prekladová vrstva farieb nechytila ──────────────────
    Preklad podľa hodnoty zvládne plochy a písmo, ale nie veci, kde je stará
@@ -2746,27 +2767,9 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lfoot-wrap { padding: 40px 16px 0; }
 }
 
-/* ── Stránka článku: hlavička ──────────────────────────────────────────────
-   Na počítači je text NA fotke a je to tam dobre. Na telefóne je fotka nízka
-   a text dlhý — nadpis so štyrmi riadkami cez ňu prekryje celý záber a spodné
-   riadky sa strácajú v tmavom závoji. Preto fotka hore, text pod ňou na
-   papieri: presne to isté rozhodnutie, aké padlo pre produkčnú hlavičku.
-   Perex sa vynecháva — na telefóne je to odsek navyše pred článkom, ktorý
-   sa aj tak o pár riadkov nižšie zopakuje inými slovami. */
-@media (max-width: 700px) {
-  .lart-hero { display: block; height: auto; background: var(--l-paper); }
-  .lart-hero-img {
-    position: static; display: block; width: 100%; height: auto;
-    aspect-ratio: 4 / 3; max-height: 52vh; object-fit: cover;
-  }
-  .lart-hero-veil { display: none; }
-  .lart-hero-in { padding: 16px 16px 2px; }
-  .lart-crumbs { color: var(--l-muted); }
-  .lart-crumbs a:hover { color: var(--l-ink); }
-  .lart .lart-title { color: var(--l-ink); font-size: clamp(23px, 6.6vw, 34px); margin-top: 10px; }
-  .lart-excerpt { display: none; }
-  .lart-meta { margin-top: 12px; font-size: 12.5px; color: var(--l-muted); }
-}
+/* Titulka na telefóne — rozmery z handoffu sú v bloku pri `.lart-hero-text`
+   vyššie. Staré pravidlá, ktoré tu prekresľovali tmavú hlavičku na papier,
+   odišli spolu s ňou. */
 
 /* ── Stránka článku: telo, pobočný stĺpec, diskusia ────────────────────── */
 @media (max-width: 640px) {
