@@ -15,7 +15,7 @@
 import { HeroSearch } from '../components/HeroSearch';
 import { InkEffect } from '../components/InkEffect';
 import LabAktuality from './LabAktuality';
-import LabMapa from './LabMapa';
+import { MapaAzKedTreba } from './MapaAzKedTreba';
 import LabKategorieRychle from './LabKategorieRychle';
 import LabDalsiObsah from './LabDalsiObsah';
 
@@ -81,9 +81,7 @@ export function LabHome() {
           scénu v Three.js aj na ostrej domovskej. Stojí hneď pod hľadaním,
           lebo odpovedá na tú istú otázku — „kde mám hradisko blízko" — len
           ukázaním namiesto vypísaním. */}
-      <section className="relative" style={{ zIndex: 5 }}>
-        <LabMapa />
-      </section>
+      <MapaAzKedTreba className="relative lhome-mapa" />
 
       {/* Kategórie, ktoré nemajú dlaždicu nad mapou — každá s radom štyroch
           najnovších článkov. */}

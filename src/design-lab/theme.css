@@ -1523,6 +1523,8 @@ body[data-lab-theme='pecat'],
 
 /* Mapa pod komentármi článku. */
 .lart-mapa { position: relative; z-index: 5; }
+/* Mapa na domovskej — z-index drží roletku hľadania nad ňou. */
+.lhome-mapa { z-index: 5; }
 
 @keyframes lkat-nabeh {
   from { opacity: 0; transform: translateY(22px); }

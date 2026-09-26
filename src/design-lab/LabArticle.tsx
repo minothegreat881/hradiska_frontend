@@ -24,7 +24,7 @@
  * Prvý skúšaný článok: `mikulcice-kopcany`.
  */
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useBlogPost } from '../hooks/useStrapi';
 import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
@@ -35,11 +35,7 @@ import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
 import { ArticleCard } from '../components/ArticleCard';
 import LabKategorieLista from './LabKategorieLista';
-import { lazyStale } from '../lib/lazyStale';
-
-/* Mapa sa dotiahne až keď na ňu príde rad. Je to najťažší komponent webu
-   a na stránke článku stojí úplne dole — nikto na ňu nečaká, kým číta. */
-const LabMapa = lazyStale(() => import('./LabMapa'));
+import { MapaAzKedTreba } from './MapaAzKedTreba';
 
 function skDate(iso?: string | null): string {
   if (!iso) return '';
@@ -225,49 +221,6 @@ export function LabArticle({ slug }: { slug: string }) {
         </section>
       )}
     </div>
-  );
-}
-
-/**
- * Mapa sa pripojí, až keď sa k nej doroluje.
- *
- * Miesto si drží prázdna sekcia, takže sa stránka pod ňou nehýbe. Pozorovateľ
- * sa spúšťa 600 px dopredu — kým čitateľ doroluje, mapa je pripravená.
- */
-function MapaAzKedTreba() {
-  const kotva = useRef<HTMLElement>(null);
-  const [zobrazit, setZobrazit] = useState(false);
-
-  useEffect(() => {
-    if (zobrazit) return;
-    if (typeof IntersectionObserver === 'undefined') { setZobrazit(true); return; }
-
-    /* Pozorovateľ sa zapína až po dosadení textu a obrázkov. Hneď po načítaní
-       je telo článku ešte krátke, takže kotva sedí pár stoviek pixelov pod
-       okrajom — pozorovateľ by sa spustil a mapa by sa stiahla aj tomu, kto
-       k nej nikdy nedoroluje (namerané: 44 dlaždíc podkladu). */
-    let io: IntersectionObserver | null = null;
-    const cas = window.setTimeout(() => {
-      const el = kotva.current;
-      if (!el) return;
-      io = new IntersectionObserver(
-        (zaznamy) => { if (zaznamy.some((z) => z.isIntersecting)) { setZobrazit(true); io?.disconnect(); } },
-        { rootMargin: '400px' }
-      );
-      io.observe(el);
-    }, 1500);
-
-    return () => { window.clearTimeout(cas); io?.disconnect(); };
-  }, [zobrazit]);
-
-  return (
-    <section className="lart-mapa" ref={kotva}>
-      {zobrazit && (
-        <Suspense fallback={null}>
-          <LabMapa />
-        </Suspense>
-      )}
-    </section>
   );
 }
 
