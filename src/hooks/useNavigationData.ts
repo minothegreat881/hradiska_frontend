@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getCategories, getBlogPosts } from '../lib/strapi';
+import { getCategories, getBlogPosts, getCategoryPostCounts } from '../lib/strapi';
 import { NavigationItem } from '../data/navigation-structure';
 
 /**
@@ -31,24 +31,15 @@ export function useNavigationData() {
       try {
         const categories = await getCategories();
 
-        const categoryItems = await Promise.all(
-          categories.map(async (cat): Promise<NavigationItem> => {
-            try {
-              // Len počet. `pageSize=1` vráti jeden článok a `meta.pagination.total`.
-              const { pagination } = await getBlogPosts({ categorySlug: cat.slug, pageSize: 1 });
-              return {
-                label: cat.name,
-                slug: `/category/${cat.slug}`,
-                count: pagination?.total ?? 0,
-                description: cat.description,
-              };
-            } catch {
-              // Jedna kategória zlyhala (napr. výpadok siete) — zobraz ju bez detailov,
-              // nech nespadne celé menu.
-              return { label: cat.name, slug: `/category/${cat.slug}`, count: 0 };
-            }
-          })
-        );
+        // Počty pre všetky kategórie naraz, jednou odpoveďou.
+        const pocty = await getCategoryPostCounts(categories.map((c) => c.slug));
+
+        const categoryItems: NavigationItem[] = categories.map((cat) => ({
+          label: cat.name,
+          slug: `/category/${cat.slug}`,
+          count: pocty[cat.slug] ?? 0,
+          description: cat.description,
+        }));
 
         if (!cancelled) setItems(categoryItems);
       } catch {

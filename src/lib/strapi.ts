@@ -216,6 +216,21 @@ export async function getCategoryBySlug(slug: string): Promise<StrapiCategory | 
  * ostane bez čísla, čo je poctivejšie než ukázať nulu.
  */
 export async function getCategoryPostCounts(slugs: string[]): Promise<Record<string, number>> {
+  /* Jedna odpoveď pre všetky kategórie. Predtým išla na server samostatná
+     požiadavka za každú (24 spiatočných ciest pri načítaní domovskej,
+     namerané). Keby endpoint chýbal (starší backend), spadne sa na pôvodný
+     spôsob nižšie. */
+  try {
+    const r = await fetchStrapi<{ pocty: Record<string, number> }>('/pocty-kategorii');
+    if (r?.pocty) {
+      const vybrane: Record<string, number> = {};
+      for (const slug of slugs) if (typeof r.pocty[slug] === 'number') vybrane[slug] = r.pocty[slug];
+      return vybrane;
+    }
+  } catch {
+    /* ideme cestou nižšie */
+  }
+
   const dvojice = await Promise.all(
     slugs.map(async (slug) => {
       try {
