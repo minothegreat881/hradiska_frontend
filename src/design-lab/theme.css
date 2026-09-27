@@ -4115,3 +4115,70 @@ html .ck-settings-btn {
     padding-right: max(env(safe-area-inset-right), 0px);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NAHLÁSENIE PRÍSPEVKU
+   Okienko je striedme zámerne: nahlásenie nie je udalosť, ktorú treba
+   oslavovať farbou, ale úkon, ktorý má prebehnúť rýchlo a bez pochybností
+   o tom, čo sa stane ďalej.
+   ══════════════════════════════════════════════════════════════════════════ */
+.nahl-vrstva {
+  position: fixed; inset: 0; z-index: 10010;
+  display: grid; place-items: center; padding: 18px;
+  background: rgba(30, 22, 12, .45);
+}
+.nahl-okno {
+  position: relative; width: 420px; max-width: 100%;
+  max-height: calc(100vh - 36px); overflow-y: auto;
+  padding: 24px 24px 20px;
+  border: 1px solid var(--l-line-2); border-radius: 14px;
+  background: var(--l-card);
+  box-shadow: 0 24px 60px rgba(40, 34, 22, .28);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.nahl-zavri {
+  position: absolute; top: 12px; right: 12px;
+  width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--l-line-2); border-radius: 999px;
+  background: var(--l-paper); color: var(--l-muted); cursor: pointer;
+}
+.nahl-zavri:hover { color: var(--l-second-deep); border-color: var(--l-second-light); }
+.nahl-nadpis {
+  display: flex; align-items: center; gap: 9px; margin: 0 0 10px;
+  font-family: 'Fraunces', Georgia, serif; font-size: 21px; font-weight: 700; color: var(--l-ink);
+}
+.nahl-text { margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: var(--l-body); }
+.nahl-dovody { border: 0; padding: 0; margin: 0 0 16px; }
+.nahl-legenda {
+  display: block; padding: 0; margin: 0 0 8px;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--l-muted);
+}
+.nahl-dovod {
+  display: flex; align-items: center; gap: 9px; padding: 7px 0;
+  font-size: 14.5px; color: var(--l-body); cursor: pointer;
+}
+.nahl-dovod input { accent-color: var(--l-second-deep); width: 16px; height: 16px; }
+.nahl-pole {
+  width: 100%; box-sizing: border-box; padding: 9px 12px; margin-bottom: 16px;
+  border: 1px solid var(--l-line-2); border-radius: 8px;
+  background: var(--l-paper); color: var(--l-ink);
+  font-family: 'Inter', system-ui, sans-serif; font-size: 14px; resize: vertical;
+}
+.nahl-pole:focus-visible { outline: 2px solid var(--l-second); outline-offset: 1px; }
+.nahl-chyba { margin: 0 0 12px; font-size: 13.5px; color: var(--l-second-deep); }
+.nahl-ukony { display: flex; justify-content: flex-end; gap: 10px; }
+.nahl-hlavne, .nahl-vedlajsie {
+  padding: 9px 18px; border-radius: 999px; cursor: pointer;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 14px; font-weight: 600;
+}
+.nahl-hlavne { border: 1px solid var(--l-second-deep); background: var(--l-second-deep); color: var(--l-card); }
+.nahl-hlavne:disabled { opacity: .6; cursor: default; }
+.nahl-vedlajsie { border: 1px solid var(--l-line-2); background: transparent; color: var(--l-body); }
+.nahl-vedlajsie:hover { border-color: var(--l-muted); }
+
+/* Na telefóne sa okienko drží pri spodnej hrane — palec je tam. */
+@media (max-width: 520px) {
+  .nahl-vrstva { place-items: end center; padding: 0; }
+  .nahl-okno { width: 100%; border-radius: 16px 16px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+}

@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
-import { ThumbsUp, Reply, Loader2, Trash2 } from 'lucide-react';
+import { ThumbsUp, Reply, Loader2, Trash2, Flag } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMember } from '../auth/MemberAuth';
 
 import { STRAPI_URL } from '../lib/api-adresa';
+import { NahlasitDialog } from './NahlasitDialog';
 
 const goTo = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
@@ -54,6 +55,7 @@ interface CommentItemProps {
   onCancelReply: () => void;
   onSubmitReply: (parentDocId: string, text: string) => Promise<void>;
   onDelete: (documentId: string) => void;
+  onNahlasit: (documentId: string, autor: string) => void;
   isLoggedIn: boolean;
   // Set aj Map majú .has() — prijmeme oboje (member likes sú Map).
   likedSet: { has(k: string): boolean };
@@ -68,6 +70,7 @@ function CommentItem({
   onCancelReply,
   onSubmitReply,
   onDelete,
+  onNahlasit,
   isLoggedIn,
   likedSet,
   replyingToDocId,
@@ -254,6 +257,23 @@ function CommentItem({
                 Zmazať
               </button>
             )}
+            {/* Nahlásiť vidí prihlásený pri CUDZOM komentári. Pri vlastnom by
+                to bolo na smiech, neprihlásenému to server aj tak odmietne. */}
+            {isLoggedIn && !comment.mine && (
+              <button
+                type="button"
+                onClick={() => onNahlasit(comment.documentId, comment.author)}
+                title="Nahlásiť tento komentár redakcii"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent',
+                  border: 0, padding: 0, cursor: 'pointer', fontFamily: 'Georgia, serif',
+                  fontSize: 12, color: '#7a6b56',
+                }}
+              >
+                <Flag style={{ width: 13, height: 13 }} />
+                Nahlásiť
+              </button>
+            )}
           </div>
 
           {/* Inline pole na odpoveď — otvorí sa priamo pod komentárom */}
@@ -319,6 +339,7 @@ function CommentItem({
           onCancelReply={onCancelReply}
           onSubmitReply={onSubmitReply}
           onDelete={onDelete}
+          onNahlasit={onNahlasit}
           isLoggedIn={isLoggedIn}
           likedSet={likedSet}
           replyingToDocId={replyingToDocId}
@@ -399,6 +420,10 @@ interface CommentSectionProps {
 
 export function CommentSection({ postDocumentId }: CommentSectionProps) {
   const { member, token, isLoggedIn } = useMember();
+  /* Nahlásenie: okienko sa otvára na konkrétny komentár. Drží sa tu, nie
+     v `CommentItem` — inak by sa vrstva vykreslila vnorená v komentári
+     a prekryla by ju karta diskusie. */
+  const [nahlasujem, setNahlasujem] = useState<{ docId: string; autor: string } | null>(null);
 
   const [comments, setComments] = useState<Comment[]>(FALLBACK_COMMENTS);
   const [loading, setLoading] = useState(false);
@@ -739,6 +764,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               onCancelReply={handleCancelReply}
               onSubmitReply={submitReply}
               onDelete={handleDelete}
+              onNahlasit={(docId, autor) => setNahlasujem({ docId, autor })}
               isLoggedIn={isLoggedIn}
               likedSet={myLikes}
               replyingToDocId={replyingTo?.docId || null}
@@ -746,6 +772,16 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
           ))
         )}
       </div>
+
+      {nahlasujem && token && (
+        <NahlasitDialog
+          druh="komentar"
+          cielDocumentId={nahlasujem.docId}
+          autor={nahlasujem.autor}
+          token={token}
+          onZavri={() => setNahlasujem(null)}
+        />
+      )}
 
       {/* Formulár */}
       <motion.div

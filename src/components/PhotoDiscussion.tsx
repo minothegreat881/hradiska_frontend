@@ -13,6 +13,7 @@ const go = (p: string) => { window.history.pushState({}, '', p); window.dispatch
 
 // Base URL pre médiá (avatar autora je relatívna /uploads/... cesta).
 import { STRAPI_URL } from '../lib/api-adresa';
+import { NahlasitDialog } from './NahlasitDialog';
 
 /** Komentár s vnorenými odpoveďami (strom podľa inReplyTo). */
 interface PhotoCommentNode extends PhotoComment {
@@ -79,6 +80,9 @@ function skloninaKom(n: number): string {
  */
 export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?: () => void }) {
   const { member, token, isLoggedIn } = useMember();
+  /* Nahlásenie fotokomentára — okienko drží celý panel, nie jednotlivý
+     komentár, aby sa vrstva vykreslila nad svetelným boxom. */
+  const [nahlasujem, setNahlasujem] = useState<{ docId: string; autor: string } | null>(null);
 
   const [comments, setComments] = useState<PhotoCommentNode[]>([]);
   const [likeCount, setLikeCount] = useState(0);
@@ -222,6 +226,18 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
                 Zmazať
               </button>
             )}
+            {/* Nahlásiť vidí prihlásený pri cudzom komentári — pri vlastnom
+                by to nedávalo zmysel a neprihlásenému to server odmietne. */}
+            {isLoggedIn && !c.mine && (
+              <button
+                onClick={() => setNahlasujem({ docId: c.documentId, autor: c.authorName || '' })}
+                className="pl-focusable"
+                title="Nahlásiť tento komentár redakcii"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 14 }}
+              >
+                Nahlásiť
+              </button>
+            )}
           </div>
 
           {replyTo === c.documentId && isLoggedIn && (
@@ -254,6 +270,15 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
 
   return (
     <div className="pl-discuss-inner" style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '1 1 auto' }}>
+      {nahlasujem && token && (
+        <NahlasitDialog
+          druh="fotokomentar"
+          cielDocumentId={nahlasujem.docId}
+          autor={nahlasujem.autor}
+          token={token}
+          onZavri={() => setNahlasujem(null)}
+        />
+      )}
       {/* Riadok reakcií — bez „0" (skryté, keď niet lajkov ani komentárov) */}
       {(likeCount > 0 || commentCount > 0) && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 15px 9px', flexShrink: 0 }}>
