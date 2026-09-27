@@ -4182,3 +4182,29 @@ html .ck-settings-btn {
   .nahl-vrstva { place-items: end center; padding: 0; }
   .nahl-okno { width: 100%; border-radius: 16px 16px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
 }
+
+/* Voľba „zároveň zablokovať" v okienku nahlásenia. Je to iný druh úkonu než
+   nahlásenie (osobné nastavenie, nie podnet redakcii), preto stojí oddelene
+   nad tlačidlami a nie medzi dôvodmi. */
+.nahl-blokovat {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin: 0 0 16px; padding: 11px 13px;
+  border: 1px solid var(--l-line); border-radius: 9px; background: var(--l-paper);
+  font-size: 13.5px; line-height: 1.5; color: var(--l-body); cursor: pointer;
+}
+.nahl-blokovat input { margin-top: 2px; accent-color: var(--l-second-deep); width: 16px; height: 16px; flex: none; }
+
+/* Zoznam zablokovaných členov v nastaveniach účtu. */
+.lprof-blokovani { list-style: none; margin: 10px 0 0; padding: 0; }
+.lprof-blokovani li {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 10px 0; border-bottom: 1px solid var(--l-line);
+  font-family: 'Inter', system-ui, sans-serif; font-size: 15px; color: var(--l-ink);
+}
+.lprof-blokovani li:last-child { border-bottom: 0; }
+.lprof-blokovani button {
+  flex: none; padding: 6px 13px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--l-line-2); background: transparent;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: var(--l-body);
+}
+.lprof-blokovani button:hover { border-color: var(--l-second-deep); color: var(--l-second-deep); }

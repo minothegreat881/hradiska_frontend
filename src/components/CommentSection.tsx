@@ -8,6 +8,7 @@ import { useMember } from '../auth/MemberAuth';
 
 import { STRAPI_URL } from '../lib/api-adresa';
 import { NahlasitDialog } from './NahlasitDialog';
+import { useBlokovani, bezBlokovanych } from '../lib/blokovania';
 
 const goTo = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
@@ -21,7 +22,9 @@ interface Comment {
   likes: number;
   sourceBlogger?: boolean;
   mine?: boolean;   // patrí prihlásenému? (príznak zo servera)
-  authorAvatar?: string | null;  // URL avatara autora (ak si ho nastavil)
+  authorAvatar?: string | null;
+  /** Číslo účtu autora — slúži na skrytie príspevkov zablokovaných členov. */
+  authorId?: number | null;  // URL avatara autora (ak si ho nastavil)
   replies?: Comment[];
 }
 
@@ -55,7 +58,7 @@ interface CommentItemProps {
   onCancelReply: () => void;
   onSubmitReply: (parentDocId: string, text: string) => Promise<void>;
   onDelete: (documentId: string) => void;
-  onNahlasit: (documentId: string, autor: string) => void;
+  onNahlasit: (documentId: string, autor: string, autorId?: number | null) => void;
   isLoggedIn: boolean;
   // Set aj Map majú .has() — prijmeme oboje (member likes sú Map).
   likedSet: { has(k: string): boolean };
@@ -262,7 +265,7 @@ function CommentItem({
             {isLoggedIn && !comment.mine && (
               <button
                 type="button"
-                onClick={() => onNahlasit(comment.documentId, comment.author)}
+                onClick={() => onNahlasit(comment.documentId, comment.author, comment.authorId)}
                 title="Nahlásiť tento komentár redakcii"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent',
@@ -374,6 +377,7 @@ function mapStrapiComment(c: StrapiComment): Comment {
     sourceBlogger: c.sourceBlogger,
     mine: c.mine,
     authorAvatar: c.authorAvatar ?? null,
+    authorId: (c as any).authorId ?? null,
   };
 }
 
@@ -423,7 +427,13 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   /* Nahlásenie: okienko sa otvára na konkrétny komentár. Drží sa tu, nie
      v `CommentItem` — inak by sa vrstva vykreslila vnorená v komentári
      a prekryla by ju karta diskusie. */
-  const [nahlasujem, setNahlasujem] = useState<{ docId: string; autor: string } | null>(null);
+  const [nahlasujem, setNahlasujem] = useState<{ docId: string; autor: string; autorId?: number | null } | null>(null);
+  /* Zoznam zablokovaných. `ref` popri stave preto, že načítanie komentárov
+     beží vo vlastnom efekte a potrebuje aktuálny zoznam bez toho, aby sa
+     kvôli nemu spúšťalo znova. */
+  const { idcka: blokovani, obnov: obnovBlokovanych } = useBlokovani(token);
+  const blokovaniRef = useRef<Set<number>>(new Set());
+  useEffect(() => { blokovaniRef.current = blokovani; }, [blokovani]);
 
   const [comments, setComments] = useState<Comment[]>(FALLBACK_COMMENTS);
   const [loading, setLoading] = useState(false);
@@ -476,11 +486,13 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
 
       // Build nested tree: replies sa zobrazia vnorené pod parent komentárom
       // (oddelené visually cez `depth` v CommentItem).
-      setComments(buildCommentTree(list.map((c) => {
+      /* Zablokovaní sa odfiltrujú PRED zostavením stromu — inak by odpoveď
+         na skrytý komentár ostala visieť bez toho, na čo odpovedá. */
+      setComments(buildCommentTree(bezBlokovanych(list.map((c) => {
         const m = mapStrapiComment(c);
         m.mine = mineSet.has(m.documentId);
         return m;
-      })));
+      }), blokovaniRef.current)));
 
       /* Ak adresa nesie kotvu komentára, prejdi naň — až TERAZ, keď je
          v dokumente. Prehliadač si hash spracuje pri načítaní stránky, keď
@@ -764,7 +776,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               onCancelReply={handleCancelReply}
               onSubmitReply={submitReply}
               onDelete={handleDelete}
-              onNahlasit={(docId, autor) => setNahlasujem({ docId, autor })}
+              onNahlasit={(docId, autor, autorId) => setNahlasujem({ docId, autor, autorId })}
               isLoggedIn={isLoggedIn}
               likedSet={myLikes}
               replyingToDocId={replyingTo?.docId || null}
@@ -778,8 +790,10 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
           druh="komentar"
           cielDocumentId={nahlasujem.docId}
           autor={nahlasujem.autor}
+          autorId={nahlasujem.autorId}
           token={token}
           onZavri={() => setNahlasujem(null)}
+          onZablokovane={() => { obnovBlokovanych(); fetchComments(); }}
         />
       )}
 

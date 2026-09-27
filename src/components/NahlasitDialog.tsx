@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Flag, X } from 'lucide-react';
 import { STRAPI_URL } from '../lib/api-adresa';
+import { zablokuj } from '../lib/blokovania';
 
 export type DruhPrispevku = 'komentar' | 'fotokomentar';
 
@@ -27,15 +28,20 @@ const DOVODY: { id: string; popis: string }[] = [
 ];
 
 export function NahlasitDialog({
-  druh, cielDocumentId, autor, token, onZavri,
+  druh, cielDocumentId, autor, autorId, token, onZavri, onZablokovane,
 }: {
   druh: DruhPrispevku;
   cielDocumentId: string;
   autor?: string;
+  /** Číslo účtu autora — bez neho sa blokovanie neponúka. */
+  autorId?: number | null;
   token: string;
   onZavri: () => void;
+  /** Zavolá sa po zablokovaní, nech si zoznam komentárov obnoví filter. */
+  onZablokovane?: () => void;
 }) {
   const [dovod, setDovod] = useState('spam');
+  const [blokovat, setBlokovat] = useState(false);
   const [poznamka, setPoznamka] = useState('');
   const [posielam, setPosielam] = useState(false);
   const [hotovo, setHotovo] = useState<string | null>(null);
@@ -69,9 +75,25 @@ export function NahlasitDialog({
       });
       if (!r.ok) throw new Error(String(r.status));
       const odpoved = await r.json().catch(() => ({}));
-      setHotovo(odpoved?.uzNahlasene
+
+      /* Blokovanie je samostatný úkon — keď zlyhá, nahlásenie tým neprepadne;
+         človeku sa o tom povie rovno vo vete, ktorú číta. */
+      let blokovanieHlaska = '';
+      if (blokovat && autorId) {
+        try {
+          await zablokuj(token, autorId);
+          onZablokovane?.();
+          blokovanieHlaska = autor
+            ? ` Príspevky od ${autor} vám už nebudeme zobrazovať.`
+            : ' Príspevky tohto člena vám už nebudeme zobrazovať.';
+        } catch {
+          blokovanieHlaska = ' Zablokovať sa ho nepodarilo — skúste to v nastaveniach účtu.';
+        }
+      }
+
+      setHotovo((odpoved?.uzNahlasene
         ? 'Tento príspevok ste už nahlásili. Redakcia o ňom vie.'
-        : 'Ďakujeme. Redakcia sa na príspevok pozrie.');
+        : 'Ďakujeme. Redakcia sa na príspevok pozrie.') + blokovanieHlaska);
     } catch {
       setChyba('Nahlásenie sa nepodarilo odoslať. Skúste to prosím o chvíľu.');
     } finally {
@@ -136,6 +158,18 @@ export function NahlasitDialog({
               onChange={(e) => setPoznamka(e.target.value)}
               placeholder="Napríklad čím presne príspevok prekáža."
             />
+
+            {/* Blokovanie sa ponúka len vtedy, keď vieme, o čí účet ide —
+                pri starých komentároch z pôvodného blogu účet neexistuje. */}
+            {autorId ? (
+              <label className="nahl-blokovat">
+                <input type="checkbox" checked={blokovat} onChange={(e) => setBlokovat(e.target.checked)} />
+                <span>
+                  Zároveň {autor ? <strong>{autor}</strong> : 'tohto člena'} zablokovať — jeho príspevky
+                  sa mi prestanú zobrazovať. Zrušiť sa to dá v nastaveniach účtu.
+                </span>
+              </label>
+            ) : null}
 
             {chyba && <p className="nahl-chyba" role="alert">{chyba}</p>}
 

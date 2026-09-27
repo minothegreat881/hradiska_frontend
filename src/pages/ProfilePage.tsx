@@ -35,6 +35,7 @@ import {
 import { pushSupported, pushPermission, enablePush, disablePush, isPushEnabled } from '../lib/push';
 
 import { STRAPI_URL } from '../lib/api-adresa';
+import { useBlokovani, odblokuj } from '../lib/blokovania';
 
 const prejdi = (p: string) => { window.history.pushState({}, '', p); window.dispatchEvent(new PopStateEvent('popstate')); };
 
@@ -497,6 +498,7 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
   profil: Profile; token: string; onProfil: (p: Profile) => void; onOdhlas: () => void;
 }) {
   const { obnov } = useMember();
+  const { zoznam: blokovani, obnov: obnovBlokovanych } = useBlokovani(token);
   const [meno, setMeno] = useState(profil.displayName || '');
   const [prefs, setPrefs] = useState(profil.prefs);
   const [push, setPush] = useState(false);
@@ -632,6 +634,43 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
         <div className="lprof-tlacidla">
           <button type="button" className="lprof-hlavne" disabled={busy} onClick={uloz}>Uložiť zmeny</button>
         </div>
+      </section>
+
+      {/* Zablokovaní členovia. Zoznam tu MUSÍ byť: blokovanie sa zapína
+          jedným klepnutím v okienku nahlásenia a bez tohto miesta by sa
+          nedalo vrátiť. */}
+      <section>
+        <h2>Zablokovaní členovia</h2>
+        {blokovani.length === 0 ? (
+          <p className="lprof-poznamka">
+            Nikoho nemáte zablokovaného. Zablokovať člena sa dá pri jeho príspevku,
+            cez „Nahlásiť".
+          </p>
+        ) : (
+          <>
+            <p className="lprof-poznamka">
+              Príspevky týchto členov sa vám nezobrazujú. Oni o tom nevedia a ostatným
+              sa ich príspevky ukazujú ďalej.
+            </p>
+            <ul className="lprof-blokovani">
+              {blokovani.map((b) => (
+                <li key={b.documentId}>
+                  <span>{b.kohoMeno || `Účet č. ${b.kohoId}`}</span>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!token) return;
+                      try { await odblokuj(token, b.documentId); obnovBlokovanych(); }
+                      catch { /* zoznam sa obnoví pri ďalšom otvorení */ }
+                    }}
+                  >
+                    Zrušiť blokovanie
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </section>
 
       {/* Odhlásenie je v hlavičke profilu — tu ostáva len to, čo sa nedá
