@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
-  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus,
+  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus, Flag,
 } from 'lucide-react';
 import '../styles/admin-redesign.css';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LoginScreen } from './screens/LoginScreen';
 import { ArticlesScreen } from './screens/ArticlesScreen';
 import { DraftsScreen } from './screens/DraftsScreen';
+import { NahlaseniaScreen } from './screens/NahlaseniaScreen';
 import { PripomienkyScreen } from './screens/PripomienkyScreen';
 import { maNeulozeneZmeny, odlozTeraz } from './editor/state/rozpracovane';
 import { EditorScreen } from './screens/EditorScreen';
@@ -24,7 +25,7 @@ import { fetchNavCounts } from './api/posts';
 import { StavPosty } from './components/StavPosty';
 
 export type AdminRoute =
-  | 'articles' | 'drafts' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'pripomienky' | 'users' | 'analytics' | 'profile';
+  | 'articles' | 'drafts' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'pripomienky' | 'nahlasenia' | 'users' | 'analytics' | 'profile';
 
 // Badge sa dopĺňa dynamicky z reálnych počtov (viď `badges` v AdminShell) — žiadne statické čísla.
 const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any }[] }[] = [
@@ -44,6 +45,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
       { id: 'tags', label: 'Štítky', icon: Tag },
       { id: 'comments', label: 'Komentáre', icon: MessageSquare },
       { id: 'pripomienky', label: 'Pripomienky', icon: MessageSquarePlus },
+      { id: 'nahlasenia', label: 'Nahlásenia', icon: Flag },
       { id: 'users', label: 'Používatelia', icon: Users },
     ],
   },
@@ -55,7 +57,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
 
 const ROUTE_LABELS: Record<AdminRoute, string> = {
   articles: 'Články', drafts: 'Koncepty', editor: 'Editor článku', media: 'Médiá',
-  categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', pripomienky: 'Pripomienky',
+  categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', pripomienky: 'Pripomienky', nahlasenia: 'Nahlásenia',
   users: 'Používatelia', analytics: 'Analytika',
   profile: 'Môj profil',
 };
@@ -262,6 +264,7 @@ function AdminShell() {
           {route === 'tags' && <TagsScreen />}
           {route === 'comments' && <CommentsScreen />}
           {route === 'pripomienky' && <PripomienkyScreen />}
+          {route === 'nahlasenia' && <NahlaseniaScreen />}
           {route === 'users' && <UsersScreen />}
           {route === 'profile' && <ProfileScreen />}
         </main>
