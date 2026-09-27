@@ -56,6 +56,9 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
 
   return (
     <button
+      /* Na úzkom okne pri fotke nestojí meno — tam sa z tlačidla stane
+         samotná fotografia (viď `.lnav-ucet--fotka` v theme.css). */
+      className={isLoggedIn && fotka ? 'lnav-ucet--fotka' : undefined}
       onClick={() => go(isLoggedIn ? '/profil' : '/prihlasenie')}
       title={label}
       aria-label={label}

@@ -4044,10 +4044,27 @@ body[data-lab-theme] .pl-act {
   .lprh-hladat { width: 100%; margin-left: 0; }
 }
 
-/* Profilová fotografia v hlavičke — kruh rovnakého rozmeru ako ikona účtu,
-   takže sa rozvrh lišty nemení, keď sa člen prihlási. */
+/* Profilová fotografia v hlavičke. Na širokom okne stojí v pilulke vedľa
+   mena, tam je to malý kruh. */
 .lnav-ucet-fotka {
   width: 26px; height: 26px; border-radius: 999px; object-fit: cover;
   display: block; background: var(--l-paper-2);
   box-shadow: 0 0 0 1px var(--l-line-2);
+}
+
+/* Na úzkom okne pri fotke nestojí meno (`hidden sm:inline`), takže v tlačidle
+   nie je nič iné. Fotografia sa preto rozťahuje na celé tlačidlo — inak sedel
+   malý kruh v ďalšom, väčšom kruhu a vyzeralo to ako nedorobok.
+   Pozadie, rámik ani odsadenie pilulky tu nemajú čo robiť; `!important` je
+   nutné, lebo spoločné pravidlo `.lnav-right button` ich tak nastavuje. */
+@media (max-width: 639px) {
+  .lnav-right button.lnav-ucet--fotka {
+    width: 44px; height: 44px; min-height: 44px;
+    padding: 0 !important; margin-block: 0 !important;
+    background: none !important; border: 0 !important;
+    border-radius: 999px !important; overflow: hidden;
+  }
+  .lnav-right button.lnav-ucet--fotka .lnav-ucet-fotka {
+    width: 100%; height: 100%; box-shadow: none;
+  }
 }
