@@ -6,7 +6,7 @@ import { ThumbsUp, Reply, Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMember } from '../auth/MemberAuth';
 
-const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+import { STRAPI_URL } from '../lib/api-adresa';
 
 const goTo = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 

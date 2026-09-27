@@ -196,7 +196,10 @@ export function LabArticle({ slug }: { slug: string }) {
               /* Fotografia už nie je podklad pod textom, ale obsah — patrí jej
                  zmysluplný popis. */
               alt={(post.coverImage as any)?.alternativeText || post.title}
-              fetchPriority="high"
+              /* Malým písmom zámerne: React 18 camelCase `fetchPriority`
+                 nepozná, ohlási ho ako neznámu vlastnosť a na prvok ho
+                 nedá — prednosť pri sťahovaní by sa tým stratila. */
+              {...{ fetchpriority: 'high' }}
               decoding="async"
               onLoad={() => setOstraTu(true)}
               /* Keď sa fotografia nestiahne, nech ostane vidieť aspoň to, čo

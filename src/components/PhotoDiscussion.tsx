@@ -12,7 +12,7 @@ import {
 const go = (p: string) => { window.history.pushState({}, '', p); window.dispatchEvent(new PopStateEvent('popstate')); };
 
 // Base URL pre médiá (avatar autora je relatívna /uploads/... cesta).
-const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+import { STRAPI_URL } from '../lib/api-adresa';
 
 /** Komentár s vnorenými odpoveďami (strom podľa inReplyTo). */
 interface PhotoCommentNode extends PhotoComment {

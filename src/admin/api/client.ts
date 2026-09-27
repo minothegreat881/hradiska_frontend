@@ -10,8 +10,7 @@
  * odhad, ale odskúšaný stav (vrátane toho, že `actions/publish` NEEXISTUJE).
  */
 
-export const STRAPI_URL =
-  (import.meta as any).env?.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : ((import.meta as any).env?.VITE_STRAPI_URL || 'http://localhost:1337');
+export { STRAPI_URL } from '../../lib/api-adresa';
 
 /** Chyba z API so zachovaným stavovým kódom, nech sa dá rozlíšiť 401 od 400. */
 export class StrapiError extends Error {

@@ -6,9 +6,7 @@ import { useMember } from '../auth/MemberAuth';
 import { getUnreadCount } from '../lib/profileApi';
 
 /* Adresa Strapi sa v projekte drží v každom module zvlášť (nie je vyvezená) — rovnako ako v `profileApi.ts` a `ProfilePage.tsx`. */
-const STRAPI_URL = import.meta.env.PROD
-  ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi')
-  : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+import { STRAPI_URL } from '../lib/api-adresa';
 
 /** Strapi vracia cesty relatívne k svojmu koreňu — bez predpony sa obrázok
     hľadá na frontende a nenačíta sa. Do kruhu stačí najmenší formát. */

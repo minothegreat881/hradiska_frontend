@@ -5,7 +5,7 @@
  * Tok: getVapidKey → Notification.requestPermission → pushManager.subscribe →
  * POST /api/push/subscribe (s JWT). Odhlásenie zruší odber aj na serveri.
  */
-const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+import { STRAPI_URL } from './api-adresa';
 
 export function pushSupported(): boolean {
   return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;

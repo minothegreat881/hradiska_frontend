@@ -15,6 +15,8 @@
  * nezobrazuje, potrebuje ich len domovská.
  */
 
+import { STRAPI_URL } from '../lib/api-adresa';
+
 export interface PolozkaRozcestnika {
   slug: string;
   label: string;
@@ -48,8 +50,7 @@ export function tvarPoctu(n: number, [jedno, malo, vela]: [string, string, strin
   return vela;
 }
 
-/** Základ adries Strapi médií — rovnaký výpočet ako v `lib/strapi.ts`. */
+/** Základ adries Strapi médií. Výpočet je jeden pre celý web aj pre appku. */
 export function zakladStrapi(): string {
-  if (!import.meta.env.PROD) return import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
-  return typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi';
+  return STRAPI_URL;
 }

@@ -6,6 +6,7 @@ import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
 import { Crown, Scroll, Loader2 } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
+import { STRAPI_URL } from '../lib/api-adresa';
 
 interface CategoryPageProps {
   categorySlug: string;
@@ -33,7 +34,6 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   // Kurátorský popis má prednosť — je písaný podľa toho, čo v kategórii reálne je.
   const categoryDescription = localCategory?.description || strapiCategory?.description || '';
   // Obrázok je z článku v tej istej kategórii, servírovaný zo Strapi médií.
-  const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
   const categoryImage = localCategory ? `${STRAPI_URL}${localCategory.image}` : null;
   const categoryIcon = localCategory?.icon || '📜';
 

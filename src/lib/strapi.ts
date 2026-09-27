@@ -2,7 +2,7 @@
  * Strapi API Client for Hradiska.sk
  */
 
-const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+import { STRAPI_URL } from './api-adresa';
 
 // Types matching Strapi response structure
 export interface StrapiImageFormat {

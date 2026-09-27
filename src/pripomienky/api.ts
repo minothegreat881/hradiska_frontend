@@ -11,9 +11,7 @@
 
 import { ADMIN_TOKEN_KEY } from '../lib/preview';
 
-const STRAPI_URL = import.meta.env.PROD
-  ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi')
-  : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+import { STRAPI_URL } from '../lib/api-adresa';
 
 export type Druh = 'chyba' | 'obsah';
 export type Stav = 'nova' | 'riesi-sa' | 'hotova' | 'zamietnuta';

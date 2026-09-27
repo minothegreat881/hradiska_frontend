@@ -33,6 +33,7 @@ import '../styles/mapa.css';
 import { SK_OUTLINE, SK_OUTLINE_BOX, SK_OUTLINE_RANGE } from './mapaObrys';
 import { MESTA, MAPA_MESTA_ZOOM } from './mapaMesta';
 import { HRANICA_SK } from './mapaHranica';
+import { STRAPI_URL } from '../lib/api-adresa';
 
 /* Výrez RENDERU — musí sedieť s BOUNDS_4326 v build_relief.py. Na tento
    výrez sa mapa otvára. */
@@ -125,11 +126,8 @@ const mercY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 
 
 const deg = (v: number, pos: string, neg: string) => `${Math.abs(v).toFixed(2)}° ${v >= 0 ? pos : neg}`;
 
-/** Základ Strapi — vo vývoji priamo 1337, v produkcii cez proxy `/strapi`. */
-const strapiBase = () =>
-  import.meta.env.PROD
-    ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi')
-    : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+/** Základ Strapi — spoločný pre web aj pre natívnu schránku (viď lib/api-adresa). */
+const strapiBase = () => STRAPI_URL;
 
 /**
  * Jeden bod. Vlastný komponent so `memo` zámerne: pri stovke bodov (najviac

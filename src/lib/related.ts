@@ -10,7 +10,7 @@
 import MiniSearch from 'minisearch';
 import { getSearchIndexLite, fold, type IndexDoc } from './searchIndex';
 
-const STRAPI_URL = import.meta.env.PROD ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi') : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+import { STRAPI_URL } from './api-adresa';
 
 // Slovenské stopslová — nech dopyt necielime na „a, na, sa, v, že…".
 const STOP = new Set(
