@@ -177,5 +177,55 @@ offline mapu a na obchody.
 
 ---
 
+## 12. Stav prác (27.–28. 9. 2026)
+
+| fáza | stav |
+|---|---|
+| 0 — adresa API na jednom mieste, CORS | **hotové a nasadené** |
+| 1 — Capacitor, Android, APK | **hotové** (`sk.hradiska.app`, 51 MB) |
+| 2 — bezpečné okraje, Späť, stavová lišta, odkazy, ikona, úvodná obrazovka | **hotové** |
+| požiadavky obchodov — nahlásenie a blokovanie | **hotové a nasadené** |
+| 3 — natívne upozornenia | čaká na účet Firebase |
+| 4 — offline „hradisko na cestu" | nezačaté (mapové dlaždice už v balíku sú) |
+| 5 — iOS a zápis do obchodov | čaká na Mac a na účty |
+| 6 — doručovanie cez vzduch (OTA) | nezačaté |
+
+### Ako appku postaviť
+
+```
+npm run app:android
+```
+
+Postaví web, zoštíhli balík, zosynchronizuje a zostaví APK. Výsledok je
+v `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+Zostavenie potrebuje `ANDROID_HOME` (na tomto počítači je SDK
+v `C:\Users\milan\Android\Sdk`) a súbor `android/local.properties`
+so `sdk.dir` — ten sa do gitu nedáva, lebo je pre každý počítač iný.
+
+### Čo som pri tom zistil
+
+* **`dist/` má 274 MB**, z toho 202 MB sú zdrojové výškové dáta (`.tif`,
+  `.zip`) v `public/heightmaps`. Sú to vstupy pre pythonovské skripty, ktoré
+  generujú reliéf; na webe ich nikto nečíta, ale **nasadzujú sa na Vercel**.
+  Pre appku ich vynecháva `scripts/priprav-app.mjs`; pre web by stálo za to
+  presunúť ich mimo `public/`.
+* **Mapové dlaždice si web hostuje sám** (`public/mapa`, 3 152 súborov,
+  zoom 10–12). V aplikácii teda mapa hradísk funguje aj bez signálu. Esri
+  dlaždice sa používajú len v detailnej mini-mape, tam offline nebude.
+* **Komentáre nemali nahlásenie ani blokovanie** — bez oboch by appku App
+  Store neprijal. Obe sú hotové aj na webe, vrátane obrazovky v administrácii.
+
+### Čo treba od zadávateľa
+
+1. Účet **Google Play** (25 USD jednorazovo) a **Apple Developer** (99 USD/rok).
+2. **Doménu `hradiska.sk`** na svojom mieste — až potom majú zmysel
+   univerzálne odkazy, `assetlinks.json` a zápis do obchodov.
+3. Rozhodnutie o **názve v obchode**; zatiaľ je nastavené „Hradiská.sk"
+   a identifikátor `sk.hradiska.app`.
+4. Projekt **Firebase** (zadarmo) pre natívne upozornenia.
+
+---
+
 *Rozbor z 27. 9. 2026. Stav, z ktorého vychádza: PWA v6, Strapi 5 na Hetzneri,
 frontend na Verceli, 365 článkov.*
