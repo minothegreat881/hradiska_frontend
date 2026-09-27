@@ -21,6 +21,8 @@ interface MemberAuthValue {
   signIn: (identifier: string, password: string) => Promise<void>;
   setSession: (jwt: string, member: Member) => void;
   signOut: () => void;
+  /** Znovu načíta účet zo servera — po zmene fotografie alebo mena. */
+  obnov: () => Promise<void>;
 }
 
 const Ctx = createContext<MemberAuthValue | null>(null);
@@ -57,10 +59,18 @@ export function MemberAuthProvider({ children }: { children: React.ReactNode }) 
   const signIn = useCallback(async (identifier: string, password: string) => {
     const { jwt, user } = await apiLogin(identifier, password);
     setSession(jwt, user);
+    /* Prihlásenie vracia účet BEZ fotografie. Dotiahne sa hneď za ním, nech
+       sa v hlavičke neobjaví najprv panáčik a až po obnovení stránky fotka. */
+    try { setMember(await apiMe(jwt)); } catch { /* fotka nie je dôvod na chybu prihlásenia */ }
   }, [setSession]);
 
+  const obnov = useCallback(async () => {
+    if (!token) return;
+    try { setMember(await apiMe(token)); } catch { /* ticho — profil sa načíta inde */ }
+  }, [token]);
+
   return (
-    <Ctx.Provider value={{ token, member, ready, isLoggedIn: !!member, signIn, setSession, signOut }}>
+    <Ctx.Provider value={{ token, member, ready, isLoggedIn: !!member, signIn, setSession, signOut, obnov }}>
       {children}
     </Ctx.Provider>
   );

@@ -5,6 +5,19 @@ import { User, LogIn } from 'lucide-react';
 import { useMember } from '../auth/MemberAuth';
 import { getUnreadCount } from '../lib/profileApi';
 
+/* Adresa Strapi sa v projekte drží v každom module zvlášť (nie je vyvezená) — rovnako ako v `profileApi.ts` a `ProfilePage.tsx`. */
+const STRAPI_URL = import.meta.env.PROD
+  ? (typeof window !== 'undefined' ? window.location.origin + '/strapi' : '/strapi')
+  : (import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337');
+
+/** Strapi vracia cesty relatívne k svojmu koreňu — bez predpony sa obrázok
+    hľadá na frontende a nenačíta sa. Do kruhu stačí najmenší formát. */
+function fotkaClena(a: { url: string; formats?: Record<string, { url: string }> } | null | undefined): string | null {
+  const u = a?.formats?.thumbnail?.url || a?.url;
+  if (!u) return null;
+  return u.startsWith('http') ? u : STRAPI_URL + u;
+}
+
 const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
 /**
@@ -14,6 +27,7 @@ const go = (path: string) => { window.history.pushState({}, '', path); window.di
 export function AccountNavLink({ compact = false }: { compact?: boolean }) {
   const { isLoggedIn, member, token } = useMember();
   const [unread, setUnread] = useState(0);
+  const fotka = fotkaClena(member?.avatar);
 
   // Počet neprečítaných notifikácií — pri prihlásení + periodicky (60 s).
   useEffect(() => {
@@ -49,7 +63,12 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
       onMouseEnter={(e) => { if (compact) (e.currentTarget as HTMLElement).style.background = 'var(--hr-line)'; }}
       onMouseLeave={(e) => { if (compact) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
     >
-      {isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
+      {/* Vlastná fotografia namiesto panáčika — v hlavičke je hneď vidieť,
+          kto je prihlásený. Kruh má rovnaký rozmer ako ikona, takže sa
+          rozvrh lišty nemení. */}
+      {isLoggedIn && fotka
+        ? <img className="lnav-ucet-fotka" src={fotka} alt="" width={26} height={26} />
+        : isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
       {!compact && (
         <span className="hidden sm:inline">
           {isLoggedIn ? (member?.displayName || member?.username || 'Účet') : 'Prihlásiť sa'}

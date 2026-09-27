@@ -498,6 +498,7 @@ function Fotky({ items }: { items: LikedPhoto[] | null }) {
 function Nastavenia({ profil, token, onProfil, onOdhlas }: {
   profil: Profile; token: string; onProfil: (p: Profile) => void; onOdhlas: () => void;
 }) {
+  const { obnov } = useMember();
   const [meno, setMeno] = useState(profil.displayName || '');
   const [prefs, setPrefs] = useState(profil.prefs);
   const [push, setPush] = useState(false);
@@ -527,6 +528,9 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
       const id = await uploadAvatar(token, file);
       await updateProfile(token, { avatar: id });
       onProfil(await getProfile(token));
+      /* Fotku nesie aj tlačidlo účtu v hlavičke — bez tohto by tam stará
+         ostala až do obnovenia stránky. */
+      await obnov();
       oznam('Fotografia je zmenená.');
     } catch { zlyhalo('Fotografiu sa nepodarilo nahrať. Skúste JPG alebo PNG.'); }
     finally { setBusy(false); }

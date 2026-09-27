@@ -19,6 +19,8 @@ export interface Member {
   displayName?: string | null;
   confirmed?: boolean;
   blocked?: boolean;
+  /** Profilová fotografia — do hlavičky, aby bolo vidieť, kto je prihlásený. */
+  avatar?: { url: string; formats?: Record<string, { url: string }> } | null;
 }
 
 export class AuthError extends Error {
@@ -70,7 +72,18 @@ export async function login(identifier: string, password: string): Promise<{ jwt
 }
 
 export async function me(token: string): Promise<Member> {
-  return call('/api/users/me', { token });
+  /* `populate` je tu kvôli fotografii: bez neho vráti Strapi účet bez nej
+     a v hlavičke by ostal neutrálny panáčik aj tomu, kto si fotku nahral.
+
+     Záchranná vetva nie je zbytočná opatrnosť: na tomto volaní stojí obnova
+     prihlásenia po obnovení stránky. Keby ho server kvôli `populate`
+     odmietol, člen by vypadol z účtu — a to je horšie než hlavička bez
+     fotografie. */
+  try {
+    return await call<Member>('/api/users/me?populate[avatar]=true', { token });
+  } catch {
+    return call<Member>('/api/users/me', { token });
+  }
 }
 
 export async function forgotPassword(email: string): Promise<void> {
