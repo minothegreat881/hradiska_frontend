@@ -3,7 +3,10 @@
   <html lang="sk">
     <head>
       <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <!-- `viewport-fit=cover` je podmienka toho, aby `env(safe-area-inset-*)`
+           vracalo iné než nuly. Bez neho by v aplikácii aj v režime celej
+           obrazovky na iPhone sedela pätička pod lištou gest. -->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
       <!-- Farba lišty prehliadača NA TELEFÓNE (na počítači sa neprejaví).
            Bola tu tmavohnedá #8a5316 zo starého zlatohnedého šatu, takže nad
            svetlou stránkou visel hnedý pás — a v nainštalovanej appke aj

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!--
+                ODKAZY Z WEBU OTVÁRA APLIKÁCIA.
+                Bez tohto by e-mail „nový komentár" otvoril prehliadač, hoci
+                má človek appku nainštalovanú.
+
+                `autoVerify` znamená, že Android si pri inštalácii stiahne
+                `https://<doména>/.well-known/assetlinks.json` a overí, že
+                doména appku pozná. Kým tam ten súbor nie je s odtlačkom
+                PODPISOVÉHO KĽÚČA, odkazy sa otvoria v prehliadači a systém
+                sa opýta — nič sa nerozbije, len to nie je hladké.
+                Odtlačok sa dá získať cez `gradlew signingReport`.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="hradiska.sk" />
+                <data android:scheme="https" android:host="www.hradiska.sk" />
+                <data android:scheme="https" android:host="webdesignforhradiskask.vercel.app" />
+            </intent-filter>
+
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!-- Permissions -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

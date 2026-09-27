@@ -46,3 +46,4 @@ skills-lock.json
 
 # Jednorazové pomocné skripty (rozbory, ladenie) — do repozitára nepatria.
 _*.mjs
+dist-app/

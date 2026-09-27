@@ -16,11 +16,14 @@ export const EVT_OPEN_INSTALL = 'hradiska:open-install';
 
 let deferred: any = null; // BeforeInstallPromptEvent
 
-/** Beží už ako nainštalovaná appka (standalone)? */
+/** Beží už ako nainštalovaná appka (standalone alebo natívna schránka)? */
 export function isStandalone(): boolean {
   return (
     window.matchMedia?.('(display-mode: standalone)').matches ||
-    (navigator as any).standalone === true
+    (navigator as any).standalone === true ||
+    /* Natívna appka z obchodu. Bez tejto vetvy by v nej vyskočila ponuka
+       „Nainštalovať appku" — komu, keď ju už má? */
+    !window.location.origin.startsWith('http')
   );
 }
 
@@ -105,8 +108,12 @@ export function initPwa(): void {
     markDismissed(); // po inštalácii už neponúkať
   });
 
-  // 3) service worker (inštalovateľnosť + offline). Len v bezpečnom kontexte.
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  /* 3) service worker (inštalovateľnosť + offline). Len v bezpečnom kontexte
+        a NIE v natívnej schránke: tam sú súbory priamo v zariadení, takže
+        by nemal čo zrýchľovať — a vedel by podsunúť starú verziu z pamäte
+        po tom, čo si appka stiahne novú cez vzduch. */
+  const vSchranke = typeof window !== 'undefined' && !window.location.origin.startsWith('http');
+  if (!vSchranke && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch(() => { /* neblokuj web */ });
     });

@@ -4068,3 +4068,50 @@ body[data-lab-theme] .pl-act {
     width: 100%; height: 100%; box-shadow: none;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BEZPEČNÉ OKRAJE V NATÍVNEJ SCHRÁNKE
+
+   Na webe má stránka celé okno. V aplikácii jej kus zaberá výrez displeja
+   (hore) a lišta gest (dole) — a čo sa pod ne dostane, je buď neviditeľné,
+   alebo sa na to nedá klepnúť. `env(safe-area-inset-*)` je v prehliadači
+   nula, takže tieto pravidlá na webe nič nerobia; nie sú za `data-schranka`
+   zámerne, lebo aj prehliadač na iPhone v režime celej obrazovky má výrez.
+
+   Prehliadač musí mať v `index.html` `viewport-fit=cover`, inak sú hodnoty
+   vždy nulové.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Hlavička sa podloží pod výrez, aby mala farbu až po hornú hranu. */
+.lab .lnav {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Čokoľvek prilepené dole — cookie lišta, ponuka inštalácie, pripomienky.
+   Predpona `html` je nutná: tieto triedy majú pôvodné pravidlo v
+   `styles/globals.css`, ktoré sa načíta AŽ PO tomto súbore, takže pri
+   rovnakej špecifickosti by vyhralo ono. */
+html .ck-dock,
+html .pwa-dock {
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+html .pr-dock,
+html .pr-panel,
+html .ck-settings-btn {
+  bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+/* Pätička webu — posledný riadok by inak sedel na lište gest. */
+.lfoot {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Vodorovné okraje pri otočení na šírku (výrez je vtedy zboku). */
+@media (orientation: landscape) {
+  .lab .lnav,
+  .lart-hero-text,
+  .lfoot-wrap {
+    padding-left: max(env(safe-area-inset-left), 0px);
+    padding-right: max(env(safe-area-inset-right), 0px);
+  }
+}

@@ -30,6 +30,7 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { initConsent } from './lib/consent';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
+import { zapojSchranku } from './nativne/schranka';
 
 // Admin je lazy — návštevník webu ho nikdy nestiahne, nezväčšuje hlavný bundle.
 const AdminApp = lazyStale(() => import('./admin/AdminApp'));
@@ -125,6 +126,10 @@ export function urcCestu(path: string, search: string): { route: Route; params: 
 }
 
 function App() {
+  /* Natívna schránka: tlačidlo Späť, stavová lišta, úvodná obrazovka a odkazy
+     zvonku. Na webe sa funkcia vráti na prvom riadku a nič nestiahne. */
+  useEffect(() => { zapojSchranku(); }, []);
+
   /* Počiatočný stav sa počíta z adresy, nie z 'home' — inak by každá stránka
      na okamih vykreslila domovskú a stiahla jej kód aj s mapou (viď `urcCestu`). */
   const [uvod] = useState(() => urcCestu(window.location.pathname, window.location.search));

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Hradiská.sk</string>
+    <string name="title_activity_main">Hradiská.sk</string>
+    <string name="package_name">sk.hradiska.app</string>
+    <string name="custom_url_scheme">sk.hradiska.app</string>
+</resources>
