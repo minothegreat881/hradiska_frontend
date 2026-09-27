@@ -13,6 +13,7 @@ import React from 'react';
 import { Plus, X, ArrowUp, ArrowDown, Images } from 'lucide-react';
 import { parseEmbedUrl } from '../../../lib/embed';
 import { splitSourceList } from './splitSources';
+import { naAdresuSuboru } from '../../../lib/api-adresa';
 
 const EMBED_PROVIDERS: { id: string; label: string }[] = [
   { id: 'youtube', label: 'YouTube' },
@@ -159,10 +160,11 @@ const move = (arr: any[], from: number, to: number) => {
   next.splice(to, 0, m);
   return next;
 };
+/* Adresa sa berie zo spoločného modulu. Predtým tu stálo
+   `VITE_STRAPI_URL || localhost:1337` — v produkcii to mierilo na dávno
+   zrušený vývojový tunel, takže sa náhľady v poliach bloku nenačítali. */
 const thumb = (img: any) =>
-  (img?.formats?.thumbnail?.url || img?.url || '').startsWith('http')
-    ? img.formats?.thumbnail?.url || img.url
-    : `${(import.meta as any).env?.VITE_STRAPI_URL || 'http://localhost:1337'}${img?.formats?.thumbnail?.url || img?.url || ''}`;
+  naAdresuSuboru(img?.formats?.thumbnail?.url || img?.url) || '';
 
 /**
  * ZDROJE A LITERATÚRA.

@@ -24,14 +24,17 @@
  */
 
 /** Adresa, na ktorú ide natívna aplikácia. Po presťahovaní na vlastnú doménu
-    sa mení TU, nikde inde. Dá sa prebiť premennou `VITE_STRAPI_URL`. */
+    sa mení TU, nikde inde. Dá sa prebiť premennou `VITE_API_ADRESA`. */
 const PRODUKCNY_ZAKLAD = 'https://webdesignforhradiskask.vercel.app/strapi';
 
 function urcAdresu(): string {
-  const nastavena = (import.meta as any).env?.VITE_STRAPI_URL;
-  if (nastavena) return String(nastavena).replace(/\/$/, '');
+  const env = (import.meta as any).env;
 
-  if (!(import.meta as any).env?.PROD) return 'http://localhost:1337';
+  /* VÝVOJ. `VITE_STRAPI_URL` platí LEN tu — v produkcii sa nesmie pozerať.
+     Vo Verceli tá premenná ostala nastavená na dávno zrušený cloudflare
+     tunel a keď sa na ňu produkcia na chvíľu spoliehala, prestali sa načítať
+     články (ERR_NAME_NOT_RESOLVED). Poradie je tu úmyselné, nie náhodné. */
+  if (!env?.PROD) return String(env?.VITE_STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
 
   // Prerender beží v Node — tam `window` nie je a adresa ostáva relatívna.
   if (typeof window === 'undefined') return '/strapi';
@@ -39,8 +42,9 @@ function urcAdresu(): string {
   const povod = window.location.origin;
   if (povod.startsWith('http')) return povod + '/strapi';
 
-  // `capacitor://`, `file://` — natívna schránka.
-  return PRODUKCNY_ZAKLAD;
+  /* `capacitor://`, `file://` — natívna schránka. Vlastná premenná, nie
+     `VITE_STRAPI_URL`: tú nastavuje web a appka ju nesmie zdediť. */
+  return String(env?.VITE_API_ADRESA || PRODUKCNY_ZAKLAD).replace(/\/$/, '');
 }
 
 export const STRAPI_URL = urcAdresu();
