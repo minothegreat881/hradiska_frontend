@@ -10,7 +10,14 @@
  * odhad, ale odskúšaný stav (vrátane toho, že `actions/publish` NEEXISTUJE).
  */
 
-export { STRAPI_URL } from '../../lib/api-adresa';
+/* POZOR: `export { X } from '…'` by tu NESTAČILO. Taký zápis len prepošle
+   meno ďalej — v tomto module žiadnu premennú nevytvorí, takže `STRAPI_URL`
+   o pár riadkov nižšie by bolo nedefinované. Prejavilo sa to tak, že sa
+   administrácia nedala otvoriť: obnova relácie spadla ešte pred volaním na
+   server a uložený token sa zmazal ako neplatný. */
+import { STRAPI_URL } from '../../lib/api-adresa';
+
+export { STRAPI_URL };
 
 /** Chyba z API so zachovaným stavovým kódom, nech sa dá rozlíšiť 401 od 400. */
 export class StrapiError extends Error {
