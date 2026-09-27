@@ -80,7 +80,7 @@ function AdminShell() {
   useEffect(() => {
     if (!token) return;
     fetchNavCounts(token)
-      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments || undefined, pripomienky: c.pripomienky || undefined }))
+      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments || undefined, pripomienky: c.pripomienky || undefined, nahlasenia: (c as any).nahlasenia || undefined }))
       .catch(() => {});
   }, [token, route]);
 
