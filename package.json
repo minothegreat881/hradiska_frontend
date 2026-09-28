@@ -9,6 +9,7 @@
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
+    "@capgo/capacitor-updater": "^8.51.25",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-aspect-ratio": "^1.1.2",
@@ -70,6 +71,7 @@
     "@capacitor/cli": "^8.5.2",
     "@types/node": "^20.10.0",
     "@vitejs/plugin-react-swc": "^3.10.2",
+    "fflate": "^0.8.2",
     "playwright": "^1.62.1",
     "sharp": "^0.35.1",
     "typescript": "^5.9.3",
@@ -81,7 +83,9 @@
     "prerender": "node scripts/prerender.mjs",
     "build": "node scripts/gen-sitemap.mjs && vite build && node scripts/prerender.mjs",
     "app:priprav": "node scripts/priprav-app.mjs",
-    "app:sync": "npm run build && node scripts/priprav-app.mjs && cap sync",
-    "app:android": "npm run app:sync && node scripts/postav-android.mjs"
+    "app:balik": "node scripts/postav-balik.mjs",
+    "app:sync": "npm run build && node scripts/priprav-app.mjs && node scripts/postav-balik.mjs && cap sync",
+    "app:android": "npm run app:sync && node scripts/postav-android.mjs",
+    "app:vydanie": "npm run app:sync && node scripts/postav-android.mjs assembleRelease"
   }
 }

@@ -16,10 +16,10 @@
 import { useEffect, useState } from 'react';
 import { Download, Smartphone, WifiOff, BellRing, Map as MapIcon, ShieldCheck } from 'lucide-react';
 import { STRAPI_URL } from '../lib/api-adresa';
+import { APLIKACIA } from '../data/aplikacia';
 
-/** APK leží vedľa API na našom serveri, nie v balíku webu — má 50 MB. */
+/** APK leží vedľa API na našom serveri, nie v balíku webu — má cez 50 MB. */
 const APK = `${STRAPI_URL}/app/hradiska.apk`;
-const VERZIA = '1.0';
 
 type System = 'android' | 'ios' | 'ine';
 
@@ -65,7 +65,7 @@ export function AplikaciaPage() {
               <Smartphone aria-hidden="true" />
               <div>
                 <h2>Android</h2>
-                <span>verzia {VERZIA} · 50 MB</span>
+                <span>verzia {APLIKACIA.verzia} · {APLIKACIA.velkostMB} MB</span>
               </div>
             </div>
             <a className="lapp-stiahnut" href={APK} download>
@@ -112,6 +112,8 @@ export function AplikaciaPage() {
         </ul>
 
         <p className="lapp-pata">
+          Aplikácia sa aktualizuje sama: nové verzie webu si stiahne na pozadí a nabudúce
+          sa otvorí už s nimi — nemusíte na nič klikať ani nič inštalovať znova.
           Aplikáciu vydáva OZ Hradiská. Na čo natrafíte, napíšte v diskusii pod ktorýmkoľvek
           článkom — čítame to.
         </p>

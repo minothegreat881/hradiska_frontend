@@ -74,6 +74,26 @@ async function zapojOdkazyZvonku(): Promise<void> {
 }
 
 /**
+ * Potvrdenie, že nový balík webu naozaj beží.
+ *
+ * Toto je záchranná poistka doručovania zmien cez vzduch: keď appka po
+ * prepnutí na nový balík toto do 10 s nezavolá (`appReadyTimeout`), plugin
+ * usúdi, že sa web nespustil, balík zahodí a vráti sa na predošlý funkčný.
+ * Bez toho by jedna pokazená verzia webu odstavila aplikáciu všetkým, ktorí
+ * si ju už stihli stiahnuť — a opraviť by sa to dalo len novým vydaním
+ * v obchode.
+ *
+ * Volá sa až po prvom vykreslení, nie pri načítaní modulu: ide o dôkaz, že
+ * rozhranie stojí, nie že sa stiahol súbor.
+ */
+async function potvrdZivotaschopnost(): Promise<void> {
+  try {
+    const { CapacitorUpdater } = await import('@capgo/capacitor-updater');
+    await CapacitorUpdater.notifyAppReady();
+  } catch { /* v starších appkách bez pluginu — nie je to dôvod na pád */ }
+}
+
+/**
  * Spustenie. Volá sa raz z `App.tsx`; na webe skončí na prvom riadku.
  */
 export function zapojSchranku(): void {
@@ -90,5 +110,6 @@ export function zapojSchranku(): void {
      webom nastane skôr, než React niečo nakreslí. */
   requestAnimationFrame(() => requestAnimationFrame(() => {
     zhasniUvodnuObrazovku().catch(() => {});
+    potvrdZivotaschopnost().catch(() => {});
   }));
 }

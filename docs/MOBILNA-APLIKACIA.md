@@ -83,14 +83,48 @@ zabalený `dist/`, ale pri každom studenom štarte sa spýta servera, či nie j
 novší. Ak je, stiahne ho a pri ďalšom otvorení beží nová verzia.
 
 ```
-git push  →  Vercel postaví web  →  CI zabalí dist/  →  nahrá na Hetzner
-                                              ↓
-              aplikácia pri štarte zistí novšiu verziu a prevezme ju
+npm run app:sync  →  zip balík webu + app-balik.json (verzia, sha256)
+        ↓
+scp na Hetzner (/opt/hradiska/public/app/)
+        ↓
+appka sa pri štarte spýta POST /api/aktualizacia → stiahne → beží z nového
 ```
 
-Nástroj: **@capgo/capacitor-updater** — otvorený zdroj, dá sa hostovať na
-vlastnom serveri, takže bez mesačných poplatkov. Platená alternatíva je
+Nástroj: **@capgo/capacitor-updater** — otvorený zdroj, hostované na našom
+serveri, takže bez mesačných poplatkov a bez posielania údajov o telefónoch
+tretej strane (`statsUrl` a `channelUrl` sú prázdne). Platená alternatíva je
 Ionic Appflow.
+
+**Ako je to zapojené (od 28. 9. 2026 v prevádzke).**
+
+| kus | kde |
+|---|---|
+| verzia balíka `1.<RRMMDD>.<HHMM>`, zip, sha256 | `scripts/postav-balik.mjs` → `app-balik/`, popis v `app-balik.json` |
+| verzia vstavaného balíka v APK | `capacitor.config.ts` ju číta z `app-balik.json` |
+| potvrdenie, že nový balík beží | `notifyAppReady()` v `src/nativne/schranka.ts` |
+| odpoveď servera | `POST /api/aktualizacia` v backende (`src/api/aktualizacia/`) |
+| popis vydaného balíka na serveri | `/opt/hradiska/public/app/aktualizacia.json` |
+
+Tri veci, na ktorých to stojí a ktoré nie sú zjavné:
+
+1. **Vstavaný balík v APK sa hlási verziou zapísanou pri zostavení.** Bez toho
+   by si appka hneď po inštalácii stiahla 45 MB toho istého webu, ktorý už
+   v sebe má. Preto `postav-balik.mjs` beží **pred** `cap sync`.
+2. **`notifyAppReady()` je poistka, nie formalita.** Keď nový balík do 10 s
+   nepotvrdí, že rozhranie stojí, appka sa sama vráti na predošlý funkčný
+   balík. Bez toho by jedna pokazená verzia webu odstavila aplikáciu všetkým
+   a opraviť by sa to dalo len novým vydaním v obchode.
+3. **Adresu balíka zapisuje vydávateľ, nie server.** Appka beží na
+   `https://localhost` a Strapi stojí za proxy, takže server svoju verejnú
+   adresu nepozná — je v `aktualizacia.json`, ktorý nahrávame spolu so zipom.
+
+Odpoveď „netreba nič" musí mať tvar `{kind:'up_to_date', message, version}`.
+Bez `kind` si plugin zapíše neúspech a v telefóne to vyzerá ako chyba siete.
+
+**Čo zip váži.** 45 MB, z toho 21 MB sú mapové dlaždice, ktoré sa nikdy
+nemenia. Sťahuje sa len vtedy, keď sa web naozaj zmení, ale sťahuje sa celý.
+Ďalší krok (nie dnes): dlaždice vyňať z balíka webu a stiahnuť ich raz
+zvlášť do súborov aplikácie — balík by potom mal jednotky MB.
 
 Obidva obchody to dovoľujú: Apple v licencii (3.3.2) povoľuje sťahovanie
 interpretovaného kódu, pokiaľ nemení účel aplikácie, Google rovnako. Čo takto
@@ -182,22 +216,65 @@ offline mapu a na obchody.
 | fáza | stav |
 |---|---|
 | 0 — adresa API na jednom mieste, CORS | **hotové a nasadené** |
-| 1 — Capacitor, Android, APK | **hotové** (`sk.hradiska.app`, 51 MB) |
+| 1 — Capacitor, Android, APK | **hotové**, podpísané vydanie 1.1 (`sk.hradiska.app`, 51 MB) |
 | 2 — bezpečné okraje, Späť, stavová lišta, odkazy, ikona, úvodná obrazovka | **hotové** |
 | požiadavky obchodov — nahlásenie a blokovanie | **hotové a nasadené** |
 | 3 — natívne upozornenia | čaká na účet Firebase |
 | 4 — offline „hradisko na cestu" | nezačaté (mapové dlaždice už v balíku sú) |
 | 5 — iOS a zápis do obchodov | čaká na Mac a na účty |
-| 6 — doručovanie cez vzduch (OTA) | nezačaté |
+| 7 — stránka na stiahnutie appky (`/aplikacia`) | **hotové a nasadené** |
+| 6 — doručovanie cez vzduch (OTA) | **hotové a nasadené** (viď kapitolu 5) |
 
 ### Ako appku postaviť
 
 ```
-npm run app:android
+npm run app:android     # na skúšku (debug)
+npm run app:vydanie     # podpísané vydanie do telefónov ľudí
 ```
 
-Postaví web, zoštíhli balík, zosynchronizuje a zostaví APK. Výsledok je
-v `android/app/build/outputs/apk/debug/app-debug.apk`.
+Oboje postaví web, zoštíhli balík, vyrobí zip pre OTA a zosynchronizuje.
+Výsledok je v `android/app/build/outputs/apk/debug/app-debug.apk`,
+pri vydaní v `…/apk/release/app-release.apk`.
+
+Číslo verzie je na dvoch miestach — `android/app/build.gradle` (`versionName`,
+`versionCode`) a `src/data/aplikacia.ts` (to vidí človek na `/aplikacia`).
+Keď si nesedia, `scripts/postav-android.mjs` zostavenie zastaví; keď sa
+veľkosť rozíde o viac než 3 MB, upozorní.
+
+### Podpis vydania — bez neho niet aktualizácií
+
+Kľúčenka je **mimo gitu**, na tomto počítači:
+
+```
+C:\Users\milan\Android\hradiska-release.keystore        (RSA 4096, alias hradiska)
+C:\Users\milan\Android\hradiska-release-heslo.txt        (heslo)
+android/keystore.properties                                (cesta a heslo pre Gradle)
+```
+
+**Keď sa kľúčenka stratí, appku už nikdy nepôjde aktualizovať** — Android
+odmietne inštalovať novú verziu podpísanú iným kľúčom a v Google Play sa
+identita balíka nedá zmeniť. Treba ju zálohovať mimo tohto počítača
+(odtlačok podpisu je aj v `public/.well-known/assetlinks.json`, takže výmena
+kľúča znamená aj zmenu tam).
+
+### Ako vydať novú verziu webu do už nainštalovaných appiek
+
+```
+npm run app:sync
+scp app-balik/hradiska-web-*.zip app-balik/aktualizacia.json \
+    root@188.245.47.29:/opt/hradiska/public/app/
+```
+
+Nové APK pri tom netreba — appky si balík stiahnu samé. Overenie:
+
+```
+curl -s https://webdesignforhradiskask.vercel.app/strapi/api/aktualizacia
+# má vrátiť verziu, adresu zipu a sha256, ktoré sedia s app-balik.json
+```
+
+Zip zostáva na serveri, kým naň ukazuje `aktualizacia.json`; starý sa dá
+zmazať až vtedy, keď ho už nikto nesťahuje (appky sa hlásia najviac o jeden
+balík staré).
 
 Zostavenie potrebuje `ANDROID_HOME` (na tomto počítači je SDK
 v `C:\Users\milan\Android\Sdk`) a súbor `android/local.properties`

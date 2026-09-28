@@ -47,3 +47,6 @@ skills-lock.json
 # Jednorazové pomocné skripty (rozbory, ladenie) — do repozitára nepatria.
 _*.mjs
 dist-app/
+
+# Balíky webu pre aplikáciu (zip, desiatky MB) — vydaný popis je v app-balik.json.
+app-balik/
