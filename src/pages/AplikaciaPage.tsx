@@ -83,12 +83,13 @@ export function AplikaciaPage() {
               <Smartphone aria-hidden="true" />
               <div>
                 <h2>iPhone a iPad</h2>
-                <span>pripravujeme</span>
+                <span>web na plochu</span>
               </div>
             </div>
             <p className="lapp-text">
-              Verziu pre App Store dokončujeme. Dovtedy si web pridajte na plochu —
-              otvorí sa na celú obrazovku ako aplikácia:
+              Apple dovoľuje inštalovať aplikácie iba cez App Store a my tam ísť nechceme.
+              Na iPhone si preto web pridajte na plochu — otvorí sa na celú obrazovku,
+              s vlastnou ikonou, ako aplikácia:
             </p>
             <ol className="lapp-kroky">
               <li>V Safari klepnite na <strong>Zdieľať</strong> (štvorček so šípkou nahor).</li>

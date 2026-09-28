@@ -180,14 +180,26 @@ offline mapu a na obchody.
 
 ## 9. Náklady
 
-* Apple Developer Program — **99 USD ročne** (bez toho sa na iPhone nedá nič)
-* Google Play — **25 USD jednorazovo**
-* Mac na zostavenie iOS verzie — vlastný, alebo cloudový v CI (~10–30 USD/mes.)
+* ~~Apple Developer Program — 99 USD ročne~~ — netreba, do App Store nejdeme
+* ~~Google Play — 25 USD jednorazovo~~ — netreba, appka sa sťahuje z webu
+* ~~Mac na zostavenie iOS verzie~~ — bez App Store niet čo zostavovať
 * Mapové dlaždice — 0 €, ak si ich vygenerujeme z OpenStreetMap na Hetzneri;
   inak od ~20 USD/mes. za poskytovateľa
 * OTA — 0 € pri vlastnom hostovaní
 
 ## 10. Čo môže pokaziť zápis do obchodu
+
+> **Rozhodnutie zadávateľa (28. 9. 2026): do obchodov nejdeme.** Appka sa
+> sťahuje z webu (`/aplikacia`). Táto kapitola ostáva ako záznam toho, čo by
+> zápis obnášal, keby sa raz rozhodlo inak. Čo z toho platí aj bez obchodov:
+> nahlásenie príspevku a blokovanie používateľa sú hotové a užitočné samy
+> osebe, a pravidlá obchodov o sťahovanom kóde nás už neviažu.
+>
+> **Dôsledok pre iPhone:** bez App Store sa naň aplikácia nainštalovať nedá.
+> Ani cesta cez alternatívne obchody (EÚ, DMA) nepomôže — aj tá vyžaduje
+> platený účet u Apple a ich notarizáciu. iPhone preto ostáva pri webe
+> pridanom na plochu; z pohľadu čitateľa je to celá obrazovka s vlastnou
+> ikonou, chýba mu offline mapa a natívne upozornenia.
 
 * **Apple 4.2** — „iba webstránka". Poistka: offline, GPS, fotoaparát, push.
 * **Obsah od používateľov** — Apple žiada možnosť **nahlásiť príspevok** a
@@ -221,7 +233,7 @@ offline mapu a na obchody.
 | požiadavky obchodov — nahlásenie a blokovanie | **hotové a nasadené** |
 | 3 — natívne upozornenia | čaká na účet Firebase |
 | 4 — offline „hradisko na cestu" | nezačaté (mapové dlaždice už v balíku sú) |
-| 5 — iOS a zápis do obchodov | čaká na Mac a na účty |
+| 5 — iOS a zápis do obchodov | **zrušené** (rozhodnutie z 28. 9. 2026, viď kapitolu 10) |
 | 7 — stránka na stiahnutie appky (`/aplikacia`) | **hotové a nasadené** |
 | 6 — doručovanie cez vzduch (OTA) | **hotové a nasadené** (viď kapitolu 5) |
 
@@ -295,9 +307,9 @@ so `sdk.dir` — ten sa do gitu nedáva, lebo je pre každý počítač iný.
 
 ### Čo treba od zadávateľa
 
-1. Účet **Google Play** (25 USD jednorazovo) a **Apple Developer** (99 USD/rok).
+1. ~~Účty v obchodoch~~ — netreba, appka sa sťahuje z webu.
 2. **Doménu `hradiska.sk`** na svojom mieste — až potom majú zmysel
-   univerzálne odkazy, `assetlinks.json` a zápis do obchodov.
+   univerzálne odkazy a `assetlinks.json`.
 3. Rozhodnutie o **názve v obchode**; zatiaľ je nastavené „Hradiská.sk"
    a identifikátor `sk.hradiska.app`.
 4. Projekt **Firebase** (zadarmo) pre natívne upozornenia.
