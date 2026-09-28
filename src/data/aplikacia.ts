@@ -8,7 +8,7 @@
  * „verziu 1.1" a v telefóne by sa nainštalovalo niečo iné.
  */
 export const APLIKACIA = {
-  verzia: '1.1',
+  verzia: '1.2',
   /** Veľkosť podpísaného APK zaokrúhlená nahor; kontroluje ju ten istý skript. */
   velkostMB: 52,
 } as const;

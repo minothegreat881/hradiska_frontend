@@ -14,9 +14,17 @@
  *      Vercel prepisuje `/strapi/*` na Hetzner, takže volania idú cez jeho
  *      sieť aj s vyrovnávacou pamäťou a bez CORS.
  *   3. natívna aplikácia  → celá adresa produkcie
- *      Pôvod `capacitor://localhost` nie je web, takže sa k nemu nedá nič
- *      pripojiť. Ide sa priamo na doménu — zámerne na tú istú, aby appka
- *      ťažila z tej istej vyrovnávacej pamäte ako web.
+ *      Vnútri appky je pôvod `https://localhost` (Android) alebo
+ *      `capacitor://localhost` (iOS) — na oboch nie je čo obslúžiť, takže
+ *      sa ide priamo na doménu. Zámerne na tú istú ako web, aby appka
+ *      ťažila z tej istej vyrovnávacej pamäte.
+ *
+ * POZOR NA `https://localhost`: keď Android otvára appku cez `androidScheme:
+ * 'https'`, pôvod **začína na `http`**, takže podľa neho sa natívna schránka
+ * rozoznať nedá. Appka sa preto hlási značkou `window.__HRADISKA_APP__`,
+ * ktorú do `index.html` vkladá `scripts/priprav-app.mjs`. Bez toho appka
+ * posielala volania na `https://localhost/strapi`, nenačítala nič a ostala
+ * visieť na úvodnej obrazovke — a na webe sa tá chyba nedala uvidieť.
  *
  * Pri prerenderi (Node, bez `window`) ostáva relatívna `/strapi`, presne ako
  * doteraz — hlavičky sa skladajú na serveri a absolútna adresa by tam bola
@@ -26,6 +34,26 @@
 /** Adresa, na ktorú ide natívna aplikácia. Po presťahovaní na vlastnú doménu
     sa mení TU, nikde inde. Dá sa prebiť premennou `VITE_API_ADRESA`. */
 const PRODUKCNY_ZAKLAD = 'https://webdesignforhradiskask.vercel.app/strapi';
+
+/**
+ * Beží to vnútri nainštalovanej aplikácie?
+ *
+ * Tri nezávislé odpovede, lebo ani jedna sama nestačí:
+ *   • značka z balíka appky — jediná, ktorá platí vždy a hneď,
+ *   • most Capacitora — keby sa balík raz robil inak,
+ *   • pôvod, ktorý nie je web (`capacitor://`, `file://`) — staršie appky.
+ */
+function vNatvnejSchranke(): boolean {
+  if (typeof window === 'undefined') return false;
+  const w = window as any;
+  if (w.__HRADISKA_APP__ === true) return true;
+  try {
+    if (w.Capacitor?.isNativePlatform?.()) return true;
+  } catch {
+    /* most nemusí byť pripravený — nevadí, značka rozhodla vyššie */
+  }
+  return !/^https?:/.test(window.location.origin);
+}
 
 function urcAdresu(): string {
   const env = (import.meta as any).env;
@@ -39,19 +67,17 @@ function urcAdresu(): string {
   // Prerender beží v Node — tam `window` nie je a adresa ostáva relatívna.
   if (typeof window === 'undefined') return '/strapi';
 
-  const povod = window.location.origin;
-  if (povod.startsWith('http')) return povod + '/strapi';
+  /* Natívna schránka. Vlastná premenná, nie `VITE_STRAPI_URL`: tú nastavuje
+     web a appka ju nesmie zdediť. */
+  if (vNatvnejSchranke()) return String(env?.VITE_API_ADRESA || PRODUKCNY_ZAKLAD).replace(/\/$/, '');
 
-  /* `capacitor://`, `file://` — natívna schránka. Vlastná premenná, nie
-     `VITE_STRAPI_URL`: tú nastavuje web a appka ju nesmie zdediť. */
-  return String(env?.VITE_API_ADRESA || PRODUKCNY_ZAKLAD).replace(/\/$/, '');
+  return window.location.origin + '/strapi';
 }
 
 export const STRAPI_URL = urcAdresu();
 
 /** Beží to v natívnej schránke? Používa sa tam, kde sa web a appka líšia. */
-export const jeNatvnaSchranka = (): boolean =>
-  typeof window !== 'undefined' && !window.location.origin.startsWith('http');
+export const jeNatvnaSchranka = (): boolean => vNatvnejSchranke();
 
 /**
  * Cesta k súboru zo Strapi na úplnú adresu.

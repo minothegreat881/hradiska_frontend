@@ -96,6 +96,33 @@ fs.rmSync(CIEL, { recursive: true, force: true });
 fs.mkdirSync(CIEL, { recursive: true });
 kopiruj(ZDROJ, CIEL);
 
+/**
+ * ZNAČKA APLIKÁCIE.
+ *
+ * Web sa musí vedieť spoľahlivo spýtať „bežím vnútri nainštalovanej appky?".
+ * Podľa pôvodu to nejde: Android appku otvára ako `https://localhost`, čo je
+ * na nerozoznanie od webu. Preto tu do `index.html` pribudne jeden riadok,
+ * ktorý je len v balíku aplikácie — číta ho `src/lib/api-adresa.ts`.
+ *
+ * Musí stáť hneď v `<head>`, teda pred modulmi aplikácie (tie sú odložené),
+ * inak by sa adresa API určila skôr, než by značka existovala.
+ */
+function oznacAkoAplikaciu() {
+  const cesta = path.join(CIEL, 'index.html');
+  const html = fs.readFileSync(cesta, 'utf8');
+  if (html.includes('__HRADISKA_APP__')) return;
+  const znacka = '<script>window.__HRADISKA_APP__=true</script>';
+  const i = html.indexOf('<head>');
+  if (i === -1) {
+    console.error('[app] v index.html nie je <head> — značku appky nemám kam dať.');
+    process.exit(1);
+  }
+  fs.writeFileSync(cesta, html.slice(0, i + 6) + znacka + html.slice(i + 6));
+  console.log('[app] index.html označený ako balík aplikácie');
+}
+
+oznacAkoAplikaciu();
+
 const mb = (b) => (b / 1024 / 1024).toFixed(1) + ' MB';
 console.log(`[app] balík pripravený: ${skopirovanych} súborov, ${mb(bajtovSkopirovanych)}`);
 console.log(`[app] vynechané: ${vynechanych} položiek, ${mb(bajtovVynechanych)}`);
