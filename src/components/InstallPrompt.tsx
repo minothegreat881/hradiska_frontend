@@ -15,6 +15,9 @@ import { hasDecided, onConsentChange } from '../lib/consent';
 export function InstallPrompt() {
   const [visible, setVisible] = useState(false);
   const [ios, setIos] = useState(false);
+  /* Android má skutočnú aplikáciu, nie len pridanie webu na plochu — ponuka
+     preto vedie na stránku, kde sa dá stiahnuť. */
+  const [android, setAndroid] = useState(false);
   const [forced, setForced] = useState(false); // otvorené ručne z pätičky
   const firstBtnRef = useRef<HTMLButtonElement>(null);
   const dwellRef = useRef(false);
@@ -23,6 +26,8 @@ export function InstallPrompt() {
     if (isStandalone()) return; // beží ako appka → neponúkať
 
     const iosDevice = isIOS();
+    const androidDevice = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
+    setAndroid(androidDevice);
 
     const tryAuto = () => {
       if (!hasDecided()) return;              // najprv nech vybaví cookies
@@ -91,9 +96,30 @@ export function InstallPrompt() {
           </div>
 
           <div className="ck-text">
-            <h2 className="ck-title">Nos hradisko vo vrecku</h2>
+            <h2 className="ck-title">{android ? 'Hradiská vo vrecku' : 'Nos hradisko vo vrecku'}</h2>
 
-            {ios ? (
+            {android ? (
+              <>
+                <p className="ck-p">
+                  Pre Android máme <strong>skutočnú aplikáciu</strong> — mapu hradísk otvorí aj
+                  tam, kde nechytá signál.
+                </p>
+                <div className="ck-actions">
+                  <a
+                    ref={firstBtnRef as unknown as React.Ref<HTMLAnchorElement>}
+                    className="ck-btn ck-btn-primary"
+                    href="/aplikacia"
+                    onClick={dismiss}
+                  >
+                    <span aria-hidden="true">⚔️</span>
+                    <span className="ck-nowrap">Stiahnuť aplikáciu</span>
+                  </a>
+                  <button type="button" className="ck-btn ck-btn-secondary" onClick={dismiss}>
+                    <span className="ck-nowrap">{forced ? 'Zavrieť' : 'Teraz nie'}</span>
+                  </button>
+                </div>
+              </>
+            ) : ios ? (
               <>
                 <p className="ck-p">
                   Pridaj <strong>Hradiská.sk</strong> na plochu: ťukni na <span className="pwa-share" aria-hidden="true">

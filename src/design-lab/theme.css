@@ -4208,3 +4208,88 @@ html .ck-settings-btn {
   font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: var(--l-body);
 }
 .lprof-blokovani button:hover { border-color: var(--l-second-deep); color: var(--l-second-deep); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STRÁNKA APLIKÁCIE (/aplikacia)
+   Pokojná, bez krikľavých pruhov: nejde o predaj, ide o to, aby človek
+   pochopil, čo si sťahuje a čo sa pri inštalácii stane.
+   ══════════════════════════════════════════════════════════════════════════ */
+.lapp { background: var(--l-paper); }
+.lapp-in { max-width: 860px; margin: 0 auto; padding: 34px 20px 90px; }
+.lapp-nadpis {
+  margin: 14px 0 0; font-family: 'Fraunces', Georgia, serif; font-weight: 700;
+  font-size: clamp(32px, 5vw, 52px); line-height: 1.04; letter-spacing: -.03em;
+  color: var(--l-ink); text-wrap: balance;
+}
+.lapp-perex {
+  margin: 14px 0 30px; max-width: 640px;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 17px; line-height: 1.6; color: var(--l-body);
+}
+
+.lapp-ponuka { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.lapp-karta {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 22px; border: 1px solid var(--l-line-2); border-radius: 14px;
+  background: var(--l-card);
+}
+/* Systém, z ktorého sa človek pozerá, dostane tichý prstenec — nie inú farbu.
+   Druhá možnosť musí ostať rovnako čitateľná, nie odsunutá. */
+.lapp-karta.je-teraz { border-color: var(--l-second-light); box-shadow: 0 0 0 3px rgba(201, 72, 58, .08); }
+.lapp-karta-hlava { display: flex; align-items: center; gap: 13px; }
+.lapp-karta-hlava svg { width: 26px; height: 26px; color: var(--l-second-deep); flex: none; }
+.lapp-karta-hlava h2 {
+  margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 21px; font-weight: 700; color: var(--l-ink);
+}
+.lapp-karta-hlava span { font-family: var(--mono); font-size: 11.5px; color: var(--l-muted); }
+
+.lapp-stiahnut {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 13px 22px; border-radius: 999px; text-decoration: none;
+  background: var(--l-second-deep); color: var(--l-card);
+  font-family: 'Inter', system-ui, sans-serif; font-size: 15.5px; font-weight: 600;
+  transition: background .15s ease;
+}
+.lapp-stiahnut:hover { background: var(--l-ink); }
+.lapp-stiahnut svg { width: 18px; height: 18px; }
+
+.lapp-poznamka, .lapp-text {
+  margin: 0; font-family: 'Inter', system-ui, sans-serif; font-size: 13.5px;
+  line-height: 1.6; color: var(--l-muted);
+}
+.lapp-text { font-size: 14.5px; color: var(--l-body); }
+/* Číslovanie treba vypýtať: základný predpis webu (Tailwind preflight) ho
+   zoznamom odoberá, takže by kroky stáli bez čísel a nedalo by sa povedať,
+   ktorý je prvý. */
+.lapp-kroky {
+  margin: 0; padding-left: 22px; list-style: decimal outside;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 14.5px; line-height: 1.75; color: var(--l-body);
+}
+.lapp-kroky li { padding-left: 4px; }
+.lapp-kroky li::marker { color: var(--l-second-deep); font-weight: 600; }
+
+.lapp-podnadpis {
+  margin: 44px 0 16px; font-family: 'Fraunces', Georgia, serif;
+  font-size: 24px; font-weight: 700; color: var(--l-ink);
+}
+.lapp-vyhody { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.lapp-vyhody li { display: flex; gap: 14px; align-items: flex-start; }
+.lapp-vyhody svg { width: 21px; height: 21px; color: var(--l-second); flex: none; margin-top: 2px; }
+.lapp-vyhody strong {
+  display: block; margin-bottom: 3px;
+  font-family: 'Inter', system-ui, sans-serif; font-size: 15.5px; color: var(--l-ink);
+}
+.lapp-vyhody p {
+  margin: 0; font-family: 'Inter', system-ui, sans-serif; font-size: 14.5px;
+  line-height: 1.6; color: var(--l-body);
+}
+
+.lapp-pata {
+  margin: 40px 0 0; padding-top: 18px; border-top: 1px solid var(--l-line);
+  font-family: 'Inter', system-ui, sans-serif; font-size: 13.5px; color: var(--l-muted);
+}
+.lapp-pata a { color: var(--l-second-deep); }
+
+@media (max-width: 720px) {
+  .lapp-ponuka { grid-template-columns: 1fr; }
+  .lapp-in { padding: 24px 18px 70px; }
+}

@@ -27,7 +27,7 @@ const outPath = resolve(__dirname, '..', 'public', 'sitemap.xml');
 const STATIC_PATHS = [
   '/', '/galeria', '/aktuality',
   '/hradiska', '/kultura', '/archeologia', '/pramene', '/pravek',
-  '/ochrana-osobnych-udajov', '/podmienky-pouzivania',
+  '/ochrana-osobnych-udajov', '/podmienky-pouzivania', '/aplikacia',
 ];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

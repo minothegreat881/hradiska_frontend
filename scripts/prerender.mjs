@@ -95,6 +95,7 @@ const STATIC = [
   { path: '/aktuality', title: 'Aktuality — kronika OZ Hradiská', description: 'Aktuality, podujatia a činnosť Občianskeho združenia Hradiská pri objavovaní a ochrane hradísk.' },
   { path: '/ochrana-osobnych-udajov', title: 'Ochrana osobných údajov — Hradiská.sk', description: 'Zásady spracovania osobných údajov (GDPR) — kontá, komentáre, cookies, práva dotknutých osôb.' },
   { path: '/podmienky-pouzivania', title: 'Podmienky používania — Hradiská.sk', description: 'Podmienky používania webu Hradiská.sk — obsah a autorské práva, kontá, komentáre a zodpovednosť.' },
+  { path: '/aplikacia', title: 'Aplikácia do telefónu — Hradiská.sk', description: 'Encyklopédia hradísk ako aplikácia pre Android. Mapa hradísk funguje aj bez signálu, upozornenia na odpovede a nové články.' },
 ];
 
 for (const s of STATIC) {

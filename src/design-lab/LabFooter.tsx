@@ -23,7 +23,6 @@
  */
 
 import { openCookieSettings } from '../lib/consent';
-import { openInstall, isStandalone } from '../lib/pwa';
 
 /* Odkazy sú zámerne zopakované (nie importované z produkčnej pätičky) — lab
    má ostať samostatný, aby sa v ňom dalo skúšať aj poradie a názvy. */
@@ -179,14 +178,11 @@ export function LabFooter() {
             <button type="button" onClick={openCookieSettings}>
               Zvyky hradiska (cookies)
             </button>
-            {/* Inštalácia je len mobilná vec — na PC sa appka nenainštaluje,
-                preto ju spodný riadok na širokom okne vôbec neponúka (to isté
-                rozhodnutie ako pri „Získať appku" v hornej lište). */}
-            {typeof window !== 'undefined' && !isStandalone() && (
-              <button type="button" className="lfoot-install" onClick={openInstall}>
-                Nainštalovať appku
-              </button>
-            )}
+            {/* Odkaz na stránku aplikácie, nie na pridanie webu na plochu:
+                appka je samostatný program, ktorý vie aj to, čo prehliadač
+                nie (mapa bez signálu). Stránka platí aj na počítači — človek
+                si odtiaľ pošle odkaz do telefónu. */}
+            <a href="/aplikacia" className="lfoot-install">Aplikácia do telefónu</a>
           </nav>
 
           <button

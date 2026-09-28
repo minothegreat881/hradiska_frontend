@@ -20,6 +20,7 @@ import { SiteDetailPage } from './pages/SiteDetailPage';
 import { CategoryPage } from './pages/CategoryPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
+import { AplikaciaPage } from './pages/AplikaciaPage';
 import { AccountPage, type AccountMode } from './pages/AccountPage';
 import { SearchResultsPage } from './pages/SearchResultsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -39,7 +40,7 @@ const AdminApp = lazyStale(() => import('./admin/AdminApp'));
 // Lazy → nesťahuje ich bežný návštevník článku, len kto otvorí /galeria.
 
 
-type Route = 'home' | 'site' | 'article' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'admin' | 'account' | 'hladat' | 'notfound';
+type Route = 'home' | 'site' | 'article' | 'category' | 'galeria' | 'aktuality' | 'privacy' | 'terms' | 'aplikacia' | 'admin' | 'account' | 'hladat' | 'notfound';
 
 // Cesty účtov → režim AccountPage
 const ACCOUNT_ROUTES: Record<string, AccountMode> = {
@@ -88,6 +89,8 @@ export function urcCestu(path: string, search: string): { route: Route; params: 
         vysledok.route = ('privacy');
       } else if (path === '/podmienky-pouzivania' || path === '/podmienky') {
         vysledok.route = ('terms');
+      } else if (path === '/aplikacia' || path === '/appka') {
+        vysledok.route = ('aplikacia');
       } else if (path === '/hradiska' || path.startsWith('/hradiska/')) {
         vysledok.route = ('category');
         vysledok.params = ({ slug: 'hradiska' });
@@ -276,6 +279,7 @@ function App() {
         {route === 'aktuality' && <AktualityPagePecat />}
         {route === 'privacy' && <PrivacyPage />}
         {route === 'terms' && <TermsPage />}
+        {route === 'aplikacia' && <AplikaciaPage />}
         {route === 'site' && <SiteDetailPage siteSlug={params.slug} />}
         {route === 'category' && <CategoryPage categorySlug={params.slug} />}
         {route === 'article' && <ArticlePagePecat slug={params.slug} />}

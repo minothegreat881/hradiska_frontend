@@ -1,5 +1,17 @@
 apply plugin: 'com.android.application'
 
+/* PODPIS VYDANIA.
+   Kľúčenka aj heslá sú v `android/keystore.properties`, ktorý do gitu
+   nepatrí a leží mimo repozitára. Keď súbor chýba (cudzí počítač, CI bez
+   tajomstiev), zostavenie sa nezlomí — `assembleDebug` beží ďalej a
+   `assembleRelease` skončí nepodpísaným balíkom, čo je zrozumiteľnejšie
+   než záhadná chyba Gradle. */
+def suborKlucenky = rootProject.file('keystore.properties')
+def klucenka = new Properties()
+if (suborKlucenky.exists()) {
+    suborKlucenky.withInputStream { klucenka.load(it) }
+}
+
 android {
     namespace = "sk.hradiska.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +28,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (klucenka.getProperty('storeFile')) {
+                storeFile file(klucenka.getProperty('storeFile'))
+                storePassword klucenka.getProperty('storePassword')
+                keyAlias klucenka.getProperty('keyAlias')
+                keyPassword klucenka.getProperty('keyPassword')
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (klucenka.getProperty('storeFile')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }

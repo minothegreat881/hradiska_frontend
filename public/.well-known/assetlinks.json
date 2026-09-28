@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "sk.hradiska.app",
+      "sha256_cert_fingerprints": [
+        "F4:6D:BF:72:09:C3:A4:6C:2A:69:DD:86:55:7E:63:85:49:35:7B:EF:B2:34:ED:EB:1D:45:DD:1A:5A:9C:E3:76"
+      ]
+    }
+  }
+]
