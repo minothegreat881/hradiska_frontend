@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ThumbsUp, MessageCircle, Share2, Heart, Send, Loader2 } from 'lucide-react';
+import { Nacitavanie } from '../design-lab/Nacitavanie';
 import { useMember } from '../auth/MemberAuth';
 import {
   listPhotoComments, addPhotoComment, deletePhotoComment,
@@ -317,9 +318,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
       {/* Komentáre — scrollovateľná časť (na desktope má panel pevnú výšku) */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 15px 8px' }}>
         {loading ? (
-          <span style={{ color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 15 }}>
-            <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ display: 'inline' }} /> Načítavam…
-          </span>
+          <Nacitavanie riadok velkost="male" text="Načítavam…" />
         ) : comments.length === 0 ? (
           <p style={{ color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 15, margin: '8px 0' }}>
             Buď prvý, kto sa ozve ✦

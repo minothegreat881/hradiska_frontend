@@ -20,6 +20,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ArticleCard } from '../components/ArticleCard';
+import { Nacitavanie } from './Nacitavanie';
 import { getKronika, type KronikaItem } from '../lib/strapi';
 import type { Article } from '../data/mock-data';
 
@@ -119,7 +120,7 @@ export function LabAktualityStranka() {
           </section>
         ))}
 
-        {busy && <p className="lgal-prazdno">Načítavam…</p>}
+        {busy && <Nacitavanie text="Načítavam…" />}
         {!busy && zaznamy.length === 0 && !chyba && (
           <p className="lgal-prazdno">Zatiaľ tu nie je ani jeden zápis.</p>
         )}

@@ -25,6 +25,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
+import { Nacitavanie } from './Nacitavanie';
 import lokalityData from '../data/lokality.json';
 import { getSearchIndexLite, type IndexDoc } from '../lib/searchIndex';
 import type { NavigationItem } from '../data/navigation-structure';
@@ -330,7 +331,7 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
 
         <div className="lprh-telo">
           {clanky === null
-            ? <p className="lprh-prazdno">Načítavam zoznam…</p>
+            ? <Nacitavanie velkost="male" text="Načítavam zoznam…" />
             : hladane.trim() && !zobrazenych
               ? <p className="lprh-prazdno">Nič sa nenašlo. Skúste obec alebo okres.</p>
               : <Skupiny skupiny={skupiny} onOdkaz={onZavri} />}

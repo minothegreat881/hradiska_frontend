@@ -5,6 +5,7 @@ import { lazyStale } from './lib/lazyStale';
 /* Pripomienky (klik na prvok → poznámka) — vykreslí sa len prihlásenému
    redaktorovi, čitateľ z nástroja nestiahne nič. */
 import { PripomienkyDock } from './pripomienky/PripomienkyDock';
+import { Nacitavanie } from './design-lab/Nacitavanie';
 import './design-lab/theme.css';
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
@@ -245,11 +246,7 @@ function App() {
   if (route === 'admin') {
     return (
       <Suspense
-        fallback={
-          <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f4efe3', color: '#8a795e', fontSize: 14 }}>
-            Načítavam administráciu…
-          </div>
-        }
+        fallback={<Nacitavanie celaVyska text="Načítavam administráciu…" />}
       >
         {/* Aj administrácia beží v šate — má vlastný rám mimo `.lab`, takže
             paletu berie zo značky na koreni dokumentu. Nosič sa tu musí
@@ -270,9 +267,7 @@ function App() {
       <Suspense fallback={
         /* Celá výška okna, nie 60 vh: pri nižšej hodnote sa počas načítania
            vysunie do obrazu pätička a po dotiahnutí stránky zasa odskočí. */
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--hr-muted)', fontFamily: 'var(--font-serif, Georgia, serif)', fontSize: 15 }}>
-          Načítavam…
-        </div>
+        <Nacitavanie celaVyska velkost="velke" text="Načítavam…" />
       }>
         {route === 'home' && <><LabHome /><LabJoinUs /></>}
         {route === 'galeria' && <GalleryPagePecat />}

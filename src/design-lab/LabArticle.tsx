@@ -25,7 +25,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Nacitavanie } from './Nacitavanie';
 import { useBlogPost } from '../hooks/useStrapi';
 import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
@@ -55,10 +55,7 @@ function skDate(iso?: string | null): string {
  */
 function CakanieNaClanok() {
   return (
-    <div className="lart-cakanie" role="status" aria-live="polite">
-      <Loader2 className="lart-cakanie-ikona animate-spin" aria-hidden="true" />
-      <span className="sr-only">Načítavam článok…</span>
-    </div>
+    <Nacitavanie celaVyska velkost="velke" text="Načítavam článok…" />
   );
 }
 

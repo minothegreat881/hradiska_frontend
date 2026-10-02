@@ -4,7 +4,8 @@ import { motion } from 'motion/react';
 import { ArticleCard } from '../components/ArticleCard';
 import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
-import { Crown, Scroll, Loader2 } from 'lucide-react';
+import { Crown, Scroll } from 'lucide-react';
+import { Nacitavanie } from '../design-lab/Nacitavanie';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { STRAPI_URL } from '../lib/api-adresa';
 
@@ -40,17 +41,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen parchment flex items-center justify-center">
-        <div className="text-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          >
-            <Loader2 className="w-12 h-12 text-amber-700 mx-auto mb-4" />
-          </motion.div>
-          <p className="text-amber-800 dark:text-amber-200">Načítavam články...</p>
-        </div>
-      </div>
+      <Nacitavanie celaVyska velkost="velke" text="Načítavam články…" />
     );
   }
 

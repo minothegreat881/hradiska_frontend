@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ThumbsUp, Reply, Loader2, Trash2, Flag } from 'lucide-react';
+import { Nacitavanie } from '../design-lab/Nacitavanie';
 import { toast } from 'sonner';
 import { useMember } from '../auth/MemberAuth';
 
@@ -747,8 +748,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               padding: 16,
             }}
           >
-            <Loader2 style={{ width: 16, height: 16 }} className="animate-spin" />
-            Načítavam komentáre…
+            <Nacitavanie riadok velkost="male" text="Načítavam komentáre…" />
           </div>
         ) : comments.length === 0 ? (
           <p

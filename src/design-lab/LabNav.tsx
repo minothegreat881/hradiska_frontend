@@ -23,6 +23,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigationData } from '../hooks/useNavigationData';
 import { AccountNavLink } from '../components/AccountNavLink';
+import { Nacitavanie } from './Nacitavanie';
 import type { NavigationItem } from '../data/navigation-structure';
 import {
   MegaPonuka, Prepinac, Skupiny, zoskup, lokalityKategorie, useClankyKategorie,
@@ -321,7 +322,7 @@ function MobilKategoria({ slug, zoskupenie, onZoskupenie, onOdkaz }: {
   const clanky = useClankyKategorie(slug);
   const maLokality = lokality.length > 0;
 
-  if (clanky === null) return <span className="lnav-m-empty">Načítavam články…</span>;
+  if (clanky === null) return <Nacitavanie riadok velkost="male" text="Načítavam články…" />;
   if (!clanky.length) return <span className="lnav-m-empty">Zatiaľ bez článkov.</span>;
 
   const jeLokalita = new Set(lokality.map(l => l.slug));

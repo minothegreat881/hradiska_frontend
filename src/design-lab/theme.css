@@ -2157,6 +2157,84 @@ body[data-lab-theme='pecat'],
 }
 .lart-cakanie-ikona { width: 34px; height: 34px; color: var(--l-second-deep); opacity: .8; }
 
+/* ══ ČAKANIE ══════════════════════════════════════════════════════════════
+   Pôdorys hradiska: tri valy, po ktorých obieha oblúk, uprostred osada.
+   Komponent je `design-lab/Nacitavanie.tsx` a používa ho celý web — článok,
+   kategória, galéria, komentáre aj mapa.
+
+   Dĺžky čiar nie sú odhad: obvod kruhu je 2πr, teda 163.4 / 113.1 / 62.8.
+   `stroke-dasharray` z nich vykrojí oblúk a medzeru, `stroke-dashoffset`
+   ho posúva dookola. Keby sa čísla rozišli s polomermi v SVG, oblúk by
+   pri každom obehu poskočil.
+   ═══════════════════════════════════════════════════════════════════════ */
+.lnac {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; text-align: center;
+}
+.lnac--cela { min-height: 100vh; background: var(--l-paper); }
+.lnac--riadok { flex-direction: row; gap: 9px; justify-content: flex-start; text-align: left; }
+
+.lnac-znak { width: 46px; height: 46px; flex: none; overflow: visible; }
+.lnac--male .lnac-znak { width: 28px; height: 28px; }
+/* Pri 28 px je celý pôdorys kaša — palisáda aj najvnútornejší val idú preč,
+   ostane obrys, jeden oblúk a stred. */
+.lnac--male .lnac-palisada, .lnac--male .lnac-val--3 { display: none; }
+.lnac--velke .lnac-znak { width: 68px; height: 68px; }
+/* Na prázdnej stránke je 68 px stratených; znak má byť to, čo oko nájde. */
+.lnac--cela .lnac-znak { width: 104px; height: 104px; }
+@media (max-width: 600px) {
+  .lnac--cela .lnac-znak { width: 84px; height: 84px; }
+}
+
+/* Palisáda: krátke kolíky dookola, ktoré sa pomaly otáčajú. Od nej je znak
+   hradiskom, nie ďalším krúžkom. */
+.lnac-palisada {
+  fill: none; stroke: var(--l-line-2); stroke-width: 2.4; stroke-linecap: round;
+  stroke-dasharray: .1 5.3;   /* 36 kolíkov po obvode 188.5 */
+  transform-box: fill-box; transform-origin: center;
+  animation: lnac-otoc 14s linear infinite;
+}
+.lnac-plan circle { fill: none; stroke: var(--l-line-2); stroke-width: 1.1; opacity: .75; }
+
+.lnac-val { fill: none; stroke-linecap: round; }
+.lnac-val--1 { stroke: var(--l-second); stroke-width: 3; stroke-dasharray: 62 101.4; animation: lnac-obeh-1 2s linear infinite; }
+.lnac-val--2 { stroke: var(--l-accent); stroke-width: 2.3; stroke-dasharray: 40 73.1; animation: lnac-obeh-2 2.7s linear infinite; }
+.lnac-val--3 { stroke: var(--l-second-deep); stroke-width: 1.9; stroke-dasharray: 24 38.8; animation: lnac-obeh-3 1.6s linear infinite; }
+.lnac-srdce { fill: var(--l-second); animation: lnac-dych 2.4s ease-in-out infinite; }
+
+/* Dĺžky nie sú odhad: obvod je 2πr, teda 163.4 (r26) · 113.1 (r18) ·
+   62.8 (r10). Keby sa posun rozišiel s obvodom, oblúk by pri každom
+   obehu poskočil. */
+@keyframes lnac-obeh-1 { to { stroke-dashoffset: -163.4; } }
+/* Prostredný val opačným smerom, inak sa po pár obehoch zladia a celé to
+   pôsobí ako jeden tuhý kotúč. */
+@keyframes lnac-obeh-2 { to { stroke-dashoffset: 113.1; } }
+@keyframes lnac-obeh-3 { to { stroke-dashoffset: -62.8; } }
+@keyframes lnac-otoc { to { transform: rotate(360deg); } }
+@keyframes lnac-dych { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+
+.lnac-text {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 15px; color: var(--l-muted); letter-spacing: .01em;
+}
+.lnac--male .lnac-text { font-size: 13.5px; }
+.lnac--velke .lnac-text, .lnac--cela .lnac-text { font-size: 17px; }
+
+/* Na tmavom podklade by hnedé čiary zanikli. */
+.lnac--tmave .lnac-palisada, .lnac--tmave .lnac-plan circle { stroke: var(--l-on-dark-line); opacity: 1; }
+.lnac--tmave .lnac-val--1 { stroke: var(--l-second-light); }
+.lnac--tmave .lnac-val--2 { stroke: var(--l-on-dark-2); }
+.lnac--tmave .lnac-val--3 { stroke: var(--l-second); }
+.lnac--tmave .lnac-srdce { fill: var(--l-second-light); }
+.lnac--tmave .lnac-text { color: var(--l-on-dark); }
+
+/* Vypnuté animácie: pôdorys ostane celý a nehybný, nie polovičný. */
+@media (prefers-reduced-motion: reduce) {
+  .lnac-val, .lnac-palisada, .lnac-srdce { animation: none; }
+  .lnac-val { stroke-dasharray: none; opacity: .85; }
+}
+
 /* Lišta náhľadu konceptu (len pre prihláseného správcu, viď lib/preview.ts). */
 .lart-preview-bar {
   padding: 10px 20px;
