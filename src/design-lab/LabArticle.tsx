@@ -328,7 +328,10 @@ export function LabArticle({ slug }: { slug: string }) {
             <h2 className="lart-more-h">Mohlo by vás zaujímať</h2>
             <p className="lart-more-s">Vybrali sme články súvisiace s touto témou</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {related.map(r => <ArticleCard key={r.id} article={r as any} />)}
+              {/* Bez štítku kategórie: v dlaždici pod článkom len prekrýval
+                  fotografiu a čitateľovi nič nepovedal — meno kategórie je
+                  o riadok vyššie v omrvinkách aj v ponuke. */}
+              {related.map(r => <ArticleCard key={r.id} article={r as any} stitok={false} />)}
             </div>
           </div>
         </section>

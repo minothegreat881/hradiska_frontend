@@ -6,9 +6,10 @@ import { Article } from '../data/mock-data';
 interface ArticleCardProps {
   article: Article;
   /**
-   * Štítok s kategóriou. Na stránke kategórie a v aktualitách ho netreba —
-   * všetky karty sú z tej istej kategórie a štítok by len opakoval nadpis
-   * stránky. Zmysel má tam, kde sa miešajú (napr. „Mohlo by vás zaujímať").
+   * Štítok s kategóriou cez fotografiu. Nikde na webe sa dnes nezapína:
+   * na stránke kategórie aj v aktualitách sú všetky karty z tej istej
+   * kategórie a v „Mohlo by vás zaujímať" pod článkom štítok len prekrýval
+   * obraz. Prepínač ostáva pre prípad, že sa karty raz začnú miešať.
    */
   stitok?: boolean;
   /**

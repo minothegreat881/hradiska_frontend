@@ -273,6 +273,15 @@
   box-shadow: inset 0 1px 2px rgba(255,255,255,.9), inset 0 -2px 4px rgba(58,52,44,.18), 0 4px 12px rgba(20,18,15,.25);
 }
 
+/* Bod aj zhluk musia ostať kruhom aj vtedy, keď ich niečo zvonku ťahá.
+   Šírku a výšku majú zhodné už vyššie; `aspect-ratio` a `flex: none` sú
+   poistka pre prípad, že by sa niektorý rozmer prepočítal inak (pružný
+   rodič, zväčšené systémové písmo, prebíjajúce pravidlo z `globals.css`).
+   Bez nej sa z krúžkov na niektorých telefónoch stávali ovály. */
+.lmap-pin-wrap, .lmap-pin, .lmap-cluster, .lmap-cluster-core, .lmap-cluster-halo {
+  aspect-ratio: 1; flex: none; box-sizing: border-box;
+}
+
 /* ── Vejár ─────────────────────────────────────────────────────────────── */
 .lmap-spider-line { position: absolute; left: 0; top: 0; height: 1px; background: rgba(58,52,44,.45); transform-origin: 0 50%; pointer-events: none; }
 .lmap-spider-x {
