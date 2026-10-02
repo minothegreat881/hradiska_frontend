@@ -2265,6 +2265,16 @@ body[data-lab-theme='pecat'],
 /* ── 2 · Zdieľanie na začiatku ─────────────────────────────────────────── */
 .lart-topshare { max-width: 1180px; margin: 0 auto 22px; }
 
+/* Nad riadkom „Zdieľať článok" stáli dve odsadenia na sebe: spodok hrdla
+   (48 px, patrí k nemu — oddeľuje meno autora od okraja fotografie) a horné
+   odsadenie sekcie (96 px). Spolu 145 px prázdna medzi „autor · dátum" a
+   zdieľaním, čo čitateľ vidí ako dieru, nie ako oddelenie dvoch častí.
+   Skracuje sa sekcii, nie hrdlu. */
+.lart > section { padding-top: 24px; }
+@media (max-width: 600px) {
+  .lart > section { padding-top: 20px; }
+}
+
 /* ── Rám článku a pobočný stĺpec ───────────────────────────────────────── */
 .lart-card { background: var(--l-card); border: 1px solid var(--l-line); }
 .lart-side { background: var(--l-paper-2); }
