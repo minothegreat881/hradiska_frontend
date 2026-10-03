@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
   BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus, Flag,
@@ -77,12 +77,45 @@ function AdminShell() {
 
   // Reálne počty pre badge (články/kategórie/štítky/komentáre) — nie statické čísla.
   const [badges, setBadges] = useState<Partial<Record<AdminRoute, number>>>({});
+  /* Nahlásenia, ktoré pribudli, kým bola administrácia otvorená. Mail chodí
+     správcom vždy, ale kto práve pracuje v administrácii, do schránky
+     nepozerá — preto to musí byť vidieť aj tu. */
+  const [noveNahlasenia, setNoveNahlasenia] = useState(0);
+  const posledneNahlasenia = useRef<number | null>(null);
+
   useEffect(() => {
     if (!token) return;
-    fetchNavCounts(token)
-      .then(c => setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments || undefined, pripomienky: c.pripomienky || undefined, nahlasenia: (c as any).nahlasenia || undefined }))
-      .catch(() => {});
+    let zivy = true;
+
+    const nacitaj = (prveNacitanie: boolean) => {
+      fetchNavCounts(token)
+        .then(c => {
+          if (!zivy) return;
+          const nahlasenia = (c as any).nahlasenia || 0;
+          setBadges({ articles: c.articles, categories: c.categories, tags: c.tags, comments: c.comments || undefined, pripomienky: c.pripomienky || undefined, nahlasenia: nahlasenia || undefined });
+          /* Prvé načítanie nie je „pribudlo" — to je len stav, s ktorým
+             sa prišlo. Hlási sa až rozdiel oproti nemu. */
+          const predtym = posledneNahlasenia.current;
+          if (!prveNacitanie && predtym != null && nahlasenia > predtym) {
+            setNoveNahlasenia(n => n + (nahlasenia - predtym));
+          }
+          posledneNahlasenia.current = nahlasenia;
+        })
+        .catch(() => {});
+    };
+
+    nacitaj(posledneNahlasenia.current == null);
+
+    /* Dopytovanie beží len vtedy, keď je karta naozaj na očiach — na pozadí
+       by to bola len záťaž navyše pre server aj batériu. */
+    const tik = () => { if (document.visibilityState === 'visible') nacitaj(false); };
+    const id = window.setInterval(tik, 45000);
+    document.addEventListener('visibilitychange', tik);
+    return () => { zivy = false; window.clearInterval(id); document.removeEventListener('visibilitychange', tik); };
   }, [token, route]);
+
+  /* Keď sa na nahlásenia pozrie, upozornenie zmizne — splnilo úlohu. */
+  useEffect(() => { if (route === 'nahlasenia') setNoveNahlasenia(0); }, [route]);
 
   // ⌘K / Ctrl+K na rýchle hľadanie
   const [searchOpen, setSearchOpen] = useState(false);
@@ -249,6 +282,20 @@ function AdminShell() {
             Zobraziť web <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </header>
+
+        {/* Upozornenie na nové nahlásenie — v administrácii, nielen v pošte. */}
+        {noveNahlasenia > 0 && route !== 'nahlasenia' && (
+          <div className="ad-upoz" role="status" aria-live="polite">
+            <Flag className="w-4 h-4" aria-hidden="true" />
+            <span>
+              {noveNahlasenia === 1
+                ? 'Niekto nahlásil príspevok.'
+                : `Pribudli ${noveNahlasenia} nahlásenia príspevkov.`}
+            </span>
+            <button className="abtn abtn-primary" onClick={() => setRoute('nahlasenia')}>Pozrieť</button>
+            <button className="ad-upoz-x" onClick={() => setNoveNahlasenia(0)} aria-label="Skryť upozornenie">×</button>
+          </div>
+        )}
 
         <main style={{ flex: 1, padding: 24, minWidth: 0 }}>
           {/* Budíček pošty. Ukáže sa len vtedy, keď odosielanie nefunguje —
