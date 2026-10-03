@@ -6,6 +6,7 @@ import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
 import { Crown, Scroll } from 'lucide-react';
 import { Nacitavanie } from '../design-lab/Nacitavanie';
+import LabKategorieLista from '../design-lab/LabKategorieLista';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { STRAPI_URL } from '../lib/api-adresa';
 
@@ -68,6 +69,11 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
 
   return (
     <div className="min-h-screen parchment">
+      {/* Tá istá lišta kategórií ako na začiatku článku. Na stránke kategórie
+          je to jediná cesta k súrodencom bez vracania sa na domovskú —
+          otvorená kategória je v nej zvýraznená. */}
+      <LabKategorieLista aktivna={categorySlug} />
+
       {/* Hero — varianta 5A „Vľavo, vertikálny scrim" */}
       <section className="relative overflow-hidden">
         <div className="container relative" style={{ paddingTop: 22, paddingBottom: 40 }}>

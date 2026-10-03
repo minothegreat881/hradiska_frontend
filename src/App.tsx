@@ -192,7 +192,13 @@ function App() {
         setRestoreScroll(false); // forward navigation — go to top, don't restore
         window.history.pushState({}, '', link.href);
         handleNavigation();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        /* Skok, nie plynulý posun. Z konca dlhého článku („Mohlo by vás
+           zaujímať" je úplne dole) sa plynulým posunom prechádzalo cez
+           trinásť tisíc pixelov — a keďže medzitým už bola vykreslená nová
+           stránka, vyzeralo to, akoby sa telo nového článku načítavalo
+           zdola nahor. Prehliadač pri prechode na inú stránku skáče, nie
+           roluje; robíme to isté. */
+        window.scrollTo({ top: 0, behavior: 'auto' });
       }
     };
 
