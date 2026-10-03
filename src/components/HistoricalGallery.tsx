@@ -48,6 +48,12 @@ export function Lightbox({
 }) {
   const [zoom, setZoom] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  /* Popis fotky: zbalený na dva riadky, rozbalený na celý text.
+     `maViac` sa NEODHADUJE z dĺžky reťazca — tá o zalomení nehovorí nič
+     (široké okno, iné písmo, iný jazyk). Meria sa skutočná výška. */
+  const [popisCely, setPopisCely] = useState(false);
+  const [maViac, setMaViac] = useState(false);
+  const popisRef = useRef<HTMLParagraphElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const touchX = useRef<number | null>(null);
   const sheetY = useRef<number | null>(null);
@@ -80,9 +86,25 @@ export function Lightbox({
     };
   }, [onClose, onPrev, onNext, zoom]);
 
+  /* Zmestil sa popis do dvoch riadkov? Meria sa po každej výmene fotky
+     a pri zmene šírky okna; `scrollHeight` je celý text, `clientHeight` to,
+     čo je vidieť. */
+  useEffect(() => {
+    setPopisCely(false);
+    const zmeraj = () => {
+      const el = popisRef.current;
+      if (!el) { setMaViac(false); return; }
+      setMaViac(el.scrollHeight - el.clientHeight > 2);
+    };
+    const t = setTimeout(zmeraj, 0);
+    window.addEventListener('resize', zmeraj);
+    return () => { clearTimeout(t); window.removeEventListener('resize', zmeraj); };
+  }, [index, images]);
+
   // Prefetch susedných fotiek (±1)
   useEffect(() => {
-    [index + 1, index - 1].forEach((i) => {
+    /* Dokola: na poslednej fotke je „ďalšia" tá prvá. */
+    [(index + 1) % images.length, (index - 1 + images.length) % images.length].forEach((i) => {
       const im = images[i];
       if (im) { const el = new Image(); el.src = im.url; }
     });
@@ -131,7 +153,7 @@ export function Lightbox({
       aria-label="Prehliadač fotky"
       onClick={onClose}
     >
-      <div className={`pl-card${commentsOpen ? ' pl-comments-open' : ''}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`pl-card${commentsOpen ? ' pl-comments-open' : ''}${popisCely ? ' pl-popis-cely' : ''}`} onClick={(e) => e.stopPropagation()}>
         {/* Hlavička — NAD fotkou, nič ju neprekrýva. Jedno ✕. */}
         <div
           className="pl-header"
@@ -162,30 +184,16 @@ export function Lightbox({
           </button>
         </div>
 
-        {/* Popis fotky — pri fotke (nie odtrhnutý dole) */}
-        {(current.caption || current.author || current.source) && (
-          <div className="pl-text" style={{ padding: '12px 15px 13px', borderBottom: '1px solid var(--pl-border-soft)' }}>
-            {current.caption && (
-              <p style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 17, lineHeight: 1.45, color: 'var(--pl-body)' }}>
-                {current.caption}
-              </p>
-            )}
-            {(current.author || current.source) && (
-              <p style={{ margin: '6px 0 0', fontFamily: 'var(--font-serif)', fontSize: 13.5, color: 'var(--pl-muted-2)' }}>
-                {[current.author && `Foto: ${current.author}`, current.source && `Zdroj: ${current.source}`].filter(Boolean).join(' · ')}
-              </p>
-            )}
-          </div>
-        )}
-
         {/* Fotka — mobil cover (fixná výška, nepresahuje), desktop contain */}
         <div className="pl-photo" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-          {index > 0 && (
+          {/* Šípky sú tu vždy (pri jedinej fotke nemajú čo robiť): galéria sa
+              listuje dokola, takže ani na poslednej fotke nie je koniec. */}
+          {images.length > 1 && (
             <button className="pl-navb pl-focusable" style={{ left: 10 }} onClick={onPrev} aria-label="Predchádzajúca fotka">
               <ChevronLeft style={{ width: 22, height: 22 }} />
             </button>
           )}
-          {index < images.length - 1 && (
+          {images.length > 1 && (
             <button className="pl-navb pl-focusable" style={{ right: 10 }} onClick={onNext} aria-label="Nasledujúca fotka">
               <ChevronRight style={{ width: 22, height: 22 }} />
             </button>
@@ -214,6 +222,34 @@ export function Lightbox({
             draggable={false}
           />
         </div>
+
+        {/* POPIS AŽ POD FOTKOU, nie nad ňou.
+            Predtým stál medzi hlavičkou a fotkou s pevným stropom 18 vh —
+            dlhší popis sa orezal uprostred vety a nebolo ani vidieť, že je
+            čo dočítať. Poradie je teraz prirodzené: najprv obraz, potom
+            vysvetlenie. Zbalený je na dva riadky (na počítači štyri)
+            a celý text si vypýta „Čítať viac", takže fotke nikdy neukrojí
+            viac miesta, než má. */}
+        {(current.caption || current.author || current.source) && (
+          <div className={`pl-text${popisCely ? ' je-cely' : ''}`}>
+            {current.caption && (
+              <p ref={popisRef} className={`pl-popis${popisCely ? ' je-cely' : ''}`}>
+                {current.caption}
+              </p>
+            )}
+            {(maViac || popisCely) && (
+              <button type="button" className="pl-viac pl-focusable" onClick={() => setPopisCely((v) => !v)}
+                      aria-expanded={popisCely}>
+                {popisCely ? 'Zbaliť' : 'Čítať viac'}
+              </button>
+            )}
+            {(current.author || current.source) && (
+              <p className="pl-zdroj">
+                {[current.author && `Foto: ${current.author}`, current.source && `Zdroj: ${current.source}`].filter(Boolean).join(' · ')}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Reakcie + akčná lišta + komentáre + vstup (ak fotka má fileId zo Strapi) */}
         {current.fileId != null ? (
@@ -262,12 +298,12 @@ export function Lightbox({
           onTouchEnd={onTouchEnd}
           style={{ position: 'fixed', inset: 0, zIndex: 70, background: 'rgba(5,4,2,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }}
         >
-          {index > 0 && (
+          {images.length > 1 && (
             <button className="pl-navb pl-focusable" style={{ left: 12 }} onClick={(e) => { e.stopPropagation(); onPrev(); }} aria-label="Predchádzajúca fotka">
               <ChevronLeft style={{ width: 22, height: 22 }} />
             </button>
           )}
-          {index < images.length - 1 && (
+          {images.length > 1 && (
             <button className="pl-navb pl-focusable" style={{ right: 12 }} onClick={(e) => { e.stopPropagation(); onNext(); }} aria-label="Nasledujúca fotka">
               <ChevronRight style={{ width: 22, height: 22 }} />
             </button>
@@ -353,9 +389,14 @@ export function HistoricalGallery({ images, title = 'Fotogaléria' }: Historical
     triggerRef.current?.focus?.();
   }, []);
 
-  const prev = useCallback(() => setModalIndex((i) => (i !== null && i > 0 ? i - 1 : i)), []);
+  /* Galéria je kruh: za poslednou fotkou je zasa prvá a pred prvou posledná.
+     Kto listuje, nenarazí na stenu a nemusí sa vracať cez celú sériu. */
+  const prev = useCallback(
+    () => setModalIndex((i) => (i === null ? i : (i - 1 + images.length) % images.length)),
+    [images.length],
+  );
   const next = useCallback(
-    () => setModalIndex((i) => (i !== null && i < images.length - 1 ? i + 1 : i)),
+    () => setModalIndex((i) => (i === null ? i : (i + 1) % images.length)),
     [images.length],
   );
 
