@@ -1418,6 +1418,29 @@ body[data-lab-theme='pecat'],
   background: var(--l-paper);
   border-bottom: 1px solid var(--l-line);
 }
+
+/* ── Tá istá lišta, ktorá sa vysunie pri posune nahor ──────────────────────
+   Visí pod hlavičkou na celom webe (`design-lab/LabKategorieVysuv.tsx`).
+   `z-index` je nižší než hlavička (60), aby sa pod ňu zasunula, a vyšší než
+   obsah. Skrytá je `visibility: hidden` — nielen odsunutá: inak by sa do nej
+   dalo trafiť tabulátorom a neviditeľné dlaždice by chytali klik. */
+.cat-vysuv {
+  position: fixed; left: 0; right: 0; z-index: 55;
+  transform: translateY(-100%);
+  visibility: hidden;
+  transition: transform .26s cubic-bezier(.22,.61,.36,1), visibility .26s;
+  box-shadow: 0 10px 24px -18px rgba(20,18,15,.5);
+}
+.cat-vysuv.je-vidno { transform: translateY(0); visibility: visible; }
+/* Vnútorná lišta má vlastný spodný vlások aj papier — tu len dosadne. */
+.cat-vysuv .cat-rail { border-bottom: 1px solid var(--l-line-2); }
+/* Vysunutá lišta je sprievodca, nie hlavná plocha — o niečo nižšia než tá
+   na začiatku článku, nech z čítanej stránky ukrojí čo najmenej. */
+.cat-vysuv .cat-rail-pas { padding-top: 12px; padding-bottom: 10px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-vysuv { transition: none; }
+}
 /* Lišta drží presne tú istú šírku ako hlavička webu (`.lnav-row`): začína
    tam, kde logo, a končí tam, kde tlačidlo „Prihlásiť sa". Preto rovnaké
    `max-width` aj bočné odsadenie — nie vlastné číslo z handoffu, ktoré by

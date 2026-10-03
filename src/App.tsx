@@ -12,6 +12,9 @@ import './design-lab/theme.css';
 const ArticlePagePecat = lazyStale(() => import('./design-lab/LabArticle'));
 /* Časti webu, ktoré v novom šate nesú vlastnú skladbu, nie len farby. */
 const LabNav = lazyStale(() => import('./design-lab/LabNav').then(m => ({ default: m.LabNav })));
+/* Vysúvacia lišta kategórií — rovnako odložene ako hlavička, je to tá istá
+   deviatka dlaždíc a na prvé vykreslenie stránky ju netreba. */
+const LabKategorieVysuv = lazyStale(() => import('./design-lab/LabKategorieVysuv').then(m => ({ default: m.LabKategorieVysuv })));
 const LabFooter = lazyStale(() => import('./design-lab/LabFooter').then(m => ({ default: m.LabFooter })));
 const LabHome = lazyStale(() => import('./design-lab/LabHome').then(m => ({ default: m.LabHome })));
 const LabJoinUs = lazyStale(() => import('./design-lab/LabJoinUs').then(m => ({ default: m.LabJoinUs })));
@@ -263,6 +266,10 @@ function App() {
        Starý zlatohnedý šat je v značke `stary-sat-2026-08-18`. */
     <div className="min-h-screen lab" data-theme="pecat">
       <LabNav />
+
+      {/* Rozcestník kategórií, ktorý sa vysunie pri posune nahor — na celom
+          webe, teda aj v článku a na stránke kategórie. Viď komponent. */}
+      <LabKategorieVysuv />
 
       <Suspense fallback={
         /* Celá výška okna, nie 60 vh: pri nižšej hodnote sa počas načítania
