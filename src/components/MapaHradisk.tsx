@@ -174,10 +174,11 @@ function CardIn({ loc, onClose }: { loc: Loc; onClose: () => void }) {
 }
 
 const PinNode = memo(function PinNode({
-  n, hot, openCard, sheet, showPill, canvasW, canvasH, onEnter, onLeave, onToggle, onClose,
+  n, hot, tu, openCard, sheet, showPill, canvasW, canvasH, onEnter, onLeave, onToggle, onClose,
 }: {
   n: Extract<Node, { kind: 'one' }>;
-  hot: boolean; openCard: boolean; sheet: boolean; showPill: boolean;
+  /** Lokalita článku, pod ktorým mapa stojí. */
+  hot: boolean; tu: boolean; openCard: boolean; sheet: boolean; showPill: boolean;
   canvasW: number; canvasH: number;
   onEnter: (id: string, cat: string) => void;
   onLeave: () => void;
@@ -192,11 +193,11 @@ const PinNode = memo(function PinNode({
               karty vnútri sa voči susedným bodom neuplatní — rozhoduje
               z-index uzla. Doteraz stúpal len po kliknutí, takže cez
               kartu otvorenú prejdením presvitali okolité body. */
-           style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: openCard ? 30 : 3 }}>
+           style={{ transform: `translate3d(${n.x}px, ${n.y}px, 0)`, zIndex: openCard ? 30 : tu ? 20 : 3 }}>
       <div className="lmap-pin-wrap pointer-events-none">
         <button
           type="button"
-          className={(openCard || hot) ? 'lmap-pin is-hot' : 'lmap-pin'}
+          className={'lmap-pin' + ((openCard || hot) ? ' is-hot' : '') + (tu ? ' je-tu' : '')}
           /* Klik ostáva kvôli dotyku — na telefóne `hover` neexistuje. */
           onClick={() => onToggle(n.loc.id)}
           onMouseEnter={() => onEnter(n.loc.id, n.loc.cat)}
@@ -209,8 +210,12 @@ const PinNode = memo(function PinNode({
           <Icon path={(CAT_BY_SLUG[n.loc.cat] || CATS[0]).icon} />
         </button>
 
-        {showPill && !openCard && (
-          <span className="lmap-pill pointer-events-none">
+        {tu && <span className="lmap-tu-kruh pointer-events-none" aria-hidden="true" />}
+
+        {/* Vyznačená lokalita má menovku vždy — bez nej je to len červená
+            bodka a čitateľ nevie, či je to naozaj tá jeho. */}
+        {(showPill || tu) && !openCard && (
+          <span className={'lmap-pill pointer-events-none' + (tu ? ' je-tu' : '')}>
             <span className="lmap-pill-n">{n.loc.name}</span>
             <span className="lmap-pill-c">{(CAT_BY_SLUG[n.loc.cat] || CATS[0]).label}</span>
           </span>
@@ -241,7 +246,15 @@ const PinNode = memo(function PinNode({
   );
 });
 
-export function MapaHradisk() {
+export function MapaHradisk({ zvyraznene }: {
+  /**
+   * Slug lokality, ktorá sa má v mape vyznačiť. Pod článkom o konkrétnom
+   * hradisku je to ten istý článok: čitateľ má na prvý pohľad vidieť, kde
+   * na Slovensku leží to, o čom práve čítal. Vyznačená značka je červená,
+   * drží si menovku a nikdy sa neschová do zhluku.
+   */
+  zvyraznene?: string;
+} = {}) {
   const rootRef = useRef<HTMLElement | null>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -581,7 +594,10 @@ export function MapaHradisk() {
       w: Math.min(180, r - l), h: Math.min(180, bo - t),
     });
 
+    /* Vyznačená lokalita ide mimo zhlukovania — keby ju pohltil zhluk,
+       čitateľ by videl číslo namiesto miesta, o ktorom číta. */
     const skip = new Set(spider ? spider.ids : []);
+    if (zvyraznene) skip.add(zvyraznene);
     const pts = locs
       .filter(l => !skip.has(l.id))
       .map(l => {
@@ -616,6 +632,15 @@ export function MapaHradisk() {
         out.push({ kind: 'many', x: g.x, y: g.y, lng, lat, members: g.members.map(m => m.loc) });
       }
     }
+    const tu = zvyraznene && !(spider ? spider.ids : []).includes(zvyraznene)
+      ? locs.find(l => l.id === zvyraznene) : null;
+    if (tu) {
+      const p = map.project([tu.lng, tu.lat]);
+      if (p.x > -60 && p.y > -60 && p.x < width + 60 && p.y < height + 60) {
+        out.push({ kind: 'one', x: p.x, y: p.y, lng: tu.lng, lat: tu.lat, loc: tu });
+      }
+    }
+
     setNodes(out);
 
     /* ── Názvy miest ──────────────────────────────────────────────────
@@ -668,7 +693,7 @@ export function MapaHradisk() {
       popisy.push(m);
     }
     setMesta(popisy);
-  }, [locs, spider]);
+  }, [locs, spider, zvyraznene]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1420,6 +1445,7 @@ export function MapaHradisk() {
               key={n.loc.id}
               n={n}
               hot={hotKey === n.loc.id}
+              tu={!!zvyraznene && n.loc.id === zvyraznene}
               openCard={selected === n.loc.id || hoverId === n.loc.id}
               sheet={touch && full}
               onClose={closeCard}

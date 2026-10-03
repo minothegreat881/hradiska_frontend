@@ -23,7 +23,7 @@ import { lazyStale } from '../lib/lazyStale';
 
 const LabMapa = lazyStale(() => import('./LabMapa'));
 
-export function MapaAzKedTreba({ className = 'lart-mapa' }: { className?: string }) {
+export function MapaAzKedTreba({ className = 'lart-mapa', zvyraznene }: { className?: string; zvyraznene?: string }) {
   const kotva = useRef<HTMLElement>(null);
   const [zobrazit, setZobrazit] = useState(false);
 
@@ -63,7 +63,7 @@ export function MapaAzKedTreba({ className = 'lart-mapa' }: { className?: string
     <section className={className} ref={kotva}>
       {zobrazit && (
         <Suspense fallback={null}>
-          <LabMapa />
+          <LabMapa zvyraznene={zvyraznene} />
         </Suspense>
       )}
     </section>

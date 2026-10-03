@@ -320,7 +320,9 @@ export function LabArticle({ slug }: { slug: string }) {
           „a kde sú ďalšie". Vykreslí sa až vtedy, keď sa k nej čitateľ
           priblíži: mapa si stiahne 44 dlaždíc podkladu (486 kB namerané)
           a väčšina čitateľov k nej nedôjde. */}
-      <MapaAzKedTreba />
+      {/* Mapa dostane slug článku: ak má článok lokalitu, jej značka bude
+          v mape červená a s menovkou, takže čitateľ hneď vidí, kde to je. */}
+      <MapaAzKedTreba zvyraznene={post.slug} />
 
       {related.length > 0 && (
         <section className="lart-more">

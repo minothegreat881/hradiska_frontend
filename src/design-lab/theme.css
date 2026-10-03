@@ -2896,6 +2896,9 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lart-more-s { margin-bottom: 22px; }
   /* Pole pod 16 px = iOS pri ťuknutí priblíži stránku a späť sa nevráti. */
   .lart input, .lart textarea { font-size: 16px !important; }
+  /* Dotykový cieľ pre tlačidlá v článku. POZOR: platí aj na mapu pod
+     článkom, kde sú body kruhy s pevnými 30 px — tam ho `mapa.css` ruší,
+     inak sa z nich stanú ovály 30 × 44. */
   .lart button { min-height: 44px; }
   /* Odsadenie komentárov v odpovediach zjedá na úzkom okne šírku textu. */
   .lart-comments [style*='margin-left: 32px'] { margin-left: 14px !important; }
