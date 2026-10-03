@@ -397,10 +397,21 @@ body {
 /* Poistka proti pretečeniu médií a širokého obsahu na úzkych displejoch. */
 img, video, iframe, table, pre { max-width: 100%; }
 
-/* Mobil: univerzálna poistka proti horizontálnemu scrollu (sticky sa tu nepoužíva,
-   preto je `hidden` bezpečné aj pre staršie prehliadače bez podpory `clip`). */
+/* Mobil: poistka proti horizontálnemu scrollu.
+   POZOR, TOTO UŽ RAZ ZLYHALO: pôvodne tu stálo `overflow-x: hidden`
+   s poznámkou „sticky sa tu nepoužíva". Odvtedy sa hlavička webu stala
+   `position: sticky` — a `hidden` robí z `html`/`body` posuvnú schránku,
+   takže hlavička na telefóne prestala lipnúť a odrolovala preč (na počítači
+   nie, tam je `clip`). `clip` zabráni posunu do strán rovnako, ale posuvnú
+   schránku nevytvára, takže sticky funguje.
+   `hidden` ostáva ako záloha pre prehliadače bez `clip` (Safari < 16). */
 @media (max-width: 1023px) {
   html, body { overflow-x: hidden; }
+}
+@supports (overflow-x: clip) {
+  @media (max-width: 1023px) {
+    html, body { overflow-x: clip; }
+  }
 }
 
 .dark body {

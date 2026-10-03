@@ -34,11 +34,15 @@ export function LabKategorieVysuv() {
   const posledny = useRef(0);
   const ceka = useRef(false);
 
+  /** Spodná hrana hlavičky — odtiaľ lišta začína. Berie sa SPODNÁ HRANA, nie
+      výška: keby hlavička z akéhokoľvek dôvodu nelipla (starý prehliadač bez
+      `overflow-x: clip`), odrolovala by preč a lišta by visela v prázdne. */
+  const zmeraj = () => {
+    const r = document.querySelector('.lnav')?.getBoundingClientRect();
+    setPodHlavickou(r ? Math.max(0, Math.round(r.bottom)) : 0);
+  };
+
   useEffect(() => {
-    const zmeraj = () => {
-      const h = document.querySelector('.lnav')?.getBoundingClientRect().height;
-      if (h) setPodHlavickou(Math.round(h));
-    };
     zmeraj();
     window.addEventListener('resize', zmeraj);
     return () => window.removeEventListener('resize', zmeraj);
@@ -56,6 +60,7 @@ export function LabKategorieVysuv() {
 
       const roletka = document.querySelector('.lnav')?.hasAttribute('data-expanded');
       if (y < PRAH || roletka) { setVidno(false); return; }
+      if (rozdiel < 0) zmeraj();   // hlavička mohla medzitým zmeniť výšku
       setVidno(rozdiel < 0);
     };
 
