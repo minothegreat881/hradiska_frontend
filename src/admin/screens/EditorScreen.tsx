@@ -523,6 +523,31 @@ export function EditorScreen({
   // Odkaz drží vždy najnovšiu verziu; poslucháč sa registruje raz, vyššie.
   keyHandlerRef.current = handleKey;
 
+  /**
+   * Publikovať · Uložiť koncept · Náhľad.
+   *
+   * Tie isté tri akcie stoja v hlavičke editora aj na hornej hrane pravého
+   * panela. Dôvod: kto dopíše text na konci dlhého článku, mal doteraz
+   * tlačidlá kdesi o desať obrazoviek vyššie a musel sa prerolovať späť.
+   * Panel je prilepený (`position: sticky`), takže v ňom sú akcie po ruke
+   * kdekoľvek v článku.
+   */
+  const akcieVydania = () => (
+    <>
+      {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts). */}
+      <a className="abtn" href={`/blog/${slug}?preview=draft`} target="_blank" rel="noreferrer"
+         title={dirty ? 'Náhľad ukáže posledný uložený stav — rozpísané zmeny v ňom ešte nie sú.' : 'Zobrazí uložený koncept tak, ako bude vyzerať na webe.'}>
+        <Eye className="w-4 h-4" /> Náhľad
+      </a>
+      <button className="abtn" onClick={() => save(false)} disabled={saving}>
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Uložiť koncept
+      </button>
+      <button className="abtn abtn-primary" onClick={() => save(true)} disabled={saving}>
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Publikovať
+      </button>
+    </>
+  );
+
   return (
     <>
       {/* ── Hlavička editora ──────────────────────────────────────────────
@@ -595,17 +620,7 @@ export function EditorScreen({
           {panelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
         </button>
 
-        {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts). */}
-        <a className="abtn" href={`/blog/${slug}?preview=draft`} target="_blank" rel="noreferrer"
-           title={dirty ? 'Náhľad ukáže posledný uložený stav — rozpísané zmeny v ňom ešte nie sú.' : 'Zobrazí uložený koncept tak, ako bude vyzerať na webe.'}>
-          <Eye className="w-4 h-4" /> Náhľad
-        </a>
-        <button className="abtn" onClick={() => save(false)} disabled={saving}>
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Uložiť koncept
-        </button>
-        <button className="abtn abtn-primary" onClick={() => save(true)} disabled={saving}>
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Publikovať
-        </button>
+        {akcieVydania()}
       </div>
 
       {/* Ponuka obnovy po páde prehliadača — pýta sa skôr, než sa začne písať. */}
@@ -734,6 +749,19 @@ export function EditorScreen({
           className="acard ad-editor-side"
           style={{ width: 344, flexShrink: 0, background: 'var(--ad-surface)', position: 'sticky', top: 76, maxHeight: 'calc(100vh - 96px)', overflowY: 'auto' }}
         >
+          {/* Akcie na hornej hrane panela. Panel sám je prilepený a jeho obsah
+              sa posúva vnútri, preto `sticky top: 0` — pás ostane na mieste
+              aj keď sa v paneli odroluje nadol. */}
+          <div className="ad-side-akcie">
+            {akcieVydania()}
+            <span className="ad-side-stav">
+              {saving ? 'Ukladám…'
+                : dirty ? 'Neuložené zmeny'
+                : savedAt ? `Uložené ${timeOf(savedAt)}`
+                : published ? 'Publikovaný' : 'Koncept'}
+            </span>
+          </div>
+
           <Panel title="Publikovanie" summary={sumPublikovanie} defaultOpen>
             <Field label="Slug">
               <input className="afld" value={slug} onChange={e => { setSlug(e.target.value); touch(); }} placeholder="nazov-clanku" />

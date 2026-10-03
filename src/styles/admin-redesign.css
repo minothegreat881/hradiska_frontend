@@ -315,3 +315,24 @@
   height:24px;border:1px solid var(--ad-field-border);border-radius:6px;background:var(--ad-card);
   font:500 11.5px Inter,sans-serif;color:var(--ad-text);padding:0 4px;max-width:120px
 }
+
+/* ── Akcie vydania v pravom paneli ─────────────────────────────────────────
+   Kto dopíše text na konci dlhého článku, mal tlačidlá len v hlavičke
+   editora — teda o desať obrazoviek vyššie. Tu sú druhýkrát, na hornej
+   hrane prilepeného panela, takže sú po ruke kdekoľvek v článku.
+   `Publikovať` je na celú šírku ako hlavná akcia, pod ňou koncept a náhľad. */
+.admin .ad-side-akcie {
+  position: sticky; top: 0; z-index: 3;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  padding: 12px 14px 12px;
+  background: var(--ad-surface);
+  border-bottom: 1px solid var(--ad-line);
+}
+.admin .ad-side-akcie > .abtn { justify-content: center; }
+/* Poradie v kóde je Náhľad · Koncept · Publikovať (rovnaké ako v hlavičke),
+   na mriežke ale patrí hlavná akcia navrch. */
+.admin .ad-side-akcie > .abtn-primary { order: -1; grid-column: 1 / -1; }
+.admin .ad-side-stav {
+  grid-column: 1 / -1;
+  font-size: 11.5px; color: var(--ad-muted); text-align: center;
+}
