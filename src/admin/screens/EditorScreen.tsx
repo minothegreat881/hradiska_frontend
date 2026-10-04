@@ -107,9 +107,15 @@ export function EditorScreen({
   const [cover, setCover] = useState<any | null>(null);
   /** Výrez titulnej fotografie — mení sa ťahaním priamo na plátne. */
   const [coverPosition, setCoverPosition] = useState('center center');
+  /** Fotogaléria na konci článku (pole `gallery` v Strapi). */
+  const [galeria, setGaleria] = useState<any[]>([]);
+  /* Poistka proti vymazaniu galérie: posiela sa len vtedy, keď ju editor
+     naozaj načítal (alebo ide o nový článok). Keby sa článok nedotiahol celý,
+     prázdne pole by pri uložení zmazalo všetky fotky pod článkom. */
+  const galeriaZnama = useRef(!articleId);
   // Kam sa má priradiť vybraný obrázok: cover alebo konkrétny blok.
   const [picking, setPicking] = useState<
-    { target: 'cover' } | { target: 'block'; uid: string; multiple?: boolean } | null
+    { target: 'cover' } | { target: 'galeria' } | { target: 'block'; uid: string; multiple?: boolean } | null
   >(null);
 
   const [device, setDevice] = useState<CanvasDevice>('desktop');
@@ -202,6 +208,8 @@ export function EditorScreen({
         setMetaDesc(d.metaDescription ?? '');
         setCover(d.coverImage ?? null);
         setCoverPosition(d.coverPosition || 'center center');
+        setGaleria(Array.isArray(d.gallery) ? d.gallery : []);
+        galeriaZnama.current = true;
         setLoc({
           name: d.location?.name ?? '',
           latitude: d.location?.latitude != null ? String(d.location.latitude) : '',
@@ -252,6 +260,15 @@ export function EditorScreen({
   const applyPick = (files: MediaFile[]) => {
     if (!files.length || !picking) return;
     if (picking.target === 'cover') { setCover(files[0]); setDirty(true); return; }
+    if (picking.target === 'galeria') {
+      /* Tá istá fotka dvakrát v galérii nemá zmysel — pridá sa, čo tam ešte nie je. */
+      setGaleria((g) => {
+        const uz = new Set(g.map((x: any) => x?.id));
+        return [...g, ...files.filter((f) => !uz.has(f.id))];
+      });
+      setDirty(true);
+      return;
+    }
     setBlocks(bs => bs.map(b => {
       if (b.uid !== picking.uid) return b;
       // Galéria zbiera viac obrázkov, ostatné bloky majú jeden.
@@ -279,6 +296,7 @@ export function EditorScreen({
     })),
     coverImage: cover,
     coverPosition,
+    gallery: galeriaZnama.current ? galeria : undefined,
   });
 
   /** Prekážka uloženia. `uid` umožní na blok rovno ukázať. */
@@ -298,7 +316,7 @@ export function EditorScreen({
 
   const snapshot = () => ({
     title, excerpt, slug, author, readingTime, pubDate, featured, category,
-    tags, metaTitle, metaDesc, loc, cover, coverPosition, keyFacts, timeline, blocks,
+    tags, metaTitle, metaDesc, loc, cover, coverPosition, galeria, keyFacts, timeline, blocks,
   });
   snapshotRef.current = snapshot;
 
@@ -310,6 +328,9 @@ export function EditorScreen({
     setMetaTitle(data.metaTitle ?? ''); setMetaDesc(data.metaDesc ?? '');
     setLoc(data.loc ?? loc); setCover(data.cover ?? null);
     setCoverPosition(data.coverPosition || 'center center');
+    /* Záloha staršia než táto funkcia galériu nepozná — vtedy sa nechá tá,
+       ktorá prišla zo servera, nech sa fotky nestratia. */
+    if (Array.isArray(data.galeria)) setGaleria(data.galeria);
     setKeyFacts(data.keyFacts ?? []); setTimeline(data.timeline ?? []);
     blocksHistory.reset(data.blocks ?? []);
     setDirty(true);
@@ -830,6 +851,48 @@ export function EditorScreen({
             </div>
           </Panel>
 
+          {/* FOTOGALÉRIA na konci článku (pole `gallery`).
+              Doteraz sa dala meniť len priamo v Strapi — v editore nebola
+              vidieť vôbec, takže redakcia nevedela, čo pod článkom visí.
+              Poradie je to isté, v akom sa fotky zobrazia; mení sa šípkami. */}
+          <Panel title="Fotogaléria" summary={galeria.length ? `${galeria.length} ${galeria.length === 1 ? 'fotografia' : galeria.length < 5 ? 'fotografie' : 'fotografií'}` : 'prázdna'}>
+            {galeria.length === 0 && (
+              <p className="ad-gal-prazdno">
+                Pod článkom sa galéria nezobrazí, kým v nej nie je aspoň jedna fotografia.
+              </p>
+            )}
+
+            {galeria.length > 0 && (
+              <ol className="ad-gal-mriezka">
+                {galeria.map((f: any, i: number) => (
+                  <li key={f?.id ?? i} className="ad-gal-polozka">
+                    <img src={fileUrl(f as MediaFile, 'thumbnail')} alt="" loading="lazy" />
+                    <span className="ad-gal-cislo">{i + 1}</span>
+                    <span className="ad-gal-nastroje">
+                      <button type="button" title="Posunúť dopredu" disabled={i === 0}
+                              onClick={() => { setGaleria((g) => { const n = [...g]; [n[i - 1], n[i]] = [n[i], n[i - 1]]; return n; }); touch(); }}>←</button>
+                      <button type="button" title="Posunúť dozadu" disabled={i === galeria.length - 1}
+                              onClick={() => { setGaleria((g) => { const n = [...g]; [n[i + 1], n[i]] = [n[i], n[i + 1]]; return n; }); touch(); }}>→</button>
+                      <button type="button" className="is-danger" title="Vybrať z galérie"
+                              onClick={() => { setGaleria((g) => g.filter((_, j) => j !== i)); touch(); }}>×</button>
+                    </span>
+                    {f?.caption ? <span className="ad-gal-popis" title={f.caption}>{f.caption}</span> : null}
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            <div className="ad-cover-links" style={{ marginTop: 10 }}>
+              <button type="button" onClick={() => setPicking({ target: 'galeria' })}>Pridať fotografie</button>
+              {galeria.length > 0 && (
+                <button type="button" className="is-danger" onClick={() => { setGaleria([]); touch(); }}>
+                  Vyprázdniť
+                </button>
+              )}
+            </div>
+            <Hint>Popis sa k fotografii píše v knižnici médií — galéria ho preberá odtiaľ.</Hint>
+          </Panel>
+
           <Panel title="Zaradenie" summary={sumZaradenie}>
             <Field label="Kategória">
               <select className="afld" value={category} onChange={e => { setCategory(e.target.value); touch(); }}>
@@ -933,7 +996,7 @@ export function EditorScreen({
         <MediaPicker
           onPick={applyPick}
           onClose={() => setPicking(null)}
-          multiple={picking.target === 'block' && !!picking.multiple}
+          multiple={picking.target === 'galeria' || (picking.target === 'block' && !!picking.multiple)}
         />
       )}
     </>

@@ -44,6 +44,9 @@ export interface EditorState {
   coverImage?: any | null;
   /** Výrez titulnej fotografie (`object-position`), napr. „center 30%". */
   coverPosition?: string;
+  /** Fotogaléria na konci článku. `undefined` = needitovala sa, nech ju PUT
+   *  neprepíše; prázdne pole = galéria sa zámerne vyprázdnila. */
+  gallery?: any[];
 }
 
 /** Média z GET-u prídu ako objekt — Strapi pri zápise čaká číselné id. */
@@ -170,6 +173,9 @@ export function buildPayload(s: EditorState, opts: { includeBlocks: boolean }) {
     data.coverImage = s.coverImage === null ? null : mediaId(s.coverImage);
   }
   if (s.coverPosition) data.coverPosition = s.coverPosition;
+  /* Galéria sa posiela len vtedy, keď ju editor naozaj drží — inak by PUT
+     zmazal fotky článkom, ktoré sa otvorili v staršom editore. */
+  if (s.gallery !== undefined) data.gallery = s.gallery.map(mediaId).filter(Boolean);
 
   // Lokalita sa zapisuje len ak má povinné polia — inak by Strapi vrátil 400.
   const lat = parseFloat(s.location.latitude);

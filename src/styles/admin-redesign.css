@@ -408,3 +408,39 @@
 /* „Zahodiť záznam" je tichá vedľajšia vec — stojí vpravo a nekričí. */
 .admin .ad-nahl-zahodit { font-size: 13px; color: var(--ad-muted); }
 .admin .ad-nahl-zahodit:hover { color: var(--ad-text); }
+
+/* ── Fotogaléria v pravom paneli editora ───────────────────────────────────
+   Mriežka štvorcových náhľadov s poradovým číslom — poradie v zozname je to
+   isté, v akom fotky vyjdú pod článkom, takže musí byť vidieť na prvý pohľad.
+   Nástroje (posun, vybrať) sa ukážu až nad dlaždicou, nech mriežka nekričí. */
+.admin .ad-gal-mriezka {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px;
+}
+.admin .ad-gal-polozka {
+  position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--ad-border); background: var(--ad-surface);
+}
+.admin .ad-gal-polozka img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.admin .ad-gal-cislo {
+  position: absolute; left: 4px; top: 4px; min-width: 17px; height: 17px;
+  display: grid; place-items: center; border-radius: 5px;
+  background: rgba(20, 14, 6, .72); color: #fff; font-size: 10.5px; font-weight: 600;
+}
+.admin .ad-gal-nastroje {
+  position: absolute; inset: auto 0 0 0; display: flex; gap: 2px; justify-content: center;
+  padding: 3px; background: rgba(20, 14, 6, .72);
+  opacity: 0; transition: opacity .15s ease;
+}
+.admin .ad-gal-polozka:hover .ad-gal-nastroje,
+.admin .ad-gal-polozka:focus-within .ad-gal-nastroje { opacity: 1; }
+.admin .ad-gal-nastroje button {
+  border: 0; background: none; color: #fff; cursor: pointer;
+  font-size: 13px; line-height: 1; padding: 2px 5px; border-radius: 4px;
+}
+.admin .ad-gal-nastroje button:hover:not(:disabled) { background: rgba(255, 255, 255, .22); }
+.admin .ad-gal-nastroje button:disabled { opacity: .35; cursor: default; }
+.admin .ad-gal-nastroje .is-danger:hover { background: var(--ad-danger); }
+/* Popis len ako bublina — v dlaždici 70 × 70 px sa aj tak neprečíta. */
+.admin .ad-gal-popis { position: absolute; inset: 0; }
+.admin .ad-gal-prazdno { margin: 0 0 4px; font-size: 13px; color: var(--ad-muted); }
