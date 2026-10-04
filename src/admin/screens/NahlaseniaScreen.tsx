@@ -146,17 +146,17 @@ export function NahlaseniaScreen() {
           const slug = slugZAdresy(n.url);
           const nazov = nazvy[slug] || slug || 'neznámy článok';
           return (
-          <div key={n.documentId} className="nahl-riadok">
+          <div key={n.documentId} className="ad-nahl-riadok">
             {/* 1 · KDE to je. Toto chýbalo najviac: z adresy sa redakcia
                    neorientovala a musela klikať, aby zistila, o ktorý článok
                    ide. Názov je prvý a je to zároveň odkaz na miesto. */}
-            <div className="nahl-kde">
+            <div className="ad-nahl-kde">
               {n.url ? (
-                <a href={n.url} target="_blank" rel="noopener noreferrer" className="nahl-clanok">
+                <a href={n.url} target="_blank" rel="noopener noreferrer" className="ad-nahl-clanok">
                   {nazov} <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 </a>
               ) : (
-                <span className="nahl-clanok">{nazov}</span>
+                <span className="ad-nahl-clanok">{nazov}</span>
               )}
               <span className="achip achip-draft"><Flag className="w-3 h-3" /> {DOVODY[n.dovod] || n.dovod}</span>
               {n.stav !== 'nove' && (
@@ -165,7 +165,7 @@ export function NahlaseniaScreen() {
             </div>
 
             {/* 2 · KTO a KEDY */}
-            <div className="nahl-meta">
+            <div className="ad-nahl-meta">
               {n.druh === 'komentar' ? 'komentár pod článkom' : 'komentár pod fotografiou'}
               {' · '}autor <strong>{n.autorObsahu || 'neznámy'}</strong>
               {n.nahlasil ? <> · nahlásil <strong>{n.nahlasil}</strong></> : null}
@@ -173,10 +173,10 @@ export function NahlaseniaScreen() {
             </div>
 
             {/* 3 · ČO sa rieši — odpis uložený pri nahlásení */}
-            <blockquote className="nahl-text">{n.odpisObsahu || '(komentár bol prázdny)'}</blockquote>
+            <blockquote className="ad-nahl-text">{n.odpisObsahu || '(komentár bol prázdny)'}</blockquote>
 
             {n.poznamka && (
-              <div className="nahl-poznamka">
+              <div className="ad-nahl-poznamka">
                 <strong>Poznámka nahlasovateľa:</strong> {n.poznamka}
               </div>
             )}
@@ -184,7 +184,7 @@ export function NahlaseniaScreen() {
             {/* 4 · ČO S TÝM. Tlačidlá sú pomenované, nie holé ikony: dve
                    odpadkové koše vedľa seba (zmazať komentár × zahodiť
                    záznam) sa inak pliesť musia. */}
-            <div className="nahl-akcie">
+            <div className="ad-nahl-akcie">
               {n.url && (
                 <a className="abtn" href={n.url} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="w-4 h-4" /> Otvoriť na webe
@@ -205,7 +205,7 @@ export function NahlaseniaScreen() {
                 </button>
               )}
               <span style={{ flex: 1 }} />
-              <button className="abtn abtn-ghost nahl-zahodit" onClick={() => setMazem(n)}
+              <button className="abtn abtn-ghost ad-nahl-zahodit" onClick={() => setMazem(n)}
                       title="Zmaže len záznam o nahlásení, komentár ostane">
                 Zahodiť záznam
               </button>
