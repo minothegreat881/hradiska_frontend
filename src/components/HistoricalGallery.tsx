@@ -20,6 +20,9 @@ export interface GalleryImage {
 interface HistoricalGalleryProps {
   images: GalleryImage[];
   title?: string;
+  /** Koľko fotiek vedľa seba na širokej obrazovke (2 – 4). Nastavuje sa
+   *  v editore; na užších oknách sa mriežka aj tak zúži sama. */
+  columns?: number;
 }
 
 const headerBtnStyle: React.CSSProperties = {
@@ -330,7 +333,7 @@ export function Lightbox({
 // MAIN GALLERY
 // =============================================================================
 
-export function HistoricalGallery({ images, title = 'Fotogaléria' }: HistoricalGalleryProps) {
+export function HistoricalGallery({ images, title = 'Fotogaléria', columns = 3 }: HistoricalGalleryProps) {
   const [modalIndex, setModalIndex] = useState<number | null>(null);
   // Kam vrátiť focus po zatvorení (miniatúra, z ktorej sa otvorilo)
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -422,7 +425,9 @@ export function HistoricalGallery({ images, title = 'Fotogaléria' }: Historical
       <hr style={{ height: 1, background: 'linear-gradient(90deg, var(--hr-line-quiet) 0%, rgba(196,165,116,0) 100%)', margin: '8px 0 24px', border: 0 }} />
 
       {/* Grid miniatúr */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+      {/* Počet stĺpcov hovorí článok (`galleryColumns`); na užšom okne sa
+          mriežka zúži sama — viď `.hgal-mriezka` v globals.css. */}
+      <div className="hgal-mriezka" style={{ ['--hgal-stlpcov' as any]: Math.min(4, Math.max(2, columns || 3)) }}>
         {images.map((image, idx) => (
           <button
             type="button"

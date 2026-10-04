@@ -2727,3 +2727,18 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   color: var(--hr-accent, #a6472a); text-decoration: none;
 }
 .lok-mapa-odkaz a:hover { text-decoration: underline; }
+
+/* Mriežka fotogalérie pod článkom. Počet stĺpcov určuje redakcia
+   (`galleryColumns`), ale na úzkych oknách rozhoduje šírka — tri stĺpce na
+   telefóne by boli poštové známky. */
+.hgal-mriezka {
+  display: grid;
+  grid-template-columns: repeat(var(--hgal-stlpcov, 3), minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .hgal-mriezka { grid-template-columns: repeat(min(var(--hgal-stlpcov, 3), 2), minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .hgal-mriezka { grid-template-columns: minmax(0, 1fr); }
+}

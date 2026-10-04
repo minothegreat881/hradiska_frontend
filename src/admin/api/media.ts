@@ -63,6 +63,17 @@ export async function uploadFiles(token: string, files: File[]): Promise<MediaFi
   return Array.isArray(res) ? res : [];
 }
 
+/**
+ * Popis fotografie. Píše sa do knižnice médií, nie do článku — tá istá
+ * fotka má popis všade rovnaký (galéria aj svetelný box ho čítajú odtiaľ).
+ * Strapi na to má `POST /api/upload?id=<id>` s poľom `fileInfo` a BEZ súboru.
+ */
+export async function ulozPopisSuboru(token: string, id: number, caption: string): Promise<void> {
+  const fd = new FormData();
+  fd.append('fileInfo', JSON.stringify({ caption, alternativeText: caption }));
+  await strapiFetch(`/api/upload?id=${id}`, { method: 'POST', token, raw: fd });
+}
+
 export async function deleteFile(token: string, id: number) {
   return strapiFetch(`/api/upload/files/${id}`, { method: 'DELETE', token });
 }

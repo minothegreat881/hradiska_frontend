@@ -47,6 +47,8 @@ export interface EditorState {
   /** Fotogaléria na konci článku. `undefined` = needitovala sa, nech ju PUT
    *  neprepíše; prázdne pole = galéria sa zámerne vyprázdnila. */
   gallery?: any[];
+  /** Koľko fotiek galérie vedľa seba (2 – 4). */
+  galleryColumns?: number;
 }
 
 /** Média z GET-u prídu ako objekt — Strapi pri zápise čaká číselné id. */
@@ -176,6 +178,7 @@ export function buildPayload(s: EditorState, opts: { includeBlocks: boolean }) {
   /* Galéria sa posiela len vtedy, keď ju editor naozaj drží — inak by PUT
      zmazal fotky článkom, ktoré sa otvorili v staršom editore. */
   if (s.gallery !== undefined) data.gallery = s.gallery.map(mediaId).filter(Boolean);
+  if (s.galleryColumns) data.galleryColumns = Math.min(4, Math.max(2, s.galleryColumns));
 
   // Lokalita sa zapisuje len ak má povinné polia — inak by Strapi vrátil 400.
   const lat = parseFloat(s.location.latitude);

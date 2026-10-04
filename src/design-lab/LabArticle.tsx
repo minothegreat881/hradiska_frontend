@@ -284,6 +284,7 @@ export function LabArticle({ slug }: { slug: string }) {
                   <HistoricalGallery
                     images={gallery as { url: string; caption?: string; alt?: string }[]}
                     title="Fotogaléria"
+                    columns={(post as any).galleryColumns || 3}
                   />
                 )}
 

@@ -20,7 +20,7 @@ import { RichTextEditor } from '../richtext/RichTextEditor';
 import { TagPicker } from '../components/TagPicker';
 import { LocationMap } from '../components/LocationMap';
 import { type Tag } from '../api/tags';
-import { fileUrl, type MediaFile } from '../api/media';
+import { fileUrl, ulozPopisSuboru, type MediaFile } from '../api/media';
 import { EditorCanvas, type CanvasDevice, type CanvasZoom } from '../editor/EditorCanvas';
 import { useHistory } from '../editor/state/useHistory';
 import { saveDraft, readDraft, clearDraft, timeOf } from '../editor/state/autosave';
@@ -113,6 +113,8 @@ export function EditorScreen({
      naozaj načítal (alebo ide o nový článok). Keby sa článok nedotiahol celý,
      prázdne pole by pri uložení zmazalo všetky fotky pod článkom. */
   const galeriaZnama = useRef(!articleId);
+  /** Koľko fotiek vedľa seba (pole `galleryColumns`, 2 – 4). */
+  const [galeriaStlpcov, setGaleriaStlpcov] = useState(3);
   // Kam sa má priradiť vybraný obrázok: cover alebo konkrétny blok.
   const [picking, setPicking] = useState<
     { target: 'cover' } | { target: 'galeria' } | { target: 'block'; uid: string; multiple?: boolean } | null
@@ -209,6 +211,7 @@ export function EditorScreen({
         setCover(d.coverImage ?? null);
         setCoverPosition(d.coverPosition || 'center center');
         setGaleria(Array.isArray(d.gallery) ? d.gallery : []);
+        setGaleriaStlpcov(Number(d.galleryColumns) || 3);
         galeriaZnama.current = true;
         setLoc({
           name: d.location?.name ?? '',
@@ -257,6 +260,21 @@ export function EditorScreen({
     );
   }
 
+  /**
+   * Popis fotografie v galérii. Zapisuje sa do knižnice médií, nie do článku:
+   * tá istá fotka má potom popis rovnaký všade (galéria, svetelný box aj
+   * iné články). Preto sa ukladá HNEĎ a nečaká na „Uložiť koncept".
+   */
+  const ulozPopisGalerie = async (fileId: number, popis: string) => {
+    if (!token || !fileId) return;
+    setGaleria((g) => g.map((f: any) => (f?.id === fileId ? { ...f, caption: popis, alternativeText: popis } : f)));
+    try {
+      await ulozPopisSuboru(token, fileId, popis);
+    } catch (e: any) {
+      setSaveMsg({ text: `Popis fotografie sa neuložil: ${e?.message || 'neznáma chyba'}` });
+    }
+  };
+
   const applyPick = (files: MediaFile[]) => {
     if (!files.length || !picking) return;
     if (picking.target === 'cover') { setCover(files[0]); setDirty(true); return; }
@@ -297,6 +315,7 @@ export function EditorScreen({
     coverImage: cover,
     coverPosition,
     gallery: galeriaZnama.current ? galeria : undefined,
+    galleryColumns: galeriaStlpcov,
   });
 
   /** Prekážka uloženia. `uid` umožní na blok rovno ukázať. */
@@ -316,7 +335,8 @@ export function EditorScreen({
 
   const snapshot = () => ({
     title, excerpt, slug, author, readingTime, pubDate, featured, category,
-    tags, metaTitle, metaDesc, loc, cover, coverPosition, galeria, keyFacts, timeline, blocks,
+    tags, metaTitle, metaDesc, loc, cover, coverPosition, galeria, galeriaStlpcov,
+    keyFacts, timeline, blocks,
   });
   snapshotRef.current = snapshot;
 
@@ -331,6 +351,7 @@ export function EditorScreen({
     /* Záloha staršia než táto funkcia galériu nepozná — vtedy sa nechá tá,
        ktorá prišla zo servera, nech sa fotky nestratia. */
     if (Array.isArray(data.galeria)) setGaleria(data.galeria);
+    if (data.galeriaStlpcov) setGaleriaStlpcov(Number(data.galeriaStlpcov));
     setKeyFacts(data.keyFacts ?? []); setTimeline(data.timeline ?? []);
     blocksHistory.reset(data.blocks ?? []);
     setDirty(true);
@@ -777,6 +798,11 @@ export function EditorScreen({
               timeline={timeline}
               tags={tags.map(t => t.name)}
               galeria={galeria}
+              galeriaStlpcov={galeriaStlpcov}
+              onGaleriaChange={(next) => { setGaleria(next); touch(); }}
+              onGaleriaPridaj={() => setPicking({ target: 'galeria' })}
+              onGaleriaStlpcov={(n) => { setGaleriaStlpcov(n); touch(); }}
+              onGaleriaPopis={ulozPopisGalerie}
               onCoverPositionChange={value => { setCoverPosition(value); touch(); }}
               onFactsChange={next => { setKeyFacts(next); touch(); }}
               onTimelineChange={next => { setTimeline(next); touch(); }}
@@ -897,7 +923,10 @@ export function EditorScreen({
                 </button>
               )}
             </div>
-            <Hint>Popis sa k fotografii píše v knižnici médií — galéria ho preberá odtiaľ.</Hint>
+            <Hint>
+              Poradie, popisy aj počet stĺpcov sa dajú meniť priamo na plátne — galéria je
+              na jeho konci, tak ako na webe. Tu je len zoznam pre rýchly prehľad.
+            </Hint>
           </Panel>
 
           <Panel title="Zaradenie" summary={sumZaradenie}>

@@ -242,6 +242,15 @@ export interface EditorCanvasProps {
    *  pozeranie — mení sa v pravom paneli —, ale musí tu byť, inak editor
    *  ukazuje iný článok, než aký je na webe. */
   galeria?: any[];
+  /** Koľko fotiek vedľa seba (2 – 4). Mení sa priamo na plátne. */
+  galeriaStlpcov?: number;
+  /** Nové poradie / vybratá fotka. */
+  onGaleriaChange?: (next: any[]) => void;
+  /** Otvorí knižnicu médií a pridá vybrané fotky do galérie. */
+  onGaleriaPridaj?: () => void;
+  onGaleriaStlpcov?: (n: number) => void;
+  /** Popis fotky — ukladá sa do knižnice médií, nie do článku. */
+  onGaleriaPopis?: (fileId: number, popis: string) => void;
   /** Štítky článku — na webe sú v pobočnom stĺpci ako karta „Témy".
       Na plátne sa iba ukazujú; menia sa v pravom paneli. */
   tags?: string[];
@@ -267,7 +276,9 @@ const LABELS: Record<string, string> = {
 export function EditorCanvas({
   article, device, zoom = 'fit', selectedUid = null, onSelect, onMove, onDelete, onDuplicate, onInsert,
   onKeyDown, onBodyChange, onPatch, onPickMedia, blockTypes = [], noShell,
-  facts = [], timeline = [], tags = [], galeria = [], onFactsChange, onTimelineChange, onCoverPositionChange,
+  facts = [], timeline = [], tags = [], galeria = [], galeriaStlpcov = 3,
+  onGaleriaChange, onGaleriaPridaj, onGaleriaStlpcov, onGaleriaPopis,
+  onFactsChange, onTimelineChange, onCoverPositionChange,
 }: EditorCanvasProps) {
   const cover = article.coverImage ? getStrapiImageUrl(article.coverImage) : null;
   const [hoverUid, setHoverUid] = useState<string | null>(null);
@@ -446,21 +457,73 @@ export function EditorCanvas({
               {/* FOTOGALÉRIA, presne tam, kde je aj na webe — pod článkom.
                   Na plátne sa needituje (to robí pravý panel), ale bez nej
                   editor ukazoval článok bez fotiek, ktoré na webe sú. */}
-              {galeria.length > 0 && (
-                <section className="ed-galeria">
-                  <h2>Fotogaléria <span>{galeria.length}</span></h2>
+              {(galeria.length > 0 || onGaleriaPridaj) && (
+                <section className="ed-galeria" data-stlpcov={Math.min(4, Math.max(2, galeriaStlpcov))}>
+                  <div className="ed-galeria-hlava">
+                    <h2>Fotogaléria <span>{galeria.length}</span></h2>
+                    {/* Koľko fotiek vedľa seba. Je to vlastnosť článku, nie
+                        editora — tak to aj vyzerá na webe. */}
+                    {onGaleriaStlpcov && (
+                      <div className="ed-galeria-stlpce" role="group" aria-label="Počet stĺpcov galérie">
+                        {[2, 3, 4].map((n) => (
+                          <button key={n} type="button"
+                                  className={galeriaStlpcov === n ? 'je-zvolene' : ''}
+                                  onClick={() => onGaleriaStlpcov(n)}
+                                  title={`${n} fotografie vedľa seba`}>
+                            {n}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="ed-galeria-mriezka">
-                    {galeria.slice(0, 12).map((f: any, i: number) => (
+                    {galeria.map((f: any, i: number) => (
                       <figure key={f?.id ?? i}>
-                        <img src={getStrapiImageUrl(f)} alt="" loading="lazy" />
-                        {f?.caption ? <figcaption>{f.caption}</figcaption> : null}
+                        <div className="ed-gf-obraz">
+                          <img src={getStrapiImageUrl(f)} alt="" loading="lazy" />
+                          {onGaleriaChange && (
+                            <div className="ed-gf-nastroje">
+                              <button type="button" title="Posunúť dopredu" disabled={i === 0}
+                                      onClick={() => { const n = [...galeria]; [n[i - 1], n[i]] = [n[i], n[i - 1]]; onGaleriaChange(n); }}>←</button>
+                              <button type="button" title="Posunúť dozadu" disabled={i === galeria.length - 1}
+                                      onClick={() => { const n = [...galeria]; [n[i + 1], n[i]] = [n[i], n[i + 1]]; onGaleriaChange(n); }}>→</button>
+                              <button type="button" className="is-danger" title="Vybrať z galérie"
+                                      onClick={() => onGaleriaChange(galeria.filter((_, j) => j !== i))}>×</button>
+                            </div>
+                          )}
+                          <span className="ed-gf-cislo">{i + 1}</span>
+                        </div>
+                        {/* Popis sa píše rovno sem. Ukladá sa do knižnice
+                            médií, takže ho má fotka všade rovnaký. */}
+                        <figcaption>
+                          {onGaleriaPopis ? (
+                            <textarea
+                              defaultValue={f?.caption || ''}
+                              placeholder="Popis fotografie…"
+                              rows={2}
+                              onBlur={(e) => {
+                                const v = e.currentTarget.value.trim();
+                                if (v !== (f?.caption || '')) onGaleriaPopis(f.id, v);
+                              }}
+                            />
+                          ) : (f?.caption || null)}
+                        </figcaption>
                       </figure>
                     ))}
+
+                    {onGaleriaPridaj && (
+                      <button type="button" className="ed-galeria-pridaj" onClick={onGaleriaPridaj}>
+                        <span>+</span> Pridať fotografie
+                      </button>
+                    )}
                   </div>
-                  <p className="ed-galeria-pata">
-                    {galeria.length > 12 ? `Zobrazených prvých 12 z ${galeria.length}. ` : ''}
-                    Fotografie sa pridávajú a zoraďujú v pravom paneli, v časti Fotogaléria.
-                  </p>
+
+                  {galeria.length === 0 && (
+                    <p className="ed-galeria-pata">
+                      Galéria je prázdna — pod článkom sa nezobrazí, kým v nej nie je aspoň jedna fotografia.
+                    </p>
+                  )}
                 </section>
               )}
             </section>
@@ -482,10 +545,13 @@ const canvasCss = `
    by orezala ponuku „Vložiť blok" aj lišty blokov pri okraji — tu preto
    pretečenie prepúšťa. Na rozvrh to nemá vplyv. */
 .lart-card { overflow: visible !important; }
-/* Fotogaléria pod článkom — na plátne len na pozeranie. */
+/* Fotogaléria pod článkom — na plátne sa aj upravuje, nielen pozerá.
+   Počet stĺpcov je ten istý, aký bude na webe (pole galleryColumns), takže
+   šachovnica v editore zodpovedá tomu, čo uvidí čitateľ. */
 .ed-galeria { max-width: 1180px; margin: 26px auto 0; }
+.ed-galeria-hlava { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .ed-galeria h2 {
-  display: flex; align-items: center; gap: 9px; margin: 0 0 12px;
+  display: flex; align-items: center; gap: 9px; margin: 0; flex: 1;
   font-family: 'Fraunces', Georgia, serif; font-size: 21px; color: var(--l-ink, #1a1510);
 }
 .ed-galeria h2 span {
@@ -493,17 +559,66 @@ const canvasCss = `
   border-radius: 999px; background: var(--l-second, #c9483a); color: #fff;
   font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
 }
-.ed-galeria-mriezka { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.ed-galeria-stlpce { display: flex; gap: 3px; padding: 3px; border-radius: 9px; background: rgba(20,14,6,.07); }
+.ed-galeria-stlpce button {
+  width: 27px; height: 25px; border: 0; border-radius: 7px; cursor: pointer;
+  background: none; color: var(--l-body, #453d33);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+}
+.ed-galeria-stlpce button:hover { background: rgba(255,255,255,.7); }
+.ed-galeria-stlpce button.je-zvolene { background: #fff; color: var(--l-second, #c9483a); box-shadow: 0 1px 3px rgba(20,14,6,.18); }
+
+.ed-galeria-mriezka {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.ed-galeria[data-stlpcov="2"] .ed-galeria-mriezka { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ed-galeria[data-stlpcov="4"] .ed-galeria-mriezka { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
 .ed-galeria figure { margin: 0; }
-.ed-galeria img {
-  width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block;
-  border-radius: 8px; border: 1px solid var(--l-line, #ded5c2);
+.ed-gf-obraz { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--l-line, #ded5c2); }
+.ed-galeria img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.ed-gf-cislo {
+  position: absolute; left: 5px; top: 5px; min-width: 18px; height: 18px; padding: 0 5px;
+  display: grid; place-items: center; border-radius: 5px;
+  background: rgba(20,14,6,.72); color: #fff;
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
 }
-.ed-galeria figcaption {
-  margin-top: 4px; font-family: 'Fraunces', Georgia, serif; font-size: 12px; line-height: 1.45;
+.ed-gf-nastroje {
+  position: absolute; inset: auto 0 0 0; display: flex; gap: 3px; justify-content: center;
+  padding: 4px; background: rgba(20,14,6,.72); opacity: 0; transition: opacity .15s ease;
+}
+.ed-gf-obraz:hover .ed-gf-nastroje, .ed-gf-obraz:focus-within .ed-gf-nastroje { opacity: 1; }
+.ed-gf-nastroje button {
+  border: 0; background: none; color: #fff; cursor: pointer;
+  font-size: 14px; line-height: 1; padding: 3px 7px; border-radius: 5px;
+}
+.ed-gf-nastroje button:hover:not(:disabled) { background: rgba(255,255,255,.22); }
+.ed-gf-nastroje button:disabled { opacity: .35; cursor: default; }
+.ed-gf-nastroje .is-danger:hover { background: #b3261e; }
+
+.ed-galeria figcaption { margin-top: 5px; }
+.ed-galeria figcaption textarea {
+  width: 100%; resize: vertical; min-height: 38px;
+  border: 1px dashed transparent; border-radius: 6px; padding: 4px 6px; background: none;
+  font-family: 'Fraunces', Georgia, serif; font-size: 12.5px; line-height: 1.45;
   color: var(--l-muted, #6f6658);
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
+.ed-galeria figcaption textarea:hover { border-color: var(--l-line-2, #c9bda5); }
+.ed-galeria figcaption textarea:focus {
+  outline: none; border-color: var(--l-second, #c9483a); border-style: solid; background: #fff;
+  color: var(--l-body, #453d33);
+}
+
+.ed-galeria-pridaj {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  aspect-ratio: 4 / 3; cursor: pointer;
+  border: 1px dashed var(--l-line-2, #c9bda5); border-radius: 8px; background: none;
+  font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--l-muted, #6f6658);
+}
+.ed-galeria-pridaj span { font-size: 22px; line-height: 1; }
+.ed-galeria-pridaj:hover { border-color: var(--l-second, #c9483a); color: var(--l-second, #c9483a); }
+
 .ed-galeria-pata {
   margin: 10px 0 0; font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--l-muted, #6f6658);
 }
