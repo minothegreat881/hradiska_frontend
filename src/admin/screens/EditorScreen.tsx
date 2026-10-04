@@ -74,7 +74,9 @@ export function EditorScreen({
   const [loadError, setLoadError] = useState('');
   const [published, setPublished] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<{ tone: 'ok' | 'err'; text: string; uid?: string } | null>(null);
+  /* Hlásenie o uložení. Len CHYBY — úspech netreba hlásiť pruhom, povie ho
+     štítok hore a tlačidlo „Publikované". */
+  const [saveMsg, setSaveMsg] = useState<{ text: string; uid?: string } | null>(null);
 
   const [title, setTitle] = useState('');
   const [excerpt, setExcerpt] = useState('');
@@ -370,7 +372,7 @@ export function EditorScreen({
     if (!token) return;
     const problem = validate();
     if (problem) {
-      setSaveMsg({ tone: 'err', text: problem.text, uid: problem.uid });
+      setSaveMsg({ text: problem.text, uid: problem.uid });
       if (problem.uid) setSelectedUid(problem.uid);
       return;
     }
@@ -379,7 +381,7 @@ export function EditorScreen({
     setSaveMsg(null);
     try {
       if (!(await isSlugFree(token, slug.trim(), articleId ?? undefined))) {
-        setSaveMsg({ tone: 'err', text: 'Slug už používa iný článok. Zvoľte iný.' });
+        setSaveMsg({ text: 'Slug už používa iný článok. Zvoľte iný.' });
         setSaving(false);
         return;
       }
@@ -399,16 +401,20 @@ export function EditorScreen({
       // Poistka: bloky sa pri PUT prepisujú celé — overíme, že ich sedí počet.
       const check = await verifyBlockCount(token, docId!, state.blocks.length);
       if (!check.ok) {
-        setSaveMsg({ tone: 'err', text: `Pozor: uložilo sa ${check.actual} blokov namiesto ${check.expected}. Skontrolujte článok.` });
+        setSaveMsg({ text: `Pozor: uložilo sa ${check.actual} blokov namiesto ${check.expected}. Skontrolujte článok.` });
       } else {
-        setSaveMsg({ tone: 'ok', text: publish ? 'Publikované.' : 'Koncept uložený.' });
+        /* Žiadne hlásenie pri úspechu. Zelený pruh cez celé plátno hovoril
+           to, čo je aj tak vidieť na dvoch miestach naraz: štítok hore
+           („Publikovaný"), čas uloženia pod ním a samotné tlačidlo, ktoré
+           sa prepne na „Publikované". Pruh len zakrýval článok. */
+        setSaveMsg(null);
         setDirty(false);
         setSavedAt(Date.now());
         clearDraft(articleId);   // záloha v prehliadači už netreba
         if (publish) setPublished(true);
       }
     } catch (e: any) {
-      setSaveMsg({ tone: 'err', text: e?.message || 'Uloženie zlyhalo.' });
+      setSaveMsg({ text: e?.message || 'Uloženie zlyhalo.' });
     } finally {
       setSaving(false);
     }
@@ -532,6 +538,9 @@ export function EditorScreen({
    * Panel je prilepený (`position: sticky`), takže v ňom sú akcie po ruke
    * kdekoľvek v článku.
    */
+  /** Publikovaný článok, v ktorom nič nečaká na uloženie. */
+  const hotove = published && !dirty && !saving;
+
   const akcieVydania = () => (
     <>
       {/* `?preview=draft` ukáže ULOŽENÝ koncept (viď lib/preview.ts). */}
@@ -542,8 +551,17 @@ export function EditorScreen({
       <button className="abtn" onClick={() => save(false)} disabled={saving}>
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Uložiť koncept
       </button>
-      <button className="abtn abtn-primary" onClick={() => save(true)} disabled={saving}>
-        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null} Publikovať
+      {/* Publikovaný článok bez rozpísaných zmien už nemá čo publikovať —
+          tlačidlo to povie samo: zozelenie a prepne sa na „Publikované".
+          Len čo sa niečo zmení, vráti sa späť na červené „Publikovať". */}
+      <button
+        className={hotove ? 'abtn abtn-hotovo' : 'abtn abtn-primary'}
+        onClick={() => save(true)}
+        disabled={saving || hotove}
+        title={hotove ? 'Článok je publikovaný a všetko je uložené.' : 'Uloží a zverejní článok na webe.'}
+      >
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : hotove ? <CircleCheck className="w-4 h-4" /> : null}
+        {hotove ? 'Publikované' : 'Publikovať'}
       </button>
     </>
   );
@@ -657,9 +675,9 @@ export function EditorScreen({
           role="status"
           style={{
             padding: '11px 15px', marginBottom: 16, fontSize: 13.5,
-            background: saveMsg.tone === 'ok' ? 'var(--ad-pub-bg)' : 'var(--hr-error-bg)',
-            borderColor: saveMsg.tone === 'ok' ? 'var(--ad-pub-br)' : 'var(--hr-error-line)',
-            color: saveMsg.tone === 'ok' ? 'var(--ad-pub-fg)' : 'var(--ad-danger)',
+            background: 'var(--hr-error-bg)',
+            borderColor: 'var(--hr-error-line)',
+            color: 'var(--ad-danger)',
           }}
         >
           {saveMsg.text}

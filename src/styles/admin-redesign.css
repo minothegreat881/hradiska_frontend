@@ -356,3 +356,14 @@
   font-size: 20px; line-height: 1; color: var(--ad-muted);
 }
 .admin .ad-upoz-x:hover { color: var(--ad-text); }
+
+/* Publikovaný článok bez rozpísaných zmien: tlačidlo prestane vyzývať
+   a len potvrdzuje stav. Zelená je tá istá ako na štítku „Publikovaný",
+   nech to ide dokopy. Nedostupnosť sa NEZOŠEDÍ bežným `opacity` —
+   vyblednuté potvrdenie vyzerá ako chyba, nie ako hotovo. */
+.admin .abtn-hotovo {
+  background: var(--ad-pub-bg);
+  color: var(--ad-pub-fg);
+  border-color: var(--ad-pub-br);
+}
+.admin .abtn-hotovo:disabled { opacity: 1; cursor: default; }
