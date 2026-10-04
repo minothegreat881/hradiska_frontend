@@ -5,10 +5,9 @@ import { ChevronRight } from 'lucide-react';
 import { Suspense, useState } from 'react';
 import { lazyStale } from '../lib/lazyStale';
 
-/* Mini-mapa si so sebou nesie MapLibre (274 kB). Ťahala sa pri každom
-   otvorení článku, hoci na telefóne je bočný stĺpec až pod celým textom —
-   teda pod prehybom. Modul sa preto dotiahne až vtedy, keď sa k mape
-   čitateľ priblíži. */
+/* Mapa sa pripojí, až keď je na dohľad. Knižnicu už so sebou nenesie
+   (je to rámec z Google Máp), ale rámec si aj tak sťahuje dlaždice —
+   a na telefóne je bočný stĺpec až pod celým textom, teda pod prehybom. */
 const MiniMap = lazyStale(() => import('./MiniMapaLokality'));
 
 /**
