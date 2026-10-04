@@ -367,3 +367,41 @@
   border-color: var(--ad-pub-br);
 }
 .admin .abtn-hotovo:disabled { opacity: 1; cursor: default; }
+
+/* ── Nahlásenia ────────────────────────────────────────────────────────────
+   Riadok čítaný zhora nadol odpovedá na štyri otázky v poradí, v akom si ich
+   redakcia kladie: KDE to je (názov článku, odkaz), KTO a KEDY, ČO sa rieši
+   (odpis komentára) a ČO S TÝM (pomenované tlačidlá). Predtým bol názov
+   článku len v adrese za ikonou a dva odpadkové koše vedľa seba sa museli
+   pliesť. */
+.admin .nahl-riadok {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ad-border);
+}
+.admin .nahl-riadok:last-child { border-bottom: 0; }
+
+.admin .nahl-kde {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;
+}
+.admin .nahl-clanok {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 15.5px; font-weight: 600; color: var(--ad-text); text-decoration: none;
+}
+.admin a.nahl-clanok:hover { color: var(--ad-secondary); text-decoration: underline; }
+
+.admin .nahl-meta { font-size: 12.5px; color: var(--ad-muted); margin-bottom: 9px; }
+.admin .nahl-meta strong { color: var(--ad-text); font-weight: 600; }
+
+.admin .nahl-text {
+  margin: 0 0 9px; padding: 11px 14px;
+  border-left: 3px solid var(--ad-danger);
+  background: var(--ad-surface); border-radius: 6px;
+  font-size: 14px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+}
+.admin .nahl-poznamka { font-size: 13.5px; color: var(--ad-muted); margin-bottom: 10px; }
+.admin .nahl-poznamka strong { color: var(--ad-text); }
+
+.admin .nahl-akcie { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+/* „Zahodiť záznam" je tichá vedľajšia vec — stojí vpravo a nekričí. */
+.admin .nahl-zahodit { font-size: 13px; color: var(--ad-muted); }
+.admin .nahl-zahodit:hover { color: var(--ad-text); }

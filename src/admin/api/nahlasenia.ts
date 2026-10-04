@@ -103,3 +103,30 @@ export const zmazNahlasenyPrispevok = (token: string, n: AdminNahlasenie) =>
       : `/api/photo-comments/${n.cielDocumentId}`,
     { method: 'DELETE', token }
   );
+
+/**
+ * Názvy článkov k slugom z adries nahlásení.
+ *
+ * Nahlásenie si pamätá adresu stránky, nie názov článku — a zo slugu
+ * („beckov-slovanske-hradisko") sa redakcia neorientuje. Doťahujú sa preto
+ * názvy, jednou požiadavkou pre celú stranu zoznamu.
+ */
+export async function nazvyClankov(token: string, slugy: string[]): Promise<Record<string, string>> {
+  const unikatne = [...new Set(slugy.filter(Boolean))];
+  if (!unikatne.length) return {};
+  const dotaz = [
+    'fields[0]=slug',
+    'fields[1]=title',
+    `pagination[pageSize]=${unikatne.length}`,
+    'status=draft',   // aj rozpísané — komentár môže visieť pod článkom, ktorý sa práve upravuje
+    ...unikatne.map((s, i) => `filters[slug][$in][${i}]=${encodeURIComponent(s)}`),
+  ].join('&');
+  try {
+    const r = await strapiFetch<any>(`/api/blog-posts?${dotaz}`, { token });
+    const mapa: Record<string, string> = {};
+    for (const x of r.data ?? []) if (x?.slug) mapa[x.slug] = x.title || x.slug;
+    return mapa;
+  } catch {
+    return {};   // bez názvov sa zoznam zobrazí tiež, len so slugom
+  }
+}
