@@ -238,6 +238,10 @@ export interface EditorCanvasProps {
   /** Pobočný stĺpec — upravuje sa priamo na plátne (nie v pravom paneli). */
   facts?: Fact[];
   timeline?: Event[];
+  /** Fotogaléria na konci článku (pole `gallery`). Na plátne je len na
+   *  pozeranie — mení sa v pravom paneli —, ale musí tu byť, inak editor
+   *  ukazuje iný článok, než aký je na webe. */
+  galeria?: any[];
   /** Štítky článku — na webe sú v pobočnom stĺpci ako karta „Témy".
       Na plátne sa iba ukazujú; menia sa v pravom paneli. */
   tags?: string[];
@@ -263,7 +267,7 @@ const LABELS: Record<string, string> = {
 export function EditorCanvas({
   article, device, zoom = 'fit', selectedUid = null, onSelect, onMove, onDelete, onDuplicate, onInsert,
   onKeyDown, onBodyChange, onPatch, onPickMedia, blockTypes = [], noShell,
-  facts = [], timeline = [], tags = [], onFactsChange, onTimelineChange, onCoverPositionChange,
+  facts = [], timeline = [], tags = [], galeria = [], onFactsChange, onTimelineChange, onCoverPositionChange,
 }: EditorCanvasProps) {
   const cover = article.coverImage ? getStrapiImageUrl(article.coverImage) : null;
   const [hoverUid, setHoverUid] = useState<string | null>(null);
@@ -438,6 +442,27 @@ export function EditorCanvas({
                 </aside>
                 </div>
               </article>
+
+              {/* FOTOGALÉRIA, presne tam, kde je aj na webe — pod článkom.
+                  Na plátne sa needituje (to robí pravý panel), ale bez nej
+                  editor ukazoval článok bez fotiek, ktoré na webe sú. */}
+              {galeria.length > 0 && (
+                <section className="ed-galeria">
+                  <h2>Fotogaléria <span>{galeria.length}</span></h2>
+                  <div className="ed-galeria-mriezka">
+                    {galeria.slice(0, 12).map((f: any, i: number) => (
+                      <figure key={f?.id ?? i}>
+                        <img src={getStrapiImageUrl(f)} alt="" loading="lazy" />
+                        {f?.caption ? <figcaption>{f.caption}</figcaption> : null}
+                      </figure>
+                    ))}
+                  </div>
+                  <p className="ed-galeria-pata">
+                    {galeria.length > 12 ? `Zobrazených prvých 12 z ${galeria.length}. ` : ''}
+                    Fotografie sa pridávajú a zoraďujú v pravom paneli, v časti Fotogaléria.
+                  </p>
+                </section>
+              )}
             </section>
           </div>
         </div>
@@ -457,6 +482,32 @@ const canvasCss = `
    by orezala ponuku „Vložiť blok" aj lišty blokov pri okraji — tu preto
    pretečenie prepúšťa. Na rozvrh to nemá vplyv. */
 .lart-card { overflow: visible !important; }
+/* Fotogaléria pod článkom — na plátne len na pozeranie. */
+.ed-galeria { max-width: 1180px; margin: 26px auto 0; }
+.ed-galeria h2 {
+  display: flex; align-items: center; gap: 9px; margin: 0 0 12px;
+  font-family: 'Fraunces', Georgia, serif; font-size: 21px; color: var(--l-ink, #1a1510);
+}
+.ed-galeria h2 span {
+  display: inline-grid; place-items: center; min-width: 25px; height: 22px; padding: 0 7px;
+  border-radius: 999px; background: var(--l-second, #c9483a); color: #fff;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+}
+.ed-galeria-mriezka { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.ed-galeria figure { margin: 0; }
+.ed-galeria img {
+  width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block;
+  border-radius: 8px; border: 1px solid var(--l-line, #ded5c2);
+}
+.ed-galeria figcaption {
+  margin-top: 4px; font-family: 'Fraunces', Georgia, serif; font-size: 12px; line-height: 1.45;
+  color: var(--l-muted, #6f6658);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ed-galeria-pata {
+  margin: 10px 0 0; font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--l-muted, #6f6658);
+}
+
 /* Miesto pod článkom, aby sa ponuka na konci mala kam otvoriť. */
 .article-body-wrapper { padding-bottom: 44px; }
 

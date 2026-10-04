@@ -776,6 +776,7 @@ export function EditorScreen({
               facts={keyFacts}
               timeline={timeline}
               tags={tags.map(t => t.name)}
+              galeria={galeria}
               onCoverPositionChange={value => { setCoverPosition(value); touch(); }}
               onFactsChange={next => { setKeyFacts(next); touch(); }}
               onTimelineChange={next => { setTimeline(next); touch(); }}
@@ -855,7 +856,13 @@ export function EditorScreen({
               Doteraz sa dala meniť len priamo v Strapi — v editore nebola
               vidieť vôbec, takže redakcia nevedela, čo pod článkom visí.
               Poradie je to isté, v akom sa fotky zobrazia; mení sa šípkami. */}
-          <Panel title="Fotogaléria" summary={galeria.length ? `${galeria.length} ${galeria.length === 1 ? 'fotografia' : galeria.length < 5 ? 'fotografie' : 'fotografií'}` : 'prázdna'}>
+          <Panel
+            title="Fotogaléria"
+            summary={galeria.length ? `${galeria.length} ${galeria.length === 1 ? 'fotografia' : galeria.length < 5 ? 'fotografie' : 'fotografií'}` : 'prázdna'}
+            /* Keď článok galériu má, panel je otvorený — práve pri starších
+               článkoch nebolo vôbec vidieť, že pod nimi nejaké fotky visia. */
+            defaultOpen={galeria.length > 0}
+          >
             {galeria.length === 0 && (
               <p className="ad-gal-prazdno">
                 Pod článkom sa galéria nezobrazí, kým v nej nie je aspoň jedna fotografia.
