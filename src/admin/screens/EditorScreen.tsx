@@ -415,6 +415,8 @@ export function EditorScreen({
     const problem = validate();
     if (problem) {
       setSaveMsg({ text: problem.text, uid: problem.uid });
+      /* Len vybrať, NEodrolovať: výhrada je hore a odrolovanie na blok č. 22
+         by ju odnieslo z obrazovky. Na pozretie je tlačidlo „Ukáž mi to". */
       if (problem.uid) setSelectedUid(problem.uid);
       return;
     }
@@ -520,6 +522,41 @@ export function EditorScreen({
   };
 
   const addBlock = (type: string) => insertBlock(type, blocks.length);
+
+  /**
+   * Odrolá na blok a vyberie ho — používa to „Ukáž mi to" pri výhrade.
+   *
+   * Samotný `setSelectedUid` nestačí: blok č. 22 je typicky mimo obrazovky,
+   * takže sa rám výberu objaví tam, kam sa práve nepozeráme, a tlačidlo
+   * pôsobí, že nerobí nič. Plátno je vlastné okno (iframe), preto sa blok
+   * hľadá najprv v ňom a až potom v hlavnom dokumente (režim formulára).
+   */
+  const ukazBlok = (uid: string) => {
+    setSelectedUid(uid);
+    requestAnimationFrame(() => {
+      const ramec = document.querySelector('iframe[title="Náhľad článku"]') as HTMLIFrameElement | null;
+      const vPlatne = ramec?.contentDocument?.querySelector(`[data-block-uid="${uid}"]`) as HTMLElement | null;
+
+      if (!vPlatne || !ramec) {   // režim formulára — blok je v tomto dokumente
+        document.querySelector(`[data-block-uid="${uid}"]`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      /* Rámec plátna rastie do výšky celého článku, takže vlastný posuvník
+         zvyčajne nemá — roluje stránka pod ním. `scrollIntoView` vnútri okna
+         iframe by teda neurobil nič; polohu bloku treba prepočítať do súradníc
+         stranky a odrolovať ňou. (Ak by rámec posuvník mal, prvý `scrollIntoView`
+         ho vybaví a druhý krok už meria správne.) */
+      vPlatne.scrollIntoView({ block: 'center' });
+      requestAnimationFrame(() => {
+        const vnutri = vPlatne.getBoundingClientRect();
+        const vonku = ramec.getBoundingClientRect();
+        const stred = window.scrollY + vonku.top + vnutri.top + vnutri.height / 2 - window.innerHeight / 2;
+        window.scrollTo({ top: Math.max(0, stred), behavior: 'smooth' });
+      });
+    });
+  };
 
   const deleteBlock = (uid: string) => {
     setBlocks(bs => bs.filter(b => b.uid !== uid), 'zmazanie bloku');
@@ -728,7 +765,7 @@ export function EditorScreen({
               <button
                 className="abtn"
                 style={{ marginLeft: 10, padding: '4px 10px', fontSize: 12.5 }}
-                onClick={() => setSelectedUid(saveMsg.uid!)}
+                onClick={() => ukazBlok(saveMsg.uid!)}
               >
                 Ukáž mi to
               </button>

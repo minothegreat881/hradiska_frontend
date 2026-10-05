@@ -2347,7 +2347,19 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   background: var(--ad-card);
   border: 1px solid var(--ad-border);
   border-radius: 12px;
+
+  /* ZHODA MIEN S WEBOM. `.acard` je aj na webe — je to karta článku
+     v zoznamoch — a `design-lab/theme.css` sa načítava v celej aplikácii,
+     teda aj v administrácii. Jeho pravidlá (`display: flex`, `height: 100%`,
+     nadvihnutie pri nabehnutí) sa sem vliali a z každej karty urobili stĺpec
+     na celú výšku rodiča: výhrada nad editorom vyplnila obrazovku a tlačidlá
+     v nej sa roztiahli cez celú šírku. Nasleduje návrat k príslušným
+     predvoleným hodnotám; prípadný rozvrh si karta urobí sama. */
+  display: block; height: auto; min-width: 0; gap: normal;
+  color: inherit; text-decoration: none;
+  transform: none; transition: none;
 }
+.admin .acard:hover { transform: none; }
 .admin .achip {
   display: inline-flex; align-items: center; gap: 6px;
   border-radius: 999px; padding: 3px 10px;
