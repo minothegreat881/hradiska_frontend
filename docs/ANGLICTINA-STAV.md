@@ -84,6 +84,12 @@ sa iba nahlási.
   stojí aj v tele článku; fotka, ktorá je len v galérii, a alt titulnej
   fotografie ostávajú po slovensky. Riešenie by znamenalo pole pre anglický
   popis pri článku (napr. komponent `gallery-caption` s id médiá + text).
+- **Mapa hradísk pod článkom** sa plní zo slovenského registra (všetkých 364
+  lokalít) a jej karta odkazuje na **slovenský** článok — v angličtine s
+  poznámkou „(in Slovak)". Inak by `/en/blog/<slovenský slug>` skončil na
+  „Article not found". Keď bude preložená väčšina článkov, mapa môže ísť na
+  anglický index a poznámka vypadne; dovtedy je lepšie ukázať celý register než
+  štyri body.
 - **Komentáre čitateľov** ostávajú v jazyku, v ktorom boli napísané — to je
   správne, nie chyba.
 

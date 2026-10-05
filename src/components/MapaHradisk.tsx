@@ -26,7 +26,7 @@
  * mapa (107 v hraniciach SR). Žiadny nový endpoint.
  */
 
-import { t, kategoria, odkaz, poAnglicky } from '../lib/jazyk';
+import { t, kategoria, poAnglicky } from '../lib/jazyk';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -166,8 +166,14 @@ function CardIn({ loc, onClose }: { loc: Loc; onClose: () => void }) {
       <span className="lmap-card-name">{loc.name}</span>
       <span className="lmap-card-coords">{deg(loc.lat, 'N', 'S')} · {deg(loc.lng, 'E', 'W')}</span>
       {loc.excerpt && <p className="lmap-card-desc">{loc.excerpt}</p>}
-      <a className="lmap-card-cta" href={odkaz(`/blog/${loc.slug}`)}>
-        {t('Čítať článok')} <span aria-hidden="true">→</span>
+      {/* ODKAZ VEDIE NA SLOVENSKÝ ČLÁNOK, aj keď je stránka anglická.
+          Mapa sa plní zo slovenského registra lokalít (všetkých 364), takže
+          `/en/blog/<slovenský slug>` by skončil na „Article not found".
+          Anglickému čitateľovi sa preto povie, v akom jazyku článok je —
+          mapa mu aj tak ukáže, kde hradiská sú. Keď budú preložené všetky,
+          mapa môže ísť na anglický index a poznámka vypadne. */}
+      <a className="lmap-card-cta" href={`/blog/${loc.slug}`}>
+        {t('Čítať článok')}{poAnglicky() ? ' (in Slovak)' : ''} <span aria-hidden="true">→</span>
       </a>
     </div>
   </div>
