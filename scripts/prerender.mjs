@@ -52,14 +52,15 @@ const jsonld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj
 
 const ORG = { '@type': 'Organization', name: 'Hradiská.sk', url: SITE + '/', logo: `${SITE}/logo_slovanske_hradiska_256.jpg` };
 
-function buildHead({ title, description, canonical, ogType = 'website', image = DEFAULT_OG, publishedTime, ld = [] }) {
+function buildHead({ title, description, canonical, ogType = 'website', image = DEFAULT_OG, publishedTime, ld = [], alternaty = [], jazyk = 'sk' }) {
   const lines = [
     `<title>${escText(title)}</title>`,
     `<meta name="description" content="${escAttr(description)}" />`,
     `<link rel="canonical" href="${escAttr(canonical)}" />`,
+    ...(alternaty || []).map((a) => `<link rel="alternate" hreflang="${a.jazyk}" href="${escAttr(a.url)}" />`),
     `<meta property="og:type" content="${ogType}" />`,
     `<meta property="og:site_name" content="Hradiská.sk" />`,
-    `<meta property="og:locale" content="sk_SK" />`,
+    `<meta property="og:locale" content="${jazyk === 'en' ? 'en_GB' : 'sk_SK'}" />`,
     `<meta property="og:title" content="${escAttr(title)}" />`,
     `<meta property="og:description" content="${escAttr(description)}" />`,
     `<meta property="og:url" content="${escAttr(canonical)}" />`,
@@ -126,6 +127,32 @@ async function main() {
     return;
   }
 
+  /* Anglické verzie — mapa `slovenský slug → anglický článok`. Keď Strapi
+     odpovedá chybou (napr. preklady ešte nie sú zapnuté), ide sa ďalej bez nich. */
+  const anglicke = new Map();
+  try {
+    const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[pageSize]=500`
+      + `&fields[0]=title&fields[1]=slug&fields[2]=excerpt&fields[3]=metaTitle&fields[4]=metaDescription`
+      + `&fields[5]=authorName&fields[6]=originalPublishedDate`
+      + `&populate[coverImage][fields][0]=url&populate[coverImage][fields][1]=formats`
+      + `&populate[localizations][fields][0]=slug&populate[localizations][fields][1]=locale`);
+    if (r.ok) {
+      const j = await r.json();
+      for (const p of j.data || []) {
+        const sk = (p.localizations || []).find((x) => x.locale === 'sk');
+        if (!sk) continue;
+        anglicke.set(sk.slug, {
+          slug: p.slug, title: p.title, excerpt: p.excerpt, metaTitle: p.metaTitle,
+          metaDescription: p.metaDescription, authorName: p.authorName,
+          date: p.originalPublishedDate || null,
+          cover: p.coverImage?.url || null,
+        });
+      }
+    }
+  } catch (e) {
+    console.warn(`[prerender] anglické verzie sa nenačítali (${e.message}) — pokračujem bez nich.`);
+  }
+
   let n = 0;
   for (const a of items) {
     if (!a.slug) continue;
@@ -163,10 +190,44 @@ async function main() {
       });
     }
 
-    writePage(`/blog/${a.slug}`, buildHead({ title, description, canonical, ogType: 'article', image, publishedTime: a.date, ld }));
+    const en = anglicke.get(a.slug);
+    const alternaty = en ? [
+      { jazyk: 'sk', url: canonical },
+      { jazyk: 'en', url: `${SITE}/en/blog/${en.slug}` },
+      { jazyk: 'x-default', url: canonical },
+    ] : [];
+
+    writePage(`/blog/${a.slug}`, buildHead({ title, description, canonical, ogType: 'article', image, publishedTime: a.date, ld, alternaty }));
     n++;
   }
-  console.log(`[prerender] hlavičky: ${STATIC.length} statických + ${n} článkov`);
+
+  /* Anglické články. Obsah je v Strapi pod jazykom `en`; zoznam sa ťahá priamo
+     z API, lebo vyhľadávací index je slovenský. */
+  let m = 0;
+  for (const [skSlug, en] of anglicke) {
+    const canonical = `${SITE}/en/blog/${en.slug}`;
+    const image = en.cover ? (en.cover.startsWith('http') ? en.cover : MEDIA + en.cover) : DEFAULT_OG;
+    const article = {
+      '@context': 'https://schema.org', '@type': 'Article',
+      headline: en.title, description: en.metaDescription || en.excerpt || '', image, inLanguage: 'en',
+      author: { '@type': 'Person', name: en.authorName || 'Hradiská' },
+      publisher: ORG, mainEntityOfPage: canonical,
+    };
+    if (en.date) article.datePublished = en.date;
+    const alternaty = [
+      { jazyk: 'sk', url: `${SITE}/blog/${skSlug}` },
+      { jazyk: 'en', url: canonical },
+      { jazyk: 'x-default', url: `${SITE}/blog/${skSlug}` },
+    ];
+    writePage(`/en/blog/${en.slug}`, buildHead({
+      title: en.metaTitle || en.title,
+      description: en.metaDescription || en.excerpt || '',
+      canonical, ogType: 'article', image, publishedTime: en.date, ld: [article],
+      alternaty, jazyk: 'en',
+    }));
+    m++;
+  }
+  console.log(`[prerender] hlavičky: ${STATIC.length} statických + ${n} slovenských + ${m} anglických článkov`);
 }
 
 main();

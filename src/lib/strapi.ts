@@ -79,6 +79,9 @@ export interface StrapiTimelineEvent {
 
 export interface StrapiBlogPost {
   id: number;
+  /** jazyk záznamu a jeho verzie v iných jazykoch (Strapi i18n) */
+  locale?: 'sk' | 'en';
+  localizations?: Array<{ locale: 'sk' | 'en'; slug: string; title: string }>;
   documentId: string;
   title: string;
   slug: string;
@@ -302,10 +305,13 @@ export async function getBlogPosts(options?: {
  */
 export async function getBlogPostBySlug(
   slug: string,
-  opts?: { draftToken?: string | null }
+  opts?: { draftToken?: string | null; locale?: 'sk' | 'en' }
 ): Promise<StrapiBlogPost | null> {
   // Deep populate for all fields including dynamic zone components
-  const query = `filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage&populate[1]=gallery&populate[2]=category&populate[3]=tags&populate[4]=quotes&populate[5]=blocks.image&populate[6]=blocks.images&populate[7]=blocks.secondImage&populate[8]=location&populate[9]=keyFacts&populate[10]=timeline&populate[11]=blocks.items`;
+  // `localizations` dávajú slug tej istej veci v druhom jazyku — z toho sa
+  // skladá prepínač jazyka aj `hreflang`.
+  const query = `filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage&populate[1]=gallery&populate[2]=category&populate[3]=tags&populate[4]=quotes&populate[5]=blocks.image&populate[6]=blocks.images&populate[7]=blocks.secondImage&populate[8]=location&populate[9]=keyFacts&populate[10]=timeline&populate[11]=blocks.items&populate[12]=localizations`
+    + (opts?.locale ? `&locale=${opts.locale}` : '');
 
   // Náhľad konceptu pre prihláseného správcu (viď lib/preview.ts). Bez tokenu
   // sa `status` neposiela vôbec a Strapi vráti publikovanú verziu ako doteraz.

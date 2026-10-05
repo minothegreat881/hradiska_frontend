@@ -31,6 +31,7 @@ import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
 import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 import { ArticleSidebar, KeyFactsCard, TimelineCard } from '../components/ArticleSidebar';
+import { t, datum as datumJazyka, odkaz, poAnglicky } from '../lib/jazyk';
 import { HistoricalGallery } from '../components/HistoricalGallery';
 import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
@@ -124,7 +125,7 @@ export function LabArticle({ slug }: { slug: string }) {
   }, [slug]);
 
   if (loading || (post && !fotkaPripravena)) return <CakanieNaClanok />;
-  if (!post) return <div className="lart-wait">Článok sa nenašiel.</div>;
+  if (!post) return <div className="lart-wait">{t('Článok sa nenašiel.')}</div>;
 
   const article = convertStrapiPostToArticle(post);
 
@@ -221,11 +222,24 @@ export function LabArticle({ slug }: { slug: string }) {
           <div className="grid-layout article-grid">
             <div className="article-main-col lart-hero-textcol">
         <div className="lart-hero-text">
+          {/* Prepínač jazyka — ukáže sa len vtedy, keď druhá jazyková verzia
+              článku naozaj existuje. Bez toho by odkaz viedol na 404. */}
+          {(() => {
+            const druhy = (post.localizations || []).find((x) => x.locale !== (post.locale || 'sk'));
+            if (!druhy) return null;
+            const doAnglictiny = druhy.locale === 'en';
+            return (
+              <a className="lart-jazyk" href={doAnglictiny ? `/en/blog/${druhy.slug}` : `/blog/${druhy.slug}`}
+                 hrefLang={druhy.locale} lang={druhy.locale}>
+                {doAnglictiny ? 'English' : 'Slovensky'}
+              </a>
+            );
+          })()}
           <nav className="lart-crumbs" aria-label="Omrvinky">
-            <a href="/">Domov</a>
+            <a href={odkaz('/')}>{t('Domov')}</a>
             <span aria-hidden="true">›</span>
             {post.category && (
-              <a className="je-tu" href={`/category/${post.category.slug}`}>{post.category.name}</a>
+              <a className="je-tu" href={odkaz(`/category/${post.category.slug}`)}>{post.category.name}</a>
             )}
           </nav>
           <h1 className="lart-title">{post.title}</h1>
@@ -236,10 +250,10 @@ export function LabArticle({ slug }: { slug: string }) {
             <span>{post.authorName || 'Hradiská.sk'}</span>
             <span className="lart-meta-dot" aria-hidden="true" />
             <time dateTime={(post.originalPublishedDate || post.publishedAt || '').slice(0, 10)}>
-              {skDate(post.originalPublishedDate || post.publishedAt)}
+              {poAnglicky() ? datumJazyka(post.originalPublishedDate || post.publishedAt) : skDate(post.originalPublishedDate || post.publishedAt)}
             </time>
             <span className="lart-meta-dot" aria-hidden="true" />
-            <span>{post.readingTime} min čítania</span>
+            <span>{post.readingTime} {t('min čítania')}</span>
           </div>
         </div>
             </div>
@@ -265,7 +279,7 @@ export function LabArticle({ slug }: { slug: string }) {
                     <DynamicZoneRenderer blocks={post.blocks} />
                   </div>
                 ) : (
-                  <p className="lart-empty">Obsah článku zatiaľ nebol pridaný.</p>
+                  <p className="lart-empty">{t('Obsah článku zatiaľ nebol pridaný.')}</p>
                 )}
 
                 {/* Na mobile pod textom, na počítači v pobočnom stĺpci — ako v produkcii. */}
@@ -328,7 +342,7 @@ export function LabArticle({ slug }: { slug: string }) {
       {related.length > 0 && (
         <section className="lart-more">
           <div className="container">
-            <h2 className="lart-more-h">Mohlo by vás zaujímať</h2>
+            <h2 className="lart-more-h">{t('Mohlo by vás zaujímať')}</h2>
             <p className="lart-more-s">Vybrali sme články súvisiace s touto témou</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Bez štítku kategórie: v dlaždici pod článkom len prekrýval

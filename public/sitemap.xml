@@ -56,6 +56,91 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/blog/ponicka-huta-na-klastore</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/pov-bystrica-sibenicny-vrsok</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/rekomberek-horne-oresany</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/sedliacka-dubova-ziar</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/skalica-hradisko-na-kalvarii</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/spissky-stvrtok-slovenske-mykeny</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/stary-plast-plavecky-mikulas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/stupava-draci-hradok</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/stupne-zeravica</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/sutovo-ratkovo-hradisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/trstin-novy-hradok</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/trzcinica-pl</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/turcianska-blatnica-plesovica</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/unin-zamcisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/vrable-fidvar-mesto-z-doby-bronzovej-b</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/vysny-kubin-tupa-skala</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/zibrica</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/blog/praveke-hradisko-na-sitne</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -441,97 +526,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/zibrica</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/vysny-kubin-tupa-skala</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/vrable-fidvar-mesto-z-doby-bronzovej-b</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/unin-zamcisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/turcianska-blatnica-plesovica</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/trzcinica-pl</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/trstin-novy-hradok</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/sutovo-ratkovo-hradisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/stupne-zeravica</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/stupava-draci-hradok</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/stary-plast-plavecky-mikulas</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/spissky-stvrtok-slovenske-mykeny</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/skalica-hradisko-na-kalvarii</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/sedliacka-dubova-ziar</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/rekomberek-horne-oresany</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/prosne-zlaty-kon</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hradiska.sk/blog/prasnik-tlsta-hora</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/pov-bystrica-sibenicny-vrsok</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/ponicka-huta-na-klastore</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1872,6 +1872,11 @@
   </url>
   <url>
     <loc>https://hradiska.sk/blog/naucny-chodnik-divinka-velky-vrch</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/molpir-hallstatt-hillfort-smolenice</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

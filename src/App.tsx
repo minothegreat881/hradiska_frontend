@@ -7,6 +7,7 @@ import { lazyStale } from './lib/lazyStale';
 import { PripomienkyDock } from './pripomienky/PripomienkyDock';
 import { Nacitavanie } from './design-lab/Nacitavanie';
 import './design-lab/theme.css';
+import { rozdelAdresu, nastavJazyk } from './lib/jazyk';
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
 const ArticlePagePecat = lazyStale(() => import('./design-lab/LabArticle'));
@@ -70,6 +71,13 @@ const ACCOUNT_ROUTES: Record<string, AccountMode> = {
  */
 export function urcCestu(path: string, search: string): { route: Route; params: Record<string, string>; accountMode: AccountMode | null } {
   const searchParams = new URLSearchParams(search);
+
+  /* Anglická verzia žije pod `/en/...`. Predpona sa odkrojí a ďalej sa cesta
+     spracuje rovnako ako slovenská, takže pribudnutie jazyka nerozbilo ani
+     jedno existujúce pravidlo nižšie. */
+  const jazykovo = rozdelAdresu(path);
+  nastavJazyk(jazykovo.jazyk);
+  path = jazykovo.cesta;
   const vysledok: { route: Route; params: Record<string, string>; accountMode: AccountMode | null } = {
     route: 'home',
     params: {},

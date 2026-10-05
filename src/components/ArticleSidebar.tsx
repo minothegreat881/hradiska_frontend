@@ -1,3 +1,4 @@
+import { t } from '../lib/jazyk';
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -80,7 +81,7 @@ export function KeyFactsCard({ facts }: { facts: KeyFact[] }) {
   if (!facts || facts.length === 0) return null;
   return (
     <div style={cardStyle}>
-      <h3 style={cardTitleStyle}>Kľúčové fakty</h3>
+      <h3 style={cardTitleStyle}>{t('Kľúčové fakty')}</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {facts.map((fact, index) => (
           <div
@@ -146,7 +147,7 @@ export function TimelineCard({ timeline }: { timeline: TimelineEvent[] }) {
   if (!timeline || timeline.length === 0) return null;
   return (
     <div style={cardStyle}>
-      <h3 style={cardTitleStyle}>Časová os</h3>
+      <h3 style={cardTitleStyle}>{t('Časová os')}</h3>
       <div>
         {timeline.map((item, index) => (
           <div key={index} style={{ display: 'flex', gap: 12 }}>
@@ -243,7 +244,7 @@ export function ArticleSidebar({
       {/* Location Card — only shown if coordinates + name are provided */}
       {hasLocation && (
         <div style={cardStyle}>
-          <h3 style={cardTitleStyle}>Lokalita</h3>
+          <h3 style={cardTitleStyle}>{t('Lokalita')}</h3>
           <MiniMap coordinates={coordinates!} locationName={capitalizedName} />
           <div style={{ marginTop: 10 }}>
             <h4
@@ -283,7 +284,7 @@ export function ArticleSidebar({
       {/* Tags */}
       {article.tags && article.tags.length > 0 && (
         <div style={cardStyle}>
-          <h3 style={cardTitleStyle}>Témy</h3>
+          <h3 style={cardTitleStyle}>{t('Témy')}</h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {article.tags.slice(0, 8).map((tag, index) => (
               <a
@@ -321,7 +322,7 @@ export function ArticleSidebar({
       {/* Related Articles */}
       {relatedArticles.length > 0 && (
         <div style={cardStyle}>
-          <h3 style={cardTitleStyle}>Súvisiace články</h3>
+          <h3 style={cardTitleStyle}>{t('Súvisiace články')}</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {relatedArticles.slice(0, 5).map((related) => (
               <a

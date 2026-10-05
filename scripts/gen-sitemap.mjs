@@ -67,10 +67,20 @@ async function main() {
     console.warn('[sitemap] Zapisujem len statické stránky.');
   }
 
+  /* Anglické verzie článkov. Keď ešte nie sú, nič sa nepridá. */
+  let anglickych = 0;
+  try {
+    const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[pageSize]=500&fields[0]=slug`);
+    if (r.ok) {
+      const j = await r.json();
+      for (const p of j.data || []) { entries.push(urlEntry(`/en/blog/${p.slug}`, '0.8')); anglickych++; }
+    }
+  } catch { /* bez angličtiny sa mapa stránok zapíše ďalej */ }
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, xml, 'utf8');
-  console.log(`[sitemap] zapísané ${entries.length} URL (${articleCount} článkov) → public/sitemap.xml`);
+  console.log(`[sitemap] zapísané ${entries.length} URL (${articleCount} slovenských + ${anglickych} anglických) → public/sitemap.xml`);
 }
 
 main();

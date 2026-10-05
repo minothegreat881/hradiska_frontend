@@ -1,3 +1,4 @@
+import { jazyk } from '../lib/jazyk';
 import { useState, useEffect } from 'react';
 import {
   getBlogPosts,
@@ -94,7 +95,7 @@ export function useBlogPost(slug: string) {
         const draftToken = getDraftPreviewToken();
         if (draftToken) {
           try {
-            const draft = await getBlogPostBySlug(slug, { draftToken });
+            const draft = await getBlogPostBySlug(slug, { draftToken, locale: jazyk() });
             if (!cancelled) {
               setPost(draft);
               setPreview('draft');
@@ -108,7 +109,7 @@ export function useBlogPost(slug: string) {
           }
         }
 
-        const result = await getBlogPostBySlug(slug);
+        const result = await getBlogPostBySlug(slug, { locale: jazyk() });
         if (!cancelled) {
           setPost(result);
         }
