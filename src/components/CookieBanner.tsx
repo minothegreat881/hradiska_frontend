@@ -1,3 +1,4 @@
+import { t, poAnglicky } from '../lib/jazyk';
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -42,7 +43,7 @@ export function CookieBanner() {
 
   return (
     <div className="ck-root ck-dock">
-      <div className="ck-card" role="dialog" aria-modal="false" aria-label="Súhlas s cookies">
+      <div className="ck-card" role="dialog" aria-modal="false" aria-label={poAnglicky() ? 'Cookie consent' : 'Súhlas s cookies'}>
         {/* Zlatý lem s vlnovkou */}
         <div className="ck-rim-bar" aria-hidden="true">
           <svg width="100%" height="12" preserveAspectRatio="none">
@@ -59,34 +60,51 @@ export function CookieBanner() {
           {/* Štít stráže */}
           <div className="ck-shield-wrap" aria-hidden="true">
             <div className="ck-shield"><span className="ck-emoji">🛡️</span></div>
-            <span className="ck-pill">STRÁŽ</span>
+            <span className="ck-pill">{t('STRÁŽ')}</span>
           </div>
 
           {/* Text */}
           <div className="ck-text">
             {mode === 'banner' ? (
               <>
-                <h2 className="ck-title">Stoj! Kto tam?</h2>
-                <p className="ck-p">
-                  Stráže na palisádach hlásia, že toto hradisko používa{' '}
-                  <span className="ck-accent">„cookies“</span>. Nie sú to síce tie upečené na ohnisku
-                  v susednej zemnici, ale také tie digitálne. Potrebujeme ich na to, aby sme udržali
-                  brány otvorené a zistili, z ktorého kmeňa k nám prichádzate.
-                </p>
-                <p className="ck-p">
-                  Kliknutím na <span className="ck-accent-i">„Súhlasím“</span> upokojíte stráže
-                  a pomôžete nám vylepšovať tento blog. <span className="ck-strong">Žiadne rabovanie, sľubujeme!</span>
-                </p>
+                <h2 className="ck-title">{t('Stoj! Kto tam?')}</h2>
+                {poAnglicky() ? (
+                  <>
+                    <p className="ck-p">
+                      The watch on the palisade reports that this hillfort uses{' '}
+                      <span className="ck-accent">“cookies”</span>. Not the kind baked on the hearth
+                      in the sunken hut next door, but the digital sort. We need them to keep the
+                      gates open and to learn which tribe you come from.
+                    </p>
+                    <p className="ck-p">
+                      Clicking <span className="ck-accent-i">“I agree”</span> will calm the guards
+                      and help us improve this blog. <span className="ck-strong">No pillaging, we promise!</span>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="ck-p">
+                      Stráže na palisádach hlásia, že toto hradisko používa{' '}
+                      <span className="ck-accent">„cookies“</span>. Nie sú to síce tie upečené na ohnisku
+                      v susednej zemnici, ale také tie digitálne. Potrebujeme ich na to, aby sme udržali
+                      brány otvorené a zistili, z ktorého kmeňa k nám prichádzate.
+                    </p>
+                    <p className="ck-p">
+                      Kliknutím na <span className="ck-accent-i">„Súhlasím“</span> upokojíte stráže
+                      a pomôžete nám vylepšovať tento blog. <span className="ck-strong">Žiadne rabovanie, sľubujeme!</span>
+                    </p>
+                  </>
+                )}
 
                 <div className="ck-actions">
                   <button ref={firstBtnRef} type="button" className="ck-btn ck-btn-primary" onClick={acceptAll}>
                     <span aria-hidden="true">⚔️</span>
-                    <span className="ck-nowrap">Prijať ako hosť</span>
+                    <span className="ck-nowrap">{t('Prijať ako hosť')}</span>
                     <span className="ck-nowrap ck-note">(Súhlasím)</span>
                   </button>
                   <button type="button" className="ck-btn ck-btn-secondary" onClick={rejectAll}>
                     <span aria-hidden="true">🐎</span>
-                    <span className="ck-nowrap">Otočiť koňa</span>
+                    <span className="ck-nowrap">{t('Otočiť koňa')}</span>
                     <span className="ck-nowrap ck-note">(Nesúhlasím)</span>
                   </button>
                   <button type="button" className="ck-settings-link" onClick={() => setMode('settings')}>
@@ -97,20 +115,20 @@ export function CookieBanner() {
             ) : (
               <>
                 <h2 className="ck-title">Zvyky hradiska</h2>
-                <p className="ck-p">Vyberte, ktoré cookies smú stráže použiť. Nevyhnutné potrebujeme na chod hradiska, o analytické vás slušne prosíme.</p>
+                <p className="ck-p">{poAnglicky() ? 'Choose which cookies the guards may use. The essential ones keep the hillfort running; for the analytics ones we are politely asking.' : 'Vyberte, ktoré cookies smú stráže použiť. Nevyhnutné potrebujeme na chod hradiska, o analytické vás slušne prosíme.'}</p>
 
                 <div className="ck-settings" style={{ padding: 0, marginTop: 14 }}>
                   <div className="ck-cat">
                     <div>
-                      <h3>Nevyhnutné</h3>
+                      <h3>{t('Nevyhnutné')}</h3>
                       <p>Držia brány otvorené — prihlásenie a zapamätanie tohto rozhodnutia. Bez nich hradisko nefunguje, preto sa nedajú vypnúť.</p>
                     </div>
-                    <div className="ck-cat-ctl"><span className="ck-fixed-tag">VŽDY ZAPNUTÉ</span></div>
+                    <div className="ck-cat-ctl"><span className="ck-fixed-tag">{t('VŽDY ZAPNUTÉ')}</span></div>
                   </div>
 
                   <div className="ck-cat">
                     <div>
-                      <h3>Analytické</h3>
+                      <h3>{t('Analytické')}</h3>
                       <p>Anonymne nám prezradia, z ktorého kmeňa prichádzate a ktoré články čítate — aby sme blog vylepšovali. Bez cookies tretích strán.</p>
                     </div>
                     <div className="ck-cat-ctl">
@@ -131,11 +149,11 @@ export function CookieBanner() {
                 <div className="ck-actions">
                   <button ref={firstBtnRef} type="button" className="ck-btn ck-btn-primary" onClick={saveSettings}>
                     <span aria-hidden="true">📜</span>
-                    <span className="ck-nowrap">Uložiť voľbu</span>
+                    <span className="ck-nowrap">{t('Uložiť voľbu')}</span>
                   </button>
                   <button type="button" className="ck-btn ck-btn-secondary" onClick={acceptAll}>
                     <span aria-hidden="true">⚔️</span>
-                    <span className="ck-nowrap">Prijať všetko</span>
+                    <span className="ck-nowrap">{t('Prijať všetko')}</span>
                   </button>
                 </div>
               </>

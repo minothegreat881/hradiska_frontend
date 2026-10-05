@@ -68,6 +68,47 @@ const EN: Record<string, string> = {
   'Načítavam…': 'Loading…',
   'Slovensky': 'Slovensky',
   'English': 'English',
+
+  /* Hlavička a päta */
+  'Hradiská': 'Hillforts',
+  'Aktuality': 'News',
+  'Prihlásiť sa': 'Sign in',
+  'Účet': 'Account',
+  'Ponuka': 'Menu',
+  'Hradiská — domov': 'Hillforts — home',
+  'Zatiaľ bez článkov.': 'No articles yet.',
+  'Slovanské hradiská': 'Slavic hillforts',
+  'Aplikácia do telefónu': 'Mobile app',
+  'Ochrana osobných údajov': 'Privacy policy',
+  'Podmienky používania': 'Terms of use',
+
+  /* Lišta o cookies */
+  'Stoj! Kto tam?': 'Halt! Who goes there?',
+  'Prijať ako hosť': 'Enter as a guest',
+  'Otočiť koňa': 'Turn the horse around',
+  'Prijať všetko': 'Accept all',
+  'Uložiť voľbu': 'Save choice',
+  'Nevyhnutné': 'Essential',
+  'Analytické': 'Analytics',
+  'VŽDY ZAPNUTÉ': 'ALWAYS ON',
+  'Žiadne rabovanie, sľubujeme!': 'No pillaging, we promise!',
+  'STRÁŽ': 'GUARD',
+  'Zvyky hradiska (nastavenia)': 'Hillfort customs (settings)',
+
+  /* Kategórie — ustálené anglické názvy; v Strapi preklad zatiaľ nemajú */
+  'Kniežacie sídla': 'Princely seats',
+  'Mocenské centrá': 'Centres of power',
+  'Strážna a hospodárska funkcia': 'Guard and economic function',
+  'Refugiá': 'Refuges',
+  'Staroveké sídla': 'Ancient settlements',
+  'Všeobecne o hradiskách': 'About hillforts',
+  'Svätyne a sakrálne objekty': 'Sanctuaries and sacred sites',
+  'Povesti': 'Legends',
+  'Listiny a písomné zdroje': 'Charters and written sources',
+  'Odborné texty': 'Academic papers',
+  '3D modely': '3D models',
+  'Informačné tabule': 'Information panels',
+  'Ostatné': 'Other',
 };
 
 /** Text rozhrania. V slovenčine vracia kľúč, v angličtine jeho preklad. */
@@ -75,6 +116,9 @@ export function t(kluc: string): string {
   if (aktualny === 'sk') return kluc;
   return EN[kluc] ?? kluc;
 }
+
+/** Názov kategórie v jazyku stránky. Keď preklad nie je, vráti pôvodný. */
+export const kategoria = (meno: string | undefined | null): string => (meno ? t(meno) : '');
 
 /** Dátum v jazyku stránky. */
 export function datum(iso: string | null | undefined): string {

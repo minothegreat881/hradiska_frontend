@@ -1,3 +1,4 @@
+import { t } from '../lib/jazyk';
 'use client';
 
 /**
@@ -127,7 +128,7 @@ export function LabFooter() {
               </picture>
               <span>
                 <span className="lfoot-name">Hradiska.sk</span>
-                <span className="lfoot-tag">Slovanské hradiská</span>
+                <span className="lfoot-tag">{t('Slovanské hradiská')}</span>
               </span>
             </a>
 
@@ -173,8 +174,8 @@ export function LabFooter() {
           </span>
 
           <nav className="lfoot-legal">
-            <a href="/ochrana-osobnych-udajov">Ochrana osobných údajov</a>
-            <a href="/podmienky-pouzivania">Podmienky používania</a>
+            <a href="/ochrana-osobnych-udajov">{t('Ochrana osobných údajov')}</a>
+            <a href="/podmienky-pouzivania">{t('Podmienky používania')}</a>
             <button type="button" onClick={openCookieSettings}>
               Zvyky hradiska (cookies)
             </button>
@@ -182,7 +183,7 @@ export function LabFooter() {
                 appka je samostatný program, ktorý vie aj to, čo prehliadač
                 nie (mapa bez signálu). Stránka platí aj na počítači — človek
                 si odtiaľ pošle odkaz do telefónu. */}
-            <a href="/aplikacia" className="lfoot-install">Aplikácia do telefónu</a>
+            <a href="/aplikacia" className="lfoot-install">{t('Aplikácia do telefónu')}</a>
           </nav>
 
           <button

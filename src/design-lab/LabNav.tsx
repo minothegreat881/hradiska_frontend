@@ -1,3 +1,4 @@
+import { t, kategoria, odkaz, poAnglicky } from '../lib/jazyk';
 'use client';
 
 /**
@@ -64,7 +65,19 @@ const SHORT: Record<string, string> = {
   '3d-modely': '3D modely',
   'informacne-tabule': 'Tabule',
 };
-const shortLabel = (i: NavigationItem) => SHORT[catSlug(i)] ?? i.label;
+/* V angličtine sa skratky nepoužívajú — anglické názvy kategórií sú krátke
+   samy osebe a skrátené tvary („Všeobecne") by nedávali zmysel. */
+const SHORT_EN: Record<string, string> = {
+  'strazna-funkcia': 'Guard function',
+  'listiny-a-pisomne-zdroje': 'Written sources',
+  'svatyne-a-sakralne-objekty': 'Sanctuaries',
+  'vseobecne-o-hradiskach': 'About hillforts',
+  'informacne-tabule': 'Panels',
+};
+const shortLabel = (i: NavigationItem) =>
+  poAnglicky()
+    ? (SHORT_EN[catSlug(i)] ?? kategoria(i.label))
+    : (SHORT[catSlug(i)] ?? i.label);
 
 export function LabNav() {
   const { items, loading, nacitajClanky } = useNavigationData();
@@ -142,8 +155,8 @@ export function LabNav() {
   const openCat = open ? cats.find(c => c.label === open.label) ?? null : null;
 
   const rows = [
-    { label: 'Typy hradísk', items: cats.filter(c => PRIMARY_SLUGS.has(catSlug(c))) },
-    { label: 'Ďalší obsah', items: cats.filter(c => !PRIMARY_SLUGS.has(catSlug(c))) },
+    { label: poAnglicky() ? 'Types of hillforts' : 'Typy hradísk', items: cats.filter(c => PRIMARY_SLUGS.has(catSlug(c))) },
+    { label: poAnglicky() ? 'More content' : 'Ďalší obsah', items: cats.filter(c => !PRIMARY_SLUGS.has(catSlug(c))) },
   ];
   const secondaryOpen = open !== null && rows[1].items.some(c => c.label === open.label);
 
@@ -156,7 +169,7 @@ export function LabNav() {
       onMouseLeave={() => setHovered(false)}
     >
       <div className="lnav-row">
-        <a href="/" className="lnav-brand" aria-label="Hradiská — domov">
+        <a href="/" className="lnav-brand" aria-label={t('Hradiská — domov')}>
           {/* Priehľadná verzia loga (podklad odstránený skôr) — v kruhu by
               sivý štvorec pôvodného súboru vyzeral ako nalepený štítok. */}
           <span className="lnav-mark">
@@ -165,7 +178,7 @@ export function LabNav() {
               <img src="/znak_minca.png" alt="" aria-hidden="true" />
             </picture>
           </span>
-          <span>Hradiská</span>
+          <span>{t('Hradiská')}</span>
         </a>
 
         {/* V hlavičke je len prvý rad — typy hradísk. Druhý rad („Ďalší
@@ -174,11 +187,11 @@ export function LabNav() {
             zalamovať. */}
         <div className="lnav-cats" ref={catsRef} data-overflow={overflow ? 'true' : undefined} data-scrolled={scrolled ? 'true' : undefined}>
           {rows.slice(0, 1).map(row => (
-            <div className="lnav-cats-row" key={row.label} data-secondary={row.label === 'Ďalší obsah' ? 'true' : undefined}>
+            <div className="lnav-cats-row" key={row.label} data-secondary={row.label === (poAnglicky() ? 'More content' : 'Ďalší obsah') ? 'true' : undefined}>
               {/* Názov nesie len druhý rad — ten sa vysúva a treba povedať, čo
                   pribudlo. Prvý rad je hlavná navigácia a popisovať ju je šum;
                   navyše tým získa 122 px, vďaka čomu sa zmestí na jeden riadok. */}
-              {row.label === 'Ďalší obsah' && <span className="lnav-rowlabel">{row.label}</span>}
+              {row.label === (poAnglicky() ? 'More content' : 'Ďalší obsah') && <span className="lnav-rowlabel">{row.label}</span>}
               {row.items.map(cat => (
                 <CatButton
                   key={cat.label}
@@ -197,8 +210,8 @@ export function LabNav() {
         </div>
 
         <div className="lnav-right">
-          <a href="/galeria" className="lnav-link">Galéria</a>
-          <a href="/aktuality" className="lnav-link">Aktuality</a>
+          <a href="/galeria" className="lnav-link">{t('Galéria')}</a>
+          <a href="/aktuality" className="lnav-link">{t('Aktuality')}</a>
           <AccountNavLink />
           {/* Ponuka pre dotyk. Cieľ má 44 × 44 px — menšie sa palcom trafí ťažko. */}
           <button
@@ -215,7 +228,7 @@ export function LabNav() {
 
       {/* ── Mobilná ponuka ──────────────────────────────────────────────── */}
       {menuOpen && (
-        <div className="lnav-mobile" role="dialog" aria-label="Ponuka">
+        <div className="lnav-mobile" role="dialog" aria-label={t('Ponuka')}>
           {rows.map(row => (
             <div className="lnav-m-group" key={row.label}>
               <span className="lnav-m-label">{row.label}</span>
@@ -258,8 +271,8 @@ export function LabNav() {
             </div>
           ))}
           <div className="lnav-m-group lnav-m-service">
-            <a href="/galeria" onClick={() => setMenuOpen(false)}>Galéria</a>
-            <a href="/aktuality" onClick={() => setMenuOpen(false)}>Aktuality</a>
+            <a href="/galeria" onClick={() => setMenuOpen(false)}>{t('Galéria')}</a>
+            <a href="/aktuality" onClick={() => setMenuOpen(false)}>{t('Aktuality')}</a>
           </div>
         </div>
       )}
@@ -323,7 +336,7 @@ function MobilKategoria({ slug, zoskupenie, onZoskupenie, onOdkaz }: {
   const maLokality = lokality.length > 0;
 
   if (clanky === null) return <Nacitavanie riadok velkost="male" text="Načítavam články…" />;
-  if (!clanky.length) return <span className="lnav-m-empty">Zatiaľ bez článkov.</span>;
+  if (!clanky.length) return <span className="lnav-m-empty">{t('Zatiaľ bez článkov.')}</span>;
 
   const jeLokalita = new Set(lokality.map(l => l.slug));
   const ostatne = clanky

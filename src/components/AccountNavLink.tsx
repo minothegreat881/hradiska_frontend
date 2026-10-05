@@ -1,3 +1,4 @@
+import { t } from '../lib/jazyk';
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -39,7 +40,7 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
 
   const label = isLoggedIn
     ? (unread ? `Môj profil — ${unread} nových upozornení` : 'Môj profil')
-    : 'Prihlásiť sa';
+    : t('Prihlásiť sa');
 
   const base: React.CSSProperties = {
     position: 'relative', flexShrink: 0, display: 'inline-flex', alignItems: 'center',
@@ -72,7 +73,7 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
         : isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
       {!compact && (
         <span className="hidden sm:inline">
-          {isLoggedIn ? (member?.displayName || member?.username || 'Účet') : 'Prihlásiť sa'}
+          {isLoggedIn ? (member?.displayName || member?.username || t('Účet')) : t('Prihlásiť sa')}
         </span>
       )}
       {isLoggedIn && unread > 0 && (
