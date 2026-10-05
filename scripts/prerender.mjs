@@ -132,7 +132,11 @@ async function main() {
     const canonical = `${SITE}/blog/${a.slug}`;
     const title = a.metaTitle || a.title;
     const description = a.metaDescription || a.excerpt || '';
-    const image = a.cover ? (a.cover.startsWith('http') ? a.cover : MEDIA + a.cover) : DEFAULT_OG;
+    /* `coverOg` je obálka v plnej veľkosti; `cover` je 500 px náhľad pre
+       zoznamy. Do sociálnej karty patrí ten veľký — kým sa tu brala malá,
+       mali náhľady na Facebooku a LinkedIne štvrtinový obrázok. */
+    const obalka = a.coverOg || a.cover;
+    const image = obalka ? (obalka.startsWith('http') ? obalka : MEDIA + obalka) : DEFAULT_OG;
 
     const article = {
       '@context': 'https://schema.org', '@type': 'Article',
