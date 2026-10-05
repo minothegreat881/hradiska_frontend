@@ -1,13 +1,2061 @@
 {
+  "redirects": [
+    {
+      "source": "/2010/05/bojna-i.html",
+      "destination": "/blog/bojna-vyznamne-velkomoravske-centrum",
+      "permanent": true
+    },
+    {
+      "source": "/2010/05/konstrukcia-slovanskych-hradisk.html",
+      "destination": "/blog/konstrukcia-slovanskych-hradisk",
+      "permanent": true
+    },
+    {
+      "source": "/2010/05/molpir.html",
+      "destination": "/blog/molpir",
+      "permanent": true
+    },
+    {
+      "source": "/2010/05/povod-vyznam-historia-najstarsich.html",
+      "destination": "/blog/povod-vyznam-a-historia-najstarsich-hradisk",
+      "permanent": true
+    },
+    {
+      "source": "/2010/05/tisicrocne-hradiska-slovanov.html",
+      "destination": "/blog/tisicrocne-hradiska-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2010/05/uvod.html",
+      "destination": "/blog/preco-to-vlastne-robim",
+      "permanent": true
+    },
+    {
+      "source": "/2010/05/zamcisko-modra.html",
+      "destination": "/blog/zamcisko-modra",
+      "permanent": true
+    },
+    {
+      "source": "/2010/06/divinka-pri-ziline.html",
+      "destination": "/blog/hradisko-velky-vrch-divinka",
+      "permanent": true
+    },
+    {
+      "source": "/2010/06/mapa-slovanskych-hradisk.html",
+      "destination": "/blog/interaktivna-mapa-hradisk",
+      "permanent": true
+    },
+    {
+      "source": "/2010/06/pobedim-je-znamou-archeologickou.html",
+      "destination": "/blog/pobedim",
+      "permanent": true
+    },
+    {
+      "source": "/2010/06/spissky-stvrtok-slovenske-mykeny.html",
+      "destination": "/blog/spissky-stvrtok-slovenske-mykeny",
+      "permanent": true
+    },
+    {
+      "source": "/2010/06/stefanovicova-slovensko-v-casoch.html",
+      "destination": "/blog/stefanovicova-slovensko-v-casoch-svatoplukovych",
+      "permanent": true
+    },
+    {
+      "source": "/2010/07/ducove-kostolec.html",
+      "destination": "/blog/ducove-kostolec",
+      "permanent": true
+    },
+    {
+      "source": "/2010/08/hradisko-zilin-papradno.html",
+      "destination": "/blog/hradisko-zilin-papradno",
+      "permanent": true
+    },
+    {
+      "source": "/2010/08/legenda-o-orgonovej-kycere.html",
+      "destination": "/blog/legenda-o-orgonovej-kycere",
+      "permanent": true
+    },
+    {
+      "source": "/2010/09/hradisko-nestych.html",
+      "destination": "/blog/hradisko-svaty-jur-nestich",
+      "permanent": true
+    },
+    {
+      "source": "/2010/09/prva-staroslovanska-svatyna-na.html",
+      "destination": "/blog/most-pri-bratislave-prva-staroslovanska-svatyna-na-slovensku",
+      "permanent": true
+    },
+    {
+      "source": "/2010/10/brekov.html",
+      "destination": "/blog/brekov",
+      "permanent": true
+    },
+    {
+      "source": "/2010/10/havranok-liptovska-mara.html",
+      "destination": "/blog/havranok-liptovska-mara",
+      "permanent": true
+    },
+    {
+      "source": "/2010/10/hradiste-pod-vratnom.html",
+      "destination": "/blog/hradiste-pod-vratnom",
+      "permanent": true
+    },
+    {
+      "source": "/2010/10/majcichov.html",
+      "destination": "/blog/majcichov",
+      "permanent": true
+    },
+    {
+      "source": "/2010/10/nitra.html",
+      "destination": "/blog/nitra",
+      "permanent": true
+    },
+    {
+      "source": "/2010/10/podbranc-stary-hrad.html",
+      "destination": "/blog/podbranc-stary-hrad",
+      "permanent": true
+    },
+    {
+      "source": "/2010/11/dolna-marikova.html",
+      "destination": "/blog/dolna-marikova-simunky",
+      "permanent": true
+    },
+    {
+      "source": "/2010/12/bratislava.html",
+      "destination": "/blog/bratislava",
+      "permanent": true
+    },
+    {
+      "source": "/2010/12/devin.html",
+      "destination": "/blog/devin",
+      "permanent": true
+    },
+    {
+      "source": "/2010/12/kopcany-slovenska-cast-mikulcic.html",
+      "destination": "/blog/mikulcice-kopcany",
+      "permanent": true
+    },
+    {
+      "source": "/2010/12/kostol-sv-margity-antiochijskej.html",
+      "destination": "/blog/kostol-sv-margity-antiochijskej-najstarsia-stojaca-stavba-na-slovensku",
+      "permanent": true
+    },
+    {
+      "source": "/2011/02/nitrianske-pravno-vysehrad.html",
+      "destination": "/blog/nitrianske-pravno-jasenovo-vysehrad",
+      "permanent": true
+    },
+    {
+      "source": "/2011/02/wogastisburg-najvyznamnejsie-hradisko.html",
+      "destination": "/blog/wogastisburg-najvyznamnejsie-hradisko-samovej-rise",
+      "permanent": true
+    },
+    {
+      "source": "/2011/03/arkona-retra-ine-pohanske-svatyne.html",
+      "destination": "/blog/arkona-retra-a-ine-pohanske-svatyne-zapadnych-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2011/03/nitrianska-blatnica.html",
+      "destination": "/blog/hradisko-nitrianska-blatnica-rotunda-blatnicky-durko",
+      "permanent": true
+    },
+    {
+      "source": "/2011/03/spisske-tomasovce.html",
+      "destination": "/blog/spisske-tomasovce",
+      "permanent": true
+    },
+    {
+      "source": "/2011/04/gaius-iulius-caesar-konstrukcia.html",
+      "destination": "/blog/gaius-iulius-caesar-konstrukcia-keltskych-hradisk-a-dobyvanie-avarica",
+      "permanent": true
+    },
+    {
+      "source": "/2011/04/jasenica-hradisko-predna-horka.html",
+      "destination": "/blog/jasenica-hradisko-predna-horka",
+      "permanent": true
+    },
+    {
+      "source": "/2011/04/stare-mesto-velehrad.html",
+      "destination": "/blog/stare-mesto-velehrad",
+      "permanent": true
+    },
+    {
+      "source": "/2011/04/zakonnik-velkwj-moravy-zakon-sudnyj.html",
+      "destination": "/blog/zakonnik-z-velkej-moravy-zakon-sudnyj-ljudem",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/blatnohrad-po-nemecky-mosapurc-dnes.html",
+      "destination": "/blog/blatnohrad-pribinovo-sidlo-v-panonii",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/bohatstvo-slovenov.html",
+      "destination": "/blog/bohatstvo-slovenov-slavic-wealth",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/breclav-pohansko.html",
+      "destination": "/blog/breclav-pohansko",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/film-o-velkej-morave.html",
+      "destination": "/category/aktuality",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/fuldske-analy.html",
+      "destination": "/blog/fuldske-analy",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/hillforts-and-fortified-settlements-in.html",
+      "destination": "/hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/kniha-vzacnych-drahocennosti.html",
+      "destination": "/blog/kniha-vzacnych-drahocennosti",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/kusin.html",
+      "destination": "/blog/kusin",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/sarisske-sokolovce.html",
+      "destination": "/blog/sarisske-sokolovce",
+      "permanent": true
+    },
+    {
+      "source": "/2011/05/slovanske-hradiska-na-orave.html",
+      "destination": "/blog/slovanske-hradiska-na-orave",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/hradiska-keltov-na-uzemi-slovenska-ako.html",
+      "destination": "/blog/hradiska-keltov-na-uzemi-slovenska-ako-centra-remeselnej-vyroby",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/hradisko-velky-vrch-divinka.html",
+      "destination": "/blog/hradisko-velky-vrch-divinka",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/mikulcice-kopcany.html",
+      "destination": "/blog/mikulcice-kopcany",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/slavic-pagan-sanctuaries.html",
+      "destination": "/blog/arkona-retra-a-ine-pohanske-svatyne-zapadnych-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/spis-o-obrateni-bavorov-korutancov-na.html",
+      "destination": "/blog/spis-o-obrateni-bavorov-a-korutancov-na-vieru-9-storocie",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/st-margaret-of-antioch-church-kopcany.html",
+      "destination": "/blog/kostol-sv-margity-antiochijskej-najstarsia-stojaca-stavba-na-slovensku",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/sumrak-velkej-moravy-povest-z-x.html",
+      "destination": "/blog/sumrak-velkej-moravy-povest-z-10-storocia",
+      "permanent": true
+    },
+    {
+      "source": "/2011/06/tlmace-festunok.html",
+      "destination": "/blog/tlmace-festunok",
+      "permanent": true
+    },
+    {
+      "source": "/2011/07/beckov-slovanske-hradisko.html",
+      "destination": "/blog/beckov-slovanske-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2011/07/domy-slovenov.html",
+      "destination": "/blog/domy-slovenov",
+      "permanent": true
+    },
+    {
+      "source": "/2011/07/drevenik-slovanske-hradisko-v-tieni.html",
+      "destination": "/blog/drevenik-slovanske-hradisko-v-tieni-spisskeho-hradu",
+      "permanent": true
+    },
+    {
+      "source": "/2011/07/ladislav-nadasi-jege-svatopluk.html",
+      "destination": "/blog/ladislav-nadasi-jege-svatopluk",
+      "permanent": true
+    },
+    {
+      "source": "/2011/07/rozdelenie-velkomoravskych-hradisk-na.html",
+      "destination": "/blog/velkomoravske-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2011/07/videa.html",
+      "destination": "/galeria",
+      "permanent": true
+    },
+    {
+      "source": "/2011/08/3d-rekonstrukcia-velmozskeho-dvorca-v.html",
+      "destination": "/blog/3d-rekonstrukcia-velmozskeho-dvorca-v-ducovom-kostolci",
+      "permanent": true
+    },
+    {
+      "source": "/2011/08/libice-hlavne-hradisko-slavnikovcov-cz.html",
+      "destination": "/blog/libice-hlavne-hradisko-slavnikovcov-cz",
+      "permanent": true
+    },
+    {
+      "source": "/2011/08/vojenstvo-na-velkej-morave-taktika.html",
+      "destination": "/blog/vojenstvo-na-velkej-morave-a-taktika-obrany-hradisk",
+      "permanent": true
+    },
+    {
+      "source": "/2011/08/zbrane-nitranov-za-cias-velkej-moravy.html",
+      "destination": "/blog/zbrane-nitranov-v-casoch-velkej-moravy",
+      "permanent": true
+    },
+    {
+      "source": "/2011/09/bohyna-lada-na-hrade-lietava.html",
+      "destination": "/blog/bohyna-lada-na-hrade-lietava",
+      "permanent": true
+    },
+    {
+      "source": "/2011/09/detva-kalamarka.html",
+      "destination": "/blog/detva-kalamarka",
+      "permanent": true
+    },
+    {
+      "source": "/2011/09/drazovce.html",
+      "destination": "/blog/drazovce",
+      "permanent": true
+    },
+    {
+      "source": "/2011/09/hronsky-benadik.html",
+      "destination": "/blog/hronsky-benadik",
+      "permanent": true
+    },
+    {
+      "source": "/2011/09/muzla-cenkov.html",
+      "destination": "/blog/muzla-cenkov",
+      "permanent": true
+    },
+    {
+      "source": "/2011/09/nn-zvolen-cast-motova-hradok-priekopa.html",
+      "destination": "/blog/zvolen-motova-hradok-priekopa",
+      "permanent": true
+    },
+    {
+      "source": "/2011/09/stary-tekov.html",
+      "destination": "/blog/stary-tekov",
+      "permanent": true
+    },
+    {
+      "source": "/2011/10/bina.html",
+      "destination": "/blog/bina",
+      "permanent": true
+    },
+    {
+      "source": "/2011/10/hradiska-v-oblasti-slovenskej-brany.html",
+      "destination": "/hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2011/10/male-kozmalovce.html",
+      "destination": "/blog/male-kozmalovce",
+      "permanent": true
+    },
+    {
+      "source": "/2011/10/povest-modlatin.html",
+      "destination": "/blog/povest-modlatin",
+      "permanent": true
+    },
+    {
+      "source": "/2011/10/skalka-nad-vahom.html",
+      "destination": "/blog/skalka-nad-vahom",
+      "permanent": true
+    },
+    {
+      "source": "/2011/10/zamcisko-nova-bana.html",
+      "destination": "/blog/zamcisko-nova-bana",
+      "permanent": true
+    },
+    {
+      "source": "/2011/11/alexander-ruttkay-o-svatoplukovi-nitre.html",
+      "destination": "/blog/alexander-ruttkay-o-svatoplukovi-a-nitre",
+      "permanent": true
+    },
+    {
+      "source": "/2011/11/gars-thunau-velkomoravske-hradisko-v.html",
+      "destination": "/blog/gars-thunau-velkomoravske-hradisko-v-rakusku",
+      "permanent": true
+    },
+    {
+      "source": "/2011/11/visegrad-dalsie-velkomoravske-hradisko.html",
+      "destination": "/blog/visegrad-dalsie-velkomoravske-hradisko-v-madarsku-hu",
+      "permanent": true
+    },
+    {
+      "source": "/2011/11/zemplin.html",
+      "destination": "/blog/zemplin",
+      "permanent": true
+    },
+    {
+      "source": "/2011/12/mytologia-smrti-u-slovanov-inych-etnik.html",
+      "destination": "/blog/mytologia-smrti-u-slovanov-a-inych-etnik",
+      "permanent": true
+    },
+    {
+      "source": "/2011/12/nizna-mysla-mesto-z-doby-bronzovej.html",
+      "destination": "/blog/nizna-mysla-mesto-z-doby-bronzovej",
+      "permanent": true
+    },
+    {
+      "source": "/2011/12/pohanska-viera-slovanov-jeho-dokazy-v.html",
+      "destination": "/blog/pohanska-viera-slovanov-a-jej-dokazy-v-archeologickych-nalezoch",
+      "permanent": true
+    },
+    {
+      "source": "/2011/12/slovansky-bohovia-v-pisomnych-pramenoch.html",
+      "destination": "/blog/slovanski-bohovia-v-pisomnych-pramenoch",
+      "permanent": true
+    },
+    {
+      "source": "/2011/12/upiri-na-velkej-morave.html",
+      "destination": "/blog/upiri-na-velkej-morave",
+      "permanent": true
+    },
+    {
+      "source": "/2012/01/pohanska-keltske-oppidum.html",
+      "destination": "/blog/pohanska-keltske-oppidum",
+      "permanent": true
+    },
+    {
+      "source": "/2012/01/pov-bystrica-dedovec-opevnene-sidlisko.html",
+      "destination": "/blog/pov-bystrica-dedovec-opevnene-sidlisko",
+      "permanent": true
+    },
+    {
+      "source": "/2012/02/hradec-prievidza.html",
+      "destination": "/blog/hradec-prievidza",
+      "permanent": true
+    },
+    {
+      "source": "/2012/02/novohrad-nograd-h.html",
+      "destination": "/blog/novohrad-nograd-h",
+      "permanent": true
+    },
+    {
+      "source": "/2012/02/pov-bystrica-sibenicny-vrsok.html",
+      "destination": "/blog/pov-bystrica-sibenicny-vrsok",
+      "permanent": true
+    },
+    {
+      "source": "/2012/02/pruzina-mesciska.html",
+      "destination": "/blog/pruzina-mesciska",
+      "permanent": true
+    },
+    {
+      "source": "/2012/02/slovanske-hradiska-v-rakusku.html",
+      "destination": "/blog/slovanske-hradiska-v-rakusku-a",
+      "permanent": true
+    },
+    {
+      "source": "/2012/03/bosaca-martakova-skala.html",
+      "destination": "/blog/zemianske-podhradie-martakova-skala",
+      "permanent": true
+    },
+    {
+      "source": "/2012/03/strasny-muromar.html",
+      "destination": "/blog/strasny-muromar",
+      "permanent": true
+    },
+    {
+      "source": "/2012/03/trencin-velkomoravske-hradisko.html",
+      "destination": "/blog/trencin-velkomoravske-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2012/04/oresany-slepy-vrch.html",
+      "destination": "/blog/oresany-slepy-vrch",
+      "permanent": true
+    },
+    {
+      "source": "/2012/04/trencianske-teplice-certova-skala.html",
+      "destination": "/blog/trencianske-teplice-certova-skala",
+      "permanent": true
+    },
+    {
+      "source": "/2012/04/zemianske-podhradie-hradista.html",
+      "destination": "/blog/zemianske-podhradie-hradista",
+      "permanent": true
+    },
+    {
+      "source": "/2012/05/bavorsky-geograf-prva-pisomna-zmienka-o.html",
+      "destination": "/blog/bavorsky-geograf-prva-pisomna-zmienka-o-nitrianskych-slovenoch",
+      "permanent": true
+    },
+    {
+      "source": "/2012/05/kriziacka-vyprava-proti-slovanom.html",
+      "destination": "/blog/krizova-vyprava-proti-slovanom-1147",
+      "permanent": true
+    },
+    {
+      "source": "/2012/05/prasnik-osada-u-fajnorov.html",
+      "destination": "/blog/prasnik-hradok-osada-u-fajnorov",
+      "permanent": true
+    },
+    {
+      "source": "/2012/06/kovovacstvo-zelezne-hrivny-v-staroveku.html",
+      "destination": "/blog/kovacstvo-a-zelezne-hrivny-v-staroveku-a-v-slovanskom-obdobi",
+      "permanent": true
+    },
+    {
+      "source": "/2012/06/slyste-pribehdavny-lidskym-kniham.html",
+      "destination": "/blog/vrsatecky-kovac-z-cias-velkej-moravy",
+      "permanent": true
+    },
+    {
+      "source": "/2012/07/chotebuz-podobora.html",
+      "destination": "/blog/chotebuz-podobora",
+      "permanent": true
+    },
+    {
+      "source": "/2012/07/keltsky-den-na-havranku.html",
+      "destination": "/blog/kelti-na-havranku-opat-oziju",
+      "permanent": true
+    },
+    {
+      "source": "/2012/07/perunov-haj-pri-ubrezi.html",
+      "destination": "/blog/perunov-haj-pri-ubrezi",
+      "permanent": true
+    },
+    {
+      "source": "/2012/07/slovanske-hradiska-v-nemecku.html",
+      "destination": "/blog/slovanske-hradiska-v-nemecku",
+      "permanent": true
+    },
+    {
+      "source": "/2012/08/film-o-slovanoch-pridajte-sa.html",
+      "destination": "/category/aktuality",
+      "permanent": true
+    },
+    {
+      "source": "/2012/08/periodizacia-dejin-slovenska.html",
+      "destination": "/category/odborne-texty",
+      "permanent": true
+    },
+    {
+      "source": "/2012/08/prosne-keltske-obetisko.html",
+      "destination": "/blog/prosne-keltske-obetisko",
+      "permanent": true
+    },
+    {
+      "source": "/2012/09/hatne.html",
+      "destination": "/blog/hatne",
+      "permanent": true
+    },
+    {
+      "source": "/2012/09/poloha-lokalita-hradiste-starsi-nazov.html",
+      "destination": "/blog/belusske-slatiny-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2012/09/rybnik-krivin.html",
+      "destination": "/blog/rybnik-krivin",
+      "permanent": true
+    },
+    {
+      "source": "/2012/10/nakreslite-pre-nas-hradisko.html",
+      "destination": "/category/aktuality",
+      "permanent": true
+    },
+    {
+      "source": "/2012/10/vrable-fidvar-mesto-z-doby-bronzovej-b.html",
+      "destination": "/blog/vrable-fidvar-mesto-z-doby-bronzovej-b",
+      "permanent": true
+    },
+    {
+      "source": "/2012/10/vyprava-arkona-2012-den-druhy-mys-arkona.html",
+      "destination": "/blog/arkona-retra-a-ine-pohanske-svatyne-zapadnych-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2012/10/vyprava-arkona-2012-den-prvy-gross-raden.html",
+      "destination": "/blog/arkona-retra-a-ine-pohanske-svatyne-zapadnych-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2012/10/vyprava-arkona-2012-den-treti-radus.html",
+      "destination": "/blog/arkona-retra-a-ine-pohanske-svatyne-zapadnych-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2012/10/vyprava-arkona-2012-den-treti-wollin.html",
+      "destination": "/blog/arkona-retra-a-ine-pohanske-svatyne-zapadnych-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2012/11/divinka-velky-vrch-v-9-storoci.html",
+      "destination": "/blog/hradisko-velky-vrch-divinka",
+      "permanent": true
+    },
+    {
+      "source": "/2012/11/novy-obrazok.html",
+      "destination": "/galeria",
+      "permanent": true
+    },
+    {
+      "source": "/2012/11/odporucana-kniha.html",
+      "destination": "/category/aktuality",
+      "permanent": true
+    },
+    {
+      "source": "/2012/11/prosne-zlaty-kon.html",
+      "destination": "/blog/prosne-zlaty-kon",
+      "permanent": true
+    },
+    {
+      "source": "/2012/11/s-melis-stopy-pohanskych-bohov.html",
+      "destination": "/blog/s-melis-stopy-pohanskych-bohov",
+      "permanent": true
+    },
+    {
+      "source": "/2012/11/v-rajeckej-doline-mameniekolko.html",
+      "destination": "/blog/turie-hradek",
+      "permanent": true
+    },
+    {
+      "source": "/2012/12/bosaca-srniansky-haj.html",
+      "destination": "/blog/bosaca-srniansky-haj",
+      "permanent": true
+    },
+    {
+      "source": "/2012/12/hradok-nad-vahom.html",
+      "destination": "/blog/hradok-nad-vahom",
+      "permanent": true
+    },
+    {
+      "source": "/2012/12/marikova-simunky-kresba.html",
+      "destination": "/blog/informacna-tabula-marikova-simunky",
+      "permanent": true
+    },
+    {
+      "source": "/2012/12/nemecka.html",
+      "destination": "/hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2012/12/pruzina-mesciska.html",
+      "destination": "/blog/pruzina-mesciska",
+      "permanent": true
+    },
+    {
+      "source": "/2013/01/hainburg-braunsberg.html",
+      "destination": "/blog/hainburg-braunsberg",
+      "permanent": true
+    },
+    {
+      "source": "/2013/01/kamenec-pod-vtacnikom_29.html",
+      "destination": "/blog/kamenec-pod-vtacnikom-bystricany",
+      "permanent": true
+    },
+    {
+      "source": "/2013/01/ladcetunezicenozdrovice.html",
+      "destination": "/blog/ladce-tunezice-nozdrovice",
+      "permanent": true
+    },
+    {
+      "source": "/2013/01/praveke-hradisko-na-sitne.html",
+      "destination": "/blog/praveke-hradisko-na-sitne",
+      "permanent": true
+    },
+    {
+      "source": "/2013/01/sidliska-otomanskej-kultury-na.html",
+      "destination": "/blog/sidliska-otomanskej-kultury-na-vychodnom-slovensku",
+      "permanent": true
+    },
+    {
+      "source": "/2013/01/velkomoravske-hradiska.html",
+      "destination": "/blog/velkomoravske-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2013/02/brodske-veles.html",
+      "destination": "/blog/brodske-veles",
+      "permanent": true
+    },
+    {
+      "source": "/2013/02/madari-v-pisomnych-pramenoch.html",
+      "destination": "/blog/madari-v-pisomnych-pramenoch",
+      "permanent": true
+    },
+    {
+      "source": "/2013/02/stredoeuropske-slovenske-mohylove.html",
+      "destination": "/blog/stredoeuropske-a-slovenske-mohylove-oblasti-zapadnych-slovanov",
+      "permanent": true
+    },
+    {
+      "source": "/2013/02/sucany-skala.html",
+      "destination": "/blog/sucany-skala",
+      "permanent": true
+    },
+    {
+      "source": "/2013/02/zazracny-dazd-zachranil-rimanov-na.html",
+      "destination": "/blog/zazracny-dazd-zachranil-rimanov-na-slovensku",
+      "permanent": true
+    },
+    {
+      "source": "/2013/03/devin.html",
+      "destination": "/blog/devin",
+      "permanent": true
+    },
+    {
+      "source": "/2013/03/informacna-tabula-marikova-simunky.html",
+      "destination": "/blog/informacna-tabula-marikova-simunky",
+      "permanent": true
+    },
+    {
+      "source": "/2013/03/krasa-slovanskych-sperkov.html",
+      "destination": "/blog/krasa-slovanskych-sperkov",
+      "permanent": true
+    },
+    {
+      "source": "/2013/03/pohanska-brana.html",
+      "destination": "/blog/pohanska-brana",
+      "permanent": true
+    },
+    {
+      "source": "/2013/03/turcianske-jaseno-hradiste.html",
+      "destination": "/blog/turcianske-jaseno-hradiste",
+      "permanent": true
+    },
+    {
+      "source": "/2013/03/zibrica.html",
+      "destination": "/blog/zibrica",
+      "permanent": true
+    },
+    {
+      "source": "/2013/04/bina-kresba.html",
+      "destination": "/blog/bina-kresba",
+      "permanent": true
+    },
+    {
+      "source": "/2013/05/gbelany.html",
+      "destination": "/blog/gbelany",
+      "permanent": true
+    },
+    {
+      "source": "/2013/05/kresby-slovenov.html",
+      "destination": "/blog/kresby-slovenov",
+      "permanent": true
+    },
+    {
+      "source": "/2013/05/sedliacka-dubova-ziar.html",
+      "destination": "/blog/sedliacka-dubova-ziar",
+      "permanent": true
+    },
+    {
+      "source": "/2013/05/vitazstvo.html",
+      "destination": "/blog/vitazstvo",
+      "permanent": true
+    },
+    {
+      "source": "/2013/06/hatne-skala-hradok.html",
+      "destination": "/blog/hatne-skala-a-hradok",
+      "permanent": true
+    },
+    {
+      "source": "/2013/06/informacna-tabula-pruzina.html",
+      "destination": "/blog/informacna-tabula-pruzina",
+      "permanent": true
+    },
+    {
+      "source": "/2013/06/kelti-na-havranku-opat-oziju.html",
+      "destination": "/blog/kelti-na-havranku-opat-oziju",
+      "permanent": true
+    },
+    {
+      "source": "/2013/06/kocovni-pastevci-jakozto-najezdnici-od.html",
+      "destination": "/blog/kocovni-pastevci-jakozto-najezdnici-od-vychodu",
+      "permanent": true
+    },
+    {
+      "source": "/2013/06/modra-zamcisko.html",
+      "destination": "/blog/zamcisko-modra",
+      "permanent": true
+    },
+    {
+      "source": "/2013/06/stefan-jansak-nedobytne-hradiska.html",
+      "destination": "/blog/stefan-jansak-nedobytne-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2013/06/sutaz-o-mapu-velkej-moravy.html",
+      "destination": "/blog/sutaz-o-mapu-velkej-moravy",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/bojnice-hradisko-centrum-dechtarstva-v.html",
+      "destination": "/blog/bojnice-hradisko-a-centrum-dechtarstva-v-slovanskom-obdobi",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/bratislava.html",
+      "destination": "/blog/bratislava-kresba",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/maly-manin-je-sucastoustrazovskej.html",
+      "destination": "/blog/maly-manin",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/pribinova-druzina.html",
+      "destination": "/blog/pribinova-druzina",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/slovanka-devuska.html",
+      "destination": "/blog/slovanka-devuska",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/stary-konus.html",
+      "destination": "/blog/stary-konus",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/sutovo-hradok.html",
+      "destination": "/blog/sutovo-ratkovo-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2013/07/zivy-starovek-na-havranku.html",
+      "destination": "/blog/zivy-starovek-na-havranku",
+      "permanent": true
+    },
+    {
+      "source": "/2013/08/certova-skala-trencianske-teplice.html",
+      "destination": "/blog/trencianske-teplice-certova-skala",
+      "permanent": true
+    },
+    {
+      "source": "/2013/08/frankovia-u-moravskeho-kniezata.html",
+      "destination": "/blog/frankovia-rokuju-s-moravanmi",
+      "permanent": true
+    },
+    {
+      "source": "/2013/08/nalezy-z-hradiska-dolna-marikova.html",
+      "destination": "/blog/nalezy-z-hradiska-dolna-marikova-simunky-siroka",
+      "permanent": true
+    },
+    {
+      "source": "/2013/08/spisske-tomasovce-podla-javorskeho.html",
+      "destination": "/blog/spisske-tomasovce",
+      "permanent": true
+    },
+    {
+      "source": "/2013/09/gorazd-petresovicz-zamcisko.html",
+      "destination": "/blog/gorazd-petresovicz-zamcisko",
+      "permanent": true
+    },
+    {
+      "source": "/2013/09/m-szoke-najnovsie-vyskumy-v-blatnohrade_11.html",
+      "destination": "/blog/m-szoke-najnovsie-vyskumy-v-blatnohrade-a-okoli",
+      "permanent": true
+    },
+    {
+      "source": "/2013/09/modra-zamcisko.html",
+      "destination": "/blog/zamcisko-modra",
+      "permanent": true
+    },
+    {
+      "source": "/2013/09/podturen-basta-velinok-varta.html",
+      "destination": "/blog/podturen-basta-velinok-varta",
+      "permanent": true
+    },
+    {
+      "source": "/2013/09/robert-muller-okolie-rieky-zala-v-8-10.html",
+      "destination": "/blog/robert-muller-okolie-rieky-zala-v-8-10-storoci",
+      "permanent": true
+    },
+    {
+      "source": "/2013/09/vyprava-k-vikingom-2-cast.html",
+      "destination": "/blog/vyprava-k-vikingom-2013-2-cast",
+      "permanent": true
+    },
+    {
+      "source": "/2013/09/vyprava-k-vikingom-2013-1-cast.html",
+      "destination": "/blog/vyprava-k-vikingom-2013-1-cast",
+      "permanent": true
+    },
+    {
+      "source": "/2013/10/divinka-velky-vrch-v-dobe-latenskej.html",
+      "destination": "/blog/divinka-velky-vrch-v-dobe-latenskej-kresba",
+      "permanent": true
+    },
+    {
+      "source": "/2013/10/informacna-tabula-modra-zamcisko.html",
+      "destination": "/blog/informacna-tabula-modra-zamcisko",
+      "permanent": true
+    },
+    {
+      "source": "/2013/10/interaktivna-mapa-hradisk.html",
+      "destination": "/blog/interaktivna-mapa-hradisk",
+      "permanent": true
+    },
+    {
+      "source": "/2013/10/najstarsi-recept-na-medovinu-14-storocie.html",
+      "destination": "/blog/najstarsi-recept-na-medovinu-14-storocie",
+      "permanent": true
+    },
+    {
+      "source": "/2013/10/nitrianske-pravno-vysehrad.html",
+      "destination": "/blog/nitrianske-pravno-jasenovo-vysehrad",
+      "permanent": true
+    },
+    {
+      "source": "/2013/10/opevnenie-sklabinskeho-hradiska.html",
+      "destination": "/blog/sklabina-macaci-hradok",
+      "permanent": true
+    },
+    {
+      "source": "/2013/10/zvolen-motova-kresba.html",
+      "destination": "/blog/zvolen-motova-kresba",
+      "permanent": true
+    },
+    {
+      "source": "/2013/11/informacna-tabula-hatne.html",
+      "destination": "/blog/informacna-tabula-hatne",
+      "permanent": true
+    },
+    {
+      "source": "/2013/11/prokopios-pise-v-6-storoci-o-slovanoch.html",
+      "destination": "/blog/prokopios-pise-v-6-storoci-o-slovanoch",
+      "permanent": true
+    },
+    {
+      "source": "/2013/11/selce-hradok.html",
+      "destination": "/blog/selce-hradok",
+      "permanent": true
+    },
+    {
+      "source": "/2013/11/sena.html",
+      "destination": "/blog/sena",
+      "permanent": true
+    },
+    {
+      "source": "/2013/11/starobyly-rastislavov-devin-sprava-o.html",
+      "destination": "/blog/starobyly-rastislavov-devin-a-sprava-o-nom-z-roku-871",
+      "permanent": true
+    },
+    {
+      "source": "/2013/11/utok-frankov-na-hradisko.html",
+      "destination": "/blog/utok-frankov-na-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2013/12/tajomne-znaky-na-skalach-na-povazi.html",
+      "destination": "/blog/tajomne-znaky-na-skalach-na-povazi",
+      "permanent": true
+    },
+    {
+      "source": "/2014/01/nitra-v-9-storoci.html",
+      "destination": "/blog/nitra-v-9-storoci",
+      "permanent": true
+    },
+    {
+      "source": "/2014/01/obcianske-zdruzenie-hradiska-sa-v-roku.html",
+      "destination": "/blog/mozete-nam-dat-2-z-dane",
+      "permanent": true
+    },
+    {
+      "source": "/2014/01/oz-hradiska-jeho-cinnost-v-roku-2013.html",
+      "destination": "/blog/oz-hradiska-a-jeho-cinnost-v-roku-2013",
+      "permanent": true
+    },
+    {
+      "source": "/2014/01/peter-schreiber-nalez-prstena-zhornej.html",
+      "destination": "/blog/peter-schreiber-nalez-prstena-z-hornej-marikovej",
+      "permanent": true
+    },
+    {
+      "source": "/2014/01/povesti-viazane-k-poloham-hradiste.html",
+      "destination": "/blog/povesti-viazane-k-poloham-hradiste-a-koscelisko",
+      "permanent": true
+    },
+    {
+      "source": "/2014/01/simunky-siroka-hradiste-koscelisko.html",
+      "destination": "/blog/simunky-siroka-hradiste-koscelisko-mozne-suvislosti",
+      "permanent": true
+    },
+    {
+      "source": "/2014/02/detektorizmus-skodi-nasej-historii.html",
+      "destination": "/blog/nelegalny-detektorizmus-skodi-nasej-historii",
+      "permanent": true
+    },
+    {
+      "source": "/2014/02/kamenec-pod-vtacnikom-bystricany-povesti.html",
+      "destination": "/blog/kamenec-pod-vtacnikom-bystricany-povesti",
+      "permanent": true
+    },
+    {
+      "source": "/2014/02/moravany-nad-vahom-hradiste.html",
+      "destination": "/blog/moravany-nad-vahom-hradiste",
+      "permanent": true
+    },
+    {
+      "source": "/2014/02/o-starom-kristofovi.html",
+      "destination": "/blog/o-starom-kristofovi",
+      "permanent": true
+    },
+    {
+      "source": "/2014/03/nas-spolupracovnik-peter-bros-nakreslil.html",
+      "destination": "/blog/zlaty-kon-kresba-p-brosa",
+      "permanent": true
+    },
+    {
+      "source": "/2014/03/prosne-zlaty-kon-kresba-lacka.html",
+      "destination": "/blog/prosne-zlaty-kon-kresba-a-lacka",
+      "permanent": true
+    },
+    {
+      "source": "/2014/03/velkomoravsky-kovac-z-vrsatca.html",
+      "destination": "/blog/velkomoravsky-kovac-z-vrsatca",
+      "permanent": true
+    },
+    {
+      "source": "/2014/04/blog-post.html",
+      "destination": "/blog/historicky-festival-pozvanka-lh-2014",
+      "permanent": true
+    },
+    {
+      "source": "/2014/04/hana-chorvatova-lunice-ich-vyznam.html",
+      "destination": "/blog/hana-chorvatova-lunice-a-ich-vyznam",
+      "permanent": true
+    },
+    {
+      "source": "/2014/04/hchorvatova-k-vyznamu-priveskov.html",
+      "destination": "/blog/h-chorvatova-k-vyznamu-priveskov-amuletov-z-vcasnostredovekych-pohrebisk",
+      "permanent": true
+    },
+    {
+      "source": "/2014/04/hradiste-pri-partizanskom.html",
+      "destination": "/blog/hradiste-pri-partizanskom",
+      "permanent": true
+    },
+    {
+      "source": "/2014/04/informacne-tabule-prosne-zlaty-kon.html",
+      "destination": "/blog/informacne-tabule-prosne-zlaty-kon-a-uhliska",
+      "permanent": true
+    },
+    {
+      "source": "/2014/04/podpalili-archologicky-skanzen.html",
+      "destination": "/blog/podpalili-archologicky-skanzen",
+      "permanent": true
+    },
+    {
+      "source": "/2014/04/zberove-nalezy-puchovskej-kultury-zo.html",
+      "destination": "/blog/a-gaspar-zberove-nalezy-puchovskej-kultury-zo-stredneho-povazia",
+      "permanent": true
+    },
+    {
+      "source": "/2014/05/anketa.html",
+      "destination": "/blog/anketa-2014-maj",
+      "permanent": true
+    },
+    {
+      "source": "/2014/05/klucov.html",
+      "destination": "/blog/klucov",
+      "permanent": true
+    },
+    {
+      "source": "/2014/06/michalovce-zivot-na-velkej-morave.html",
+      "destination": "/blog/michalovce-zivot-na-velkej-morave",
+      "permanent": true
+    },
+    {
+      "source": "/2014/06/stepne-pyramidy-na-ukrajine.html",
+      "destination": "/blog/a-namerova-stepne-pyramidy-na-ukrajine",
+      "permanent": true
+    },
+    {
+      "source": "/2014/07/anketa.html",
+      "destination": "/blog/anketa-2014-jul",
+      "permanent": true
+    },
+    {
+      "source": "/2014/07/muzla-cenkov-nizinne-hradisko-na-brehu.html",
+      "destination": "/blog/muzla-cenkov-nizinne-hradisko-na-brehu-dunaja",
+      "permanent": true
+    },
+    {
+      "source": "/2014/08/naucny-chodnik-divinka-velky-vrch.html",
+      "destination": "/blog/naucny-chodnik-divinka-velky-vrch",
+      "permanent": true
+    },
+    {
+      "source": "/2014/08/peter-schreiber-osidlenie-ziliny-okolia.html",
+      "destination": "/blog/peter-schreiber-osidlenie-ziliny-a-okolia-od-doby-rimskej-po-stredovek-lokalita-divinka",
+      "permanent": true
+    },
+    {
+      "source": "/2014/10/bojova-taktika-madarov-inych-kocovnikov.html",
+      "destination": "/blog/bojova-taktika-madarov-a-inych-kocovnikov",
+      "permanent": true
+    },
+    {
+      "source": "/2014/10/peter-schreiber-druhy-zivot-pravekej.html",
+      "destination": "/blog/peter-schreiber-druhy-zivot-pravekej-kamennej-industrie",
+      "permanent": true
+    },
+    {
+      "source": "/2014/10/vysny-kubin-ostra-skala.html",
+      "destination": "/blog/vysny-kubin-ostra-skala",
+      "permanent": true
+    },
+    {
+      "source": "/2014/11/diskusna-skupina-hradiska.html",
+      "destination": "/blog/diskusna-skupina-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2014/11/kronika-dusi-roman-o-tatarskom-vpade.html",
+      "destination": "/blog/kronika-dusi-roman-o-tatarskom-vpade",
+      "permanent": true
+    },
+    {
+      "source": "/2014/12/informacna-tabula-hradisko-maly-manin.html",
+      "destination": "/blog/informacna-tabula-hradisko-maly-manin",
+      "permanent": true
+    },
+    {
+      "source": "/2014/12/keramicke-idoly-z-budmeric-starsia-doba.html",
+      "destination": "/blog/keramicke-idoly-z-budmeric-starsia-doba-bronzova-madarovska-kultura",
+      "permanent": true
+    },
+    {
+      "source": "/2014/12/pavol-satko-konstantin-porfyrogenetes.html",
+      "destination": "/blog/pavol-satko-konstantin-porfyrogenetes-a-jeho-moravy",
+      "permanent": true
+    },
+    {
+      "source": "/2014/12/slovanska-svatyna-most-pri-bratislave.html",
+      "destination": "/blog/slovanska-svatyna-most-pri-bratislave",
+      "permanent": true
+    },
+    {
+      "source": "/2014/12/slovansky-velmozsky-dvorec.html",
+      "destination": "/blog/slovansky-velmozsky-dvorec",
+      "permanent": true
+    },
+    {
+      "source": "/2015/01/bojna-zivot-slovanov-na-hradisku-v-zime.html",
+      "destination": "/blog/bojna-zivot-slovanov-na-hradisku-v-zime",
+      "permanent": true
+    },
+    {
+      "source": "/2015/01/p-schreiber-vcasnostredoveke-osidlenie.html",
+      "destination": "/blog/p-schreiber-vcasnostredoveke-osidlenie-regionu-marikovskej-doliny",
+      "permanent": true
+    },
+    {
+      "source": "/2015/01/vidiecke-opevnene-sidlisko.html",
+      "destination": "/blog/vidiecke-opevnene-sidlisko",
+      "permanent": true
+    },
+    {
+      "source": "/2015/01/vysny-kubin-tupa-skala.html",
+      "destination": "/blog/vysny-kubin-tupa-skala",
+      "permanent": true
+    },
+    {
+      "source": "/2015/02/istebne-hradok.html",
+      "destination": "/blog/istebne-hradok",
+      "permanent": true
+    },
+    {
+      "source": "/2015/03/brigada-oz-hradiska-dolna-marikova.html",
+      "destination": "/blog/brigada-oz-hradiska-dolna-marikova-siroka",
+      "permanent": true
+    },
+    {
+      "source": "/2015/03/nosice-hradisko.html",
+      "destination": "/blog/nosice-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2015/03/tak-nam-zas-zamlciavaju-dejiny.html",
+      "destination": "/blog/tak-nam-zas-zamlciavaju-dejiny",
+      "permanent": true
+    },
+    {
+      "source": "/2015/04/krasa-pravekej-keramiky-vystava-v-ziline.html",
+      "destination": "/blog/krasa-pravekej-keramiky-vystava-v-ziline",
+      "permanent": true
+    },
+    {
+      "source": "/2015/04/z-stegmann-rajtar-predbezne-vysledky.html",
+      "destination": "/blog/z-stegmann-rajtar-predbezne-vysledky-archeologickeho-vyskumu-na-zibrici-vyskumy-v-r-2002-2003-a-2005-2006",
+      "permanent": true
+    },
+    {
+      "source": "/2015/05/a-pretoze-vedu-koristnicky-zivot.html",
+      "destination": "/blog/t-humaj-slovania-prepadli-fransku-jednotku",
+      "permanent": true
+    },
+    {
+      "source": "/2015/05/oresany-slepy-vrch-kresba.html",
+      "destination": "/blog/oresany-slepy-vrch-kresba",
+      "permanent": true
+    },
+    {
+      "source": "/2015/06/informacne-tabule-dolne-oresany-slepy.html",
+      "destination": "/blog/informacne-tabule-dolne-oresany-slepy-vrch",
+      "permanent": true
+    },
+    {
+      "source": "/2015/06/tragedia-jedneho-uspesneho-obsadenia.html",
+      "destination": "/blog/tragedia-jedneho-uspesneho-obsadenia-vlasti",
+      "permanent": true
+    },
+    {
+      "source": "/2015/07/ziva-historia-v-juli.html",
+      "destination": "/blog/ziva-historia-v-juli",
+      "permanent": true
+    },
+    {
+      "source": "/2015/07/zivy-starovek-na-havranku.html",
+      "destination": "/blog/zivy-starovek-na-havranku",
+      "permanent": true
+    },
+    {
+      "source": "/2015/08/maros-demko-kyjevsky-panteon.html",
+      "destination": "/blog/maros-demko-kyjevsky-panteon",
+      "permanent": true
+    },
+    {
+      "source": "/2015/09/obisovce-straza.html",
+      "destination": "/blog/obisovce-straza",
+      "permanent": true
+    },
+    {
+      "source": "/2015/10/trzcinica-pl.html",
+      "destination": "/blog/trzcinica-pl",
+      "permanent": true
+    },
+    {
+      "source": "/2015/11/mohylnik-sverepec-podvrscie.html",
+      "destination": "/blog/mohylnik-sverepec-podvrscie",
+      "permanent": true
+    },
+    {
+      "source": "/2015/12/pobedim-3d.html",
+      "destination": "/blog/pobedim-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2015/12/zbornik-hradiska-svedkovia-davnych-cias.html",
+      "destination": "/blog/zbornik-hradiska-svedkovia-davnych-cias",
+      "permanent": true
+    },
+    {
+      "source": "/2016/01/vysiel-nas-zbornik-o-hradiskach.html",
+      "destination": "/blog/vysiel-nas-zbornik-o-hradiskach",
+      "permanent": true
+    },
+    {
+      "source": "/2016/02/darujte-nam-2-z-dane.html",
+      "destination": "/blog/darujte-nam-2-z-dane-2016",
+      "permanent": true
+    },
+    {
+      "source": "/2016/03/zilina-zavodie.html",
+      "destination": "/blog/zilina-zavodie",
+      "permanent": true
+    },
+    {
+      "source": "/2016/04/slovanska-svatyna-v-moste-pri.html",
+      "destination": "/blog/slovanska-svatyna-v-moste-pri-bratislave-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2016/04/tollens-bitka-z-doby-bronzovej.html",
+      "destination": "/blog/tollens-bitka-z-doby-bronzovej",
+      "permanent": true
+    },
+    {
+      "source": "/2016/04/zilina-zastranie-stranik.html",
+      "destination": "/blog/zilina-zastranie-stranik",
+      "permanent": true
+    },
+    {
+      "source": "/2016/05/mohyla-z-doby-bronzovej-v-palarikove-3d.html",
+      "destination": "/blog/mohyla-z-doby-bronzovej-v-palarikove-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2016/05/vyskum-na-hradsiku-simunky-v-dolnej.html",
+      "destination": "/blog/vyskum-na-hradisku-simunky-v-dolnej-marikovej",
+      "permanent": true
+    },
+    {
+      "source": "/2016/06/humno-najstarsia-zmienka.html",
+      "destination": "/blog/humno-najstarsia-zmienka",
+      "permanent": true
+    },
+    {
+      "source": "/2016/08/dna-24.html",
+      "destination": "/blog/slepy-vrch-v-oresanoch-dobudovanie-naucneho-chodnika",
+      "permanent": true
+    },
+    {
+      "source": "/2016/08/ohlasit-archeologicky-nalez-sa-oplati.html",
+      "destination": "/blog/ohlasit-archeologicky-nalez-sa-oplati-patri-vam-nalezne",
+      "permanent": true
+    },
+    {
+      "source": "/2016/08/visolaje-slovansky-mohylnik.html",
+      "destination": "/blog/visolaje-slovansky-mohylnik",
+      "permanent": true
+    },
+    {
+      "source": "/2016/09/muzla-cenkov-3d-vizualizacia-hradiska.html",
+      "destination": "/blog/muzla-cenkov-3d-vizualizacia-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2016/09/zrekonstruovali-ukradnutu-prilbu-z.html",
+      "destination": "/blog/zrekonstruovali-ukradnutu-prilbu-z-bojnej",
+      "permanent": true
+    },
+    {
+      "source": "/2016/10/pevnost-nove-zamky-3d.html",
+      "destination": "/blog/pevnost-nove-zamky-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2016/11/prosiek-hradok.html",
+      "destination": "/blog/prosiek-hradok",
+      "permanent": true
+    },
+    {
+      "source": "/2016/12/bojna-v-zime.html",
+      "destination": "/blog/bojna-v-zime",
+      "permanent": true
+    },
+    {
+      "source": "/2016/12/kedy-prisli-slovania-na-slovensko.html",
+      "destination": "/blog/kedy-prisli-slovania-na-slovensko",
+      "permanent": true
+    },
+    {
+      "source": "/2016/12/p-schreiber-dolna-marikova-siroka.html",
+      "destination": "/blog/p-schreiber-dolna-marikova-siroka-archeologicky-vyskum-2016",
+      "permanent": true
+    },
+    {
+      "source": "/2016/12/pekne-sviatky.html",
+      "destination": "/blog/pekne-sviatky",
+      "permanent": true
+    },
+    {
+      "source": "/2017/01/3d-rekonstrukcie.html",
+      "destination": "/blog/3d-rekonstrukcie",
+      "permanent": true
+    },
+    {
+      "source": "/2017/01/devin-velkomoravsky-palac-s-kostolom-3d.html",
+      "destination": "/blog/devin-velkomoravsky-palac-s-kostolom-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2017/01/falosne-runove-napisy-na-skalach.html",
+      "destination": "/blog/falosne-runove-napisy-na-skalach",
+      "permanent": true
+    },
+    {
+      "source": "/2017/01/hladajte-na-hradiskach-poklady.html",
+      "destination": "/blog/hladajte-na-hradiskach-poklady",
+      "permanent": true
+    },
+    {
+      "source": "/2017/01/v-spolupraci-s-projektom-dwarf-digital.html",
+      "destination": "/blog/rondel-vo-svodine-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2017/01/velkomoravske-hradisko-zvolen-motova-3d.html",
+      "destination": "/blog/velkomoravske-hradisko-zvolen-motova-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2017/02/ak-ste-sa-este-nerozhodli-komu-venujete.html",
+      "destination": "/blog/2-pre-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2017/02/nitrianska-blatnica-rotunda-3d.html",
+      "destination": "/blog/nitrianska-blatnica-rotunda-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2017/02/surany-3d-rekonstrukcia.html",
+      "destination": "/blog/surany-3d-rekonstrukcia",
+      "permanent": true
+    },
+    {
+      "source": "/2017/02/zvolen-motova-3d-panorama.html",
+      "destination": "/blog/zvolen-motova-3d-panorama",
+      "permanent": true
+    },
+    {
+      "source": "/2017/03/hricovske-podhradie-hrad-hricov.html",
+      "destination": "/blog/hricovske-podhradie-hrad-hricov",
+      "permanent": true
+    },
+    {
+      "source": "/2017/03/moslimovia-o-madaroch-pred-zaujatim.html",
+      "destination": "/blog/moslimovia-o-madaroch-pred-zaujatim-vlasti",
+      "permanent": true
+    },
+    {
+      "source": "/2017/03/osada-z-mladsej-doby-kamennej.html",
+      "destination": "/blog/osada-z-mladsej-doby-kamennej",
+      "permanent": true
+    },
+    {
+      "source": "/2017/04/halstatska-mohyla-holasky.html",
+      "destination": "/blog/velmozska-mohyla-holasky-2",
+      "permanent": true
+    },
+    {
+      "source": "/2017/04/velmozska-mohyla-holasky-1.html",
+      "destination": "/blog/velmozska-mohyla-holasky-1",
+      "permanent": true
+    },
+    {
+      "source": "/2017/04/voz-z-obdobia-eneolitu.html",
+      "destination": "/blog/voz-z-obdobia-eneolitu",
+      "permanent": true
+    },
+    {
+      "source": "/2017/05/dolna-marikova-simunky-z-vtacej.html",
+      "destination": "/blog/dolna-marikova-simunky",
+      "permanent": true
+    },
+    {
+      "source": "/2017/05/nase-tabule-visolaje-slovansky-mohylnik.html",
+      "destination": "/blog/nase-tabule-visolaje-slovansky-mohylnik",
+      "permanent": true
+    },
+    {
+      "source": "/2017/05/prinasame-vam-dalsiu-uzasnu-vizualnu.html",
+      "destination": "/blog/liptovsky-hrad",
+      "permanent": true
+    },
+    {
+      "source": "/2017/05/surady-3d-v-noci-muzei.html",
+      "destination": "/blog/surany-3d-v-noci-muzei",
+      "permanent": true
+    },
+    {
+      "source": "/2017/05/surany-v-15-storoci-3d.html",
+      "destination": "/blog/surany-v-16-storoci-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2017/06/ako-zbierat-starozitnosti-19-storocie.html",
+      "destination": "/blog/ako-zbierat-starozitnosti",
+      "permanent": true
+    },
+    {
+      "source": "/2017/06/lipt-stiavnica-lucny-hrib.html",
+      "destination": "/blog/lipt-stiavnica-lucny-hrib",
+      "permanent": true
+    },
+    {
+      "source": "/2017/06/patdesiate-vyrocie-umrtia-antona.html",
+      "destination": "/blog/patdesiate-vyrocie-umrtia-antona-petrovskeho-sichmana",
+      "permanent": true
+    },
+    {
+      "source": "/2017/07/kelti-v-malych-karpatoch.html",
+      "destination": "/blog/kelti-v-malych-karpatoch",
+      "permanent": true
+    },
+    {
+      "source": "/2017/07/prasnik-tlsta-hora.html",
+      "destination": "/blog/prasnik-tlsta-hora",
+      "permanent": true
+    },
+    {
+      "source": "/2017/08/drevenik-z-vtacej-perspektivy.html",
+      "destination": "/blog/drevenik-z-vtacej-perspektivy",
+      "permanent": true
+    },
+    {
+      "source": "/2017/08/hatne-hradok-objav-fragmentov.html",
+      "destination": "/blog/hatne-hradok-objav-fragmentov-murovanych-architektur-p-schreiber",
+      "permanent": true
+    },
+    {
+      "source": "/2017/08/stupne-zeravica.html",
+      "destination": "/blog/stupne-zeravica",
+      "permanent": true
+    },
+    {
+      "source": "/2017/09/kelti-v-tvrdosovciach.html",
+      "destination": "/blog/kelti-v-tvrdosovciach",
+      "permanent": true
+    },
+    {
+      "source": "/2017/09/predstavujeme-vam-nasu-novu-3d.html",
+      "destination": "/blog/keltska-osada-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2017/10/nimnica-holis.html",
+      "destination": "/blog/nimnica-holis",
+      "permanent": true
+    },
+    {
+      "source": "/2017/10/prednaska-o-kletoch-video.html",
+      "destination": "/blog/prednaska-o-keltoch-video",
+      "permanent": true
+    },
+    {
+      "source": "/2017/10/stary-orgon-na-kycere.html",
+      "destination": "/blog/stary-orgon-na-kycere",
+      "permanent": true
+    },
+    {
+      "source": "/2017/11/cividalsky-evanieliar-pribina-kocel.html",
+      "destination": "/blog/cividalsky-evanieliar-pribina-kocel-rastislav-a-svatopluk",
+      "permanent": true
+    },
+    {
+      "source": "/2017/11/tabula-nosice-hradisko.html",
+      "destination": "/blog/tabula-nosice-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2017/11/vyuzitie-rozsirenej-reality-pri.html",
+      "destination": "/blog/vyuzitie-rozsirenej-reality-pri-popularizacii-archeologie",
+      "permanent": true
+    },
+    {
+      "source": "/2017/11/zemplin-keltske-obetisko.html",
+      "destination": "/blog/zemplin-keltske-dacke-obetisko",
+      "permanent": true
+    },
+    {
+      "source": "/2017/12/anton-intibus-1855-o-okoli-trnavy.html",
+      "destination": "/blog/anton-intibus-1855-o-okoli-trnavy",
+      "permanent": true
+    },
+    {
+      "source": "/2017/12/pred-2-rokmi-sme-vydali-zbornik.html",
+      "destination": "/blog/zbornik",
+      "permanent": true
+    },
+    {
+      "source": "/2017/12/priatelia-uvazujeme-nad-moznostou.html",
+      "destination": "/blog/casopis-o-hradiskach-v-tlacenej-podobe",
+      "permanent": true
+    },
+    {
+      "source": "/2017/12/ukradli-mec-z-puchovskej-skaly.html",
+      "destination": "/blog/ukradli-mec-z-puchovskej-skaly",
+      "permanent": true
+    },
+    {
+      "source": "/2017/12/vychadza-prvy-diel-nasho-casopis.html",
+      "destination": "/blog/vychadza-prvy-diel-nasho-casopisu-digitalne-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2018/01/klapy-keltske-hradisko.html",
+      "destination": "/blog/klapy-keltske-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2018/01/konstrukcia-hradisk-3d.html",
+      "destination": "/blog/rekonstrukcia-opevnenia-hradisk",
+      "permanent": true
+    },
+    {
+      "source": "/2018/01/oprava-tabule-v-pruzine.html",
+      "destination": "/blog/oprava-tabule-v-pruzine",
+      "permanent": true
+    },
+    {
+      "source": "/2018/02/hrad-hricov-3d.html",
+      "destination": "/blog/hrad-hricov-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2018/02/muzla-cenkov-nova-rekonstrukcia.html",
+      "destination": "/blog/muzla-cenkov-nova-rekonstrukcia",
+      "permanent": true
+    },
+    {
+      "source": "/2018/03/darujte-nam-2-z-dane.html",
+      "destination": "/blog/darujte-nam-2-z-dane-2018",
+      "permanent": true
+    },
+    {
+      "source": "/2018/03/horne-plachtince.html",
+      "destination": "/blog/horne-plachtince-pohansky-vrch",
+      "permanent": true
+    },
+    {
+      "source": "/2018/04/dwarf-digital-archeology-v-spolupraci-s.html",
+      "destination": "/blog/kniha-ozivena-archeologia",
+      "permanent": true
+    },
+    {
+      "source": "/2018/05/divin-3d.html",
+      "destination": "/blog/divin-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2018/05/nosice-hradisko-3d.html",
+      "destination": "/blog/nosice-hradisko-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2018/07/bojna-3d-rekonstrukcia-slovanskeho.html",
+      "destination": "/blog/bojna-3d-rekonstrukcia-slovanskeho-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2018/07/detektorovy-prieskum-hradiska.html",
+      "destination": "/blog/detektorovy-prieskum-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2018/07/utgard-2018.html",
+      "destination": "/blog/utgard-2018",
+      "permanent": true
+    },
+    {
+      "source": "/2018/08/klatova-nova-ves-siance.html",
+      "destination": "/blog/klatova-nova-ves-siance",
+      "permanent": true
+    },
+    {
+      "source": "/2018/09/socha-tabula-na-orgonovej-kycere.html",
+      "destination": "/blog/socha-a-tabula-na-orgonovej-kycere",
+      "permanent": true
+    },
+    {
+      "source": "/2018/09/u5nin-zamcisko.html",
+      "destination": "/blog/unin-zamcisko",
+      "permanent": true
+    },
+    {
+      "source": "/2018/10/dolne-vestenice-slovanske-hradisko.html",
+      "destination": "/blog/dolne-vestenice-slovanske-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2018/10/informacne-tabule-predna-horka-klape.html",
+      "destination": "/blog/informacne-tabule-predna-horka-a-klape",
+      "permanent": true
+    },
+    {
+      "source": "/2018/10/kyjevske-listy.html",
+      "destination": "/blog/kyjevske-listy",
+      "permanent": true
+    },
+    {
+      "source": "/2018/10/skalka-zahadny-kostolik-na-hradisku.html",
+      "destination": "/blog/skalka-zahadny-kostolik-na-hradisku",
+      "permanent": true
+    },
+    {
+      "source": "/2018/10/stanovisko-k-takzvanym-slovansko.html",
+      "destination": "/blog/stanovisko-k-takzvanym-slovansko-arijskym-vedam",
+      "permanent": true
+    },
+    {
+      "source": "/2018/11/knihy-o-slovanoch.html",
+      "destination": "/blog/knihy-o-slovanoch",
+      "permanent": true
+    },
+    {
+      "source": "/2018/11/pezinok-stary-zamok-ii.html",
+      "destination": "/blog/pezinok-stary-zamok-ii",
+      "permanent": true
+    },
+    {
+      "source": "/2018/12/dolne-vestenice-kresba-slovanskeho.html",
+      "destination": "/blog/dolne-vestenice-kresba-slovanskeho-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2019/02/ponicka-huta-na-klastore.html",
+      "destination": "/blog/ponicka-huta-na-klastore",
+      "permanent": true
+    },
+    {
+      "source": "/2019/03/ako-mohli-prebiehat-stare-pohanske.html",
+      "destination": "/blog/pohanska-svatyna-most-pri-bratislave-nove-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2019/03/mapa-stredovekych-obchodnych-ciest.html",
+      "destination": "/blog/mapa-stredovekych-obchodnych-ciest",
+      "permanent": true
+    },
+    {
+      "source": "/2019/03/skryte-poklady.html",
+      "destination": "/blog/skryte-poklady",
+      "permanent": true
+    },
+    {
+      "source": "/2019/04/2-pre-oz-hradiska.html",
+      "destination": "/blog/2-pre-oz-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2019/04/na-slovensku-objavili-novy-keltsky.html",
+      "destination": "/blog/na-slovensku-objavili-novy-keltsky-symbol",
+      "permanent": true
+    },
+    {
+      "source": "/2019/04/starosloviensky-slovnik-online.html",
+      "destination": "/blog/starosloviensky-slovnik-online",
+      "permanent": true
+    },
+    {
+      "source": "/2019/07/turcianska-blatnica-plesovica.html",
+      "destination": "/blog/turcianska-blatnica-plesovica",
+      "permanent": true
+    },
+    {
+      "source": "/2019/09/nase-niekolkomesacne-usilie-bude-uz.html",
+      "destination": "/blog/zbornik-hradiska-svedkovia-davnych-cias-2",
+      "permanent": true
+    },
+    {
+      "source": "/2019/10/basen-o-orgonovi.html",
+      "destination": "/blog/basen-o-orgonovi",
+      "permanent": true
+    },
+    {
+      "source": "/2019/11/nacelnici-kniezata-krali-slovanskych.html",
+      "destination": "/blog/nacelnici-kniezata-a-krali-slovanskych-veletov-a-obodritov-peter-salkovsky",
+      "permanent": true
+    },
+    {
+      "source": "/2019/11/nacelnici-kniezata-krali-srbskych.html",
+      "destination": "/blog/nacelnici-kniezata-a-krali-srbskych-luzickych-a-sprevansko-havolanskych-slovanov-peter-salkovsky",
+      "permanent": true
+    },
+    {
+      "source": "/2019/11/stupne-zeravica-info-tabule.html",
+      "destination": "/blog/stupne-zeravica",
+      "permanent": true
+    },
+    {
+      "source": "/2019/11/zbornik-ii-uz-je-vytlaceny.html",
+      "destination": "/blog/zbornik-ii-uz-je-vytlaceny",
+      "permanent": true
+    },
+    {
+      "source": "/2019/12/dolne-oresany-vapenice-alebo-ako-sme.html",
+      "destination": "/blog/dolne-oresany-vapenice-alebo-ako-sme-nasli-nove-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2019/12/zbornik-o-hradiskach-sa-rychlo-predava.html",
+      "destination": "/blog/zbornik-o-hradiskach-sa-rychlo-predava",
+      "permanent": true
+    },
+    {
+      "source": "/2020/01/marikova-simunky.html",
+      "destination": "/blog/dolna-marikova-simunky",
+      "permanent": true
+    },
+    {
+      "source": "/2020/03/2-z-vasich-dani-nam-velmi-pomozu.html",
+      "destination": "/blog/2-z-vasich-dani-nam-velmi-pomozu",
+      "permanent": true
+    },
+    {
+      "source": "/2020/03/nimnica-holis-kreba.html",
+      "destination": "/blog/nimnica-holis",
+      "permanent": true
+    },
+    {
+      "source": "/2020/03/okopanec-borinka.html",
+      "destination": "/blog/okopanec-borinka",
+      "permanent": true
+    },
+    {
+      "source": "/2020/03/zeleznik-dolne-oresany.html",
+      "destination": "/blog/zeleznik-dolne-oresany",
+      "permanent": true
+    },
+    {
+      "source": "/2020/05/p-salkovsky-nacelnici-kniezata-krali.html",
+      "destination": "/blog/p-salkovsky-nacelnici-kniezata-a-krali-slovenskych-a-moravskych-slovanov-a-ich-sidla",
+      "permanent": true
+    },
+    {
+      "source": "/2020/05/zilina-zavodie.html",
+      "destination": "/blog/zilina-zavodie",
+      "permanent": true
+    },
+    {
+      "source": "/2020/08/tabula-na-hradisku-holis-nimnica.html",
+      "destination": "/blog/tabula-na-hradisku-holis-nimnica",
+      "permanent": true
+    },
+    {
+      "source": "/2020/10/vyroba-dosiek-pre-hradisko-bojna.html",
+      "destination": "/blog/vyroba-dosiek-pre-hradisko-bojna",
+      "permanent": true
+    },
+    {
+      "source": "/2020/12/marianka-barania-luka-bazgovic.html",
+      "destination": "/blog/marianka-barania-luka-bazgovic",
+      "permanent": true
+    },
+    {
+      "source": "/2021/02/stupava-draci-hradok.html",
+      "destination": "/blog/stupava-draci-hradok",
+      "permanent": true
+    },
+    {
+      "source": "/2021/06/detva-kalamarka-3-d.html",
+      "destination": "/blog/detva-kalamarka-3-d",
+      "permanent": true
+    },
+    {
+      "source": "/2021/06/male-kozmalovce-plesovica.html",
+      "destination": "/blog/male-kozmalovce",
+      "permanent": true
+    },
+    {
+      "source": "/2021/06/stary-plast-plavecky-mikulas.html",
+      "destination": "/blog/stary-plast-plavecky-mikulas",
+      "permanent": true
+    },
+    {
+      "source": "/2021/06/svaty-jur-nestich-3d.html",
+      "destination": "/blog/svaty-jur-nestich-3d",
+      "permanent": true
+    },
+    {
+      "source": "/2021/07/prednaska-o-archeologii-na-zs-s-ms.html",
+      "destination": "/blog/prednaska-o-archeologii-na-zs-s-ms-dolne-oresany",
+      "permanent": true
+    },
+    {
+      "source": "/2021/11/trstin-novy-hradok.html",
+      "destination": "/blog/trstin-novy-hradok",
+      "permanent": true
+    },
+    {
+      "source": "/2022/02/prinasame-vam-novinku-podcast-nasich.html",
+      "destination": "/blog/podcast-kelti-na-juznom-slovensku",
+      "permanent": true
+    },
+    {
+      "source": "/2022/03/podcast-praveke-mece.html",
+      "destination": "/blog/podcast-praveke-mece",
+      "permanent": true
+    },
+    {
+      "source": "/2022/05/klapy-udica-kresba-hradiska-z-obdobia.html",
+      "destination": "/blog/klapy-udica-kresba-hradiska-z-obdobia-puchovskej-kultury",
+      "permanent": true
+    },
+    {
+      "source": "/2022/05/rekomberok-horne-oresany.html",
+      "destination": "/blog/rekomberek-horne-oresany",
+      "permanent": true
+    },
+    {
+      "source": "/2022/09/plavba-rimskou-lodou-po-dunaji-1-diel.html",
+      "destination": "/blog/plavba-rimskou-lodou-po-dunaji-1-diel",
+      "permanent": true
+    },
+    {
+      "source": "/2022/09/plavba-rimskou-lodou-po-dunaji-2-diel.html",
+      "destination": "/blog/plavba-rimskou-lodou-po-dunaji-2-diel",
+      "permanent": true
+    },
+    {
+      "source": "/2022/09/zbrucsky-idol.html",
+      "destination": "/blog/zbrucsky-idol",
+      "permanent": true
+    },
+    {
+      "source": "/2022/10/vyprava-polske-hradiska-biskupin.html",
+      "destination": "/blog/vyprava-polske-hradiska-2-biskupin-wenecja-wiszogrod-gora-zamkowa",
+      "permanent": true
+    },
+    {
+      "source": "/2022/10/vyprava-polske-hradiska-krakow-bnin-den.html",
+      "destination": "/blog/vyprava-polske-hradiska-krakow-a-bnin-den-1",
+      "permanent": true
+    },
+    {
+      "source": "/2022/12/vyprava-polske-hradiska-3-gdansk-owidz.html",
+      "destination": "/blog/vyprava-polske-hradiska-3-gdansk-a-owidz",
+      "permanent": true
+    },
+    {
+      "source": "/2023/01/bronzovy-poklad-z-hradiska-na-strednom.html",
+      "destination": "/blog/bronzovy-poklad-z-hradiska-na-strednom-povazi",
+      "permanent": true
+    },
+    {
+      "source": "/2023/01/skalica-hradisko-na-kalvarii.html",
+      "destination": "/blog/skalica-hradisko-na-kalvarii",
+      "permanent": true
+    },
+    {
+      "source": "/2023/09/spisske-tomasovce-kresba-vesna.html",
+      "destination": "/blog/spisske-tomasovce-kresba-vesna",
+      "permanent": true
+    },
+    {
+      "source": "/2024/01/lodstvo-starovekeho-grecka.html",
+      "destination": "/blog/lodstvo-starovekeho-grecka",
+      "permanent": true
+    },
+    {
+      "source": "/2024/02/markomani-kvadi.html",
+      "destination": "/blog/markomani-a-kvadi",
+      "permanent": true
+    },
+    {
+      "source": "/2024/05/danuvina-alacris-opat-na-vodach-dunaja.html",
+      "destination": "/blog/danuvina-alacris-opat-na-vodach-dunaja",
+      "permanent": true
+    },
+    {
+      "source": "/2024/05/nezbudska-luckavarin-gabrisova.html",
+      "destination": "/blog/varin-nezbudska-lucka-gabrisova",
+      "permanent": true
+    },
+    {
+      "source": "/2024/06/rozhovor-o-hradiskach.html",
+      "destination": "/blog/rozhovor-o-hradiskach",
+      "permanent": true
+    },
+    {
+      "source": "/2024/08/odhalovanie-tajomstiev-antickeho-rima.html",
+      "destination": "/blog/odhalovanie-tajomstiev-antickeho-rima-na-strednom-dunaji",
+      "permanent": true
+    },
+    {
+      "source": "/2024/09/tisicky-rokov-pred-nasou-generaciou.html",
+      "destination": "/blog/putovanie-za-rimskymi-pamiatkami-v-afrike",
+      "permanent": true
+    },
+    {
+      "source": "/2024/09/velky-tribec.html",
+      "destination": "/blog/velky-tribec-mohutne-praveke-hradisko",
+      "permanent": true
+    },
+    {
+      "source": "/2024/11/archeologicke-kultury-na-slovensku.html",
+      "destination": "/blog/archeologicke-kultury-na-slovensku-datovanie",
+      "permanent": true
+    },
+    {
+      "source": "/2025/02/2-pre-hradiska-v-roku-2025.html",
+      "destination": "/blog/2-pre-hradiska-v-roku-2025",
+      "permanent": true
+    },
+    {
+      "source": "/2025/04/janovcemachalovce.html",
+      "destination": "/blog/janovce-machalovce",
+      "permanent": true
+    },
+    {
+      "source": "/2025/11/prosne-zlaty-kon-vyskum.html",
+      "destination": "/blog/prosne-zlaty-kon",
+      "permanent": true
+    },
+    {
+      "source": "/2025/12/hladanie-bez-hranic-cesko-slovensky.html",
+      "destination": "/blog/hladanie-bez-hranic-cesko-slovensky-dialog-archeologov-a-detektoristov",
+      "permanent": true
+    },
+    {
+      "source": "/2026/02/zakladne-zasady-obcianskeho-zdruzenia.html",
+      "destination": "/blog/zakladne-zasady-obcianskeho-zdruzenia-hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/2026/06/oblik-vyskum-kultovej-hory.html",
+      "destination": "/blog/oblik-vyskum-kultovej-hory",
+      "permanent": true
+    },
+    {
+      "source": "/search/label/:stitok*",
+      "destination": "/hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/search",
+      "destination": "/hladat",
+      "permanent": true
+    },
+    {
+      "source": "/:rok(d{4})/:mesiac(d{2})/:nazov*",
+      "destination": "/hradiska",
+      "permanent": true
+    },
+    {
+      "source": "/:rok(d{4})_:mesiac(d{2})_:den(d{2})_archive.html",
+      "destination": "/hradiska",
+      "permanent": true
+    }
+  ],
   "rewrites": [
-    { "source": "/strapi/:path*", "destination": "http://188.245.47.29/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/strapi/:path*",
+      "destination": "http://188.245.47.29/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
-      "has": [{ "type": "host", "value": ".*\\.vercel\\.app" }],
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "has": [
+        {
+          "type": "host",
+          "value": ".*\\.vercel\\.app"
+        }
+      ],
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     },
     {
       "source": "/mapa/(.*)",

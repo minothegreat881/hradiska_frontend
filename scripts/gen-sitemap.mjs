@@ -7,9 +7,9 @@
  *
  * ENV:
  *   SITE_URL          verejná doména webu (default https://hradiska.sk)
- *   VITE_STRAPI_URL   API backendu (default http://localhost:1337)
+ *   SITEMAP_STRAPI_URL  API backendu (default produkcia na Hetzneri)
  */
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -17,8 +17,10 @@ const SITE = (process.env.SITE_URL || 'https://hradiska.sk').replace(/\/$/, '');
 // Pri builde na Verceli ziadny localhost nebezi — `VITE_STRAPI_URL` tam nie je
 // nastavena a fetch na 1337 padal, takze sa do mapy stranok zapisalo 11 URL
 // a ZIADNY clanok. Rovnaka zaloha ako v `prerender.mjs`: backend na Hetzneri.
-// Prepisatelne cez SITEMAP_STRAPI_URL (lokalne staci VITE_STRAPI_URL).
-const STRAPI = (process.env.SITEMAP_STRAPI_URL || process.env.VITE_STRAPI_URL || 'http://188.245.47.29').replace(/\/$/, '');
+// `VITE_STRAPI_URL` sa tu UŽ NEPOUŽÍVA: na Verceli je nastavená a mierila inam,
+// takže stiahnutie zlyhávalo. Rovnaké poradie ako `prerender.mjs` — ten funguje.
+// Lokálne proti vlastnému Strapi: SITEMAP_STRAPI_URL=http://localhost:1337.
+const STRAPI = (process.env.SITEMAP_STRAPI_URL || process.env.PRERENDER_STRAPI_URL || 'http://188.245.47.29').replace(/\/$/, '');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outPath = resolve(__dirname, '..', 'public', 'sitemap.xml');
@@ -53,7 +55,16 @@ async function main() {
       articleCount++;
     }
   } catch (e) {
-    console.warn(`[sitemap] Strapi nedostupný (${e.message}) — zapisujem len statické stránky.`);
+    /* NEPREPISOVAŤ dobrý súbor zlým. Toto sa už raz stalo: na Verceli
+       stiahnutie zlyhalo, vetva „fail-soft" prepísala vygenerovanú mapu
+       jedenástimi statickými adresami a web mal na produkcii mapu stránok
+       bez jediného článku. Keď v repe mapa s článkami je, nechá sa tak. */
+    console.warn(`[sitemap] Strapi nedostupný (${e.message}).`);
+    if (existsSync(outPath) && readFileSync(outPath, 'utf8').includes('/blog/')) {
+      console.warn('[sitemap] Nechávam pôvodnú mapu stránok — má v sebe články.');
+      return;
+    }
+    console.warn('[sitemap] Zapisujem len statické stránky.');
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
