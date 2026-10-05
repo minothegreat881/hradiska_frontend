@@ -2703,9 +2703,18 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   aspect-ratio: 1000 / 580; background: var(--hr-surface-3, #efe8da);
   text-decoration: none;
 }
-.lok-mapa-snimka, .lok-mapa-popisy {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+/* Mozaika z hotových dlaždíc. Dve vrstvy nad sebou — snímka a popisy —,
+   obe v percentách, takže sa zmenšujú spolu s rámčekom. */
+.lok-mapa-vrstva {
+  position: absolute; inset: 0; display: block;
+  opacity: 0; transition: opacity .25s ease;
 }
+.lok-mapa.je-tu .lok-mapa-vrstva { opacity: 1; }
+.lok-mapa-vrstva img { position: absolute; display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .lok-mapa-vrstva { transition: none; }
+}
+
 .lok-mapa-znacka {
   position: absolute; left: 50%; top: 50%;
   /* Hrot značky ukazuje na bod, nie jej stred — preto celá výška nahor. */

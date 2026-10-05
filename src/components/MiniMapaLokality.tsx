@@ -3,66 +3,83 @@
 /**
  * MINI-MAPA LOKALITY v bočnom stĺpci článku.
  *
- * DVA POKUSY PREDTÝM, oba zle:
- *   1. MapLibre naklonená o 60° („3D mapa") — snímka bez popisov, značka sa
- *      pri približovaní plazila po mape (naklonená kamera) a 274 kB knižnice
- *      pri každom článku.
- *   2. Rámec z Google Máp — popisy aj značka boli v poriadku, ale do malého
- *      okienka Google natlačil svoje ovládanie: šípky, lupy, tlačidlo
- *      „Otvoriť v Mapách" a dole pruh „Údaje máp · Podmienky · Nahlásiť
- *      chybu mapy". Z mapky veľkej ako dlaň tak bola zmes gombíkov a jediné,
- *      čo na nej nebolo vidieť, bola krajina. Orezať sa to nedá — uvedenie
- *      zdroja musí v rámci ostať.
+ * TRI POKUSY, každý na inú chybu:
+ *   1. MapLibre naklonená o 60° („3D mapa") — bez popisov, značka sa pri
+ *      približovaní plazila po mape, 274 kB knižnice pri každom článku.
+ *   2. Rámec z Google Máp — popisy aj značka v poriadku, ale do okienka
+ *      veľkého ako dlaň natlačil Google svoje ovládanie a dolný pruh
+ *      „Údaje máp · Podmienky · Nahlásiť chybu mapy".
+ *   3. Jeden veľký obrázok z Esri `export` — ticho a čisto, LENŽE tú snímku
+ *      Esri kreslí až na požiadanie: namerané 1,9 s na mobile a 8,3 s na
+ *      počítači. Mapa sa preto „pomaly lúpala" pred očami.
  *
- * TOTO JE TRETÍ, A NAJTICHŠÍ: jeden statický obrázok. Satelitná snímka
- * s vrstvou popisov (obce, rieky, cesty) a NAŠA značka presne v strede —
- * obrázok je na súradnice vycentrovaný, takže značka sedí vždy a nemá sa
- * kam pohnúť. Žiadne gombíky, žiadny rámec, žiadna knižnica. Kto chce
- * mapu ovládať, klikne — otvorí sa v Google Mapách, kde na to je miesto.
+ * TOTO JE ŠTVRTÝ: mozaika z HOTOVÝCH dlaždíc. Tie isté dlaždice, aké ťahá
+ * veľká mapa — ležia na CDN predpripravené, takže chodia v desiatkach
+ * milisekúnd a nečaká sa na žiadne kreslenie. Skladajú sa dve vrstvy
+ * (satelitná snímka a priehľadné popisy obcí, riek a ciest) a doprostred
+ * ide naša značka: výrez je na súradnice vycentrovaný, takže značka sedí
+ * vždy a nemá sa kam pohnúť.
  *
- * Výrez je 8 km široký: dosť na to, aby boli v ňom susedné obce (teda
- * „kde to je"), a dosť blízko, aby bolo vidieť samotný kopec.
+ * Mozaika sa ukáže NARAZ, až keď sú dlaždice doma — inak by sa mapa
+ * skladala po štvorčekoch pred očami.
  */
 
+import { useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 
-/** Šírka výrezu v metroch. Dosť na susedné obce, dosť blízko na samotný kopec. */
-const SIRKA_M = 8000;
-/** Snímka sa pýta väčšia, než je plocha v paneli — kvôli jemným displejom. */
-const SNIMKA = { w: 1000, h: 580 };
-/**
- * Popisy sa pýtajú MALÉ, zhruba v tej veľkosti, v akej sa aj zobrazia.
- * Dôvod: Esri kreslí názvy pevnou veľkosťou v pixeloch obrázka. Keby sa
- * vykreslili do tisícpixelovej snímky a tá sa potom stlačila na 378 px
- * v paneli, z desaťbodového písma ostanú štyri body a nikto ich neprečíta
- * (presne to bolo na prvom pokuse vidieť). Takto vyjdú v prirodzenej
- * veľkosti; snímka pod nimi ostáva ostrá, lebo tá sa sťahuje veľká.
- */
-const POPISY = { w: 400, h: 232 };
+/** Priblíženie. 13 ≈ 12,6 m na pixel u nás — výrez vyjde zhruba 7,5 km. */
+const ZOOM = 13;
+/** Rozmer výrezu v pixeloch mapy. Pomer strán drží aj rámček v stĺpci. */
+const VYREZ = { w: 600, h: 348 };
+const DLAZDICA = 256;
 
 const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
+const SATELIT = `${ESRI}/World_Imagery/MapServer/tile`;
+const POPISY = `${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile`;
 
-/** Zemepisné súradnice na metre vo Web Mercatore — v tom počíta aj Esri. */
-function naMercator(lat: number, lng: number) {
-  const x = (lng * 20037508.34) / 180;
-  const y = (Math.log(Math.tan(((90 + lat) * Math.PI) / 360)) / (Math.PI / 180)) * (20037508.34 / 180);
+/** Zemepisné súradnice na pixel mapy pri danom priblížení. */
+function naPixel(lat: number, lng: number, z: number) {
+  const n = DLAZDICA * 2 ** z;
+  const x = ((lng + 180) / 360) * n;
+  const s = Math.sin((lat * Math.PI) / 180);
+  const y = (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * n;
   return { x, y };
 }
 
 export function MiniMap({ coordinates, locationName }: { coordinates: { lat: number; lng: number }; locationName: string }) {
   const { lat, lng } = coordinates;
-  const { x, y } = naMercator(lat, lng);
-  const dx = SIRKA_M / 2;
-  const dy = (dx * SNIMKA.h) / SNIMKA.w;
-  /* Ten istý výrez pre obe vrstvy — tým sa prekryjú presne na seba,
-     aj keď má každá iný počet pixelov. */
-  const vyrez = `bbox=${x - dx},${y - dy},${x + dx},${y + dy}&bboxSR=3857&imageSR=3857&f=image`;
+  const stred = naPixel(lat, lng, ZOOM);
+  /* Ľavý horný roh výrezu v pixeloch mapy — od neho sa počítajú dlaždice. */
+  const x0 = stred.x - VYREZ.w / 2;
+  const y0 = stred.y - VYREZ.h / 2;
 
-  const snimka = `${ESRI}/World_Imagery/MapServer/export?${vyrez}&size=${SNIMKA.w},${SNIMKA.h}&format=jpg`;
-  /* Priehľadná vrstva s názvami obcí, riek a ciest. Bez nej je snímka pekná,
-     ale nemá sa podľa čoho orientovať. */
-  const popisy = `${ESRI}/Reference/World_Boundaries_and_Places/MapServer/export?${vyrez}&size=${POPISY.w},${POPISY.h}&format=png32&transparent=true`;
+  const odX = Math.floor(x0 / DLAZDICA);
+  const doX = Math.floor((x0 + VYREZ.w - 1) / DLAZDICA);
+  const odY = Math.floor(y0 / DLAZDICA);
+  const doY = Math.floor((y0 + VYREZ.h - 1) / DLAZDICA);
+
+  const dlazdice: { tx: number; ty: number; left: number; top: number }[] = [];
+  for (let ty = odY; ty <= doY; ty++) {
+    for (let tx = odX; tx <= doX; tx++) {
+      dlazdice.push({
+        tx, ty,
+        /* V percentách, nie v pixeloch — mozaika sa tak zmenší spolu
+           s rámčekom a nepotrebuje merať šírku v JavaScripte. */
+        left: ((tx * DLAZDICA - x0) / VYREZ.w) * 100,
+        top: ((ty * DLAZDICA - y0) / VYREZ.h) * 100,
+      });
+    }
+  }
+  const sirka = (DLAZDICA / VYREZ.w) * 100;
+  const vyska = (DLAZDICA / VYREZ.h) * 100;
+
+  /* Mozaika sa odkryje, až keď je satelitná vrstva celá — inak sa mapa
+     skladá po štvorčekoch. Popisy dosadnú spolu s ňou. */
+  const [hotovych, setHotovych] = useState(0);
+  const hotovo = hotovych >= dlazdice.length;
+
   const vonku = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  const url = (zaklad: string, t: { tx: number; ty: number }) => `${zaklad}/${ZOOM}/${t.ty}/${t.tx}`;
 
   return (
     <div>
@@ -71,12 +88,36 @@ export function MiniMap({ coordinates, locationName }: { coordinates: { lat: num
         target="_blank"
         rel="noopener noreferrer"
         title={`${locationName} — otvoriť v Google Mapách`}
-        className="lok-mapa"
+        className={hotovo ? 'lok-mapa je-tu' : 'lok-mapa'}
       >
-        <img className="lok-mapa-snimka" src={snimka} alt={`Satelitná snímka okolia — ${locationName}`} width={SNIMKA.w} height={SNIMKA.h} loading="lazy" decoding="async" />
-        <img className="lok-mapa-popisy" src={popisy} alt="" aria-hidden="true" width={POPISY.w} height={POPISY.h} loading="lazy" decoding="async" />
-        {/* Značka. Stojí v strede obrázka, lebo naň je mapa vycentrovaná —
-            preto nepotrebuje prepočet a nemôže sa rozísť s polohou. */}
+        <span className="lok-mapa-vrstva">
+          {dlazdice.map((t) => (
+            <img
+              key={`s${t.tx}-${t.ty}`}
+              src={url(SATELIT, t)}
+              alt=""
+              style={{ left: `${t.left}%`, top: `${t.top}%`, width: `${sirka}%`, height: `${vyska}%` }}
+              loading="eager" decoding="async" {...{ fetchpriority: 'low' }}
+              onLoad={() => setHotovych((n) => n + 1)}
+              /* Chýbajúca dlaždica nesmie mapu nechať navždy skrytú. */
+              onError={() => setHotovych((n) => n + 1)}
+            />
+          ))}
+        </span>
+        <span className="lok-mapa-vrstva lok-mapa-popisy" aria-hidden="true">
+          {dlazdice.map((t) => (
+            <img
+              key={`p${t.tx}-${t.ty}`}
+              src={url(POPISY, t)}
+              alt=""
+              style={{ left: `${t.left}%`, top: `${t.top}%`, width: `${sirka}%`, height: `${vyska}%` }}
+              loading="eager" decoding="async" {...{ fetchpriority: 'low' }}
+            />
+          ))}
+        </span>
+
+        {/* Značka. Stojí v strede, lebo naň je výrez vycentrovaný — preto
+            nepotrebuje prepočet a nemôže sa rozísť s polohou. */}
         <span className="lok-mapa-znacka" aria-hidden="true">
           <svg width="26" height="34" viewBox="0 0 26 34">
             <path d="M13 0C5.8 0 0 5.8 0 13c0 9.4 13 21 13 21s13-11.6 13-21C26 5.8 20.2 0 13 0z"

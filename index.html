@@ -3,6 +3,11 @@
   <html lang="sk">
     <head>
       <meta charset="UTF-8" />
+      <!-- Mapka lokality v článku sa kreslí u Esri. Nadviazanie spojenia
+           (DNS, TLS) trvá pár stoviek milisekúnd a bez tohto riadku sa
+           začne až vo chvíli, keď si prehliadač pýta obrázok. -->
+      <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin />
+      <link rel="dns-prefetch" href="https://server.arcgisonline.com" />
       <!-- `viewport-fit=cover` je podmienka toho, aby `env(safe-area-inset-*)`
            vracalo iné než nuly. Bez neho by v aplikácii aj v režime celej
            obrazovky na iPhone sedela pätička pod lištou gest. -->

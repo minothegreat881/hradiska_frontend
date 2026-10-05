@@ -2,45 +2,14 @@
 
 import React, { useEffect, useRef } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { Suspense, useState } from 'react';
-import { lazyStale } from '../lib/lazyStale';
 
-/* Mapa sa pripojí, až keď je na dohľad. Knižnicu už so sebou nenesie
-   (je to rámec z Google Máp), ale rámec si aj tak sťahuje dlaždice —
-   a na telefóne je bočný stĺpec až pod celým textom, teda pod prehybom. */
-const MiniMap = lazyStale(() => import('./MiniMapaLokality'));
-
-/**
- * Obal, ktorý pustí mapu, až keď je na dohľad.
- * Miesto si drží rovnako vysoká prázdna plocha, takže sa nič nepreskupuje.
- */
-function MiniMapaAzNaDohlad(props: { coordinates: { lat: number; lng: number }; locationName: string }) {
-  const [zobrazit, setZobrazit] = useState(false);
-  const kotva = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (zobrazit) return;
-    const el = kotva.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === 'undefined') { setZobrazit(true); return; }
-    const io = new IntersectionObserver(
-      (z) => { if (z.some((x) => x.isIntersecting)) { setZobrazit(true); io.disconnect(); } },
-      { rootMargin: '300px' }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [zobrazit]);
-
-  return (
-    <div ref={kotva}>
-      {zobrazit ? (
-        <Suspense fallback={null}>
-          <MiniMap {...props} />
-        </Suspense>
-      ) : null}
-    </div>
-  );
-}
+/* Mapa je dnes jeden statický obrázok (satelitná snímka + vrstva popisov),
+   nie knižnica za 274 kB. Odkladať ju preto nemá zmysel — pri starom riešení
+   sa čakalo, kým sa k nej čitateľ priblíži, a potom ešte kým ju Esri
+   vyrenderuje. Dokopy to vyzeralo, že sa mapa „pomaly lúpe". Načítava sa
+   teraz rovno s článkom, len s nízkou prioritou, aby nebrala pásmo titulnej
+   fotografii. */
+import MiniMap from './MiniMapaLokality';
 
 // Types
 interface TimelineEvent {
@@ -275,7 +244,7 @@ export function ArticleSidebar({
       {hasLocation && (
         <div style={cardStyle}>
           <h3 style={cardTitleStyle}>Lokalita</h3>
-          <MiniMapaAzNaDohlad coordinates={coordinates!} locationName={capitalizedName} />
+          <MiniMap coordinates={coordinates!} locationName={capitalizedName} />
           <div style={{ marginTop: 10 }}>
             <h4
               style={{
