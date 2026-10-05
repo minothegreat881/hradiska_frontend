@@ -216,6 +216,33 @@ const EN: Record<string, string> = {
   'zablokovať — jeho príspevky sa mi prestanú zobrazovať. Zrušiť sa to dá v nastaveniach účtu.':
     'block them — their posts will stop appearing for me. This can be undone in the account settings.',
 
+  /* Mapa hradísk */
+  'Terénny atlas': 'Field atlas',
+  'Slovenska': 'of Slovakia',
+  'lokalít leží za hranicami — ukázať': 'sites lie beyond the border — show them',
+  'Podklad mapy': 'Map background',
+  'Reliéf': 'Relief',
+  'Satelit': 'Satellite',
+  'Kategórie lokalít': 'Site categories',
+  'Zhluk — kliknutím priblížite': 'A cluster — click to zoom in',
+  'Zhluk': 'A cluster of',
+  'lokalít — priblížiť': 'sites — zoom in',
+  'Ťuknutím otvoríte mapu na celú obrazovku': 'Tap to open the map full screen',
+  'Zavrieť mapu': 'Close the map',
+  'Zavrieť vejár': 'Close the fan',
+  'Zobraziť reliéf': 'Show the relief',
+  'Zobraziť satelitnú snímku': 'Show the satellite image',
+  'Priblíženie': 'Zoom',
+  'Priblížiť': 'Zoom in',
+  'Oddialiť': 'Zoom out',
+  'Kliknutím presuniete pohľad': 'Click to move the view',
+  'Posunúť hore': 'Pan up',
+  'Posunúť vľavo': 'Pan left',
+  'Posunúť vpravo': 'Pan right',
+  'Posunúť dole': 'Pan down',
+  'Celé Slovensko': 'All of Slovakia',
+  'Čítať článok': 'Read the article',
+
   /* Mapa lokality */
   'otvoriť v Google Mapách': 'open in Google Maps',
 

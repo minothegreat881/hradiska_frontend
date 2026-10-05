@@ -26,6 +26,7 @@
  * mapa (107 v hraniciach SR). Žiadny nový endpoint.
  */
 
+import { t, kategoria, odkaz, poAnglicky } from '../lib/jazyk';
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -157,16 +158,16 @@ function CardIn({ loc, onClose }: { loc: Loc; onClose: () => void }) {
       <span className="lmap-card-veil" aria-hidden="true" />
       <span className="lmap-card-cat">
         <Icon path={(CAT_BY_SLUG[loc.cat] || CATS[0]).icon} size={11} w={2.4} />
-        {(CAT_BY_SLUG[loc.cat] || CATS[0]).label}
+        {kategoria((CAT_BY_SLUG[loc.cat] || CATS[0]).label)}
       </span>
-      <button type="button" className="lmap-card-x" onClick={onClose} aria-label="Zavrieť">×</button>
+      <button type="button" className="lmap-card-x" onClick={onClose} aria-label={t('Zavrieť')}>×</button>
     </div>
     <div className="lmap-card-body">
       <span className="lmap-card-name">{loc.name}</span>
       <span className="lmap-card-coords">{deg(loc.lat, 'N', 'S')} · {deg(loc.lng, 'E', 'W')}</span>
       {loc.excerpt && <p className="lmap-card-desc">{loc.excerpt}</p>}
-      <a className="lmap-card-cta" href={`/blog/${loc.slug}`}>
-        Čítať článok <span aria-hidden="true">→</span>
+      <a className="lmap-card-cta" href={odkaz(`/blog/${loc.slug}`)}>
+        {t('Čítať článok')} <span aria-hidden="true">→</span>
       </a>
     </div>
   </div>
@@ -1159,25 +1160,24 @@ export function MapaHradisk({ zvyraznene }: {
       {/* ── Ľavý panel ─────────────────────────────────────────────────── */}
       <div className="lmap-side" style={full ? { display: 'none' } : undefined}>
         <div className="lmap-head">
-          <div className="lmap-eyebrow"><span /> Terénny atlas · 02</div>
-          <h2 className="lmap-title">Hradiská</h2>
-          <div className="lmap-sub">Slovenska</div>
+          <div className="lmap-eyebrow"><span /> {t('Terénny atlas')} · 02</div>
+          <h2 className="lmap-title">{t('Hradiská')}</h2>
+          <div className="lmap-sub">{t('Slovenska')}</div>
           <p className="lmap-lead">
-            Interaktívna mapa lokalít. Kliknutím do nej zapnete koliesko na
-            približovanie, ťahaním posúvate —
-            zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode
-            otvoríte kartu lokality, klikom do mapy ju zavriete.
+            {poAnglicky()
+              ? 'An interactive map of the sites. Click into it to enable the scroll wheel for zooming and drag to pan — clusters break apart into single points as you zoom in. Hover over a point to open the site card; click into the map to close it.'
+              : 'Interaktívna mapa lokalít. Kliknutím do nej zapnete koliesko na približovanie, ťahaním posúvate — zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode otvoríte kartu lokality, klikom do mapy ju zavriete.'}
           </p>
           {outside > 0 && (
             <button type="button" className="lmap-outside" onClick={() => mapRef.current?.fitBounds(ROAM, { padding: 40, duration: 600 })}>
-              <span>{outside}</span> lokalít leží za hranicami — ukázať
+              <span>{outside}</span> {t('lokalít leží za hranicami — ukázať')}
             </button>
           )}
         </div>
 
         {/* Podklad. Reliéf ukáže, PREČO hradisko stojí práve tam — ostrožnu,
             sútok, prevýšenie. Snímka ukáže, ČO je na tom mieste dnes. */}
-        <div className="lmap-podklad" role="group" aria-label="Podklad mapy">
+        <div className="lmap-podklad" role="group" aria-label={t('Podklad mapy')}>
           {([['relief', 'Reliéf'], ['satelit', 'Satelit']] as const).map(([k, l]) => (
             <button
               key={k}
@@ -1186,26 +1186,26 @@ export function MapaHradisk({ zvyraznene }: {
               aria-pressed={podklad === k}
               onClick={() => setPodklad(k)}
             >
-              {l}
+              {t(l)}
             </button>
           ))}
         </div>
 
         <div className={legendOpen ? 'lmap-legend is-open' : 'lmap-legend'}>
           <button type="button" className="lmap-legend-h" onClick={() => setLegendOpen(v => !v)}>
-            Kategórie lokalít <span aria-hidden="true">{legendOpen ? '–' : '+'}</span>
+            {t('Kategórie lokalít')} <span aria-hidden="true">{legendOpen ? '–' : '+'}</span>
           </button>
           <div className="lmap-legend-body">
             {CATS.map(c => (
               <div className={activeCat === c.slug ? 'lmap-legend-row is-active' : 'lmap-legend-row'} key={c.slug}>
                 <span className="lmap-glass"><Icon path={c.icon} size={13} w={2} /></span>
-                <span className="lmap-legend-name">{c.label}</span>
+                <span className="lmap-legend-name">{kategoria(c.label)}</span>
                 <span className="lmap-legend-n">{String(counts[c.slug] || 0).padStart(2, '0')}</span>
               </div>
             ))}
             <div className="lmap-legend-row lmap-legend-cluster">
               <span className="lmap-glass lmap-glass-n">9</span>
-              <span className="lmap-legend-name">Zhluk — kliknutím priblížite</span>
+              <span className="lmap-legend-name">{t('Zhluk — kliknutím priblížite')}</span>
             </div>
           </div>
         </div>
@@ -1266,7 +1266,7 @@ export function MapaHradisk({ zvyraznene }: {
               pointerEvents: 'none', background: 'transparent',
             }}
           >
-            <span>Ťuknutím otvoríte mapu na celú obrazovku</span>
+            <span>{t('Ťuknutím otvoríte mapu na celú obrazovku')}</span>
           </div>
         )}
 
@@ -1275,7 +1275,7 @@ export function MapaHradisk({ zvyraznene }: {
             type="button"
             className="lmap-close"
             onPointerDown={closeFull}
-            aria-label="Zavrieť mapu"
+            aria-label={t('Zavrieť mapu')}
             style={{
               position: 'absolute', zIndex: 4100,
               top: 'calc(12px + env(safe-area-inset-top))', right: 12,
@@ -1314,7 +1314,7 @@ export function MapaHradisk({ zvyraznene }: {
                   key={k}
                   type="button"
                   aria-pressed={podklad === k}
-                  aria-label={k === 'relief' ? 'Zobraziť reliéf' : 'Zobraziť satelitnú snímku'}
+                  aria-label={k === 'relief' ? t('Zobraziť reliéf') : t('Zobraziť satelitnú snímku')}
                   onPointerDown={e => { e.preventDefault(); setPodklad(k); }}
                   style={{
                     width: 48, height: 30, display: 'grid', placeItems: 'center',
@@ -1337,7 +1337,7 @@ export function MapaHradisk({ zvyraznene }: {
               type="range"
               min={MIN_Z} max={MAX_Z} step={0.05}
               value={zoom}
-              aria-label="Priblíženie"
+              aria-label={t('Priblíženie')}
               onChange={e => { mapRef.current?.stop(); mapRef.current?.setZoom(Number(e.target.value)); }}
               onPointerDown={e => e.stopPropagation()}
             />
@@ -1345,7 +1345,7 @@ export function MapaHradisk({ zvyraznene }: {
               <button
                 key={sign}
                 type="button"
-                aria-label={d > 0 ? 'Priblížiť' : 'Oddialiť'}
+                aria-label={d > 0 ? t('Priblížiť') : t('Oddialiť')}
                 onPointerDown={e => { e.preventDefault(); stepZoom(d); }}
                 style={{
                   width: 48, height: 48, display: 'grid', placeItems: 'center',
@@ -1374,7 +1374,7 @@ export function MapaHradisk({ zvyraznene }: {
               {/* Krížik patrí rohu KARTY. V rámci karty sedí vo fotke, a tá
                   je tu len úzky ľavý stĺpec — tam by prekážal fotke aj
                   palcu. */}
-              <button type="button" className="lmap-sheet-x" onClick={closeCard} aria-label="Zavrieť">
+              <button type="button" className="lmap-sheet-x" onClick={closeCard} aria-label={t('Zavrieť')}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
                   <path d="M6 6l12 12M18 6L6 18" />
                 </svg>
@@ -1411,7 +1411,7 @@ export function MapaHradisk({ zvyraznene }: {
                 />
               ))}
               <button type="button" className="lmap-spider-x" style={{ transform: `translate3d(${spider.x}px, ${spider.y}px, 0) translate(-50%, -50%)` }}
-                      onClick={() => setSpider(null)} aria-label="Zavrieť vejár">×</button>
+                      onClick={() => setSpider(null)} aria-label={t('Zavrieť vejár')}>×</button>
             </>
           )}
 
@@ -1431,7 +1431,7 @@ export function MapaHradisk({ zvyraznene }: {
                 }));
               }}
               onClick={() => openCluster(n)}
-              aria-label={`Zhluk ${n.members.length} lokalít — priblížiť`}
+              aria-label={`${t('Zhluk')} ${n.members.length} ${t('lokalít — priblížiť')}`}
             >
               {/* Obežné bodky (jedna = jedna lokalita) z handoffu sú preč —
                   pri desiatkach bodov robili z mapy čierne machule a počet
@@ -1467,7 +1467,7 @@ export function MapaHradisk({ zvyraznene }: {
           {/* Navigátor — kde v rámci Slovenska práve som. Klik prenesie pohľad,
               krížik posúva o tretinu obrazovky. Bez toho sa v priblíženom
               reliéfe bez popisov nedá zorientovať. */}
-          <div className="lmap-locator" onClick={jump} title="Kliknutím presuniete pohľad">
+          <div className="lmap-locator" onClick={jump} title={t('Kliknutím presuniete pohľad')}>
             <svg viewBox={`0 0 ${SK_OUTLINE_BOX.w} ${SK_OUTLINE_BOX.h}`} aria-hidden="true">
               <path d={SK_OUTLINE} />
             </svg>
@@ -1479,17 +1479,17 @@ export function MapaHradisk({ zvyraznene }: {
           </div>
 
           <div className="lmap-pad">
-            <button type="button" className="lmap-pad-u" onClick={() => pan(0, -1)} aria-label="Posunúť hore">▲</button>
-            <button type="button" className="lmap-pad-l" onClick={() => pan(-1, 0)} aria-label="Posunúť vľavo">◀</button>
-            <button type="button" className="lmap-pad-c" onClick={reset} aria-label="Celé Slovensko">✛</button>
-            <button type="button" className="lmap-pad-r" onClick={() => pan(1, 0)} aria-label="Posunúť vpravo">▶</button>
-            <button type="button" className="lmap-pad-d" onClick={() => pan(0, 1)} aria-label="Posunúť dole">▼</button>
+            <button type="button" className="lmap-pad-u" onClick={() => pan(0, -1)} aria-label={t('Posunúť hore')}>▲</button>
+            <button type="button" className="lmap-pad-l" onClick={() => pan(-1, 0)} aria-label={t('Posunúť vľavo')}>◀</button>
+            <button type="button" className="lmap-pad-c" onClick={reset} aria-label={t('Celé Slovensko')}>✛</button>
+            <button type="button" className="lmap-pad-r" onClick={() => pan(1, 0)} aria-label={t('Posunúť vpravo')}>▶</button>
+            <button type="button" className="lmap-pad-d" onClick={() => pan(0, 1)} aria-label={t('Posunúť dole')}>▼</button>
           </div>
 
           <div className="lmap-zoom-box">
-            <button type="button" onClick={() => zoomBy(1)} aria-label="Priblížiť">+</button>
-            <button type="button" onClick={() => zoomBy(-1)} aria-label="Oddialiť">−</button>
-            <button type="button" onClick={reset} aria-label="Celé Slovensko" className="lmap-zoom-reset">1:1</button>
+            <button type="button" onClick={() => zoomBy(1)} aria-label={t('Priblížiť')}>+</button>
+            <button type="button" onClick={() => zoomBy(-1)} aria-label={t('Oddialiť')}>−</button>
+            <button type="button" onClick={reset} aria-label={t('Celé Slovensko')} className="lmap-zoom-reset">1:1</button>
           </div>
         </div>
       </div>
