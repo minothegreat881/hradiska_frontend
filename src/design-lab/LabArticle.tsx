@@ -145,6 +145,16 @@ export function LabArticle({ slug }: { slug: string }) {
      a ten preklad má. Preto sa najprv hľadá popis bloku pre to isté médium
      a až potom sa použije ten z knižnice. V slovenčine sú oba rovnaké,
      takže sa nemení nič. */
+  /* Popisy, ktoré má článok pre SVOJ jazyk (pole `mediaTexts`). Majú
+     prednosť pred všetkým ostatným — sú to jediné texty, ktoré sú naozaj
+     v jazyku stránky. */
+  const popisyJazyka = new Map<number, { caption: string; alt: string }>();
+  for (const m of post.mediaTexts || []) {
+    if (typeof m.mediaId === 'number') {
+      popisyJazyka.set(m.mediaId, { caption: m.caption || '', alt: m.alt || '' });
+    }
+  }
+
   const popisyZBlokov = new Map<number, { caption: string; alt: string }>();
   for (const b of (post.blocks || []) as any[]) {
     if (b.__component !== 'content.image-block' || !b.image) continue;
@@ -155,11 +165,12 @@ export function LabArticle({ slug }: { slug: string }) {
   }
 
   const gallery = (post.gallery || []).map((img: any) => {
+    const vJazyku = popisyJazyka.get(img.id);
     const zBloku = popisyZBlokov.get(img.id);
     return {
       url: getStrapiImageUrl(img),
-      caption: zBloku?.caption || img.caption || img.alternativeText || '',
-      alt: zBloku?.alt || img.alternativeText || img.caption || '',
+      caption: vJazyku?.caption || zBloku?.caption || img.caption || img.alternativeText || '',
+      alt: vJazyku?.alt || zBloku?.alt || img.alternativeText || img.caption || '',
       fileId: img.id,
     };
   });
@@ -212,7 +223,9 @@ export function LabArticle({ slug }: { slug: string }) {
               sizes={coverSada ? '100vw' : undefined}
               /* Fotografia už nie je podklad pod textom, ale obsah — patrí jej
                  zmysluplný popis. */
-              alt={(post.coverImage as any)?.alternativeText || post.title}
+              alt={popisyJazyka.get((post.coverImage as any)?.id)?.alt
+                || (post.coverImage as any)?.alternativeText
+                || post.title}
               /* Malým písmom zámerne: React 18 camelCase `fetchPriority`
                  nepozná, ohlási ho ako neznámu vlastnosť a na prvok ho
                  nedá — prednosť pri sťahovaní by sa tým stratila. */
@@ -250,7 +263,8 @@ export function LabArticle({ slug }: { slug: string }) {
             return (
               <a className="lart-jazyk" href={doAnglictiny ? `/en/blog/${druhy.slug}` : `/blog/${druhy.slug}`}
                  hrefLang={druhy.locale} lang={druhy.locale}>
-                {doAnglictiny ? 'English' : 'Slovensky'}
+                {/* Jazyk sa uvádza vlastným menom (endonym): „English", „Slovenčina". */}
+                {doAnglictiny ? 'English' : 'Slovenčina'}
               </a>
             );
           })()}

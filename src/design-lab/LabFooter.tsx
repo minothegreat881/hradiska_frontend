@@ -134,7 +134,7 @@ export function LabFooter() {
 
             <p className="lfoot-desc">
               {poAnglicky()
-                ? 'A voluntary association devoted to the Slavic hillforts, castles and manors of Slovakia.'
+                ? 'A civic association devoted to the Slavic hillforts, castles and manors of Slovakia.'
                 : 'Občianske združenie venované slovanským hradiskám, hradom a zámkom Slovenska.'}
             </p>
 

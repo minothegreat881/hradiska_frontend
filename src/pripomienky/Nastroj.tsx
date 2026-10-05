@@ -18,6 +18,7 @@
  * všetko, cez čo sa musí dať kliknúť, nosí triedu `pointer-events-none`.
  */
 
+import { t } from '../lib/jazyk';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X, MousePointerClick, Check, Trash2, Copy, MapPin, AlertTriangle, FileText } from 'lucide-react';
 import { kotvaPre, kotvaVolna, najdiPodlaKotvy, popisPrvku, type Kotva } from './kotva';
@@ -40,6 +41,8 @@ const ramikPre = (el: Element): Ramik => {
   return { top: r.top + window.scrollY, left: r.left + window.scrollX, width: r.width, height: r.height };
 };
 
+/* Mená stavov sa prekladajú pri vykreslení (`t`), nie tu — modul sa
+   vyhodnotí raz, ešte kým je známy jazyk stránky. */
 const STAVY: Record<Stav, string> = {
   nova: 'Nová',
   'riesi-sa': 'Rieši sa',
@@ -91,7 +94,7 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
         setOtvorena(uz.documentId);
         najdiPodlaKotvy(uz)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       })
-      .catch(() => { if (zive) setSprava('Pripomienky sa nepodarilo načítať.'); });
+      .catch(() => { if (zive) setSprava(t('Pripomienky sa nepodarilo načítať.')); });
     return () => { zive = false; };
   }, [prepocitaj]);
 
@@ -115,7 +118,7 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
       if (el === document.body || el === document.documentElement) {
         setHover({
           ramik: { top: e.clientY + window.scrollY - 12, left: e.clientX + window.scrollX - 12, width: 24, height: 24 },
-          popis: 'voľné miesto na stránke',
+          popis: t('voľné miesto na stránke'),
           volne: true,
         });
         return;
@@ -176,7 +179,7 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
       setMiesta((m) => ({ ...m, [nova.documentId]: koncept.ramik }));
       setKoncept(null);
     } catch (e: any) {
-      setSprava(e?.status === 429 ? 'Priveľa pripomienok za chvíľu. Skúste o minútu.' : 'Uloženie zlyhalo.');
+      setSprava(e?.status === 429 ? t('Priveľa pripomienok za chvíľu. Skúste o minútu.') : t('Uloženie zlyhalo.'));
     } finally {
       setUklada(false);
     }
@@ -199,7 +202,7 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
   };
 
   const vymaz = async (p: Pripomienka) => {
-    if (!window.confirm('Zmazať túto pripomienku? Nedá sa to vrátiť.')) return;
+    if (!window.confirm(t('Zmazať túto pripomienku? Nedá sa to vrátiť.'))) return;
     const povodne = zoznam;
     setZoznam((z) => z.filter((x) => x.documentId !== p.documentId));
     setOtvorena(null);
@@ -216,10 +219,10 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
   const skopiruj = async () => {
     try {
       await navigator.clipboard.writeText(`Pripomienky — ${document.title}\n\n${prePrenos}`);
-      setSprava('Skopírované do schránky.');
+      setSprava(t('Skopírované do schránky.'));
       setTimeout(() => setSprava(''), 2500);
     } catch {
-      setSprava('Kopírovanie zlyhalo.');
+      setSprava(t('Kopírovanie zlyhalo.'));
     }
   };
 
@@ -277,10 +280,10 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
         >
           <div className="pr-bublina-hlava">
             <span className={`pr-znacka${otvorenaP.druh === 'obsah' ? ' je-obsah' : ''}`}>
-              {otvorenaP.druh === 'obsah' ? 'obsah' : 'chyba'}
+              {otvorenaP.druh === 'obsah' ? t('obsah') : t('chyba')}
             </span>
-            <span className="pr-bublina-autor">{otvorenaP.autor || 'hosť'}</span>
-            <button className="pr-x" onClick={() => setOtvorena(null)} aria-label="Zavrieť">
+            <span className="pr-bublina-autor">{otvorenaP.autor || t('hosť')}</span>
+            <button className="pr-x" onClick={() => setOtvorena(null)} aria-label={t('Zavrieť')}>
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -288,18 +291,18 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
           {redaktor ? (
             <div className="pr-bublina-nohy">
               <button className="pr-btn" onClick={() => zmen(otvorenaP, otvorenaP.stav === 'riesi-sa' ? 'nova' : 'riesi-sa')}>
-                {otvorenaP.stav === 'riesi-sa' ? 'Späť na novú' : 'Rieši sa'}
+                {otvorenaP.stav === 'riesi-sa' ? t('Späť na novú') : t('Rieši sa')}
               </button>
               <button className="pr-btn je-hlavne" onClick={() => zmen(otvorenaP, 'hotova')}>
-                <Check className="w-3.5 h-3.5" /> Hotová
+                <Check className="w-3.5 h-3.5" /> {t('Hotová')}
               </button>
-              <button className="pr-btn je-nebezpecne" onClick={() => vymaz(otvorenaP)} aria-label="Zmazať">
+              <button className="pr-btn je-nebezpecne" onClick={() => vymaz(otvorenaP)} aria-label={t('Zmazať')}>
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
             <p className="pr-tip" style={{ margin: 0 }}>
-              {otvorenaP.stav === 'riesi-sa' ? 'Redakcia to už rieši.' : 'Čaká na redakciu.'}
+              {otvorenaP.stav === 'riesi-sa' ? t('Redakcia to už rieši.') : t('Čaká na redakciu.')}
             </p>
           )}
         </div>
@@ -319,16 +322,16 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
         >
           <div className="pr-bublina-hlava">
             <span className="pr-bublina-prvok">{koncept.kotva.popisPrvku}</span>
-            <button className="pr-x" onClick={() => setKoncept(null)} aria-label="Zrušiť">
+            <button className="pr-x" onClick={() => setKoncept(null)} aria-label={t('Zrušiť')}>
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
           <div className="pr-prepinac">
             <button className={koncept.druh === 'chyba' ? 'je-on' : ''} onClick={() => setKoncept({ ...koncept, druh: 'chyba' })}>
-              <AlertTriangle className="w-3.5 h-3.5" /> Chyba
+              <AlertTriangle className="w-3.5 h-3.5" /> {t('Chyba')}
             </button>
             <button className={koncept.druh === 'obsah' ? 'je-on' : ''} onClick={() => setKoncept({ ...koncept, druh: 'obsah' })}>
-              <FileText className="w-3.5 h-3.5" /> Obsah
+              <FileText className="w-3.5 h-3.5" /> {t('Obsah')}
             </button>
           </div>
           <textarea
@@ -337,7 +340,7 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
             rows={3}
             maxLength={2000}
             value={koncept.text}
-            placeholder="Čo je tu zle alebo čo treba zmeniť?"
+            placeholder={t('Čo je tu zle alebo čo treba zmeniť?')}
             onChange={(e) => setKoncept({ ...koncept, text: e.target.value })}
             onKeyDown={(e) => {
               if (e.key === 'Escape') setKoncept(null);
@@ -345,9 +348,9 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
             }}
           />
           <div className="pr-bublina-nohy">
-            <span className="pr-tip">Ctrl+Enter uloží</span>
+            <span className="pr-tip">{t('Ctrl+Enter uloží')}</span>
             <button className="pr-btn je-hlavne" disabled={!koncept.text.trim() || uklada} onClick={uloz}>
-              {uklada ? 'Ukladám…' : 'Uložiť'}
+              {uklada ? t('Ukladám…') : t('Uložiť')}
             </button>
           </div>
         </div>
@@ -357,20 +360,20 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
       <div className="pr-panel">
         <div className="pr-panel-hlava">
           <MapPin className="w-4 h-4" />
-          <b>Pripomienky</b>
+          <b>{t('Pripomienky')}</b>
           <span className="pr-pocet">{zoznam.length}</span>
-          <button className="pr-x" onClick={onZavri} aria-label="Zavrieť nástroj">
+          <button className="pr-x" onClick={onZavri} aria-label={t('Zavrieť nástroj')}>
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <button className={`pr-lov${rezim ? ' je-on' : ''}`} onClick={() => { setRezim(!rezim); setKoncept(null); }}>
           <MousePointerClick className="w-4 h-4" />
-          {rezim ? 'Kliknite na prvok… (Esc zruší)' : 'Pridať pripomienku na prvok'}
+          {rezim ? t('Kliknite na prvok… (Esc zruší)') : t('Pridať pripomienku na prvok')}
         </button>
 
         <div className="pr-zoznam">
-          {zoznam.length === 0 && <p className="pr-prazdno">Na tejto stránke zatiaľ nič.</p>}
+          {zoznam.length === 0 && <p className="pr-prazdno">{t('Na tejto stránke zatiaľ nič.')}</p>}
           {zoznam.map((p, i) => (
             <button
               key={p.documentId}
@@ -384,10 +387,10 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
               <span className="pr-polozka-telo">
                 <span className="pr-polozka-text">{p.text}</span>
                 <span className="pr-polozka-prvok">
-                  {miesta[p.documentId] ? (p.popisPrvku || '') : 'prvok sa na stránke nenašiel'}
+                  {miesta[p.documentId] ? (p.popisPrvku || '') : t('prvok sa na stránke nenašiel')}
                 </span>
               </span>
-              {p.stav !== 'nova' && <span className="pr-stav">{STAVY[p.stav]}</span>}
+              {p.stav !== 'nova' && <span className="pr-stav">{t(STAVY[p.stav])}</span>}
             </button>
           ))}
         </div>
@@ -396,13 +399,13 @@ export function Nastroj({ onZavri }: { onZavri: () => void }) {
 
         <div className="pr-panel-nohy">
           <button className="pr-btn" onClick={skopiruj} disabled={!zoznam.length}>
-            <Copy className="w-3.5 h-3.5" /> Kopírovať pre vývojára
+            <Copy className="w-3.5 h-3.5" /> {t('Kopírovať pre vývojára')}
           </button>
-          {redaktor && <a className="pr-btn" href="/admin" target="_blank" rel="noreferrer">Všetky v admine</a>}
+          {redaktor && <a className="pr-btn" href="/admin" target="_blank" rel="noreferrer">{t('Všetky v admine')}</a>}
         </div>
         {!redaktor && (
           <p className="pr-tip" style={{ margin: '6px 2px 0' }}>
-            Píšete ako hosť — pripomienku uvidí redakcia.
+            {t('Píšete ako hosť — pripomienku uvidí redakcia.')}
           </p>
         )}
       </div>

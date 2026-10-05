@@ -82,6 +82,9 @@ export interface StrapiBlogPost {
   /** jazyk záznamu a jeho verzie v iných jazykoch (Strapi i18n) */
   locale?: 'sk' | 'en';
   localizations?: Array<{ locale: 'sk' | 'en'; slug: string; title: string }>;
+  /** Popisy fotiek pre JAZYK článku: knižnica médií má popis a alt len jeden
+      pre celý web, takže anglická galéria by inak stála po slovensky. */
+  mediaTexts?: Array<{ mediaId: number; caption?: string | null; alt?: string | null }>;
   documentId: string;
   title: string;
   slug: string;
@@ -310,7 +313,7 @@ export async function getBlogPostBySlug(
   // Deep populate for all fields including dynamic zone components
   // `localizations` dávajú slug tej istej veci v druhom jazyku — z toho sa
   // skladá prepínač jazyka aj `hreflang`.
-  const query = `filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage&populate[1]=gallery&populate[2]=category&populate[3]=tags&populate[4]=quotes&populate[5]=blocks.image&populate[6]=blocks.images&populate[7]=blocks.secondImage&populate[8]=location&populate[9]=keyFacts&populate[10]=timeline&populate[11]=blocks.items&populate[12]=localizations`
+  const query = `filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage&populate[1]=gallery&populate[2]=category&populate[3]=tags&populate[4]=quotes&populate[5]=blocks.image&populate[6]=blocks.images&populate[7]=blocks.secondImage&populate[8]=location&populate[9]=keyFacts&populate[10]=timeline&populate[11]=blocks.items&populate[12]=localizations&populate[13]=mediaTexts`
     + (opts?.locale ? `&locale=${opts.locale}` : '');
 
   // Náhľad konceptu pre prihláseného správcu (viď lib/preview.ts). Bez tokenu

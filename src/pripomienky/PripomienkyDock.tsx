@@ -13,6 +13,7 @@
  */
 
 import { Suspense, useEffect, useState } from 'react';
+import { t } from '../lib/jazyk';
 import { MessageSquarePlus } from 'lucide-react';
 import { lazyStale } from '../lib/lazyStale';
 
@@ -29,9 +30,9 @@ export function PripomienkyDock() {
   return (
     <>
       {!otvorene && (
-        <button className="pr-dock" onClick={() => setOtvorene(true)} title="Pripomienky k tejto stránke">
+        <button className="pr-dock" onClick={() => setOtvorene(true)} title={t('Pripomienky k tejto stránke')}>
           <MessageSquarePlus className="w-4 h-4" />
-          <span>Pripomienky</span>
+          <span>{t('Pripomienky')}</span>
         </button>
       )}
       {otvorene && (
