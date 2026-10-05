@@ -288,7 +288,9 @@ export function ArticleSidebar({
             {article.tags.slice(0, 8).map((tag, index) => (
               <a
                 key={index}
-                href={`/?search=${encodeURIComponent(tag)}`}
+                /* Domovská stránka parameter `search` nikdy nečítala, takže
+                   klik na tému nerobil nič. Hľadanie žije na `/hladat`. */
+                href={`/hladat?q=${encodeURIComponent(tag)}`}
                 style={{
                   display: 'inline-block',
                   padding: '5px 12px',
