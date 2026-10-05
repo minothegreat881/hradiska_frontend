@@ -2021,12 +2021,12 @@
       "permanent": true
     },
     {
-      "source": "/:rok(\\\\d{4})/:mesiac(\\\\d{2})/:nazov",
+      "source": "/:rok(\\d\\d\\d\\d)/:mesiac(\\d\\d)/:nazov",
       "destination": "/hradiska",
       "permanent": true
     },
     {
-      "source": "/:archiv(\\\\d{4}_\\\\d{2}_\\\\d{2}_archive.html)",
+      "source": "/:archiv(\\d\\d\\d\\d_\\d\\d_\\d\\d_archive.html)",
       "destination": "/hradiska",
       "permanent": true
     }
