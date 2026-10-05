@@ -71,9 +71,11 @@ rozlíšiť: `caption` je popis, ktorý vidí čitateľ, `alt` je opis obrazu pr
 čítačku a pre vyhľadávanie obrázkov. Dnes je `alt` len kópiou popisu — to je
 lepšie než prázdno, ale nevyužíva to ani polovicu potenciálu.
 
-### 2.4 Titulné fotky bez `alt`
-**260 z 364** článkov má titulnú fotku bez `alt` (má ho 104). Najhoršie:
-Strážna a hospodárska funkcia 36/41, Mocenské centrá 23/29, 3D modely 38/51.
+### 2.4 Titulné fotky bez `alt` — **HOTOVÉ 5. 10. 2026**
+Bez `alt` bolo **198 z 296** titulných fotiek (zvyšných 68 článkov titulnú fotku
+nemá vôbec, viď §2.2). Každá je pozretá a opísaná podľa toho, čo na nej je;
+`caption` sa nemenil. Namerané po dokončení: **296 z 296** publikovaných
+titulných fotiek má `alt`. Nástroj: `hradiska-strapi/scripts/opravy/alty-davka.mjs`.
 
 ---
 
@@ -131,7 +133,10 @@ web nástrojom `hradiska-strapi/scripts/opravy/prepis-stare-odkazy.mjs`. Zámern
 ostali 4: tri by boli odkazom na vlastný článok a štítok „Orava" nemá na novom
 webe cieľ.
 
-### 4.2 Testovací koncept má verejnú SEO hlavičku
+### 4.2 Testovací koncept má verejnú SEO hlavičku — **ČIASTOČNE OPRAVENÉ 5. 10. 2026**
+`search-index` už vracia iba publikované články (`status: 'published'`), takže
+koncept nemá vôbec vlastnú stránku ani sa nedá nájsť hľadaním — overené na
+produkcii. Sám záznam „dsadsad" v databáze ostáva.
 Článok `dsadsad` so slugom `Nitra-vyskym` je koncept, ale `search-index` vracia
 aj koncepty, takže má na produkcii vlastnú stránku s hlavičkou
 `<title>Nitra hradiska</title>` a popisom s preklepmi. Zmazať — a zvážiť, či má
@@ -148,9 +153,10 @@ JSON-LD `Article` + `BreadcrumbList` fungujú a sú na mieste.
 
 1. ~~**Mapa stránok**~~ — hotové 5. 10. 2026.
 1b. ~~**Presmerovania a odkazy v telách**~~ — hotové 5. 10. 2026.
-2. **`og:image` v plnej veľkosti** (§2.1) — jedna oprava, dotkne sa 297 článkov.
-3. **Zmazať testovací koncept** (§4.2).
-4. **`alt` k titulným fotkám** — 260 článkov.
+2. ~~**`og:image` v plnej veľkosti**~~ — hotové 5. 10. 2026 (`coverOg` zo `search-index`).
+3. **Zmazať testovací koncept** (§4.2) — do verejného indexu sa už nedostane,
+   ale z databázy ho treba odstrániť.
+4. ~~**`alt` k titulným fotkám**~~ — hotové 5. 10. 2026, 198 fotiek.
 5. **Popisy a `alt` k fotkám v galériách** — 2 995 fotiek bez popisu. Najväčšia
    položka; dá sa robiť po kategóriách a prioritne tam, kde je galéria veľká.
 6. **Slovník štítkov** (~20–30) a priradenie naprieč blogom — 146 článkov bez
