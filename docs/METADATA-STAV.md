@@ -106,7 +106,7 @@ Súradnice v lokalitných kategóriách sú takmer úplné — vďaka nim ide do
 
 ## 4. Technické chyby, ktoré zahadzujú hotovú prácu 🔴
 
-### 4.1 Mapa stránok neobsahuje ani jeden článok
+### 4.1 Mapa stránok neobsahuje ani jeden článok — **OPRAVENÉ 5. 10. 2026**
 Živý `sitemap.xml` má **11 adries** — len statické stránky. V repe je pritom
 správne vygenerovaný súbor s 376 adresami. Príčina: `gen-sitemap.mjs` siaha po
 `SITEMAP_STRAPI_URL || VITE_STRAPI_URL || http://188.245.47.29`, a na Verceli
@@ -115,9 +115,21 @@ správne vygenerovaný súbor s 376 adresami. Príčina: `gen-sitemap.mjs` siaha
 tú istú premennú nepozerá (má vlastnú `PRERENDER_STRAPI_URL`), preto hlavičky
 článkov na produkcii fungujú a mapa stránok nie.
 
-Oprava: zrovnať poradie premenných s `prerender.mjs`, a keď stiahnutie zlyhá,
-**existujúci súbor nechať tak** namiesto prepísania. Bez toho pôjde web do sveta
-s mapou stránok, ktorá o 365 článkoch mlčí.
+Opravené: poradie premenných je zrovnané s `prerender.mjs` a keď stiahnutie
+zlyhá, existujúci súbor sa nechá tak namiesto prepísania. Na produkcii namerané:
+**376 adries** (365 článkov + 11 statických).
+
+### 4.1b Presmerovania zo starého blogu — **HOTOVÉ 5. 10. 2026**
+`vercel.json` má 406 presmerovaní: 403 konkrétnych Blogger adries a chvost na
+štítkové stránky, hľadanie, archívy a zvyšné `/RRRR/MM/…`. Dvojice nie sú hádané —
+migračné medziýstupy si pri každom článku pamätajú jeho pôvodnú adresu (362 z nich
+je doslovný prepis); zvyšných 40 má ručne určený cieľ. Namerané na nasadení:
+**403 z 403** vedie na existujúcu stránku.
+
+V telách článkov bolo 80 odkazov na starý blog v 72 článkoch — prepísané na nový
+web nástrojom `hradiska-strapi/scripts/opravy/prepis-stare-odkazy.mjs`. Zámerne
+ostali 4: tri by boli odkazom na vlastný článok a štítok „Orava" nemá na novom
+webe cieľ.
 
 ### 4.2 Testovací koncept má verejnú SEO hlavičku
 Článok `dsadsad` so slugom `Nitra-vyskym` je koncept, ale `search-index` vracia
@@ -134,7 +146,8 @@ JSON-LD `Article` + `BreadcrumbList` fungujú a sú na mieste.
 
 ## 5. Poradie prác — fáza 1
 
-1. **Mapa stránok** (§4.1) — jedna oprava skriptu, odomkne indexáciu 365 článkov.
+1. ~~**Mapa stránok**~~ — hotové 5. 10. 2026.
+1b. ~~**Presmerovania a odkazy v telách**~~ — hotové 5. 10. 2026.
 2. **`og:image` v plnej veľkosti** (§2.1) — jedna oprava, dotkne sa 297 článkov.
 3. **Zmazať testovací koncept** (§4.2).
 4. **`alt` k titulným fotkám** — 260 článkov.
