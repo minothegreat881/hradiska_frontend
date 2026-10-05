@@ -2728,9 +2728,10 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .lok-mapa-odkaz a:hover { text-decoration: underline; }
 
-/* Mriežka fotogalérie pod článkom. Počet stĺpcov určuje redakcia
-   (`galleryColumns`), ale na úzkych oknách rozhoduje šírka — tri stĺpce na
-   telefóne by boli poštové známky. */
+/* Mriežka fotogalérie pod článkom — ZÁKLAD pre stránky bez šatu.
+   V článku ju prekrýva `.lart .hgal-mriezka` v theme.css, ktorá kreslí
+   stĺpcovú sadzbu (fotky si nesú svoj pomer strán a pod nízkymi nevznikajú
+   diery). Počet stĺpcov je v oboch prípadoch ten istý — `--hgal-stlpcov`. */
 .hgal-mriezka {
   display: grid;
   grid-template-columns: repeat(var(--hgal-stlpcov, 3), minmax(0, 1fr));

@@ -2441,19 +2441,27 @@ body[data-lab-theme='pecat'],
    na stĺpce a fotka si nesie svoj pomer strán.
    Svetelný box po kliknutí ostáva PRODUKČNÝ (komentáre a lajky pod fotkou),
    len prefarbený — viď `--pl-*` nižšie. */
-.lart [style*='minmax(240px, 1fr)'] {
+/* POZOR, TOTO SA UŽ RAZ ROZBILO: pravidlo sa pôvodne chytalo vloženého
+   štýlu `minmax(240px, 1fr)`. Keď mriežka dostala triedu a počet stĺpcov
+   podľa článku, selektor prestal sedieť — stĺpcová sadzba zmizla, z galérie
+   bola obyčajná mriežka a pod nízkymi fotkami ostávali prázdne diery.
+   Odteraz sa to drží triedy a počet stĺpcov berie z premennej, ktorú
+   nastavuje článok. */
+.lart .hgal-mriezka {
   display: block !important;
-  columns: 3; column-gap: 12px;
+  columns: var(--hgal-stlpcov, 3); column-gap: 12px;
 }
-.lart [style*='minmax(240px, 1fr)'] > * { break-inside: avoid; margin: 0 0 12px; display: block; }
+.lart .hgal-mriezka > * { break-inside: avoid; margin: 0 0 12px; display: block; }
 .lart [style*='aspect-ratio: 4 / 3'] { aspect-ratio: auto !important; height: auto !important; }
 .lart [style*='aspect-ratio: 4 / 3'] > img,
 .lart [style*='aspect-ratio: 4 / 3'] .absolute {
   position: static !important; height: auto !important; width: 100% !important;
   object-fit: contain !important;
 }
-@media (max-width: 900px) { .lart [style*='minmax(240px, 1fr)'] { columns: 2; } }
-@media (max-width: 560px) { .lart [style*='minmax(240px, 1fr)'] { columns: 1; } }
+/* Na užšom okne rozhoduje šírka, nie prianie redakcie — tri stĺpce na
+   telefóne by boli poštové známky. */
+@media (max-width: 900px) { .lart .hgal-mriezka { columns: 2; } }
+@media (max-width: 560px) { .lart .hgal-mriezka { columns: 1; } }
 
 /* ── Svetelný box (`--pl-*` z globals.css) ─────────────────────────────────
    Vykresľuje sa portálom priamo do `body`, teda MIMO `.lab`. Preto sú palety

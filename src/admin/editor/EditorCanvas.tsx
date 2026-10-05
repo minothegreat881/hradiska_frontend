@@ -568,16 +568,17 @@ const canvasCss = `
 .ed-galeria-stlpce button:hover { background: rgba(255,255,255,.7); }
 .ed-galeria-stlpce button.je-zvolene { background: #fff; color: var(--l-second, #c9483a); box-shadow: 0 1px 3px rgba(20,14,6,.18); }
 
-.ed-galeria-mriezka {
-  display: grid; gap: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.ed-galeria[data-stlpcov="2"] .ed-galeria-mriezka { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.ed-galeria[data-stlpcov="4"] .ed-galeria-mriezka { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* Stĺpcová sadzba, nie mriežka — presne ako na webe. Fotky si nesú svoj
+   pomer strán (plány a kresby sa neorezávajú) a nižšia fotka nenechá pod
+   sebou dieru: ďalšia nastúpi hneď za ňou. */
+.ed-galeria-mriezka { columns: 3; column-gap: 12px; }
+.ed-galeria[data-stlpcov="2"] .ed-galeria-mriezka { columns: 2; }
+.ed-galeria[data-stlpcov="4"] .ed-galeria-mriezka { columns: 4; }
+.ed-galeria-mriezka > * { break-inside: avoid; margin: 0 0 12px; display: block; }
 
-.ed-galeria figure { margin: 0; }
+.ed-galeria figure { margin: 0 0 12px; }
 .ed-gf-obraz { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--l-line, #ded5c2); }
-.ed-galeria img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.ed-galeria img { width: 100%; height: auto; display: block; }
 .ed-gf-cislo {
   position: absolute; left: 5px; top: 5px; min-width: 18px; height: 18px; padding: 0 5px;
   display: grid; place-items: center; border-radius: 5px;
@@ -612,7 +613,7 @@ const canvasCss = `
 
 .ed-galeria-pridaj {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  aspect-ratio: 4 / 3; cursor: pointer;
+  width: 100%; min-height: 120px; cursor: pointer;
   border: 1px dashed var(--l-line-2, #c9bda5); border-radius: 8px; background: none;
   font-family: 'Inter', sans-serif; font-size: 12.5px; color: var(--l-muted, #6f6658);
 }
