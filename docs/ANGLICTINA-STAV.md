@@ -69,9 +69,36 @@ sa iba nahlási.
 
 ---
 
+## 2b. Popisy fotiek — pole `mediaTexts`
+
+Knižnica médií má popis (`caption`) a alt (`alternativeText`) **jeden pre celý
+web**, takže anglická galéria stála po slovensky. Článok preto má prekladané
+pole `mediaTexts` — repeatable komponent `shared.media-text`:
+
+```json
+"mediaTexts": [
+  { "mediaId": 3316, "caption": "A sword from Detva…", "alt": "A sword from Detva…" },
+  { "mediaId": 3322, "alt": "A beech wood on the crown of the hillfort…" }
+]
+```
+
+`mediaId` je id súboru v médiách (vidno ho v odpovedi `populate[gallery]`).
+Poradie je ľubovoľné, fotka sa páruje podľa id. Pole patrí k `data` vo vstupnom
+súbore prekladu, takže sa zapisuje tým istým skriptom.
+
+Na stránke platí toto poradie: **`mediaTexts` → popis preloženého bloku (keď tá
+istá fotka stojí aj v tele) → knižnica médií.** Titulná fotografia berie alt
+rovnako. V slovenčine je pole prázdne, takže sa na slovenskej strane nič nemení.
+
+**Fotka, ktorá v slovenčine popis ani alt nemá, ho nedostáva ani v angličtine** —
+nevymýšľa sa.
+
+---
+
 ## 3. Čo zostáva
 
-- **360 článkov**. Prekladať po dávkach, každý s kontrolou terminológa.
+- **360 článkov**. Prekladať po dávkach, každý s kontrolou terminológa —
+  vrátane `mediaTexts` (pri Detve to je 29 fotiek, pri Veľkom Tríbči 28).
 - **Počty článkov v kategóriách** (hlavička, dlaždice) sa berú zo slovenského
   obsahu — anglická hlavička píše „41", hoci po anglicky sú 4 články. Zarovná sa
   to samo s prekladmi; ak to má byť správne hneď, treba `/api/pocty-kategorii`
@@ -79,11 +106,8 @@ sa iba nahlási.
 - **Kategórie a štítky nemajú preklad v Strapi** — anglické názvy drží slovník
   v `jazyk.ts` (23 štítkov, 14 kategórií). Keď pribudne nový štítok, treba ho
   doplniť tam, inak sa na anglickej stránke ukáže po slovensky.
-- **Popis a alt fotografie sú v knižnici médií spoločné pre oba jazyky.**
-  V galérii sa preto popis berie z preloženého popisu bloku, keď tá istá fotka
-  stojí aj v tele článku; fotka, ktorá je len v galérii, a alt titulnej
-  fotografie ostávajú po slovensky. Riešenie by znamenalo pole pre anglický
-  popis pri článku (napr. komponent `gallery-caption` s id médiá + text).
+- ~~Popis a alt fotografie sú v knižnici médií spoločné pre oba jazyky.~~
+  **Vyriešené 5. 10. 2026** poľom `mediaTexts` (viď §2b).
 - **Mapa hradísk pod článkom** sa plní zo slovenského registra (všetkých 364
   lokalít) a jej karta odkazuje na **slovenský** článok — v angličtine s
   poznámkou „(in Slovak)". Inak by `/en/blog/<slovenský slug>` skončil na
