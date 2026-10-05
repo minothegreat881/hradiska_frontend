@@ -169,7 +169,7 @@ export function LabNav() {
       onMouseLeave={() => setHovered(false)}
     >
       <div className="lnav-row">
-        <a href="/" className="lnav-brand" aria-label={t('Hradiská — domov')}>
+        <a href={odkaz('/')} className="lnav-brand" aria-label={t('Hradiská — domov')}>
           {/* Priehľadná verzia loga (podklad odstránený skôr) — v kruhu by
               sivý štvorec pôvodného súboru vyzeral ako nalepený štítok. */}
           <span className="lnav-mark">
@@ -246,7 +246,7 @@ export function LabNav() {
                         setOpenMobileCat(prev => (prev === cat.label ? null : cat.label));
                       }}
                     >
-                      <span>{cat.label}</span>
+                      <span>{kategoria(cat.label)}</span>
                       {typeof cat.count === 'number' && cat.count > 0 && <span className="lnav-m-count">{cat.count}</span>}
                       <span className="lnav-m-chev" aria-hidden="true">{isOpen ? '–' : '+'}</span>
                     </button>
@@ -305,7 +305,7 @@ function CatButton({ cat, open, onToggle }: {
         data-open={open ? 'true' : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
-        title={cat.label}
+        title={kategoria(cat.label)}
         onClick={(e) => {
           // Poloha tlačidla voči lište — panel sa vykresľuje mimo radu, takže
           // si ju musí niesť so sebou.

@@ -1,5 +1,6 @@
 'use client';
 
+import { t } from '../lib/jazyk';
 import React from 'react';
 import { motion } from 'motion/react';
 import { createPortal } from 'react-dom';
@@ -334,7 +335,7 @@ function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps
             // (object-contain) — podfarbíme ho pergamenom, nech to pôsobí zámerne.
             ...(isTallCapped ? { background: '#f0e9dc' } : {}),
           }}
-          title="Kliknutím zobraziť v galérii"
+          title={t('Kliknutím zobraziť v galérii')}
         >
           <ImageWithFallback
             src={getStrapiImageUrl(block.image)}

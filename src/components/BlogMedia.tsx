@@ -1,5 +1,6 @@
 'use client';
 
+import { t } from '../lib/jazyk';
 import { motion } from 'motion/react';
 import { ZoomIn } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -211,7 +212,7 @@ function ImageWrapper({
       onClick={() => openPhoto(src)}
       className={`relative overflow-hidden ${roundedClass} ${shadowClass} ${className} cursor-pointer group block w-full text-left`}
       style={{ paddingBottom: paddingBottom || '66.67%' }}
-      title="Kliknutím zobraziť v galérii"
+      title={t('Kliknutím zobraziť v galérii')}
     >
       <ImageWithFallback
         src={src}

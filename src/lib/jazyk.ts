@@ -242,6 +242,7 @@ const EN: Record<string, string> = {
   'Posunúť dole': 'Pan down',
   'Celé Slovensko': 'All of Slovakia',
   'Čítať článok': 'Read the article',
+  'Kliknutím zobraziť v galérii': 'Click to view in the gallery',
 
   /* Mapa lokality */
   'otvoriť v Google Mapách': 'open in Google Maps',

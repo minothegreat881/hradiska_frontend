@@ -361,7 +361,9 @@ export function MapaHradisk({ zvyraznene }: {
             minzoom: 6,
             maxzoom: 12,
             bounds: [BOUNDS[0][0], BOUNDS[0][1], BOUNDS[1][0], BOUNDS[1][1]],
-            attribution: 'Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries',
+            attribution: poAnglicky()
+              ? 'Relief: Copernicus DEM · Rivers: © OpenStreetMap contributors · Border: geoBoundaries'
+              : 'Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries',
           },
           /* Satelitná snímka ako druhý podklad. Reliéf ukáže tvar terénu —
              prečo hradisko stojí práve tam — ale nepovie, čo je na tom
@@ -415,7 +417,7 @@ export function MapaHradisk({ zvyraznene }: {
       /* MapLibre pomenúva plátno po anglicky („Map"), hoci stránka je
          slovenská. Čítačka to ohlási v cudzom jazyku uprostred slovenského
          dokumentu. */
-      locale: { 'Map.Title': 'Mapa hradísk' },
+      locale: { 'Map.Title': poAnglicky() ? 'Map of hillforts' : 'Mapa hradísk' },
       canvasContextAttributes: { alpha: true, antialias: true },
       dragRotate: false,
       pitchWithRotate: false,
@@ -1216,8 +1218,12 @@ export function MapaHradisk({ zvyraznene }: {
             zarovno s panelom. */}
         <p className="lmap-attrib">
           {podklad === 'satelit'
-            ? 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'
-            : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'}
+            ? (poAnglicky()
+              ? 'Satellite imagery: Esri, Maxar, Earthstar Geographics · Place names: © OpenStreetMap contributors · Border: geoBoundaries'
+              : 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries')
+            : (poAnglicky()
+              ? 'Relief: Copernicus DEM · Rivers and place names: © OpenStreetMap contributors · Border: geoBoundaries'
+              : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries')}
         </p>
       </div>
 
