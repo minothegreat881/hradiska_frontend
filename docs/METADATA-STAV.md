@@ -56,7 +56,7 @@ lokalitných kategórií nemá dieru — tam je pokrytie 100 %.
 (26 z nich je pod 600 px — sú to skeny listín a staré fotografie). Tie sa
 nedotiahnu inak než novým obrázkom.
 
-### 2.3 Popisy fotografií
+### 2.3 Popisy fotografií — **UZAVRETÉ 5. 10. 2026: nedopĺňať**
 | | počet |
 |---|---|
 | fotiek v galériách spolu | 4 474 |
@@ -68,8 +68,14 @@ nedotiahnu inak než novým obrázkom.
 
 Telo článkov je teda v poriadku, galérie nie. Dve veci sa tu miešajú a treba ich
 rozlíšiť: `caption` je popis, ktorý vidí čitateľ, `alt` je opis obrazu pre
-čítačku a pre vyhľadávanie obrázkov. Dnes je `alt` len kópiou popisu — to je
-lepšie než prázdno, ale nevyužíva to ani polovicu potenciálu.
+čítačku a pre vyhľadávanie obrázkov. Dnes je `alt` len kópiou popisu.
+
+**ROZHODNUTIE (5. 10. 2026): fotka, ktorej autor nedal popis, nedostane ani
+`alt`.** Hromadné dopĺňanie sa zastavilo po 576 fotkách (kategória Strážna
+a hospodárska funkcia celá, časť Mocenských centier); to, čo už napísané je,
+ostáva. Zvyšných ~2 269 fotiek bez popisu sa necháva tak — popis je autorská
+vec. Nástroje na dávky ostávaju v repe (`galeria-davka.mjs`, `harok.py`),
+keby sa to niekedy robilo s vlastnými popismi.
 
 ### 2.4 Titulné fotky bez `alt` — **HOTOVÉ 5. 10. 2026**
 Bez `alt` bolo **198 z 296** titulných fotiek (zvyšných 68 článkov titulnú fotku
@@ -157,8 +163,8 @@ JSON-LD `Article` + `BreadcrumbList` fungujú a sú na mieste.
 3. **Zmazať testovací koncept** (§4.2) — do verejného indexu sa už nedostane,
    ale z databázy ho treba odstrániť.
 4. ~~**`alt` k titulným fotkám**~~ — hotové 5. 10. 2026, 198 fotiek.
-5. **Popisy a `alt` k fotkám v galériách** — 2 995 fotiek bez popisu. Najväčšia
-   položka; dá sa robiť po kategóriách a prioritne tam, kde je galéria veľká.
+5. ~~**Popisy a `alt` k fotkám v galériách**~~ — uzavreté: fotky bez vlastného
+   popisu sa nechávajú tak (viď §2.3).
 6. **Slovník štítkov** (~20–30) a priradenie naprieč blogom — 146 článkov bez
    štítka, zvyšok preradiť.
 7. **Zdroje** do 26 odborných článkov, kde skutočne chýbajú.
