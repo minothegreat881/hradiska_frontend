@@ -346,15 +346,12 @@
   padding: 6px 10px; display: inline-flex; align-items: baseline; gap: 7px;
   white-space: nowrap; transition: color .18s ease;
 }
-.lnav-cat-btn::after {
-  content: ''; position: absolute; left: 10px; right: 10px; bottom: 0; height: 2px;
-  background: var(--l-accent); border-radius: 2px;
-  transform: scaleX(0); transform-origin: center;
-  transition: transform .24s cubic-bezier(.22,.61,.36,1);
-}
+/* Otvorená kategória sa drží potichu: papľuch pod textom namiesto čiernej
+   linky. Linka bola pri každom kliknutí do lišty to prvé, čo oko chytilo —
+   a pritom už pod tlačidlom visí celá roletka, ktorá povie to isté. */
+.lnav-cat-btn { border-radius: 8px; transition: color .18s ease, background .18s ease; }
 .lnav-cat-btn:hover { color: var(--l-ink); }
-.lnav-cat-btn:hover::after, .lnav-cat-btn[data-open]::after { transform: scaleX(1); }
-.lnav-cat-btn[data-open] { color: var(--l-accent); }
+.lnav-cat-btn[data-open] { color: var(--l-accent); background: rgba(28, 31, 40, .06); }
 
 /* Počet: tichšie než názov, ale čitateľné. Trinásť čísel v lište nesmie
    súťažiť s názvami kategórií o pozornosť. */
@@ -438,7 +435,7 @@
   .lnav-right { margin-left: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lnav-cat-btn, .lnav-cat-btn::after, .lnav-cats-row[data-secondary], .lnav-mark { transition: none; }
+  .lnav-cat-btn, .lnav-cats-row[data-secondary], .lnav-mark { transition: none; }
   .lnav-panel { animation: none; }
 }
 
@@ -628,18 +625,14 @@ body[data-lab-theme='pecat'],
 .lnav-mark img { transition: transform .4s cubic-bezier(.22,.61,.36,1); }
 .lnav-brand:hover .lnav-mark img { transform: scale(1.06); }
 
-/* Názov značky: podčiarknutie vyrastie zľava spolu s logom. */
+/* Značka sa NEPODČIARKUJE. Podčiarknutie, čo tu bolo, kreslil selektor
+   `.lnav-brand span`, lenže spany sú v značke dva — minca aj názov. Po kliknutí
+   teda nabehli dve čierne čiary: jedna pod logom, druhá pod slovom. Zostáva
+   len nadýchnutie mince — odkaz na domov sa nehľadá, ten je známy. */
 .lnav-brand span { position: relative; }
-.lnav-brand span::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
-  background: var(--l-accent); border-radius: 2px;
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .32s cubic-bezier(.22,.61,.36,1);
-}
-.lnav-brand:hover span::after { transform: scaleX(1); }
 
 /* Kategória sa pri nabehnutí nepatrne nadvihne — dá to lište „hmat". */
-.lnav-cat-btn { transition: color .18s ease, transform .18s ease; }
+.lnav-cat-btn { transition: color .18s ease, background .18s ease, transform .18s ease; }
 .lnav-cat-btn:hover { transform: translateY(-1px); }
 
 /* Položky roletky sa vysunú postupne, nie všetky naraz. Zdržanie je krátke
@@ -671,7 +664,7 @@ body[data-lab-theme='pecat'],
 .lnav[data-expanded] { box-shadow: 0 10px 30px -22px rgba(30,24,18,.5); }
 
 @media (prefers-reduced-motion: reduce) {
-  .lnav-mark, .lnav-mark img, .lnav-brand span::after,
+  .lnav-mark, .lnav-mark img,
   .lnav-cat-btn, .lnav-panel-list a, .lnav-panel-list a::before, .lnav { transition: none; }
   .lnav-panel-list a { animation: none; }
   .lnav-cat-btn:hover { transform: none; }
