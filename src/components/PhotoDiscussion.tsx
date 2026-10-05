@@ -1,5 +1,6 @@
 'use client';
 
+import { t } from '../lib/jazyk';
 import { useEffect, useRef, useState } from 'react';
 import { ThumbsUp, MessageCircle, Share2, Heart, Send, Loader2 } from 'lucide-react';
 import { Nacitavanie } from '../design-lab/Nacitavanie';
@@ -71,7 +72,9 @@ function skloninaLajk(n: number): string {
   return n === 1 ? 'lajk' : n < 5 ? 'lajky' : 'lajkov';
 }
 function skloninaKom(n: number): string {
-  return n === 1 ? 'komentár' : n < 5 ? 'komentáre' : 'komentárov';
+  /* Angličtina pozná len jednotné a množné číslo, slovenčina tri tvary —
+     preto sa tvar vyberie po slovensky a prekladová vrstva ho zjednotí. */
+  return t(n === 1 ? 'komentár' : n < 5 ? 'komentáre' : 'komentárov');
 }
 
 /**
@@ -147,7 +150,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
 
   const remove = async (id: string) => {
     if (!token) return;
-    if (!window.confirm('Zmazať tento komentár?')) return;
+    if (!window.confirm(t('Zmazať tento komentár?'))) return;
     try { await deletePhotoComment(token, id); load(); } catch {}
   };
 
@@ -207,7 +210,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
               style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: c.myLikeId ? 'var(--pl-amber-2)' : 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: c.myLikeId ? 700 : 400 }}
             >
               <ThumbsUp style={{ width: 14, height: 14, fill: c.myLikeId ? 'currentColor' : 'transparent' }} />
-              Páči sa{c.likeCount ? ` · ${c.likeCount}` : ''}
+              {t('Páči sa')}{c.likeCount ? ` · ${c.likeCount}` : ''}
             </button>
             {isLoggedIn && (
               <button
@@ -215,7 +218,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
                 className="pl-focusable"
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 14 }}
               >
-                Odpovedať
+                {t('Odpovedať')}
               </button>
             )}
             {c.mine && (
@@ -224,7 +227,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
                 className="pl-focusable"
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--pl-bordo-2)', fontFamily: 'var(--font-serif)', fontSize: 14 }}
               >
-                Zmazať
+                {t('Zmazať')}
               </button>
             )}
             {/* Nahlásiť vidí prihlásený pri cudzom komentári — pri vlastnom
@@ -233,10 +236,10 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
               <button
                 onClick={() => setNahlasujem({ docId: c.documentId, autor: c.authorName || '' })}
                 className="pl-focusable"
-                title="Nahlásiť tento komentár redakcii"
+                title={t('Nahlásiť tento komentár redakcii')}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontSize: 14 }}
               >
-                Nahlásiť
+                {t('Nahlásiť')}
               </button>
             )}
           </div>
@@ -248,14 +251,14 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submitReply(c.documentId); } }}
-                placeholder={`Odpoveď pre ${c.authorName}…`}
+                placeholder={`${t('Odpoveď pre')} ${c.authorName}…`}
                 maxLength={2000}
                 style={pillInputStyle}
               />
               <button
                 onClick={() => submitReply(c.documentId)}
                 disabled={replyBusy || !replyText.trim()}
-                aria-label="Odoslať odpoveď"
+                aria-label={t('Odoslať odpoveď')}
                 className="pl-focusable"
                 style={{ ...sendBtnStyle, opacity: replyBusy || !replyText.trim() ? 0.5 : 1 }}
               >
@@ -305,23 +308,23 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
       {/* Akčná lišta */}
       <div style={{ display: 'flex', gap: 4, padding: '4px 10px', margin: '0 5px', borderTop: '1px solid var(--pl-border-soft)', flexShrink: 0 }}>
         <button className="pl-act pl-focusable" data-active={liked} onClick={toggleLike} aria-pressed={liked}>
-          <ThumbsUp className="w-4.5 h-4.5" style={{ width: 18, height: 18, fill: liked ? 'currentColor' : 'transparent' }} /> Páči sa mi
+          <ThumbsUp className="w-4.5 h-4.5" style={{ width: 18, height: 18, fill: liked ? 'currentColor' : 'transparent' }} /> {t('Páči sa mi')}
         </button>
         <button className="pl-act pl-focusable" onClick={focusInput}>
-          <MessageCircle style={{ width: 18, height: 18 }} /> Komentovať
+          <MessageCircle style={{ width: 18, height: 18 }} /> {t('Komentovať')}
         </button>
         <button className="pl-act pl-focusable" onClick={onShare}>
-          <Share2 style={{ width: 18, height: 18 }} /> Zdieľať
+          <Share2 style={{ width: 18, height: 18 }} /> {t('Zdieľať')}
         </button>
       </div>
 
       {/* Komentáre — scrollovateľná časť (na desktope má panel pevnú výšku) */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '4px 15px 8px' }}>
         {loading ? (
-          <Nacitavanie riadok velkost="male" text="Načítavam…" />
+          <Nacitavanie riadok velkost="male" text={t('Načítavam…')} />
         ) : comments.length === 0 ? (
           <p style={{ color: 'var(--pl-muted-2)', fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 15, margin: '8px 0' }}>
-            Buď prvý, kto sa ozve ✦
+            {t('Buď prvý, kto sa ozve ✦')}
           </p>
         ) : (
           comments.map((c) => renderComment(c))
@@ -349,7 +352,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
-              placeholder="Napíš komentár…"
+              placeholder={t('Napíš komentár…')}
               maxLength={2000}
               className="pl-focusable"
               style={pillInputStyle}
@@ -357,7 +360,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
             <button
               onClick={submit}
               disabled={busy || !text.trim()}
-              aria-label="Odoslať komentár"
+              aria-label={t('Odoslať komentár')}
               className="pl-focusable"
               style={{ ...sendBtnStyle, opacity: busy || !text.trim() ? 0.5 : 1 }}
             >
@@ -370,7 +373,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
             className="pl-focusable"
             style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--pl-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}
           >
-            <strong style={{ color: 'var(--pl-amber-2)' }}>Prihláste sa</strong> a zapojte sa do diskusie
+            <strong style={{ color: 'var(--pl-amber-2)' }}>{t('Prihláste sa')}</strong> {t('a zapojte sa do diskusie')}
           </button>
         )}
       </div>

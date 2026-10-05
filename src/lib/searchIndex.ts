@@ -10,6 +10,7 @@
 import MiniSearch from 'minisearch';
 
 import { STRAPI_URL } from './api-adresa';
+import { jazyk } from './jazyk';
 
 export interface IndexDoc {
   slug: string;
@@ -38,10 +39,13 @@ interface LoadedIndex {
   bySlug: Map<string, IndexDoc>;
 }
 
-let loadPromise: Promise<LoadedIndex> | null = null;
+/* Index je pre každý jazyk vlastný: anglická stránka musí hľadať
+   v anglických článkoch, nie v slovenských. Backend to rozlišuje podľa
+   `?locale=`, tu sa podľa jazyka líši aj kľúč v pamäti. */
+const loadPromise: Record<string, Promise<LoadedIndex> | undefined> = {};
 
-async function loadIndex(): Promise<LoadedIndex> {
-  const res = await fetch(`${STRAPI_URL}/api/search-index`, {
+async function loadIndex(j: string): Promise<LoadedIndex> {
+  const res = await fetch(`${STRAPI_URL}/api/search-index?locale=${j}`, {
     headers: { 'ngrok-skip-browser-warning': 'true' },
   });
   if (!res.ok) throw new Error(`search-index HTTP ${res.status}`);
@@ -75,11 +79,12 @@ async function loadIndex(): Promise<LoadedIndex> {
  *
  * Plný index si ďalej berie hľadanie — ale až vtedy, keď niekto naozaj hľadá.
  */
-let lahkyPromise: Promise<Map<string, IndexDoc>> | null = null;
+const lahkyPromise: Record<string, Promise<Map<string, IndexDoc>> | undefined> = {};
 
 export function getSearchIndexLite(): Promise<Map<string, IndexDoc>> {
-  if (!lahkyPromise) {
-    lahkyPromise = fetch(`${STRAPI_URL}/api/search-index?bezTextu=1`, {
+  const j = jazyk();
+  if (!lahkyPromise[j]) {
+    lahkyPromise[j] = fetch(`${STRAPI_URL}/api/search-index?bezTextu=1&locale=${j}`, {
       headers: { 'ngrok-skip-browser-warning': 'true' },
     })
       .then((r) => {
@@ -92,17 +97,20 @@ export function getSearchIndexLite(): Promise<Map<string, IndexDoc>> {
         return m;
       })
       .catch((e) => {
-        lahkyPromise = null;
+        lahkyPromise[j] = undefined;
         throw e;
       });
   }
-  return lahkyPromise;
+  return lahkyPromise[j]!;
 }
 
 /** Lenivo (singleton) načíta a postaví index. Ďalšie volania sú okamžité. */
 export function getSearchIndex(): Promise<LoadedIndex> {
-  if (!loadPromise) loadPromise = loadIndex().catch((e) => { loadPromise = null; throw e; });
-  return loadPromise;
+  const j = jazyk();
+  if (!loadPromise[j]) {
+    loadPromise[j] = loadIndex(j).catch((e) => { loadPromise[j] = undefined; throw e; });
+  }
+  return loadPromise[j]!;
 }
 
 /** Spustí hľadanie. Vráti zoradené zhody (najlepšie prvé). */

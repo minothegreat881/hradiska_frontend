@@ -218,7 +218,7 @@ export function LabNav() {
             type="button"
             className="lnav-burger"
             aria-expanded={menuOpen}
-            aria-label={menuOpen ? 'Zavrieť ponuku' : 'Otvoriť ponuku'}
+            aria-label={menuOpen ? t('Zavrieť ponuku') : t('Otvoriť ponuku')}
             onClick={() => setMenuOpen(v => !v)}
           >
             <span className="lnav-burger-i" data-open={menuOpen ? 'true' : undefined} aria-hidden="true" />
@@ -260,7 +260,7 @@ export function LabNav() {
                         />
                         {cat.slug && (
                           <a className="lnav-m-all" href={cat.slug} onClick={() => setMenuOpen(false)}>
-                            Zobraziť všetky{typeof cat.count === 'number' && cat.count > 0 ? ` (${cat.count})` : ''} <span aria-hidden="true">→</span>
+                            {t('Zobraziť všetky')}{typeof cat.count === 'number' && cat.count > 0 ? ` (${cat.count})` : ''} <span aria-hidden="true">→</span>
                           </a>
                         )}
                       </div>
@@ -335,7 +335,7 @@ function MobilKategoria({ slug, zoskupenie, onZoskupenie, onOdkaz }: {
   const clanky = useClankyKategorie(slug);
   const maLokality = lokality.length > 0;
 
-  if (clanky === null) return <Nacitavanie riadok velkost="male" text="Načítavam články…" />;
+  if (clanky === null) return <Nacitavanie riadok velkost="male" text={t('Načítavam články…')} />;
   if (!clanky.length) return <span className="lnav-m-empty">{t('Zatiaľ bez článkov.')}</span>;
 
   const jeLokalita = new Set(lokality.map(l => l.slug));

@@ -31,7 +31,7 @@ import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
 import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 import { ArticleSidebar, KeyFactsCard, TimelineCard } from '../components/ArticleSidebar';
-import { t, datum as datumJazyka, odkaz, poAnglicky } from '../lib/jazyk';
+import { t, datum as datumJazyka, odkaz, poAnglicky, kategoria, jazyk } from '../lib/jazyk';
 import { HistoricalGallery } from '../components/HistoricalGallery';
 import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
@@ -138,12 +138,31 @@ export function LabArticle({ slug }: { slug: string }) {
       ? { lat: post.location.latitude, lng: post.location.longitude }
       : undefined;
 
-  const gallery = (post.gallery || []).map((img: any) => ({
-    url: getStrapiImageUrl(img),
-    caption: img.caption || img.alternativeText || '',
-    alt: img.alternativeText || img.caption || '',
-    fileId: img.id,
-  }));
+  /* POPISY FOTIEK V GALÉRII.
+     Popis sa inak berie z knižnice médií, a ten je jeden pre celý web —
+     na anglickej stránke by teda pod fotkami stál slovenský text. Tá istá
+     fotografia však väčšinou stojí aj v tele článku, kde popis patrí bloku,
+     a ten preklad má. Preto sa najprv hľadá popis bloku pre to isté médium
+     a až potom sa použije ten z knižnice. V slovenčine sú oba rovnaké,
+     takže sa nemení nič. */
+  const popisyZBlokov = new Map<number, { caption: string; alt: string }>();
+  for (const b of (post.blocks || []) as any[]) {
+    if (b.__component !== 'content.image-block' || !b.image) continue;
+    const id = b.image.id ?? b.image;
+    if (typeof id === 'number' && (b.caption || b.alt)) {
+      popisyZBlokov.set(id, { caption: b.caption || '', alt: b.alt || '' });
+    }
+  }
+
+  const gallery = (post.gallery || []).map((img: any) => {
+    const zBloku = popisyZBlokov.get(img.id);
+    return {
+      url: getStrapiImageUrl(img),
+      caption: zBloku?.caption || img.caption || img.alternativeText || '',
+      alt: zBloku?.alt || img.alternativeText || img.caption || '',
+      fileId: img.id,
+    };
+  });
 
   return (
     <div className="lart">
@@ -239,7 +258,7 @@ export function LabArticle({ slug }: { slug: string }) {
             <a href={odkaz('/')}>{t('Domov')}</a>
             <span aria-hidden="true">›</span>
             {post.category && (
-              <a className="je-tu" href={odkaz(`/category/${post.category.slug}`)}>{post.category.name}</a>
+              <a className="je-tu" href={odkaz(`/category/${post.category.slug}`)}>{kategoria(post.category.name)}</a>
             )}
           </nav>
           <h1 className="lart-title">{post.title}</h1>
@@ -273,7 +292,7 @@ export function LabArticle({ slug }: { slug: string }) {
             <div className="p-6 md:p-8 article-main-col">
               {/* 720 px pri 18 px písme je ~85 znakov na riadok; 668 px dá ~72,
                   čo je horná hranica pohodlného čítania. Rozvrh sa nemení. */}
-              <div className="article-body-wrapper" lang="sk" style={{ maxWidth: 668, margin: '0 auto' }}>
+              <div className="article-body-wrapper" lang={jazyk()} style={{ maxWidth: 668, margin: '0 auto' }}>
                 {post.blocks && post.blocks.length > 0 ? (
                   <div className="prose prose-stone max-w-none article-content" style={{ display: 'flow-root' }}>
                     <DynamicZoneRenderer blocks={post.blocks} />
@@ -297,7 +316,6 @@ export function LabArticle({ slug }: { slug: string }) {
                 {gallery.length > 0 && (
                   <HistoricalGallery
                     images={gallery as { url: string; caption?: string; alt?: string }[]}
-                    title="Fotogaléria"
                     columns={(post as any).galleryColumns || 3}
                   />
                 )}
@@ -343,7 +361,7 @@ export function LabArticle({ slug }: { slug: string }) {
         <section className="lart-more">
           <div className="container">
             <h2 className="lart-more-h">{t('Mohlo by vás zaujímať')}</h2>
-            <p className="lart-more-s">Vybrali sme články súvisiace s touto témou</p>
+            <p className="lart-more-s">{t('Vybrali sme články súvisiace s touto témou')}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Bez štítku kategórie: v dlaždici pod článkom len prekrýval
                   fotografiu a čitateľovi nič nepovedal — meno kategórie je

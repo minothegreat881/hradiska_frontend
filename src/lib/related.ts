@@ -11,13 +11,18 @@ import MiniSearch from 'minisearch';
 import { getSearchIndexLite, fold, type IndexDoc } from './searchIndex';
 
 import { STRAPI_URL } from './api-adresa';
+import { jazyk, kategoria } from './jazyk';
 
 // Slovenské stopslová — nech dopyt necielime na „a, na, sa, v, že…".
 const STOP = new Set(
   ('a aj ako ale alebo ani áno by bol bola boli bolo bez do ho i iba ich im je jej jeho k ku '
     + 'kde keď ktorý ktorá ktoré ktorí len ma má mal mať me medzi mi mne my na nad nám náš neho '
     + 'nie no o od po pod pre pred pri s sa si so tak takže te ten tento to toto tu túto u už v '
-    + 'vo z za zo že ich sú bude budú viac však tiež nato preto tam teda').split(' ')
+    + 'vo z za zo že ich sú bude budú viac však tiež nato preto tam teda '
+    /* Anglická stránka sa dopytuje anglickými názvami — bez týchto slov by
+       dopyt mieril na „the", „and" a „with" a vrátil by polovicu blogu. */
+    + 'the and with from that this were was for are had has have been also into '
+    + 'their there which when where while they them then than over under about').split(' ')
 );
 
 export interface RelatedCard {
@@ -49,7 +54,7 @@ function toCard(doc: IndexDoc): RelatedCard {
     title: doc.title,
     excerpt: doc.excerpt || '',
     category: doc.categorySlug,
-    categoryName: doc.categoryName,
+    categoryName: kategoria(doc.categoryName),
     coverImage: coverUrl(doc.cover),
     publishedAt: (doc as any).date || undefined,
     readTime: readingTime(doc),
@@ -73,11 +78,14 @@ function keyTerms(doc: IndexDoc): string {
    Predtým sa použil ten, ktorý si stavia hľadanie — lenže ten ťahá plné
    znenia článkov (1,19 MB) a na odporúčanie stačí názov, značky, lokalita
    a perex. Postaviť index nad 365 krátkymi záznamami je otázka milisekúnd. */
-let lahkyIndex: Promise<{ mini: MiniSearch<IndexDoc>; bySlug: Map<string, IndexDoc> }> | null = null;
+/* Vlastný index pre každý jazyk — slovenské odporúčania na anglickej
+   stránke by viedli na články, ktoré čitateľ neprečíta. */
+const lahkyIndex: Record<string, Promise<{ mini: MiniSearch<IndexDoc>; bySlug: Map<string, IndexDoc> }> | undefined> = {};
 
 function indexPreOdporucanie() {
-  if (!lahkyIndex) {
-    lahkyIndex = getSearchIndexLite()
+  const j = jazyk();
+  if (!lahkyIndex[j]) {
+    lahkyIndex[j] = getSearchIndexLite()
       .then((bySlug) => {
         const mini = new MiniSearch<IndexDoc>({
           idField: 'slug',
@@ -93,11 +101,11 @@ function indexPreOdporucanie() {
         return { mini, bySlug };
       })
       .catch((e) => {
-        lahkyIndex = null;
+        lahkyIndex[j] = undefined;
         throw e;
       });
   }
-  return lahkyIndex;
+  return lahkyIndex[j]!;
 }
 
 export async function getRelated(slug: string, limit = 6): Promise<RelatedCard[]> {

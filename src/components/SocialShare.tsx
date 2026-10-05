@@ -1,5 +1,6 @@
 'use client';
 
+import { t } from '../lib/jazyk';
 import { Facebook, Instagram, Youtube, MessageCircle, Link2, Check } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner@2.0.3';
@@ -55,10 +56,10 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
       await navigator.clipboard.writeText(currentUrl);
       setCopied(true);
       track('copy');
-      toast.success('Odkaz skopírovaný');
+      toast.success(t('Odkaz skopírovaný'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error('Nepodarilo sa skopírovať odkaz');
+      toast.error(t('Nepodarilo sa skopírovať odkaz'));
     }
   };
 
@@ -85,7 +86,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
             color: 'var(--hr-accent-soft)',
           }}
         >
-          Zdieľať článok
+          {t('Zdieľať článok')}
         </span>
         <div style={{ display: 'flex', gap: 10 }}>
           {items.map(({ name, Icon, href }) => (
@@ -95,7 +96,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => track(name)}
-              aria-label={`Zdieľať na ${name}`}
+              aria-label={`${t('Zdieľať na')} ${name}`}
               title={name}
               style={{
                 width: 40,
@@ -124,8 +125,8 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
           ))}
           <button
             onClick={copy}
-            aria-label="Kopírovať odkaz"
-            title={copied ? 'Skopírované' : 'Kopírovať odkaz'}
+            aria-label={t('Kopírovať odkaz')}
+            title={copied ? t('Skopírované') : t('Kopírovať odkaz')}
             style={{
               width: 40,
               height: 40,

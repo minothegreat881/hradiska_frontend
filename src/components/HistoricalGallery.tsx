@@ -1,5 +1,6 @@
 'use client';
 
+import { t } from '../lib/jazyk';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X, Maximize2, Share2 } from 'lucide-react';
@@ -122,12 +123,12 @@ export function Lightbox({
 
   const share = async () => {
     const url = `${window.location.origin}${window.location.pathname}#foto-${index + 1}`;
-    const title = current.caption || current.alt || 'Fotka z Hradiská.sk';
+    const title = current.caption || current.alt || t('Fotka z Hradiská.sk');
     if (typeof navigator !== 'undefined' && (navigator as any).share) {
       try { await (navigator as any).share({ title, url }); return; } catch { /* používateľ zrušil */ }
     }
-    try { await navigator.clipboard.writeText(url); toast.success('Odkaz na fotku skopírovaný'); }
-    catch { toast.error('Nepodarilo sa skopírovať odkaz'); }
+    try { await navigator.clipboard.writeText(url); toast.success(t('Odkaz na fotku skopírovaný')); }
+    catch { toast.error(t('Nepodarilo sa skopírovať odkaz')); }
   };
 
   const onTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0].clientX; };
@@ -153,7 +154,7 @@ export function Lightbox({
       className="pl-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Prehliadač fotky"
+      aria-label={t('Prehliadač fotky')}
       onClick={onClose}
     >
       <div className={`pl-card${commentsOpen ? ' pl-comments-open' : ''}${popisCely ? ' pl-popis-cely' : ''}`} onClick={(e) => e.stopPropagation()}>
@@ -171,13 +172,13 @@ export function Lightbox({
               Hradiská.sk
             </div>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13.5, color: 'var(--pl-muted-2)' }}>
-              Fotogaléria · {index + 1} / {images.length}
+              {t('Fotogaléria')} · {index + 1} / {images.length}
             </div>
           </div>
           <button
             ref={closeRef}
             onClick={onClose}
-            aria-label="Zavrieť"
+            aria-label={t('Zavrieť')}
             className="pl-focusable"
             style={headerBtnStyle}
             onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--pl-amber)'; }}
@@ -192,19 +193,19 @@ export function Lightbox({
           {/* Šípky sú tu vždy (pri jedinej fotke nemajú čo robiť): galéria sa
               listuje dokola, takže ani na poslednej fotke nie je koniec. */}
           {images.length > 1 && (
-            <button className="pl-navb pl-focusable" style={{ left: 10 }} onClick={onPrev} aria-label="Predchádzajúca fotka">
+            <button className="pl-navb pl-focusable" style={{ left: 10 }} onClick={onPrev} aria-label={t('Predchádzajúca fotka')}>
               <ChevronLeft style={{ width: 22, height: 22 }} />
             </button>
           )}
           {images.length > 1 && (
-            <button className="pl-navb pl-focusable" style={{ right: 10 }} onClick={onNext} aria-label="Nasledujúca fotka">
+            <button className="pl-navb pl-focusable" style={{ right: 10 }} onClick={onNext} aria-label={t('Nasledujúca fotka')}>
               <ChevronRight style={{ width: 22, height: 22 }} />
             </button>
           )}
           <span className="pl-pill" style={{ top: 10, right: 10 }} aria-live="polite">
             {index + 1} / {images.length}
           </span>
-          <button className="pl-corner pl-focusable" style={{ right: 10, bottom: 10 }} onClick={() => setZoom(true)} aria-label="Zväčšiť fotku">
+          <button className="pl-corner pl-focusable" style={{ right: 10, bottom: 10 }} onClick={() => setZoom(true)} aria-label={t('Zväčšiť fotku')}>
             <Maximize2 style={{ width: 18, height: 18 }} />
           </button>
           {/* Rozmazané pozadie (rovnaká fotka) — FB-style letterbox pre portrét */}
@@ -243,7 +244,7 @@ export function Lightbox({
             {(maViac || popisCely) && (
               <button type="button" className="pl-viac pl-focusable" onClick={() => setPopisCely((v) => !v)}
                       aria-expanded={popisCely}>
-                {popisCely ? 'Zbaliť' : 'Čítať viac'}
+                {popisCely ? t('Zbaliť') : t('Čítať viac')}
               </button>
             )}
             {(current.author || current.source) && (
@@ -262,7 +263,7 @@ export function Lightbox({
             <button
               type="button"
               className="pl-sheet-handle"
-              aria-label={commentsOpen ? 'Skryť komentáre' : 'Zobraziť komentáre'}
+              aria-label={commentsOpen ? t('Skryť komentáre') : t('Zobraziť komentáre')}
               aria-expanded={commentsOpen}
               onTouchStart={(e) => { sheetY.current = e.touches[0].clientY; sheetDragged.current = false; }}
               onTouchMove={(e) => {
@@ -276,7 +277,7 @@ export function Lightbox({
                 setCommentsOpen((o) => !o);
               }}
             >
-              <span>{commentsOpen ? 'Skryť komentáre' : 'Komentáre'}</span>
+              <span>{commentsOpen ? t('Skryť komentáre') : t('Komentáre')}</span>
               <span className="pl-sheet-chev" aria-hidden="true">{commentsOpen ? '▾' : '▴'}</span>
             </button>
             <PhotoDiscussion fileId={current.fileId} onShare={share} />
@@ -287,7 +288,7 @@ export function Lightbox({
             style={{ display: 'flex', padding: '4px 10px', margin: '0 5px', borderTop: '1px solid var(--pl-border-soft)' }}
           >
             <button className="pl-act pl-focusable" onClick={share}>
-              <Share2 style={{ width: 18, height: 18 }} /> Zdieľať
+              <Share2 style={{ width: 18, height: 18 }} /> {t('Zdieľať')}
             </button>
           </div>
         )}
@@ -302,16 +303,16 @@ export function Lightbox({
           style={{ position: 'fixed', inset: 0, zIndex: 70, background: 'rgba(5,4,2,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, cursor: 'zoom-out' }}
         >
           {images.length > 1 && (
-            <button className="pl-navb pl-focusable" style={{ left: 12 }} onClick={(e) => { e.stopPropagation(); onPrev(); }} aria-label="Predchádzajúca fotka">
+            <button className="pl-navb pl-focusable" style={{ left: 12 }} onClick={(e) => { e.stopPropagation(); onPrev(); }} aria-label={t('Predchádzajúca fotka')}>
               <ChevronLeft style={{ width: 22, height: 22 }} />
             </button>
           )}
           {images.length > 1 && (
-            <button className="pl-navb pl-focusable" style={{ right: 12 }} onClick={(e) => { e.stopPropagation(); onNext(); }} aria-label="Nasledujúca fotka">
+            <button className="pl-navb pl-focusable" style={{ right: 12 }} onClick={(e) => { e.stopPropagation(); onNext(); }} aria-label={t('Nasledujúca fotka')}>
               <ChevronRight style={{ width: 22, height: 22 }} />
             </button>
           )}
-          <button className="pl-corner pl-focusable" style={{ top: 14, right: 14 }} onClick={(e) => { e.stopPropagation(); setZoom(false); }} aria-label="Zavrieť zväčšenie">
+          <button className="pl-corner pl-focusable" style={{ top: 14, right: 14 }} onClick={(e) => { e.stopPropagation(); setZoom(false); }} aria-label={t('Zavrieť zväčšenie')}>
             <X style={{ width: 18, height: 18 }} />
           </button>
           <span className="pl-pill" style={{ bottom: 16, left: '50%', transform: 'translateX(-50%)' }} aria-live="polite">
@@ -333,7 +334,9 @@ export function Lightbox({
 // MAIN GALLERY
 // =============================================================================
 
-export function HistoricalGallery({ images, title = 'Fotogaléria', columns = 3 }: HistoricalGalleryProps) {
+/* Nadpis galérie neprichádza zo článku, je to text rozhrania — preto sa
+   berie z prekladovej vrstvy a nie z volajúceho komponentu. */
+export function HistoricalGallery({ images, title, columns = 3 }: HistoricalGalleryProps) {
   const [modalIndex, setModalIndex] = useState<number | null>(null);
   // Kam vrátiť focus po zatvorení (miniatúra, z ktorej sa otvorilo)
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -410,7 +413,7 @@ export function HistoricalGallery({ images, title = 'Fotogaléria', columns = 3 
       {/* Nadpis sekcie */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
         <h2 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 22, fontWeight: 600, color: '#2d1810', margin: 0 }}>
-          {title}
+          {title || t('Fotogaléria')}
         </h2>
         <span
           style={{
@@ -433,13 +436,13 @@ export function HistoricalGallery({ images, title = 'Fotogaléria', columns = 3 
             type="button"
             key={image.url || idx}
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); open(idx, e.currentTarget); }}
-            aria-label={image.alt || image.caption || `Otvoriť obrázok ${idx + 1}`}
+            aria-label={image.alt || image.caption || `${t('Otvoriť obrázok')} ${idx + 1}`}
             style={{ background: 'transparent', border: 0, padding: 0, cursor: 'zoom-in', display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'left', font: 'inherit', color: 'inherit' }}
           >
             <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 8, border: '1px solid var(--hr-line)', pointerEvents: 'none' }}>
               <ImageWithFallback
                 src={image.url}
-                alt={image.alt || image.caption || `Obrázok ${idx + 1}`}
+                alt={image.alt || image.caption || `${t('Obrázok')} ${idx + 1}`}
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ pointerEvents: 'none' }}
               />

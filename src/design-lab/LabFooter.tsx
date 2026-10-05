@@ -1,4 +1,4 @@
-import { t } from '../lib/jazyk';
+import { t, odkaz, poAnglicky } from '../lib/jazyk';
 'use client';
 
 /**
@@ -68,11 +68,11 @@ const SOCIALS = [
 function Col({ title, links }: { title: string; links: { href: string; label: string }[] }) {
   return (
     <div className="lfoot-col">
-      <h3 className="lfoot-h">{title}</h3>
+      <h3 className="lfoot-h">{t(title)}</h3>
       <nav>
         {links.map((l) => (
-          <a key={l.href + l.label} href={l.href}>
-            {l.label}
+          <a key={l.href + l.label} href={odkaz(l.href)}>
+            {t(l.label)}
           </a>
         ))}
       </nav>
@@ -133,8 +133,9 @@ export function LabFooter() {
             </a>
 
             <p className="lfoot-desc">
-              Občianske združenie venované slovanským hradiskám, hradom a zámkom
-              Slovenska.
+              {poAnglicky()
+                ? 'A voluntary association devoted to the Slavic hillforts, castles and manors of Slovakia.'
+                : 'Občianske združenie venované slovanským hradiskám, hradom a zámkom Slovenska.'}
             </p>
 
             {/* Náušnica, ktorá tu stála vedľa ikon, sa presťahovala do päty
@@ -170,28 +171,28 @@ export function LabFooter() {
           <span className="lfoot-copy">
             © {new Date().getFullYear()} Hradiska.sk
             <span className="lfoot-sep" aria-hidden="true">·</span>
-            Projekt venovaný slovanskej archeológii a histórii
+            {poAnglicky() ? 'A project devoted to Slavic archaeology and history' : 'Projekt venovaný slovanskej archeológii a histórii'}
           </span>
 
           <nav className="lfoot-legal">
-            <a href="/ochrana-osobnych-udajov">{t('Ochrana osobných údajov')}</a>
-            <a href="/podmienky-pouzivania">{t('Podmienky používania')}</a>
+            <a href={odkaz('/ochrana-osobnych-udajov')}>{t('Ochrana osobných údajov')}</a>
+            <a href={odkaz('/podmienky-pouzivania')}>{t('Podmienky používania')}</a>
             <button type="button" onClick={openCookieSettings}>
-              Zvyky hradiska (cookies)
+              {t('Zvyky hradiska (cookies)')}
             </button>
             {/* Odkaz na stránku aplikácie, nie na pridanie webu na plochu:
                 appka je samostatný program, ktorý vie aj to, čo prehliadač
                 nie (mapa bez signálu). Stránka platí aj na počítači — človek
                 si odtiaľ pošle odkaz do telefónu. */}
-            <a href="/aplikacia" className="lfoot-install">{t('Aplikácia do telefónu')}</a>
+            <a href={odkaz('/aplikacia')} className="lfoot-install">{t('Aplikácia do telefónu')}</a>
           </nav>
 
           <button
             type="button"
             className="lfoot-up"
             onClick={scrollTop}
-            aria-label="Späť hore"
-            title="Späť hore"
+            aria-label={t('Späť hore')}
+            title={t('Späť hore')}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 19V5M5 12l7-7 7 7" />

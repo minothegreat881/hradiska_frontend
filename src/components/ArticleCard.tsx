@@ -1,5 +1,6 @@
 'use client';
 
+import { kategoria, odkaz, poAnglicky } from '../lib/jazyk';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { Article } from '../data/mock-data';
 
@@ -41,13 +42,16 @@ function prettifySlug(slug: string): string {
 }
 
 export function ArticleCard({ article, stitok = true, znak = false }: ArticleCardProps) {
-  const categoryLabel =
+  /* Meno kategórie príde zo Strapi po slovensky (kategórie preklad nemajú),
+     preto ide ešte cez prekladovú vrstvu. */
+  const categoryLabel = kategoria(
     (article as any).categoryName ||
-    CATEGORY_LABELS[article.category] ||
-    prettifySlug(article.category);
+      CATEGORY_LABELS[article.category] ||
+      prettifySlug(article.category),
+  );
 
   const dateLabel = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString('sk-SK', {
+    ? new Date(article.publishedAt).toLocaleDateString(poAnglicky() ? 'en-GB' : 'sk-SK', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -56,7 +60,7 @@ export function ArticleCard({ article, stitok = true, znak = false }: ArticleCar
 
   return (
     <a
-      href={`/blog/${article.slug}`}
+      href={odkaz(`/blog/${article.slug}`)}
       className={znak ? 'acard acard--znak' : 'acard'}
       aria-label={stitok && categoryLabel ? `${article.title} — ${categoryLabel}` : article.title}
     >

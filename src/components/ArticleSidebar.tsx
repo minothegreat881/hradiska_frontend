@@ -1,4 +1,4 @@
-import { t } from '../lib/jazyk';
+import { t, odkaz } from '../lib/jazyk';
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -291,7 +291,7 @@ export function ArticleSidebar({
                 key={index}
                 /* Domovská stránka parameter `search` nikdy nečítala, takže
                    klik na tému nerobil nič. Hľadanie žije na `/hladat`. */
-                href={`/hladat?q=${encodeURIComponent(tag)}`}
+                href={odkaz(`/hladat?q=${encodeURIComponent(t(tag))}`)}
                 style={{
                   display: 'inline-block',
                   padding: '5px 12px',
@@ -312,7 +312,7 @@ export function ArticleSidebar({
                   (e.currentTarget as HTMLAnchorElement).style.background = 'var(--hr-line)';
                 }}
               >
-                {tag}
+                {t(tag)}
               </a>
             ))}
           </div>
@@ -327,7 +327,7 @@ export function ArticleSidebar({
             {relatedArticles.slice(0, 5).map((related) => (
               <a
                 key={related.id}
-                href={`/blog/${related.slug}`}
+                href={odkaz(`/blog/${related.slug}`)}
                 className="group"
                 style={{
                   display: 'flex',

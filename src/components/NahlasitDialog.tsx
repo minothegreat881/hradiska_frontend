@@ -11,6 +11,7 @@
  * toho, kto chce niekomu uškodiť; server to odmieta tak či tak.
  */
 
+import { t } from '../lib/jazyk';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Flag, X } from 'lucide-react';
@@ -84,18 +85,18 @@ export function NahlasitDialog({
           await zablokuj(token, autorId);
           onZablokovane?.();
           blokovanieHlaska = autor
-            ? ` Príspevky od ${autor} vám už nebudeme zobrazovať.`
-            : ' Príspevky tohto člena vám už nebudeme zobrazovať.';
+            ? ` ${t('Príspevky od')} ${autor} ${t('vám už nebudeme zobrazovať.')}`
+            : ' ' + t('Príspevky tohto člena vám už nebudeme zobrazovať.');
         } catch {
-          blokovanieHlaska = ' Zablokovať sa ho nepodarilo — skúste to v nastaveniach účtu.';
+          blokovanieHlaska = ' ' + t('Zablokovať sa ho nepodarilo — skúste to v nastaveniach účtu.');
         }
       }
 
       setHotovo((odpoved?.uzNahlasene
-        ? 'Tento príspevok ste už nahlásili. Redakcia o ňom vie.'
-        : 'Ďakujeme. Redakcia sa na príspevok pozrie.') + blokovanieHlaska);
+        ? t('Tento príspevok ste už nahlásili. Redakcia o ňom vie.')
+        : t('Ďakujeme. Redakcia sa na príspevok pozrie.')) + blokovanieHlaska);
     } catch {
-      setChyba('Nahlásenie sa nepodarilo odoslať. Skúste to prosím o chvíľu.');
+      setChyba(t('Nahlásenie sa nepodarilo odoslať. Skúste to prosím o chvíľu.'));
     } finally {
       setPosielam(false);
     }
@@ -106,33 +107,33 @@ export function NahlasitDialog({
      Vnútri neho by `z-index: 10010` platil len voči jej súrodencom a plávajúce
      tlačidlo pripomienok by okienko prekrylo — namerané na telefóne. */
   return createPortal(
-    <div className="nahl-vrstva" role="dialog" aria-modal="true" aria-label="Nahlásiť príspevok">
+    <div className="nahl-vrstva" role="dialog" aria-modal="true" aria-label={t('Nahlásiť príspevok')}>
       <div className="nahl-okno">
-        <button type="button" className="nahl-zavri" onClick={onZavri} aria-label="Zavrieť">
+        <button type="button" className="nahl-zavri" onClick={onZavri} aria-label={t('Zavrieť')}>
           <X style={{ width: 16, height: 16 }} />
         </button>
 
         {hotovo ? (
           <>
-            <h2 className="nahl-nadpis">Nahlásené</h2>
+            <h2 className="nahl-nadpis">{t('Nahlásené')}</h2>
             <p className="nahl-text">{hotovo}</p>
             <div className="nahl-ukony">
-              <button type="button" className="nahl-hlavne" onClick={onZavri}>Zavrieť</button>
+              <button type="button" className="nahl-hlavne" onClick={onZavri}>{t('Zavrieť')}</button>
             </div>
           </>
         ) : (
           <>
             <h2 className="nahl-nadpis">
               <Flag style={{ width: 17, height: 17 }} aria-hidden="true" />
-              Nahlásiť príspevok
+              {t('Nahlásiť príspevok')}
             </h2>
             <p className="nahl-text">
-              {autor ? <>Príspevok od <strong>{autor}</strong>. </> : null}
-              Nahlásenie príspevok neskryje — pozrie sa naň redakcia.
+              {autor ? <>{t('Príspevok od')} <strong>{autor}</strong>. </> : null}
+              {t('Nahlásenie príspevok neskryje — pozrie sa naň redakcia.')}
             </p>
 
             <fieldset className="nahl-dovody">
-              <legend className="nahl-legenda">Čo mu vyčítate?</legend>
+              <legend className="nahl-legenda">{t('Čo mu vyčítate?')}</legend>
               {DOVODY.map((d, i) => (
                 <label key={d.id} className="nahl-dovod">
                   <input
@@ -143,12 +144,12 @@ export function NahlasitDialog({
                     checked={dovod === d.id}
                     onChange={() => setDovod(d.id)}
                   />
-                  <span>{d.popis}</span>
+                  <span>{t(d.popis)}</span>
                 </label>
               ))}
             </fieldset>
 
-            <label className="nahl-legenda" htmlFor="nahl-poznamka">Chcete niečo doplniť? (nepovinné)</label>
+            <label className="nahl-legenda" htmlFor="nahl-poznamka">{t('Chcete niečo doplniť? (nepovinné)')}</label>
             <textarea
               id="nahl-poznamka"
               className="nahl-pole"
@@ -156,7 +157,7 @@ export function NahlasitDialog({
               maxLength={1000}
               value={poznamka}
               onChange={(e) => setPoznamka(e.target.value)}
-              placeholder="Napríklad čím presne príspevok prekáža."
+              placeholder={t('Napríklad čím presne príspevok prekáža.')}
             />
 
             {/* Blokovanie sa ponúka len vtedy, keď vieme, o čí účet ide —
@@ -165,8 +166,8 @@ export function NahlasitDialog({
               <label className="nahl-blokovat">
                 <input type="checkbox" checked={blokovat} onChange={(e) => setBlokovat(e.target.checked)} />
                 <span>
-                  Zároveň {autor ? <strong>{autor}</strong> : 'tohto člena'} zablokovať — jeho príspevky
-                  sa mi prestanú zobrazovať. Zrušiť sa to dá v nastaveniach účtu.
+                  {t('Zároveň')} {autor ? <strong>{autor}</strong> : t('tohto člena')}{' '}
+                  {t('zablokovať — jeho príspevky sa mi prestanú zobrazovať. Zrušiť sa to dá v nastaveniach účtu.')}
                 </span>
               </label>
             ) : null}
@@ -174,9 +175,9 @@ export function NahlasitDialog({
             {chyba && <p className="nahl-chyba" role="alert">{chyba}</p>}
 
             <div className="nahl-ukony">
-              <button type="button" className="nahl-vedlajsie" onClick={onZavri}>Zrušiť</button>
+              <button type="button" className="nahl-vedlajsie" onClick={onZavri}>{t('Zrušiť')}</button>
               <button type="button" className="nahl-hlavne" onClick={posli} disabled={posielam}>
-                {posielam ? 'Odosielam…' : 'Nahlásiť'}
+                {posielam ? t('Odosielam…') : t('Nahlásiť')}
               </button>
             </div>
           </>

@@ -24,6 +24,7 @@
  * skladala po štvorčekoch pred očami.
  */
 
+import { t } from '../lib/jazyk';
 import { useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 
@@ -87,7 +88,7 @@ export function MiniMap({ coordinates, locationName }: { coordinates: { lat: num
         href={vonku}
         target="_blank"
         rel="noopener noreferrer"
-        title={`${locationName} — otvoriť v Google Mapách`}
+        title={`${locationName} — ${t('otvoriť v Google Mapách')}`}
         className={hotovo ? 'lok-mapa je-tu' : 'lok-mapa'}
       >
         <span className="lok-mapa-vrstva">
@@ -129,7 +130,7 @@ export function MiniMap({ coordinates, locationName }: { coordinates: { lat: num
       </a>
       <span className="lok-mapa-odkaz">
         <a href={vonku} target="_blank" rel="noopener noreferrer">
-          Otvoriť v Google Mapách <ExternalLink className="w-3 h-3" aria-hidden="true" />
+          {t('Otvoriť v Google Mapách')} <ExternalLink className="w-3 h-3" aria-hidden="true" />
         </a>
       </span>
     </div>

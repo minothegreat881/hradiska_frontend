@@ -16,6 +16,7 @@
  * sa nemôžu rozísť.
  */
 
+import { t, odkaz } from '../lib/jazyk';
 import { useEffect, useRef } from 'react';
 import { hradiskaCategories, variant } from '../data/categories';
 import { ROZCESTNIK_TYPY, ROZCESTNIK_PRAMENE, zakladStrapi } from '../data/rozcestnik';
@@ -28,8 +29,8 @@ function Mini({ slug, label, aktivna }: { slug: string; label: string; aktivna: 
   return (
     <a
       className={aktivna ? 'cat-mini is-active' : 'cat-mini'}
-      href={`/category/${slug}`}
-      title={k.label}
+      href={odkaz(`/category/${slug}`)}
+      title={t(k.label)}
       aria-current={aktivna ? 'page' : undefined}
       data-slug={slug}
     >
@@ -44,7 +45,7 @@ function Mini({ slug, label, aktivna }: { slug: string; label: string; aktivna: 
           decoding="async"
         />
       </span>
-      <span className="cat-mini-nazov">{label}</span>
+      <span className="cat-mini-nazov">{t(label)}</span>
     </a>
   );
 }
@@ -86,7 +87,7 @@ export function LabKategorieLista({ aktivna }: { aktivna?: string }) {
   }, [aktivna]);
 
   return (
-    <nav className="cat-rail" aria-label="Kategórie hradísk">
+    <nav className="cat-rail" aria-label={t('Kategórie hradísk')}>
       <div className="cat-rail-pas" ref={pas} onPointerDown={stlacenie} onClickCapture={klik}>
         {ROZCESTNIK_TYPY.map((p) => (
           <Mini key={p.slug} slug={p.slug} label={p.label} aktivna={p.slug === aktivna} />

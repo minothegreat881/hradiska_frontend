@@ -1,5 +1,6 @@
 'use client';
 
+import { t, poAnglicky } from '../lib/jazyk';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ThumbsUp, Reply, Loader2, Trash2, Flag } from 'lucide-react';
@@ -162,7 +163,7 @@ function CommentItem({
                   borderRadius: 4,
                 }}
               >
-                z pôvodného blogu
+                {t('z pôvodného blogu')}
               </span>
             )}
           </div>
@@ -189,7 +190,7 @@ function CommentItem({
             <button
               type="button"
               onClick={() => onLike(comment.documentId)}
-              title={liked ? 'Zrušiť reakciu' : 'Páči sa mi'}
+              title={liked ? t('Zrušiť reakciu') : t('Páči sa mi')}
               aria-pressed={liked}
               style={{
                 display: 'inline-flex',
@@ -228,7 +229,7 @@ function CommentItem({
             <button
               type="button"
               onClick={() => onReply(comment.documentId, comment.author)}
-              title="Odpovedať na tento komentár"
+              title={t('Odpovedať na tento komentár')}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -243,14 +244,14 @@ function CommentItem({
               }}
             >
               <Reply style={{ width: 14, height: 14 }} />
-              Odpovedať
+              {t('Odpovedať')}
             </button>
             {/* Mazať vidí len autor vlastného komentára */}
             {comment.mine && (
               <button
                 type="button"
                 onClick={() => onDelete(comment.documentId)}
-                title="Zmazať môj komentár"
+                title={t('Zmazať môj komentár')}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent',
                   border: 0, padding: 0, cursor: 'pointer', fontFamily: 'Georgia, serif',
@@ -258,7 +259,7 @@ function CommentItem({
                 }}
               >
                 <Trash2 style={{ width: 13, height: 13 }} />
-                Zmazať
+                {t('Zmazať')}
               </button>
             )}
             {/* Nahlásiť vidí prihlásený pri CUDZOM komentári. Pri vlastnom by
@@ -267,7 +268,7 @@ function CommentItem({
               <button
                 type="button"
                 onClick={() => onNahlasit(comment.documentId, comment.author, comment.authorId)}
-                title="Nahlásiť tento komentár redakcii"
+                title={t('Nahlásiť tento komentár redakcii')}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent',
                   border: 0, padding: 0, cursor: 'pointer', fontFamily: 'Georgia, serif',
@@ -275,7 +276,7 @@ function CommentItem({
                 }}
               >
                 <Flag style={{ width: 13, height: 13 }} />
-                Nahlásiť
+                {t('Nahlásiť')}
               </button>
             )}
           </div>
@@ -288,7 +289,7 @@ function CommentItem({
                   autoFocus
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder={`Odpoveď pre ${comment.author}…`}
+                  placeholder={`${t('Odpoveď pre')} ${comment.author}…`}
                   rows={2}
                   maxLength={5000}
                   style={{
@@ -314,11 +315,11 @@ function CommentItem({
                     }}
                   >
                     {sending && <Loader2 style={{ width: 13, height: 13 }} className="animate-spin" />}
-                    Odoslať odpoveď
+                    {t('Odoslať odpoveď')}
                   </button>
                   <button type="button" onClick={onCancelReply}
                           style={{ background: 'transparent', border: 0, color: '#7a6b56', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, textDecoration: 'underline' }}>
-                    Zrušiť
+                    {t('Zrušiť')}
                   </button>
                 </div>
               </div>
@@ -326,8 +327,8 @@ function CommentItem({
               <div style={{ marginTop: 10, fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
                 <button type="button" onClick={() => goTo('/prihlasenie')}
                         style={{ color: 'var(--hr-accent-soft)', background: 'none', border: 0, cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'Georgia, serif', fontSize: 13 }}>
-                  Prihláste sa
-                </button>{' '}a zapojte sa do diskusie.
+                  {t('Prihláste sa')}
+                </button>{' '}{t('a zapojte sa do diskusie')}.
               </div>
             )
           )}
@@ -356,7 +357,7 @@ function CommentItem({
 function formatDate(iso?: string) {
   if (!iso) return '';
   try {
-    return new Date(iso).toLocaleDateString('sk-SK', {
+    return new Date(iso).toLocaleDateString(poAnglicky() ? 'en-GB' : 'sk-SK', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -563,7 +564,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   const handleLike = useCallback(
     async (commentDocId: string) => {
       if (!isLoggedIn || !token) {
-        toast.error('Lajkovať môžu len prihlásení. Prihláste sa.');
+        toast.error(t('Lajkovať môžu len prihlásení. Prihláste sa.'));
         return;
       }
       const existingReaction = myLikes.get(commentDocId);
@@ -605,7 +606,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
           return next;
         });
         setComments(prev => bumpLikesInTree(prev, commentDocId, -delta));
-        toast.error(wasLiked ? 'Nepodarilo sa zrušiť lajk.' : 'Nepodarilo sa zaznamenať lajk.');
+        toast.error(wasLiked ? t('Nepodarilo sa zrušiť lajk.') : t('Nepodarilo sa zaznamenať lajk.'));
       }
     },
     [isLoggedIn, token, myLikes],
@@ -621,16 +622,16 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   // Mazanie vlastného komentára (backend povolí len vlastný / staff).
   const handleDelete = useCallback(async (commentDocId: string) => {
     if (!token) return;
-    if (!window.confirm('Zmazať tento komentár?')) return;
+    if (!window.confirm(t('Zmazať tento komentár?'))) return;
     try {
       const res = await fetch(`${STRAPI_URL}/api/blog-comments/${commentDocId}`, {
         method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      toast.success('Komentár zmazaný.');
+      toast.success(t('Komentár zmazaný.'));
       fetchComments();
     } catch {
-      toast.error('Nepodarilo sa zmazať komentár.');
+      toast.error(t('Nepodarilo sa zmazať komentár.'));
     }
   }, [token, fetchComments]);
 
@@ -645,10 +646,10 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setReplyingTo(null);
-      toast.success('Odpoveď pridaná.');
+      toast.success(t('Odpoveď pridaná.'));
       fetchComments();
     } catch (e) {
-      toast.error('Nepodarilo sa pridať odpoveď.');
+      toast.error(t('Nepodarilo sa pridať odpoveď.'));
     }
   }, [token, postDocumentId, fetchComments]);
 
@@ -674,14 +675,14 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       }
       setNewComment('');
       setReplyingTo(null);
-      toast.success('Komentár pridaný.');
+      toast.success(t('Komentár pridaný.'));
       // Komentár sa zobrazí HNEĎ (status=visible) — načítame zoznam nanovo,
       // aby sa zaradil na správne miesto (aj ako odpoveď).
       fetchComments();
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error('[CommentSection] submit failed:', e);
-      toast.error(`Nepodarilo sa pridať komentár: ${msg.slice(0, 120)}`);
+      toast.error(`${t('Nepodarilo sa pridať komentár')}: ${msg.slice(0, 120)}`);
     } finally {
       setSubmitting(false);
     }
@@ -699,7 +700,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             margin: 0,
           }}
         >
-          Diskusia
+          {t('Diskusia')}
         </h2>
         <span
           style={{
@@ -748,7 +749,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               padding: 16,
             }}
           >
-            <Nacitavanie riadok velkost="male" text="Načítavam komentáre…" />
+            <Nacitavanie riadok velkost="male" text={t('Načítavam komentáre…')} />
           </div>
         ) : comments.length === 0 ? (
           <p
@@ -764,7 +765,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               margin: 0,
             }}
           >
-            Zatiaľ tu nie sú žiadne komentáre. Buďte prvý, kto napíše svoj názor.
+            {t('Zatiaľ tu nie sú žiadne komentáre. Buďte prvý, kto napíše svoj názor.')}
           </p>
         ) : (
           comments.map((c) => (
@@ -824,7 +825,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             margin: 0,
           }}
         >
-          Pridať komentár
+          {t('Pridať komentár')}
         </h3>
         {!postDocumentId && (
           <p
@@ -836,7 +837,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               margin: '12px 0 0',
             }}
           >
-            Komentovanie tohto článku nie je momentálne dostupné.
+            {t('Komentovanie tohto článku nie je momentálne dostupné.')}
           </p>
         )}
         {isLoggedIn ? (
@@ -848,12 +849,12 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             }}
           >
             <div style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
-              Píšete ako <strong style={{ color: '#5d3a14' }}>{member?.displayName || member?.username}</strong>
+              {t('Píšete ako')} <strong style={{ color: '#5d3a14' }}>{member?.displayName || member?.username}</strong>
             </div>
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Napíšte svoj komentár…"
+              placeholder={t('Napíšte svoj komentár…')}
               rows={4}
               maxLength={5000}
               style={{ ...inputStyle, resize: 'vertical', fontFamily: 'Georgia, serif' }}
@@ -872,7 +873,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               }}
             >
               {submitting && <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" />}
-              {submitting ? "Pridávam…" : "Pridať komentár"}
+              {submitting ? t('Pridávam…') : t('Pridať komentár')}
             </button>
           </div>
         ) : (
@@ -884,7 +885,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             }}
           >
             <p style={{ margin: '0 0 12px', fontSize: 14.5, color: '#5d4a32' }}>
-              Do diskusie sa môžu zapojiť prihlásení členovia.
+              {t('Do diskusie sa môžu zapojiť prihlásení členovia.')}
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
@@ -893,7 +894,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
                   background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
                   fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
               >
-                Prihlásiť sa
+                {t('Prihlásiť sa')}
               </button>
               <button
                 onClick={() => goTo('/registracia')}
@@ -901,7 +902,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
                   background: 'transparent', color: '#9a5d1f', fontFamily: 'Georgia, serif',
                   fontSize: 14, cursor: 'pointer' }}
               >
-                Zaregistrovať sa
+                {t('Zaregistrovať sa')}
               </button>
             </div>
           </div>
