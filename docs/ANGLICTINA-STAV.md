@@ -171,6 +171,34 @@ Každý hromadný skript preto pri 429 čaká a skúša znova a vypisuje, **koľ
 
 ---
 
+## 3d. Kde presne pokračovať v terminológii
+
+Dávky po desiatich článkoch sú uložené v repe backendu:
+`scripts/kontrola/davky-terminologia/f00`…`f23` (jeden slug na riadok).
+Čo je už skontrolované, drží `scripts/kontrola/terminologia-hotove.txt`.
+
+- **hotové:** 131 článkov z predchádzajúcich vĺn + dávky **f00–f11** → 251 článkov
+- **rozbehnuté 6. 10. 2026 a dokončené:** f12–f17 (ich opravy sú v commite
+  „Terminologia f12-f17")
+- **nespustené:** **f18–f23** (60 článkov) — pokračuje sa nimi
+
+Spustenie jednej dávky (agent `terminolog-hradiska`, 10 článkov naraz, pokojne
+šesť dávok paralelne):
+
+> Dávka f18 — skontroluj terminológiu anglických prekladov týchto 10 článkov…
+> Anglický text je vo **vstupnom súbore prekladu** `scripts/preklad/preklady/<slug>.json`
+> (na produkcii EN verziu nehľadaj dotazom na slovenský slug — má iný slug a
+> dotaz vráti prázdno). Slovenčinu ťahaj z produkčného API, nie z lokálnej
+> `.tmp/data.db`. Slovník `docs/TERMINOLOGIA-EN.md`, §11e rozhoduje. Do databázy
+> nezapisuj. Štruktúru blokov, rozvrh obrázkov ani položky Zdrojov nemeň.
+> Rozsahy, percentá, úvodzovky, Central Europe, comital castle, crest of the
+> rampart a „on the ground" rieši hromadný skript — tie nech nerieši.
+
+Po každej dávke pripíš jej slugy do `terminologia-hotove.txt` a commitni
+`scripts/preklad/preklady/`.
+
+---
+
 ## 3c. Poradie dokončenia (6. 10. 2026)
 
 Terminologické dávky prepisujú tie isté vstupné súbory, takže hromadné opravy
