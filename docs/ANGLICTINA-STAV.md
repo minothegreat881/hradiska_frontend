@@ -114,6 +114,7 @@ nevymýšľa sa.
 - **6 vstupných súborov má obrázkové bloky v inom poradí než slovenčina**
   (`kyjevske-listy` 10 miest, `madari-v-pisomnych-pramenoch` 12 blokov proti 11,
   `kniha-vzacnych-drahocennosti`, `kronika-dusi-roman-o-tatarskom-vpade`,
+  `fuldske-analy` (7 miest),
   a `hradiste-pod-vratnom` + `hradok-nad-vahom` padajú na vložení `mediaTexts`).
   **Publikované anglické články sú v poriadku** — dávkový zapisovač ich odmietol
   prepísať práve preto, že štruktúra nesedí, takže im ostal text z posledného
