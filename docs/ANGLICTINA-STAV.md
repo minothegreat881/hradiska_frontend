@@ -111,6 +111,21 @@ nevymýšľa sa.
   kontroloval každý prekladateľ sám podľa slovníka — slabšie než samostatný
   priechod terminológom. Keď má byť kontrola rovnako dôsledná ako pri prvých
   štyroch, treba ju pustiť po dávkach.
+- **6 vstupných súborov má obrázkové bloky v inom poradí než slovenčina**
+  (`kyjevske-listy` 10 miest, `madari-v-pisomnych-pramenoch` 12 blokov proti 11,
+  `kniha-vzacnych-drahocennosti`, `kronika-dusi-roman-o-tatarskom-vpade`,
+  a `hradiste-pod-vratnom` + `hradok-nad-vahom` padajú na vložení `mediaTexts`).
+  **Publikované anglické články sú v poriadku** — dávkový zapisovač ich odmietol
+  prepísať práve preto, že štruktúra nesedí, takže im ostal text z posledného
+  úspešného zápisu. Oprava: v tých súboroch prehodiť obrázkové bloky na pozície
+  podľa slovenskej verzie (`node scripts/preklad/zapis-davku.cjs --len=<slug>`
+  nasucho to overí) a zapísať znova.
+- **Terminologická kontrola: hotových 8 dávok zo 46** (56 článkov). Dávkové
+  súbory s nálezmi strojovej kontroly sú v scratchpade `term-davky/`; generuje
+  ich `scripts/kontrola/terminologia-en.cjs --json=…`.
+- **Po KAŽDOM dávkovom zápise treba znova pustiť `scripts/opravy/odkazy-en.cjs
+  --zapis`** — vstupné súbory prekladu majú vnútorné odkazy na slovenské slugy,
+  takže zápis prepíše už opravené anglické odkazy späť.
 - **Poznámky pod čiarou** v 6 článkoch (komponent Zdrojov nesie autorský text,
   nie bibliografiu) — prekladajú sa zvlášť.
 - **Kategórie a štítky nemajú preklad v Strapi** — anglické názvy drží slovník
