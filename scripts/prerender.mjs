@@ -131,14 +131,19 @@ async function main() {
      odpovedá chybou (napr. preklady ešte nie sú zapnuté), ide sa ďalej bez nich. */
   const anglicke = new Map();
   try {
-    const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[pageSize]=500`
+    /* STRÁNKOVAŤ: `pageSize` nad 100 Strapi ticho oreže na stovku a prerender
+       by vyrobil hlavičky len prvej stovke anglických článkov. */
+    for (let page = 1; page <= 20; page++) {
+    const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[page]=${page}&pagination[pageSize]=100`
       + `&fields[0]=title&fields[1]=slug&fields[2]=excerpt&fields[3]=metaTitle&fields[4]=metaDescription`
       + `&fields[5]=authorName&fields[6]=originalPublishedDate`
       + `&populate[coverImage][fields][0]=url&populate[coverImage][fields][1]=formats`
       + `&populate[localizations][fields][0]=slug&populate[localizations][fields][1]=locale`);
-    if (r.ok) {
+    if (!r.ok) break;
+    {
       const j = await r.json();
-      for (const p of j.data || []) {
+      const davka = j.data || [];
+      for (const p of davka) {
         const sk = (p.localizations || []).find((x) => x.locale === 'sk');
         if (!sk) continue;
         anglicke.set(sk.slug, {
@@ -148,6 +153,9 @@ async function main() {
           cover: p.coverImage?.url || null,
         });
       }
+      const celkom = j.meta?.pagination?.total ?? 0;
+      if (davka.length < 100 || anglicke.size >= celkom) break;
+    }
     }
   } catch (e) {
     console.warn(`[prerender] anglické verzie sa nenačítali (${e.message}) — pokračujem bez nich.`);

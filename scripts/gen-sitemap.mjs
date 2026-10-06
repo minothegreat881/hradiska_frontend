@@ -70,10 +70,16 @@ async function main() {
   /* Anglické verzie článkov. Keď ešte nie sú, nič sa nepridá. */
   let anglickych = 0;
   try {
-    const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[pageSize]=500&fields[0]=slug`);
-    if (r.ok) {
+    /* STRÁNKOVAŤ. Strapi má strop `pageSize` 100, takže `500` ticho vráti
+       prvú stovku — mapa stránok potom mlčky vynechá zvyšok prekladov. */
+    for (let page = 1; page <= 20; page++) {
+      const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[page]=${page}&pagination[pageSize]=100&fields[0]=slug`);
+      if (!r.ok) break;
       const j = await r.json();
-      for (const p of j.data || []) { entries.push(urlEntry(`/en/blog/${p.slug}`, '0.8')); anglickych++; }
+      const davka = j.data || [];
+      for (const p of davka) { entries.push(urlEntry(`/en/blog/${p.slug}`, '0.8')); anglickych++; }
+      const celkom = j.meta?.pagination?.total ?? 0;
+      if (davka.length < 100 || anglickych >= celkom) break;
     }
   } catch { /* bez angličtiny sa mapa stránok zapíše ďalej */ }
 
