@@ -1,6 +1,6 @@
 # Anglická verzia webu — stav a postup
 
-Merané **5. 10. 2026** proti živej produkcii (`webdesignforhradiskask.vercel.app`,
+Merané **6. 10. 2026** proti živej produkcii (`webdesignforhradiskask.vercel.app`,
 `188.245.47.29`). Čísla sú z odpovedí servera a z meraní Playwrightom, nie odhady.
 
 Nadväzuje na [METADATA-STAV.md](METADATA-STAV.md): slovenská fáza (metadáta) je
@@ -43,6 +43,10 @@ V sitemape 364 slovenských a 364 anglických adries; každá anglická stránka
 | zjednotenie mien (Svatopluk, Kyiv) | `opravy/zjednot-mena-en.cjs` | 19 zmien v 11 článkoch |
 | slovník | `hradiska-strapi/docs/TERMINOLOGIA-EN.md` §11d | 586 nových termínov |
 | nezrovnalosti v slovenčine | `hradiska-strapi/docs/NEZROVNALOSTI-SK.md` | 167 nálezov na redakčnú revíziu |
+| slovenské úvodzovky v angličtine | `opravy/uvodzovky-en.cjs` | 528 úvodzoviek v 44 článkoch |
+| fotokredity v bloku Zdrojov | `opravy/fotokredity-en.cjs` | 26 kreditov v 24 článkoch |
+| rozvrh obrázkov SK vs. EN | `kontrola/rozvrh-obrazkov.cjs` | 1248 / 1248 zhodných |
+| slovenské telo v anglickej verzii | `kontrola/slovencina-v-en.mjs` | 14 nájdených, všetky opravené, zostáva 0 |
 
 ---
 
@@ -106,24 +110,18 @@ nevymýšľa sa.
 
 ## 3. Čo zostáva
 
-- **Terminologická kontrola agentom `terminolog-hradiska`** prešli len prvé
-  štyri články (Molpír, Rekomberek, Detva, Veľký Tríbeč). Zvyšné 360 si
-  kontroloval každý prekladateľ sám podľa slovníka — slabšie než samostatný
-  priechod terminológom. Keď má byť kontrola rovnako dôsledná ako pri prvých
-  štyroch, treba ju pustiť po dávkach.
-- **6 vstupných súborov má obrázkové bloky v inom poradí než slovenčina**
-  (`kyjevske-listy` 10 miest, `madari-v-pisomnych-pramenoch` 12 blokov proti 11,
-  `kniha-vzacnych-drahocennosti`, `kronika-dusi-roman-o-tatarskom-vpade`,
-  `fuldske-analy` (7 miest),
-  a `hradiste-pod-vratnom` + `hradok-nad-vahom` padajú na vložení `mediaTexts`).
-  **Publikované anglické články sú v poriadku** — dávkový zapisovač ich odmietol
-  prepísať práve preto, že štruktúra nesedí, takže im ostal text z posledného
-  úspešného zápisu. Oprava: v tých súboroch prehodiť obrázkové bloky na pozície
-  podľa slovenskej verzie (`node scripts/preklad/zapis-davku.cjs --len=<slug>`
-  nasucho to overí) a zapísať znova.
-- **Terminologická kontrola: hotových 8 dávok zo 46** (56 článkov). Dávkové
-  súbory s nálezmi strojovej kontroly sú v scratchpade `term-davky/`; generuje
-  ich `scripts/kontrola/terminologia-en.cjs --json=…`.
+- **Terminologická kontrola agentom `terminolog-hradiska`: hotových 131 článkov
+  z 364.** Ktoré sú hotové, drží `hradiska-strapi/scripts/kontrola/terminologia-hotove.txt`;
+  zvyšok sa pustí po dávkach po desiatich. Strojové nálezy generuje
+  `scripts/kontrola/terminologia-en.cjs --json=…`, ale agent hľadá aj to, čo
+  pravidlá nezachytia.
+- **Rozídená štruktúra blokov je vyriešená (6. 10. 2026).** Trinásť vstupných
+  súborov malo bloky v inom poradí než slovenčina, pri štyroch nesedeli ani
+  počty (pridaný blok s menom autorky, zdvojená bibliografia, obrázok z galérie
+  vložený do tela). Na preusporiadanie je `opravy/zrovnaj-bloky.mjs`, a keď
+  nesedia ani počty, `opravy/kostra-zo-sk.mjs` poskladá bloky na slovenskej
+  kostre a popisy obrázkov vezme z `mediaTexts` podľa id — nie podľa poradia,
+  lebo poradie obrázkov sa v preklade líšilo.
 - **Po KAŽDOM dávkovom zápise treba znova pustiť `scripts/opravy/odkazy-en.cjs
   --zapis`** — vstupné súbory prekladu majú vnútorné odkazy na slovenské slugy,
   takže zápis prepíše už opravené anglické odkazy späť.
@@ -142,6 +140,34 @@ nevymýšľa sa.
   štyri body.
 - **Komentáre čitateľov** ostávajú v jazyku, v ktorom boli napísané — to je
   správne, nie chyba.
+
+---
+
+## 3b. Čo sa pokazilo a čo to drží (6. 10. 2026)
+
+**Zrkadlenie štruktúry prepisovalo anglické telo slovenským.** Cron
+`/usr/local/bin/hradiska-zrkadlenie.sh` (každých 10 minút) spúšťa
+`preklad/zrkadli-strukturu.cjs`. Ten blok, ktorý v angličtine náprotivok nemal,
+vyplnil slovenským textom a publikoval — štrnásť článkov tak malo anglický slug
+a slovenský obsah (napr. `thousand-year-old-slavic-hillforts`,
+`tollense-bronze-age-battle`, `stefanovicova-slovakia-in-the-time-of-svatopluk`).
+Bloky bez náprotivka vznikali tam, kde sa štruktúra vstupného súboru rozišla so
+slovenčinou, takže ich dávkový zapisovač odmietal a zrkadlenie malo voľné pole.
+
+Čo to odteraz drží:
+- poistka v `zrkadli-strukturu.cjs`: keď by hoci **jediný** textový blok ostal po
+  slovensky, článok sa preskočí a nahlási (predtým sa tolerovali dva);
+- `kontrola/slovencina-v-en.mjs` prejde všetky anglické články a počíta slovenské
+  funkčné slová na tisíc slov, po blokoch — bibliografia v bloku Zdrojov je
+  slovenská zámerne a vo výpise sa dá rozoznať podľa typu bloku;
+- `opravy/zrovnaj-bloky.mjs` nasucho overí, že štruktúra všetkých 364 vstupných
+  súborov sedí so slovenčinou.
+
+**Pozor na obmedzenie počtu požiadaviek.** Pri 364 dotazoch na produkčné API
+začne web vracať 429 a skript, ktorý to nekontroluje, články ticho preskočí —
+prvá kontrola štruktúry takto ohlásila „0 rozídených", pričom rozídené boli tri.
+Každý hromadný skript preto pri 429 čaká a skúša znova a vypisuje, **koľko
+článkov naozaj overil**.
 
 ---
 
