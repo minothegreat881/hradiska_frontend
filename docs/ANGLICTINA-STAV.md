@@ -23,17 +23,26 @@ nahlásenie príspevku, mapa hradísk, lišta o cookies a päta. Dátumy idú v 
 | obsah článku | Strapi i18n | `?locale=en`, prepínač jazyka v článku, `hreflang` v prerenderovanej hlavičke |
 | hľadanie a odporúčanie | `/api/search-index?locale=` | index je na backende **per jazyk**; anglická stránka neodporúča slovenské články |
 
-**Preložené články: 4 / 364**
+**Preložené články: 364 / 364** (dokončené 6. 10. 2026)
 
-| slovenský slug | anglický slug |
-|---|---|
-| `molpir` | `molpir-hallstatt-hillfort-smolenice` |
-| `rekomberek-horne-oresany` | `rekomberek-hillfort-horne-oresany` |
-| `detva-kalamarka` | `detva-kalamarka-guard-hillfort` |
-| `velky-tribec-mohutne-praveke-hradisko` | `velky-tribec-prehistoric-hillfort` |
+Preklad bežal v 60 paralelných dávkach cez agenta `prekladatel-hradiska`
+(definícia v `~/.claude/agents/`), zapisoval sa `scripts/preklad/zapis-davku.cjs`.
+415 062 slov slovenského textu. Pri každom zápise skript overil počet a typy
+blokov, obrázky, bibliografiu, popisy fotiek — a že slovenská verzia ostala
+nedotknutá.
 
-V sitemape 364 slovenských a 4 anglické adresy; každá anglická stránka má
+V sitemape 364 slovenských a 364 anglických adries; každá anglická stránka má
 `hreflang sk/en/x-default`, `og:locale=en_GB` a vlastný kanonický odkaz.
+
+**Čo prešlo po prekladoch:**
+
+| priechod | skript | výsledok |
+|---|---|---|
+| zrkadlenie štruktúry | `preklad/zrkadli-strukturu.cjs` | 364 kontrolovaných, 0 rozídených |
+| vnútorné odkazy na anglické adresy | `opravy/odkazy-en.cjs` | 74 odkazov v 68 článkoch |
+| zjednotenie mien (Svatopluk, Kyiv) | `opravy/zjednot-mena-en.cjs` | 19 zmien v 11 článkoch |
+| slovník | `hradiska-strapi/docs/TERMINOLOGIA-EN.md` §11d | 586 nových termínov |
+| nezrovnalosti v slovenčine | `hradiska-strapi/docs/NEZROVNALOSTI-SK.md` | 167 nálezov na redakčnú revíziu |
 
 ---
 
@@ -97,12 +106,13 @@ nevymýšľa sa.
 
 ## 3. Čo zostáva
 
-- **360 článkov**. Prekladať po dávkach, každý s kontrolou terminológa —
-  vrátane `mediaTexts` (pri Detve to je 29 fotiek, pri Veľkom Tríbči 28).
-- **Počty článkov v kategóriách** (hlavička, dlaždice) sa berú zo slovenského
-  obsahu — anglická hlavička píše „41", hoci po anglicky sú 4 články. Zarovná sa
-  to samo s prekladmi; ak to má byť správne hneď, treba `/api/pocty-kategorii`
-  rozdeliť podľa jazyka rovnako ako index.
+- **Terminologická kontrola agentom `terminolog-hradiska`** prešli len prvé
+  štyri články (Molpír, Rekomberek, Detva, Veľký Tríbeč). Zvyšné 360 si
+  kontroloval každý prekladateľ sám podľa slovníka — slabšie než samostatný
+  priechod terminológom. Keď má byť kontrola rovnako dôsledná ako pri prvých
+  štyroch, treba ju pustiť po dávkach.
+- **Poznámky pod čiarou** v 6 článkoch (komponent Zdrojov nesie autorský text,
+  nie bibliografiu) — prekladajú sa zvlášť.
 - **Kategórie a štítky nemajú preklad v Strapi** — anglické názvy drží slovník
   v `jazyk.ts` (23 štítkov, 14 kategórií). Keď pribudne nový štítok, treba ho
   doplniť tam, inak sa na anglickej stránke ukáže po slovensky.
