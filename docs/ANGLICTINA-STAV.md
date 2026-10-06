@@ -171,6 +171,33 @@ Každý hromadný skript preto pri 429 čaká a skúša znova a vypisuje, **koľ
 
 ---
 
+## 3c. Poradie dokončenia (6. 10. 2026)
+
+Terminologické dávky prepisujú tie isté vstupné súbory, takže hromadné opravy
+idú až po nich — inak si navzájom prepíšu zmeny. Poradie:
+
+1. dobehnúť terminologické dávky (po desiatich, zoznam hotových v
+   `scripts/kontrola/terminologia-hotove.txt`);
+2. `node scripts/kontrola/rozvrh-suborov.mjs --oprav` — rozvrh obrázkov vo
+   vstupných súboroch na slovenské hodnoty. **Zapisovač berie `width`, `position`
+   a ostatné polia rozvrhu zo vstupného súboru, nie zo slovenčiny** (zo
+   slovenčiny dopĺňa len `image` a bibliografiu), takže čo si prekladateľ vymyslel,
+   to sa aj zapíše. Teraz je rozdielov 33 v trinástich článkoch;
+3. `node scripts/opravy/rozsahy-en.mjs --zapis` — číselné rozsahy a percentá
+   bez medzier (§11e);
+4. commit, push, `git pull` na serveri;
+5. `node scripts/preklad/zapis-davku.cjs --zapis --znova` — celý blog znova;
+6. `odkazy-en.cjs --zapis`, `uvodzovky-en.cjs --zapis`, `fotokredity-en.cjs --zapis`
+   (v tomto poradí, vždy po zápise) a `systemctl restart hradiska`;
+7. kontroly: `kontrola/slovencina-v-en.mjs` (má byť 0 článkov so slovenským
+   telom mimo bibliografie), `kontrola/rozvrh-obrazkov.cjs`,
+   `kontrola/terminologia-en.cjs` (tvrdé porušenia 0), `opravy/zrovnaj-bloky.mjs`
+   nasucho (0 rozídených);
+8. nový build Vercelu — prerenderované hlavičky a sitemap si ťahajú titulky
+   z databázy pri builde, takže bez builduu zostanú staré.
+
+---
+
 ## 4. Ako to overiť
 
 - anglických článkov v databáze:
