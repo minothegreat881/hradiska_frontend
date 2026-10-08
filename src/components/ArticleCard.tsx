@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { kategoria, odkaz, poAnglicky } from '../lib/jazyk';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { Article } from '../data/mock-data';
+import { hradiskaCategories, variant } from '../data/categories';
+import { zakladStrapi } from '../data/rozcestnik';
 
 interface ArticleCardProps {
   article: Article;
@@ -36,12 +39,46 @@ const CATEGORY_LABELS: Record<string, string> = {
   aktuality: 'Aktuality',
 };
 
+/* Deväť akvarelových kresieb kategórií — tie isté, čo stoja v dlaždiciach
+   pod titulkom domovskej. Nasadnú vtedy, keď k zápisu nemáme fotku alebo sa
+   uložená fotka nenačíta. Minca v prázdnom ráme vyzerala ako chyba načítania
+   a kresba povie to isté — „obraz k tomuto zápisu nemáme" — len tak, že je na
+   ňu pekný pohľad. */
+const KRESLENE = [
+  'kniezacie-sidla', 'mocenske-centra', 'strazna-funkcia', 'refugia', 'staroveke-sidla',
+  'listiny-a-pisomne-zdroje', 'povesti', 'svatyne-a-sakralne-objekty', 'vseobecne-o-hradiskach',
+];
+const MALBY = KRESLENE
+  .map((slug) => hradiskaCategories.find((c) => c.slug === slug)?.image)
+  .filter((cesta): cesta is string => !!cesta);
+
+/* Výber nie je náhodný pri každom vykreslení — to by obraz preskakoval pri
+   každom prekreslení zoznamu. Je to odtlačok slugu, takže ten istý zápis má
+   vždy tú istú kresbu. Keď má článok kreslenú kategóriu, vyhráva tá: je to
+   pravdivejšie než náhodný výber. */
+function malbaPre(article: Article): string {
+  const vlastna = KRESLENE.includes(article.category)
+    ? hradiskaCategories.find((c) => c.slug === article.category)?.image
+    : undefined;
+  if (vlastna) return vlastna;
+  const kluc = article.slug || article.title || '';
+  let h = 0;
+  for (let i = 0; i < kluc.length; i++) h = (h * 31 + kluc.charCodeAt(i)) >>> 0;
+  return MALBY[h % MALBY.length];
+}
+
 function prettifySlug(slug: string): string {
   const s = slug.replace(/-/g, ' ').trim();
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 }
 
 export function ArticleCard({ article, stitok = true, znak = false }: ArticleCardProps) {
+  /* Uložená fotka môže byť mŕtva adresa (v zozname aktualít ich pár je).
+     Vtedy ostával v karte rozbitý obrázok — po zlyhaní nasadne kresba. */
+  const [fotkaZlyhala, setFotkaZlyhala] = useState(false);
+  const maFotku = !!article.coverImage && !fotkaZlyhala;
+  const malba = malbaPre(article);
+  const zaklad = zakladStrapi();
   /* Meno kategórie príde zo Strapi po slovensky (kategórie preklad nemajú),
      preto ide ešte cez prekladovú vrstvu. */
   const categoryLabel = kategoria(
@@ -67,17 +104,26 @@ export function ArticleCard({ article, stitok = true, znak = false }: ArticleCar
       {/* Obraz v zaoblenom ráme. Text naň nelezie, takže nepotrebuje závoj
           a fotka ostáva celá — to bol dôvod prestavby. */}
       <span className="acard-ram">
-        {article.coverImage ? (
-          <img className="acard-obraz" src={article.coverImage} alt="" loading="lazy" decoding="async" />
+        {maFotku ? (
+          <img
+            className="acard-obraz"
+            src={article.coverImage}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={() => setFotkaZlyhala(true)}
+          />
         ) : (
-          /* Bez fotky nasadne značka. Prázdny rám pôsobil ako chyba
-             načítania; minca hovorí, že fotku k zápisu jednoducho nemáme. */
-          <span className="acard-bezfotky" aria-hidden="true">
-            <picture>
-              <source srcSet="/znak_minca.webp" type="image/webp" />
-              <img src="/znak_minca.png" alt="" width={160} height={178} loading="lazy" decoding="async" />
-            </picture>
-          </span>
+          <img
+            className="acard-obraz acard-malba"
+            src={`${zaklad}${variant(malba, 'small')}`}
+            srcSet={`${zaklad}${variant(malba, 'small')} 500w, ${zaklad}${variant(malba, 'medium')} 750w`}
+            sizes="(max-width: 720px) 92vw, 380px"
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+          />
         )}
 
         {stitok && categoryLabel && <span className="acard-stitok">{categoryLabel}</span>}

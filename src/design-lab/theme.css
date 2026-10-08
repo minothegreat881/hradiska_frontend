@@ -1170,11 +1170,10 @@ body[data-lab-theme='pecat'],
   filter: saturate(.55) sepia(.18);
   transition: transform 1.1s cubic-bezier(.2, .8, .2, 1), filter .6s ease;
 }
-.acard-bezfotky {
-  position: absolute; inset: 0; display: grid; place-items: center;
-  opacity: .5;
-}
-.acard-bezfotky img { width: 44%; max-width: 132px; height: auto; display: block; }
+/* Kresba namiesto chýbajúcej fotky. Vypĺňa celý rám ako fotografia, len
+   bez sépiového nádychu — akvarel má vlastné farby a stlmený by zošedivel.
+   Ťažisko kresieb je v strede, nie v hornej tretine ako na fotkách. */
+.acard-malba { object-position: center; filter: saturate(.92); }
 
 /* Štítok kategórie ostáva na obraze — pod nadpisom by súperil s perexom. */
 .acard-stitok {

@@ -13,7 +13,9 @@
  * PREČO ČLENENIE PO ČLÁNKOCH. Nie je to ozdoba: fotky do archívu prichádzajú
  * z článkov o konkrétnych lokalitách a výpravách, takže názov článku je
  * pravdivá informácia o pôvode snímky — a zároveň jediný spôsob, ako sa
- * v tisícke fotografií zorientovať. Rovnaké členenie preto nesie aj filter.
+ * v tisícke fotografií zorientovať. Lišta s názvami článkov nad archívom
+ * bola zrušená: osem názvov výprav pod sebou čítal človek ako obsah
+ * stránky, nie ako filter, a na mobile odtlačilo prvé fotky pod prehyb.
  *
  * ČO SI BERIE Z PRODUKCIE. Načítanie (`getGalleryPhotos`) aj prezeranie
  * (`Lightbox`) sú spoločné s ostrou stránkou — nová je len skladba a šat.
@@ -25,8 +27,6 @@ import { Lightbox, type GalleryImage } from '../components/HistoricalGallery';
 import { getGalleryPhotos, type KronikaPhoto } from '../lib/strapi';
 
 const NA_STRANU = 24;
-/** Koľko článkov ponúknuť ako filter. Viac by z lišty spravilo zoznam. */
-const FILTROV = 8;
 
 export function LabGaleria() {
   const [photos, setPhotos] = useState<KronikaPhoto[]>([]);
@@ -35,8 +35,9 @@ export function LabGaleria() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [openAt, setOpenAt] = useState<number | null>(null);
-  /* Filter žije v adrese — dá sa poslať odkazom a späť funguje. */
-  const [filter, setFilter] = useState<string | null>(() =>
+  /* Zúženie na jeden článok ostáva v adrese (`?z=<slug>`) — posiela sa
+     odkazom z článku. Lišta na prepínanie v stránke už nie je. */
+  const [filter] = useState<string | null>(() =>
     typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('z'));
 
   const nacitaj = useCallback(async (dalsia: number) => {
@@ -83,10 +84,6 @@ export function LabGaleria() {
     return [...m.values()].sort((a, b) => b.fotky.length - a.fotky.length);
   }, [photos]);
 
-  const ponukaFiltrov = useMemo(
-    () => [...skupiny].sort((a, b) => b.fotky.length - a.fotky.length).slice(0, FILTROV),
-    [skupiny]);
-
   const zobrazene = filter ? skupiny.filter(s => s.slug === filter) : skupiny;
   /* Lightbox potrebuje plochý zoznam presne v poradí, v akom sa kreslí. */
   const ploche = useMemo(() => zobrazene.flatMap(s => s.fotky), [zobrazene]);
@@ -114,13 +111,6 @@ export function LabGaleria() {
     const t = window.setTimeout(zmeraj, 800);
     return () => { window.removeEventListener('resize', zmeraj); window.clearTimeout(t); };
   }, []);
-
-  const prepniFilter = (slug: string | null) => {
-    setFilter(slug);
-    const u = new URL(window.location.href);
-    if (slug) u.searchParams.set('z', slug); else u.searchParams.delete('z');
-    window.history.replaceState(null, '', u.toString());
-  };
 
   return (
     <div className="lgal" ref={koren}>
@@ -150,24 +140,6 @@ export function LabGaleria() {
             </p>
           )}
         </header>
-
-        {ponukaFiltrov.length > 1 && (
-          <div className="lgal-filter" role="group" aria-label={t('Zúžiť podľa článku')}>
-            <button type="button" className={filter ? undefined : 'is-on'} onClick={() => prepniFilter(null)}>
-              {t('Všetko')}
-            </button>
-            {ponukaFiltrov.map(s => (
-              <button
-                key={s.slug}
-                type="button"
-                className={filter === s.slug ? 'is-on' : undefined}
-                onClick={() => prepniFilter(s.slug)}
-              >
-                {s.nazov}<span className="lgal-pocet">{s.fotky.length}</span>
-              </button>
-            ))}
-          </div>
-        )}
 
         {error && <div role="alert" className="lgal-chyba">{error}</div>}
 
