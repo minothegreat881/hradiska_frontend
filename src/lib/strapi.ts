@@ -3,7 +3,7 @@
  */
 
 import { STRAPI_URL } from './api-adresa';
-import { jazyk } from './jazyk';
+import { jazyk, type Jazyk } from './jazyk';
 
 // Types matching Strapi response structure
 export interface StrapiImageFormat {
@@ -148,8 +148,9 @@ const RETRY_DELAYS = [700, 2000, 4000];
 function sJazykom(endpoint: string): string {
   if (!endpoint.startsWith('/blog-posts')) return endpoint;
   if (/[?&]locale=/.test(endpoint)) return endpoint;
-  if (jazyk() === 'sk') return endpoint;
-  return endpoint + (endpoint.includes('?') ? '&' : '?') + 'locale=en';
+  const j = jazyk();
+  if (j === 'sk') return endpoint;
+  return endpoint + (endpoint.includes('?') ? '&' : '?') + `locale=${j}`;
 }
 
 async function fetchStrapi<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -331,7 +332,7 @@ export async function getBlogPosts(options?: {
  * vždy vznikne z dát. `locale=sk` je tu zámerne: filtrujeme podľa slovenského
  * slugu, aj keď je stránka anglická.
  */
-export async function anglickeSlugy(skSlugy: string[]): Promise<Record<string, string>> {
+export async function anglickeSlugy(skSlugy: string[], cielovy: Jazyk = 'en'): Promise<Record<string, string>> {
   if (!skSlugy.length) return {};
   const q = skSlugy.map((s, i) => `filters[slug][$in][${i}]=${encodeURIComponent(s)}`).join('&');
   const r = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
@@ -339,8 +340,11 @@ export async function anglickeSlugy(skSlugy: string[]): Promise<Record<string, s
   );
   const von: Record<string, string> = {};
   for (const p of r.data || []) {
-    const en = (p.localizations || []).find((x) => x.locale === 'en');
-    if (en?.slug) von[p.slug] = en.slug;
+    /* Jazyk je parameter, nie natvrdo „en": tá istá funkcia skladá odkazy
+       aj do nemeckej verzie. Keď článok v danom jazyku ešte nie je,
+       dvojica v mape chýba a volajúci ostane pri slovenskom slugu. */
+    const inojazycny = (p.localizations || []).find((x) => x.locale === cielovy);
+    if (inojazycny?.slug) von[p.slug] = inojazycny.slug;
   }
   return von;
 }

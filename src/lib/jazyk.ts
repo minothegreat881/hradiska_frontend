@@ -1,16 +1,29 @@
 /**
- * JAZYK WEBU — slovenčina a angličtina.
+ * JAZYK WEBU — slovenčina, angličtina, nemčina.
  *
  * Web je postavený ako slovenský a texty rozhrania sú v komponentoch napísané
  * natvrdo. Namiesto prestavby na prekladovú knižnicu je tu malá vrstva:
- * jazyk sa určí z adresy (`/en/...`), drží sa v module a komponenty si pýtajú
- * reťazce cez `t()`. Keď je jazyk slovenský, vracia sa pôvodný slovenský text,
- * takže sa na slovenskej strane nič nemení.
+ * jazyk sa určí z adresy (`/en/...`, `/de/...`), drží sa v module a komponenty
+ * si pýtajú reťazce cez `t()`. Keď je jazyk slovenský, vracia sa pôvodný
+ * slovenský text, takže sa na slovenskej strane nič nemení.
+ *
+ * Keď preklad do daného jazyka chýba, `t()` vráti slovenský originál. Je to
+ * zámer: prázdne miesto by stránku rozbilo a takto je na prvý pohľad vidieť,
+ * čo ešte nie je preložené.
  *
  * Preklad OBSAHU (články) rieši Strapi i18n; toto je len rozhranie.
  */
 
-export type Jazyk = 'sk' | 'en';
+import { DE } from './slovnik-de';
+
+export type Jazyk = 'sk' | 'en' | 'de';
+
+/** Jazyky s vlastnou predponou v adrese. Slovenčina je bez predpony. */
+export const JAZYKY: Jazyk[] = ['sk', 'en', 'de'];
+const PREDPONY: Record<Exclude<Jazyk, 'sk'>, string> = { en: '/en', de: '/de' };
+
+/** Kód pre `toLocaleDateString` a formátovanie čísel. */
+const PROSTREDIE: Record<Jazyk, string> = { sk: 'sk-SK', en: 'en-GB', de: 'de-DE' };
 
 let aktualny: Jazyk = 'sk';
 
@@ -22,14 +35,20 @@ export function nastavJazyk(j: Jazyk): void {
 
 export const jazyk = (): Jazyk => aktualny;
 export const poAnglicky = (): boolean => aktualny === 'en';
+export const poNemecky = (): boolean => aktualny === 'de';
+export const poSlovensky = (): boolean => aktualny === 'sk';
+/** Kód prostredia pre dátumy a čísla v jazyku stránky. */
+export const narodneProstredie = (j: Jazyk = aktualny): string => PROSTREDIE[j];
 
 /**
  * Z adresy vyberie jazyk a vráti cestu bez predpony.
  * `/en/blog/x` → { jazyk: 'en', cesta: '/blog/x' }
  */
 export function rozdelAdresu(path: string): { jazyk: Jazyk; cesta: string } {
-  if (path === '/en' || path.startsWith('/en/')) {
-    return { jazyk: 'en', cesta: path.slice(3) || '/' };
+  for (const [j, predpona] of Object.entries(PREDPONY) as [Jazyk, string][]) {
+    if (path === predpona || path.startsWith(predpona + '/')) {
+      return { jazyk: j, cesta: path.slice(predpona.length) || '/' };
+    }
   }
   return { jazyk: 'sk', cesta: path };
 }
@@ -39,29 +58,42 @@ export function odkaz(cesta: string, j: Jazyk = aktualny): string {
   /* Poistka proti dvojitej predpone. Adresa sa miestami skladá v dátach a
      potom ešte raz pri vykreslení; `/en/en/blog/…` nezodpovedá žiadnej ceste
      a skončí na 404 — a hľadá sa to ťažko, lebo časť odkazov funguje. */
-  const { jazyk: uz, cesta: holá } = rozdelAdresu(cesta);
-  if (uz === 'en') cesta = holá;
+  const { cesta: holá } = rozdelAdresu(cesta);
+  cesta = holá;
   if (j === 'sk') return cesta;
-  return cesta === '/' ? '/en' : `/en${cesta}`;
+  const predpona = PREDPONY[j as Exclude<Jazyk, 'sk'>];
+  return cesta === '/' ? predpona : `${predpona}${cesta}`;
 }
 
-/* ── Prepnutie na druhý jazyk ─────────────────────────────────────────────
-   Väčšinu adries vie prepnúť predpona `/en`, lenže článok má v každom jazyku
-   vlastný slug (`/blog/devin` ↔ `/en/blog/devin-great-moravian-dowina-hillfort`).
-   Tú adresu pozná len stránka článku, preto ju sem ohlási a hlavička si ju
-   vypýta. Keď nie je ohlásená, prepne sa predponou. */
+/* ── Prepnutie jazyka ─────────────────────────────────────────────────────
+   Väčšinu adries vie prepnúť predpona, lenže článok má v každom jazyku
+   vlastný slug (`/blog/devin` ↔ `/en/blog/devin-great-moravian-dowina-hillfort`
+   ↔ `/de/blog/devin-grossmaehrischer-burgwall`). Tie adresy pozná len stránka
+   článku, preto ich sem ohlási a hlavička si ich vypýta. Čo nie je ohlásené,
+   prepne sa predponou.
 
-let druhyOdkaz: string | null = null;
+   Pri dvoch jazykoch stačila jedna premenná („ten druhý"); pri troch je to
+   mapa jazyk → adresa. */
+
+let inojazycne: Partial<Record<Jazyk, string>> = {};
 const poslucháči = new Set<() => void>();
 
-/** Ohlási adresu tej istej stránky v druhom jazyku; `null` ju zruší. */
-export function nastavDruhyOdkaz(url: string | null): void {
-  if (druhyOdkaz === url) return;
-  druhyOdkaz = url;
+/** Ohlási adresy tej istej stránky v ostatných jazykoch; `null` ich zruší. */
+export function nastavInojazycneOdkazy(mapa: Partial<Record<Jazyk, string>> | null): void {
+  const nove = mapa || {};
+  const rovnake = JAZYKY.every((j) => inojazycne[j] === nove[j]);
+  if (rovnake) return;
+  inojazycne = nove;
   poslucháči.forEach((f) => f());
 }
 
-export const dajDruhyOdkaz = (): string | null => druhyOdkaz;
+/** Spätná kompatibilita: ohlásenie JEDNEJ adresy v druhom jazyku. */
+export function nastavDruhyOdkaz(url: string | null): void {
+  nastavInojazycneOdkazy(url ? { [rozdelAdresu(url).jazyk]: url } : null);
+}
+
+export const dajInojazycnyOdkaz = (j: Jazyk): string | null => inojazycne[j] ?? null;
+export const dajDruhyOdkaz = (): string | null => dajInojazycnyOdkaz(druhyJazyk());
 
 /** Prihlásenie na zmenu — pre `useSyncExternalStore` v hlavičke. */
 export function sledujDruhyOdkaz(f: () => void): () => void {
@@ -69,11 +101,18 @@ export function sledujDruhyOdkaz(f: () => void): () => void {
   return () => { poslucháči.delete(f); };
 }
 
-export const druhyJazyk = (j: Jazyk = aktualny): Jazyk => (j === 'sk' ? 'en' : 'sk');
+/** Jazyk, na ktorý prepne jedno klepnutie: sk → en → de → sk. */
+export const druhyJazyk = (j: Jazyk = aktualny): Jazyk =>
+  JAZYKY[(JAZYKY.indexOf(j) + 1) % JAZYKY.length];
+
+/** Kam vedie prepínač do konkrétneho jazyka (cesta je bez predpony). */
+export function odkazDoJazyka(cesta: string, j: Jazyk): string {
+  return dajInojazycnyOdkaz(j) || odkaz(cesta, j);
+}
 
 /** Kam vedie prepínač jazyka z danej cesty (bez jazykovej predpony). */
 export function odkazDoDruhehoJazyka(cesta: string): string {
-  return druhyOdkaz || odkaz(cesta, druhyJazyk());
+  return odkazDoJazyka(cesta, druhyJazyk());
 }
 
 /* ── Texty rozhrania ──────────────────────────────────────────────────────
@@ -718,9 +757,11 @@ const EN: Record<string, string> = {
 };
 
 /** Text rozhrania. V slovenčine vracia kľúč, v angličtine jeho preklad. */
+const SLOVNIKY: Partial<Record<Jazyk, Record<string, string>>> = { en: EN, de: DE };
+
 export function t(kluc: string): string {
   if (aktualny === 'sk') return kluc;
-  return EN[kluc] ?? kluc;
+  return SLOVNIKY[aktualny]?.[kluc] ?? kluc;
 }
 
 /** Názov kategórie v jazyku stránky. Keď preklad nie je, vráti pôvodný. */
@@ -731,9 +772,7 @@ export function datum(iso: string | null | undefined): string {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  return aktualny === 'en'
-    ? d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-    : d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString(narodneProstredie(), { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 /* ── Datovanie lokalít ─────────────────────────────────────────────────────

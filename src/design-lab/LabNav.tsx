@@ -1,4 +1,4 @@
-import { t, kategoria, odkaz, poAnglicky, rozdelAdresu, druhyJazyk, sledujDruhyOdkaz, dajDruhyOdkaz } from '../lib/jazyk';
+import { t, kategoria, odkaz, poAnglicky, rozdelAdresu, druhyJazyk, odkazDoJazyka, sledujDruhyOdkaz, dajDruhyOdkaz } from '../lib/jazyk';
 'use client';
 
 /**
@@ -89,20 +89,30 @@ const shortLabel = (i: NavigationItem) =>
  * Článok má v každom jazyku vlastnú adresu, preto ju stránka článku ohlási
  * cez `nastavDruhyOdkaz`; inde stačí jazyková predpona.
  */
+/* Skratka a popis podľa toho, KAM klepnutie vedie. Jedno tlačidlo, ktoré
+   cyklí sk → en → de → sk: tri samostatné by sa do mobilnej lišty vedľa
+   účtu a ponuky nezmestili. */
+const POPIS_JAZYKA: Record<string, { skratka: string; popis: string }> = {
+  sk: { skratka: 'SK', popis: 'Prepnúť do slovenčiny' },
+  en: { skratka: 'EN', popis: 'Switch to English' },
+  de: { skratka: 'DE', popis: 'Auf Deutsch umschalten' },
+};
+
 function PrepinacJazyka() {
-  const druhyOdkaz = useSyncExternalStore(sledujDruhyOdkaz, dajDruhyOdkaz, () => null);
+  /* Prihlásenie na zmenu stačí jedno — mapa inojazyčných adries sa mení
+     naraz, keď ju ohlási stránka článku. */
+  useSyncExternalStore(sledujDruhyOdkaz, dajDruhyOdkaz, () => null);
   const cesta = typeof window === 'undefined' ? '/' : rozdelAdresu(window.location.pathname).cesta;
-  const ciel = druhyOdkaz || odkaz(cesta, druhyJazyk());
-  const doAnglictiny = !poAnglicky();
-  const skratka = doAnglictiny ? 'EN' : 'SK';
-  const popis = doAnglictiny ? 'Switch to English' : 'Prepnúť do slovenčiny';
+  const cielovyJazyk = druhyJazyk();
+  const ciel = odkazDoJazyka(cesta, cielovyJazyk);
+  const { skratka, popis } = POPIS_JAZYKA[cielovyJazyk];
   return (
     <a
       className="lnav-jazyk"
       href={ciel}
       data-jazyk="1"
-      hrefLang={doAnglictiny ? 'en' : 'sk'}
-      lang={doAnglictiny ? 'en' : 'sk'}
+      hrefLang={cielovyJazyk}
+      lang={cielovyJazyk}
       title={popis}
       aria-label={popis}
     >
