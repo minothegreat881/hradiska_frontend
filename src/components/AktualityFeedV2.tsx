@@ -40,11 +40,11 @@ const GLASS: React.CSSProperties = {
  * nepodarí načítať. Nech sekcia nikdy nezíva prázdnym miestom.
  */
 const GALLERY_FALLBACK: { src: string; place?: string }[] = [
-  { src: '/articles/bojna/bojna-cover.jpg', place: 'Bojná — Valy' },
+  { src: '/articles/bojna/bojna-cover.webp', place: 'Bojná — Valy' },
   { src: '/medailon-bojna.webp' },
-  { src: '/articles/bojna/bojna-od-vychodu.jpg' },
-  { src: '/articles/bojna/brana.jpg' },
-  { src: '/articles/bojna/bojna-09-reconstruction.jpg' },
+  { src: '/articles/bojna/bojna-od-vychodu.webp' },
+  { src: '/articles/bojna/brana.webp' },
+  { src: '/articles/bojna/bojna-09-reconstruction.webp' },
 ];
 const GALLERY_TILES = 5;
 const FOUNDED_YEAR = 2010;

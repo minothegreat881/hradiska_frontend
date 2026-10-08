@@ -10,6 +10,9 @@ import './design-lab/theme.css';
 import { rozdelAdresu, nastavJazyk, t } from './lib/jazyk';
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
+/* Stránky sa sťahujú až keď na ne čitateľ príde. Predtým boli všetky v
+   hlavnom balíku, takže domovská stránka ťahala aj podmienky používania,
+   detail lokality a prihlásenie — 487 kB pre každého návštevníka. */
 const ArticlePagePecat = lazyStale(() => import('./design-lab/LabArticle'));
 /* Časti webu, ktoré v novom šate nesú vlastnú skladbu, nie len farby. */
 const LabNav = lazyStale(() => import('./design-lab/LabNav').then(m => ({ default: m.LabNav })));
@@ -21,14 +24,15 @@ const LabHome = lazyStale(() => import('./design-lab/LabHome').then(m => ({ defa
 const LabJoinUs = lazyStale(() => import('./design-lab/LabJoinUs').then(m => ({ default: m.LabJoinUs })));
 const GalleryPagePecat = lazyStale(() => import('./design-lab/LabGaleria'));
 const AktualityPagePecat = lazyStale(() => import('./design-lab/LabAktualityStranka'));
-import { SiteDetailPage } from './pages/SiteDetailPage';
-import { CategoryPage } from './pages/CategoryPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { TermsPage } from './pages/TermsPage';
-import { AplikaciaPage } from './pages/AplikaciaPage';
-import { AccountPage, type AccountMode } from './pages/AccountPage';
-import { SearchResultsPage } from './pages/SearchResultsPage';
-import { NotFoundPage } from './pages/NotFoundPage';
+const SiteDetailPage = lazyStale(() => import('./pages/SiteDetailPage').then(m => ({ default: m.SiteDetailPage })));
+const CategoryPage = lazyStale(() => import('./pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
+const PrivacyPage = lazyStale(() => import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazyStale(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })));
+const AplikaciaPage = lazyStale(() => import('./pages/AplikaciaPage').then(m => ({ default: m.AplikaciaPage })));
+import { type AccountMode } from './pages/AccountPage';
+const AccountPage = lazyStale(() => import('./pages/AccountPage').then(m => ({ default: m.AccountPage })));
+const SearchResultsPage = lazyStale(() => import('./pages/SearchResultsPage').then(m => ({ default: m.SearchResultsPage })));
+const NotFoundPage = lazyStale(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 import { MemberAuthProvider } from './auth/MemberAuth';
 import { Toaster } from './components/ui/sonner';
 import { CookieBanner } from './components/CookieBanner';

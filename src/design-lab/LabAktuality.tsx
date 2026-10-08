@@ -32,7 +32,9 @@ import { zakladStrapi } from '../data/rozcestnik';
    obrázok vymení, vymení sa aj tu. */
 const obrazokSekcie = (() => {
   const k = hradiskaCategories.find((c) => c.slug === 'strazna-funkcia');
-  return k ? `${zakladStrapi()}${variant(k.image, 'large')}` : '/logo_hradiska_full.png';
+  /* `medium` stačí: obraz má v sekcii okolo 400 px, `large` znamenal
+     116 kB navyše na každej domovskej stránke. */
+  return k ? `${zakladStrapi()}${variant(k.image, 'medium')}` : '/logo_hradiska_full.png';
 })();
 
 const GOLD_GRAD = 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))';
@@ -46,11 +48,11 @@ const GLASS: React.CSSProperties = {
 const CARD_STEP = 300 + 18;
 
 const GALLERY_FALLBACK: { src: string; place?: string }[] = [
-  { src: '/articles/bojna/bojna-cover.jpg', place: 'Bojná — Valy' },
+  { src: '/articles/bojna/bojna-cover.webp', place: 'Bojná — Valy' },
   { src: '/medailon-bojna.webp' },
-  { src: '/articles/bojna/bojna-od-vychodu.jpg' },
-  { src: '/articles/bojna/brana.jpg' },
-  { src: '/articles/bojna/bojna-09-reconstruction.jpg' },
+  { src: '/articles/bojna/bojna-od-vychodu.webp' },
+  { src: '/articles/bojna/brana.webp' },
+  { src: '/articles/bojna/bojna-09-reconstruction.webp' },
 ];
 const GALLERY_TILES = 6;
 const FOUNDED_YEAR = 2010;
