@@ -82,7 +82,7 @@ function TeloSK() {
               Otázky k týmto podmienkam smerujte na{' '}
               <a href="mailto:info@hradiska.sk" style={LINK}>info@hradiska.sk</a>. Spracovanie osobných
               údajov upravujú samostatné{' '}
-              <a href="/ochrana-osobnych-udajov" style={LINK}>Zásady ochrany osobných údajov</a>.
+              <a href={odkaz('/ochrana-osobnych-udajov')} style={LINK}>Zásady ochrany osobných údajov</a>.
             </p>
           </section>
     </>

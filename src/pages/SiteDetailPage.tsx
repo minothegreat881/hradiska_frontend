@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { t } from '../lib/jazyk';
+import { odkaz, t } from '../lib/jazyk';
 import { MapPin, Calendar, Layers, CheckCircle2, ArrowLeft, ExternalLink } from 'lucide-react';
 import { motion } from 'motion/react';
 import { mockSites, periods, siteTypes } from '../data/mock-data';
@@ -26,7 +26,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
             {t('Lokalita nenájdená')}
           </h1>
           <a
-            href="/search"
+            href={odkaz('/search')}
             className="text-sky-600 dark:text-sky-400 hover:underline"
           >
             {t('Späť na vyhľadávanie')} →
@@ -69,7 +69,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
           <div className="py-12 md:py-20">
             {/* Back button */}
             <a
-              href="/search"
+              href={odkaz('/search')}
               className="inline-flex items-center gap-2 mb-6 text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />

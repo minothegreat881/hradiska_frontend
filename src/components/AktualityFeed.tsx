@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useMemo, useState, useCallback } from 'react';
+import { odkaz } from '../lib/jazyk';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner@2.0.3';
 import {
@@ -583,7 +584,7 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
         )}
 
         <a
-          href={`/blog/${item.slug}`}
+          href={odkaz(`/blog/${item.slug}`)}
           style={{
             display: 'inline-block',
             fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.05em', color: 'var(--hr-on-photo)',
@@ -602,7 +603,7 @@ function KronikaIntro({ item }: { item: KronikaItem }) {
  *  Na mobile sa excerpt skryje (.ak-excerpt v globals.css), ostane názov + meta. */
 function KronikaCard({ item }: { item: KronikaItem }) {
   return (
-    <a href={`/blog/${item.slug}`} className="block h-full group ak-tile" style={{ textDecoration: 'none' }}>
+    <a href={odkaz(`/blog/${item.slug}`)} className="block h-full group ak-tile" style={{ textDecoration: 'none' }}>
       <article
         className="h-full flex flex-col overflow-hidden"
         style={{

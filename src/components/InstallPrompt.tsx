@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { odkaz } from '../lib/jazyk';
 import {
   isStandalone, isIOS, hasDeferredPrompt, shouldAutoOffer, engaged,
   promptInstall, markDismissed, EVT_AVAILABLE, EVT_OPEN_INSTALL,
@@ -108,7 +109,7 @@ export function InstallPrompt() {
                   <a
                     ref={firstBtnRef as unknown as React.Ref<HTMLAnchorElement>}
                     className="ck-btn ck-btn-primary"
-                    href="/aplikacia"
+                    href={odkaz('/aplikacia')}
                     onClick={dismiss}
                   >
                     <span aria-hidden="true">⚔️</span>

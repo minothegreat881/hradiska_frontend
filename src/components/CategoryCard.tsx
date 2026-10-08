@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { odkaz } from '../lib/jazyk';
 import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ArrowRight } from 'lucide-react';
@@ -34,7 +35,7 @@ export function CategoryCard({ category, index }: CategoryCardProps) {
 
   return (
     <motion.a
-      href={`/category/${category.value}`}
+      href={odkaz(`/category/${category.value}`)}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

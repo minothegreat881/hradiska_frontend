@@ -292,7 +292,7 @@ export default function LabAktuality() {
               {t('Zo života združenia')}
             </h2>
           </div>
-          <a href="/aktuality" className="lakv-more">{t('CELÁ KRONIKA')} →</a>
+          <a href={odkaz('/aktuality')} className="lakv-more">{t('CELÁ KRONIKA')} →</a>
         </div>
 
         {/* horný rad: kresba + pripnutý zápis */}
@@ -435,13 +435,13 @@ export default function LabAktuality() {
         {/* vybraná fotogaléria */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
           <span className="lakv-label">{t('VYBRANÁ FOTOGALÉRIA')}</span>
-          <a href="/galeria" className="lakv-more">{t('CELÁ GALÉRIA')} →</a>
+          <a href={odkaz('/galeria')} className="lakv-more">{t('CELÁ GALÉRIA')} →</a>
         </div>
         <div ref={galleryRef} className="lakv-gal">
           {galleryTiles.map((g, i) => (
             <a
               key={g.src}
-              href="/galeria"
+              href={odkaz('/galeria')}
               className="lakv-tile"
               /* Meno odkazu nesie popis fotografie. Keď ho v Strapi niekto
                  nevyplnil, odkaz ostával bez mena a čítačka ohlásila iba

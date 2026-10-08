@@ -456,7 +456,7 @@ function Ulozene({ clanky, zdielane }: { clanky: FavoritePost[] | null; zdielane
         <ul className="lprof-zoznam">
           {clanky.map((z) => (
             <li key={z.documentId} className="lprof-zaznam">
-              <div className="lprof-riadok"><a className="lprof-nazov" href={`/blog/${z.slug}`}>{z.title}</a></div>
+              <div className="lprof-riadok"><a className="lprof-nazov" href={odkaz(`/blog/${z.slug}`)}>{z.title}</a></div>
               {z.category && <span className="lprof-znacka">{z.category.name}</span>}
             </li>
           ))}
@@ -473,7 +473,7 @@ function Ulozene({ clanky, zdielane }: { clanky: FavoritePost[] | null; zdielane
                   <span className="lprof-co">{s.channel || 'odkazom'}</span>
                   <span className="lprof-kedy">{datum(s.createdAt)}</span>
                 </div>
-                {s.post && <a className="lprof-kde" href={`/blog/${s.post.slug}`}>{s.post.title}</a>}
+                {s.post && <a className="lprof-kde" href={odkaz(`/blog/${s.post.slug}`)}>{s.post.title}</a>}
               </li>
             ))}
           </ul>

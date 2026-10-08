@@ -118,7 +118,7 @@ export function LabDalsiObsah() {
                 {t(s.label)}
                 <span className="dob-pocet">{s.pocet}</span>
               </h2>
-              <a className="dob-vsetky" href={`/category/${s.slug}`}>
+              <a className="dob-vsetky" href={odkaz(`/category/${s.slug}`)}>
                 {t('Zobraziť všetky')} <span aria-hidden="true">→</span>
               </a>
             </div>

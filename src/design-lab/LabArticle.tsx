@@ -27,7 +27,7 @@
 import { useEffect, useState } from 'react';
 import { Nacitavanie } from './Nacitavanie';
 import { useBlogPost } from '../hooks/useStrapi';
-import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
+import { getStrapiImageUrl, convertStrapiPostToArticle, anglickeSlugy } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
 import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 import { ArticleSidebar, KeyFactsCard, TimelineCard } from '../components/ArticleSidebar';
@@ -139,6 +139,24 @@ export function LabArticle({ slug }: { slug: string }) {
     return () => { alive = false; };
   }, [slug]);
 
+  /* Záchrana pre anglickú adresu so slovenským slugom.
+     Mapa aj staršie odkazy vedú na `/en/blog/<slovenský slug>`, čo v angličtine
+     neexistuje. Namiesto „Article not found" sa dohľadá slovenský článok,
+     z neho anglická verzia a stránka sa naň presmeruje. */
+  useEffect(() => {
+    if (loading || post || !poAnglicky() || !slug) return;
+    let zrusene = false;
+    anglickeSlugy([slug])
+      .then((m) => {
+        const en = m[slug];
+        if (zrusene || !en) return;
+        window.history.replaceState({}, '', `/en/blog/${en}`);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      })
+      .catch(() => { /* ostane hlásenie, že článok nie je */ });
+    return () => { zrusene = true; };
+  }, [loading, post, slug]);
+
   if (loading || (post && !fotkaPripravena)) return <CakanieNaClanok />;
   if (!post) return <div className="lart-wait">{t('Článok sa nenašiel.')}</div>;
 
@@ -184,8 +202,14 @@ export function LabArticle({ slug }: { slug: string }) {
     const zBloku = popisyZBlokov.get(img.id);
     return {
       url: getStrapiImageUrl(img),
-      caption: vJazyku?.caption || zBloku?.caption || img.caption || img.alternativeText || '',
-      alt: vJazyku?.alt || zBloku?.alt || img.alternativeText || img.caption || '',
+      /* Poradie je dôležité: čo je v jazyku stránky, ide prvé, a slovenský
+         popis z knižnice médií sa v angličtine použije až vtedy, keď niet
+         ničoho iného — predtým sa cez neho preskakoval anglický `alt`
+         a pod fotkou v galérii stál slovenský text. */
+      caption: vJazyku?.caption || zBloku?.caption || vJazyku?.alt
+        || (poAnglicky() ? '' : (img.caption || img.alternativeText || '')),
+      alt: vJazyku?.alt || zBloku?.alt || vJazyku?.caption
+        || (poAnglicky() ? post.title : (img.alternativeText || img.caption || '')),
       fileId: img.id,
     };
   });
@@ -239,8 +263,7 @@ export function LabArticle({ slug }: { slug: string }) {
               /* Fotografia už nie je podklad pod textom, ale obsah — patrí jej
                  zmysluplný popis. */
               alt={popisyJazyka.get((post.coverImage as any)?.id)?.alt
-                || (post.coverImage as any)?.alternativeText
-                || post.title}
+                || (poAnglicky() ? post.title : ((post.coverImage as any)?.alternativeText || post.title))}
               /* Malým písmom zámerne: React 18 camelCase `fetchPriority`
                  nepozná, ohlási ho ako neznámu vlastnosť a na prvok ho
                  nedá — prednosť pri sťahovaní by sa tým stratila. */

@@ -20,6 +20,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { odkaz } from '../lib/jazyk';
 import {
   getDomovskaGaleria, getKronikaAll, getKronikaIntro, getKronikaPhotos, getStrapiImageUrl,
   KRONIKA_INTRO_SLUG, KronikaItem, KronikaPhoto, StrapiImage,
@@ -235,7 +236,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
                 Zo života združenia
               </h2>
             </div>
-            <a href="/aktuality" style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: 'var(--hr-accent-deep)', borderBottom: '1px solid var(--hr-line-quiet)', paddingBottom: 4, whiteSpace: 'nowrap' }}>
+            <a href={odkaz('/aktuality')} style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: 'var(--hr-accent-deep)', borderBottom: '1px solid var(--hr-line-quiet)', paddingBottom: 4, whiteSpace: 'nowrap' }}>
               CELÁ KRONIKA →
             </a>
           </div>
@@ -315,7 +316,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
         </div>
         <div ref={stripRef} onScroll={onStripScroll} className="akv2-strip" style={{ display: 'flex', gap: 18, overflowX: 'auto', overflowY: 'hidden', scrollSnapType: 'x mandatory', padding: '6px 2px 18px' }}>
           {stripItems.map(item => (
-            <a key={item.documentId} href={`/blog/${item.slug}`} className="akv2-tile" style={{ scrollSnapAlign: 'start', flex: '0 0 300px', position: 'relative', display: 'block', height: 300, borderRadius: 26, overflow: 'hidden', boxShadow: '0 16px 36px -20px rgba(40,26,10,.5)' }}>
+            <a key={item.documentId} href={odkaz(`/blog/${item.slug}`)} className="akv2-tile" style={{ scrollSnapAlign: 'start', flex: '0 0 300px', position: 'relative', display: 'block', height: 300, borderRadius: 26, overflow: 'hidden', boxShadow: '0 16px 36px -20px rgba(40,26,10,.5)' }}>
               {item.coverUrl ? (
                 <img src={item.coverUrl} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -362,7 +363,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
         {/* vybraná fotogaléria */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
           <span style={{ fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '.2em', color: 'var(--hr-accent)' }}>VYBRANÁ FOTOGALÉRIA</span>
-          <a href="/galeria" style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: 'var(--hr-accent-deep)', borderBottom: '1px solid var(--hr-line-quiet)', paddingBottom: 3, whiteSpace: 'nowrap' }}>CELÁ GALÉRIA →</a>
+          <a href={odkaz('/galeria')} style={{ fontFamily: 'var(--font-heading)', fontSize: 12, letterSpacing: '.06em', color: 'var(--hr-accent-deep)', borderBottom: '1px solid var(--hr-line-quiet)', paddingBottom: 3, whiteSpace: 'nowrap' }}>CELÁ GALÉRIA →</a>
         </div>
         <div ref={galleryRef} className="akv2-gal" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridAutoRows: 158, gap: 14 }}>
           {/* Ukážka vedie do galérie — samotné prezeranie fotiek patrí tam,
@@ -370,7 +371,7 @@ export default function AktualityFeedV2({ showHeader = true }: AktualityFeedProp
           {galleryTiles.map((g, i) => (
             <a
               key={g.src}
-              href="/galeria"
+              href={odkaz('/galeria')}
               className="akv2-tile"
               style={{ position: 'relative', display: 'block', borderRadius: i === 0 ? 26 : 20, overflow: 'hidden', boxShadow: '0 12px 28px -18px rgba(40,26,10,.5)', gridColumn: i === 0 ? 'span 2' : undefined, gridRow: i === 0 ? 'span 2' : undefined }}
             >
