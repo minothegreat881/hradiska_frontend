@@ -13,6 +13,16 @@ import { getSearchIndexLite, fold, type IndexDoc } from './searchIndex';
 import { STRAPI_URL } from './api-adresa';
 import { jazyk, kategoria } from './jazyk';
 
+/* PEVNÁ DVOJICA. Dva najčítanejšie články autora stoja v odporúčaní vždy
+   prvé — sú to základné otázky, s ktorými človek na web prichádza, a bez
+   nich by sa k nim dostal len cez hľadanie. Slugy sú pre každý jazyk
+   vlastné (anglická verzia má vlastnú adresu). Keď sa článok v indexe
+   nenájde, dvojica sa potichu preskočí — odporúčanie beží ďalej. */
+const PRIPNUTE: Record<string, string[]> = {
+  sk: ['archeologicke-kultury-na-slovensku-datovanie', 'kedy-prisli-slovania-na-slovensko'],
+  en: ['archaeological-cultures-slovakia-dating', 'when-did-the-slavs-arrive-in-slovakia'],
+};
+
 // Slovenské stopslová — nech dopyt necielime na „a, na, sa, v, že…".
 const STOP = new Set(
   ('a aj ako ale alebo ani áno by bol bola boli bolo bez do ho i iba ich im je jej jeho k ku '
@@ -120,6 +130,18 @@ export async function getRelated(slug: string, limit = 6): Promise<RelatedCard[]
   if (!cur) return [];
 
   const seen = new Set<string>([slug]);
+
+  /* Pevná dvojica napred. Do `seen` ide hneď, aby sa nižšie nezopakovala
+     ako bežné odporúčanie. */
+  const pripnute: RelatedCard[] = [];
+  for (const s of PRIPNUTE[jazyk()] || []) {
+    if (seen.has(s)) continue;
+    const doc = bySlug.get(s);
+    if (!doc) continue;
+    seen.add(s);
+    pripnute.push(toCard(doc));
+  }
+
   const scored: Array<{ doc: IndexDoc; score: number }> = [];
 
   const query = keyTerms(cur);
@@ -139,7 +161,10 @@ export async function getRelated(slug: string, limit = 6): Promise<RelatedCard[]
   }
   scored.sort((a, b) => b.score - a.score);
 
-  const result: RelatedCard[] = scored.slice(0, limit).map((x) => toCard(x.doc));
+  const result: RelatedCard[] = [
+    ...pripnute,
+    ...scored.slice(0, Math.max(0, limit - pripnute.length)).map((x) => toCard(x.doc)),
+  ];
 
   // Fallback — doplň z rovnakej kategórie, potom hocičím, nech je vždy plných `limit`.
   if (result.length < limit) {

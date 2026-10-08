@@ -1,5 +1,7 @@
 'use client';
 
+import { t } from '../lib/jazyk';
+
 /**
  * ČAKANIE — jediný znak načítavania na celom webe.
  *

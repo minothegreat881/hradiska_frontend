@@ -80,6 +80,40 @@ export function odkazDoDruhehoJazyka(cesta: string): string {
    Kľúč je slovenský originál, aby sa v komponente dalo napísať
    `t('Mohlo by vás zaujímať')` a slovenská vetva ostala čitateľná. */
 const EN: Record<string, string> = {
+  'Činnosť združenia':
+    'What the association does',
+  'Čo združenie robí':
+    'What the association does',
+  'Knihy a zborníky':
+    'Books and journals',
+  '2 % z daní':
+    '2% of your tax',
+  '3D rekonštrukcie':
+    '3D reconstructions',
+  'Archeologické výskumy':
+    'Archaeological research',
+  'Výpravy a podujatia':
+    'Expeditions and events',
+  'Prednášky a médiá':
+    'Talks and media',
+  'Tabule, ktoré združenie vyrobilo a osadilo priamo pri hradiskách.':
+    'Panels the association has made and installed at the hillforts themselves.',
+  'Dva zborníky „Hradiská — Svedkovia dávnych čias“, kniha Oživená archeológia a časopis Digitálne hradiská.':
+    'Two volumes of “Hillforts — Witnesses of Ancient Times”, the book Oživená archeológia and the journal Digitálne hradiská.',
+  'Výzvy, z čoho sa platia tabule, výskumy a tlač — a ako sa dá prispieť.':
+    'What pays for the panels, the fieldwork and the printing — and how you can chip in.',
+  'Ako hradiská vyzerali, kým z nich ostali valy — modely, kresby a letecké pohľady.':
+    'What the hillforts looked like before only the ramparts were left — models, drawings and aerial views.',
+  'Vlastné výskumy a prieskumy v teréne — od mikrosond po ohlásené nálezy.':
+    'The association’s own fieldwork — from micro-trenches to reported finds.',
+  'Cesty za hradiskami doma aj v cudzine, plavby, brigády a živá história.':
+    'Trips to hillforts at home and abroad, voyages, work parties and living history.',
+  'Prednášky v školách a kluboch, podcasty, rozhovory a diskusie.':
+    'Talks in schools and clubs, podcasts, interviews and discussions.',
+  'zápisov v téme':
+    'entries in',
+  'Celá kronika':
+    'The whole chronicle',
   'Tabule, ktoré združenie vyrobilo a osadilo priamo pri hradiskách — čo je na nich napísané, ako vznikali a kde ich v teréne nájdete.':
     'Panels the association has made and installed at the hillforts themselves — what they say, how they came about and where to find them.',
 
