@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { t, poAnglicky } from '../lib/jazyk';
+import { odkaz, t, poAnglicky } from '../lib/jazyk';
 import { Search, MapPin } from 'lucide-react';
 import {
   searchArticles, makeSnippet, highlightTerm, coverToUrl, type SearchHit,
@@ -29,7 +29,7 @@ function Row({ hit, query }: { hit: SearchHit; query: string }) {
   const thumb = coverToUrl(hit.cover);
   return (
     <a
-      href={`/blog/${hit.slug}`}
+      href={odkaz(`/blog/${hit.slug}`)}
       style={{
         display: 'flex', gap: 16, alignItems: 'flex-start', textDecoration: 'none',
         background: T.panelBg, border: `1px solid ${T.border}`, borderRadius: 12,

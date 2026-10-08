@@ -18,22 +18,38 @@ import LabAktuality from './LabAktuality';
 import { MapaAzKedTreba } from './MapaAzKedTreba';
 import LabKategorieRychle from './LabKategorieRychle';
 import LabDalsiObsah from './LabDalsiObsah';
+import { useEffect, useState } from 'react';
+import { anglickeSlugy } from '../lib/strapi';
 import { t, odkaz, poAnglicky } from '../lib/jazyk';
 
 /* Tri ukážkové hradiská pod hľadaním. Článok má v každom jazyku vlastný slug,
-   takže odkaz sa nedá zložiť z jednej cesty — inak anglická stránka posiela
-   čitateľa na „Article not found". */
-const SLUGY = {
-  sk: { bojna: 'bojna-vyznamne-velkomoravske-centrum', devin: 'devin', molpir: 'molpir' },
-  en: {
-    bojna: 'bojna-great-moravian-centre-valy-hillfort',
-    devin: 'devin-great-moravian-dowina-hillfort',
-    molpir: 'molpir-hallstatt-hillfort-smolenice',
-  },
+   takže anglickú adresu si vypýtame z dát — napísaná v kóde by po premenovaní
+   článku viedla na „Article not found". Kým odpoveď nepríde, odkaz vedie na
+   slovenskú verziu, ktorá existuje vždy. */
+const POPULARNE = {
+  bojna: 'bojna-vyznamne-velkomoravske-centrum',
+  devin: 'devin',
+  molpir: 'molpir',
 };
 
 export function LabHome() {
-  const populrneSlugy = poAnglicky() ? SLUGY.en : SLUGY.sk;
+  const [populrneSlugy, setPopulrneSlugy] = useState(POPULARNE);
+  useEffect(() => {
+    if (!poAnglicky()) return;
+    let zrusene = false;
+    anglickeSlugy(Object.values(POPULARNE))
+      .then((m) => {
+        if (zrusene) return;
+        setPopulrneSlugy({
+          bojna: m[POPULARNE.bojna] || POPULARNE.bojna,
+          devin: m[POPULARNE.devin] || POPULARNE.devin,
+          molpir: m[POPULARNE.molpir] || POPULARNE.molpir,
+        });
+      })
+      .catch(() => { /* ostanú slovenské adresy */ });
+    return () => { zrusene = true; };
+  }, []);
+
   return (
     <div className="min-h-screen parchment relative">
       <InkEffect />

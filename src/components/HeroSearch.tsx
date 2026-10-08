@@ -274,14 +274,14 @@ export function HeroSearch() {
     const snip = makeSnippet(hit.text, trimmed);
     return {
       id: `article-${hit.slug}`,
-      href: `/blog/${hit.slug}`,
+      href: odkaz(`/blog/${hit.slug}`),
       pre: h.pre,
       mid: h.mid,
       post: h.post,
       sub: hit.categoryName || t('Článok'),
       snip,
       thumbnail: coverToUrl(hit.cover),
-      typeLabel: hit.hasLocation ? 'lokalita' : undefined,
+      typeLabel: hit.hasLocation ? t('lokalita') : undefined,
     };
   };
 
@@ -307,7 +307,7 @@ export function HeroSearch() {
     if (!trimmed) return;
     setIsFocused(false);
     inputRef.current?.blur();
-    goTo(`/hladat?q=${encodeURIComponent(trimmed)}`);
+    goTo(odkaz(`/hladat?q=${encodeURIComponent(trimmed)}`));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

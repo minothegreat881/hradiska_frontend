@@ -7,7 +7,7 @@ import { lazyStale } from './lib/lazyStale';
 import { PripomienkyDock } from './pripomienky/PripomienkyDock';
 import { Nacitavanie } from './design-lab/Nacitavanie';
 import './design-lab/theme.css';
-import { rozdelAdresu, nastavJazyk } from './lib/jazyk';
+import { rozdelAdresu, nastavJazyk, t } from './lib/jazyk';
 /* Článok v novom šate. Nie je to prefarbená `ArticlePage`, ale vlastná
    skladba — preto sa pri zapnutom šate vymieňa celý komponent, nie štýly. */
 const ArticlePagePecat = lazyStale(() => import('./design-lab/LabArticle'));

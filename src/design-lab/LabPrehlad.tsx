@@ -24,6 +24,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { t, kategoria } from '../lib/jazyk';
 import { X } from 'lucide-react';
 import { Nacitavanie } from './Nacitavanie';
 import lokalityData from '../data/lokality.json';
@@ -179,9 +180,9 @@ export const pocetLokalit = LOKALITY.length;
 export function Prepinac({ hodnota, onZmena, celeSirky }: {
   hodnota: Zoskupenie; onZmena: (z: Zoskupenie) => void; celeSirky?: boolean;
 }) {
-  const volby: [Zoskupenie, string][] = [['kraj', 'Kraj'], ['datovanie', 'Datovanie'], ['az', 'A–Z']];
+  const volby: [Zoskupenie, string][] = [['kraj', t('Kraj')], ['datovanie', t('Datovanie')], ['az', 'A–Z']];
   return (
-    <div className={celeSirky ? 'lprh-prepinac je-siroky' : 'lprh-prepinac'} role="group" aria-label="Zoskupiť podľa">
+    <div className={celeSirky ? 'lprh-prepinac je-siroky' : 'lprh-prepinac'} role="group" aria-label={t('Zoskupiť podľa')}>
       {volby.map(([k, l]) => (
         <button
           key={k}
@@ -203,13 +204,13 @@ export function Prepinac({ hodnota, onZmena, celeSirky }: {
 export function Skupiny({ skupiny, mobil, onOdkaz }: {
   skupiny: Skupina[]; mobil?: boolean; onOdkaz?: () => void;
 }) {
-  if (!skupiny.length) return <p className="lprh-prazdno">V tejto kategórii zatiaľ nie sú lokality.</p>;
+  if (!skupiny.length) return <p className="lprh-prazdno">{t('V tejto kategórii zatiaľ nie sú lokality.')}</p>;
   return (
     <>
       {skupiny.map((s) => (
         <section key={s.nazov} className="lprh-skupina">
           <div className="lprh-skupina-h">
-            <span>{s.nazov}</span>
+            <span>{t(s.nazov)}</span>
             <span className="lprh-skupina-n">{s.polozky.length}</span>
           </div>
           <ul className="lprh-zoznam">
@@ -278,19 +279,19 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
   const zobrazenych = skupiny.reduce((n, s) => n + s.polozky.length, 0);
 
   return (
-    <div className="lprh" role="dialog" aria-label={`Prehľad kategórie ${aktivna.label}`}>
+    <div className="lprh" role="dialog" aria-label={`${t('Prehľad kategórie')} ${kategoria(aktivna.label)}`}>
       {/* Zavretie v pravom hornom rohu panela — tam ho oko hľadá. Miesto mu
           robí odsadenie hlavičky sprava, takže sa neprekrýva s prepínačom
           zoskupenia ani na najužšom okne, kde sa hlavička zalamuje. */}
-      <button type="button" className="lprh-zavri" onClick={onZavri} aria-label="Zavrieť prehľad">
+      <button type="button" className="lprh-zavri" onClick={onZavri} aria-label={t('Zavrieť prehľad')}>
         <X aria-hidden="true" />
       </button>
 
-      <nav className="lprh-register" aria-label="Kategórie">
+      <nav className="lprh-register" aria-label={t('Kategórie')}>
         <div className="lprh-register-zoznam">
           {([['Typy hradísk', kategorie.primarne], ['Ďalší obsah', kategorie.dalsie]] as const).map(([nadpis, zoznam]) => (
             <div key={nadpis}>
-              <p className="lprh-register-h">{nadpis}</p>
+              <p className="lprh-register-h">{t(nadpis)}</p>
               {zoznam.map((c) => (
                 <button
                   key={c.label}
@@ -313,7 +314,7 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
           <div>
             <h2>{aktivna.label}</h2>
             <p className="lprh-suhrn">
-              {clanky === null ? 'Načítavam…' : `${clanky.length} článkov`}
+              {clanky === null ? t('Načítavam…') : `${clanky.length} ${t('článkov')}`}
               {maLokality && ` · z toho ${lokality.length} lokalít`}
               {hladane.trim() && ` · zobrazených ${zobrazenych}`}
             </p>
@@ -323,17 +324,17 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
             type="search"
             value={hladane}
             onChange={(e) => setHladane(e.target.value)}
-            placeholder={maLokality ? 'Hľadať hradisko, obec alebo okres' : 'Hľadať v kategórii'}
-            aria-label="Hľadať v kategórii"
+            placeholder={maLokality ? t('Hľadať hradisko, obec alebo okres') : t('Hľadať v kategórii')}
+            aria-label={t('Hľadať v kategórii')}
           />
           {maLokality && <Prepinac hodnota={zoskupenie} onZmena={onZoskupenie} />}
         </header>
 
         <div className="lprh-telo">
           {clanky === null
-            ? <Nacitavanie velkost="male" text="Načítavam zoznam…" />
+            ? <Nacitavanie velkost="male" text={t('Načítavam zoznam…')} />
             : hladane.trim() && !zobrazenych
-              ? <p className="lprh-prazdno">Nič sa nenašlo. Skúste obec alebo okres.</p>
+              ? <p className="lprh-prazdno">{t('Nič sa nenašlo. Skúste obec alebo okres.')}</p>
               : <Skupiny skupiny={skupiny} onOdkaz={onZavri} />}
         </div>
 

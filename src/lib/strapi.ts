@@ -323,6 +323,29 @@ export async function getBlogPosts(options?: {
 }
 
 /**
+ * K slovenským slugom dohľadá anglické.
+ *
+ * Používa to zopár odkazov napísaných v kóde (napríklad tri ukážkové hradiská
+ * pod hľadaním). Natvrdo zapísaný anglický slug by po premenovaní článku
+ * ukazoval na „Article not found" a nikto by sa to nedozvedel — takto adresa
+ * vždy vznikne z dát. `locale=sk` je tu zámerne: filtrujeme podľa slovenského
+ * slugu, aj keď je stránka anglická.
+ */
+export async function anglickeSlugy(skSlugy: string[]): Promise<Record<string, string>> {
+  if (!skSlugy.length) return {};
+  const q = skSlugy.map((s, i) => `filters[slug][$in][${i}]=${encodeURIComponent(s)}`).join('&');
+  const r = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
+    `/blog-posts?${q}&locale=sk&fields[0]=slug&populate[0]=localizations`
+  );
+  const von: Record<string, string> = {};
+  for (const p of r.data || []) {
+    const en = (p.localizations || []).find((x) => x.locale === 'en');
+    if (en?.slug) von[p.slug] = en.slug;
+  }
+  return von;
+}
+
+/**
  * Get blog post by slug
  */
 export async function getBlogPostBySlug(
