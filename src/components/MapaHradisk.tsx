@@ -379,7 +379,7 @@ export function MapaHradisk({ zvyraznene }: {
             tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
             tileSize: 256,
             maxzoom: 18,
-            attribution: 'Satelitné snímky: Esri, Maxar, Earthstar Geographics',
+            attribution: t('Satelitné snímky: Esri, Maxar, Earthstar Geographics'),
           },
           /* Štátna hranica. Na reliéfe ju povie sama kresba — dlaždice končia
              na hranici — ale na snímke nie je vidieť, kde krajina končí. */

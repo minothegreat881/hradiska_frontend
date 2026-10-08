@@ -22,7 +22,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { t, odkaz } from '../lib/jazyk';
+import { poAnglicky, t, odkaz } from '../lib/jazyk';
 import { useMember } from '../auth/MemberAuth';
 import { deleteMyAccount } from '../lib/memberApi';
 import {
@@ -51,23 +51,32 @@ function vKronike(iso: string): { cislo: string; slovo: string } {
   const mes = (teraz.getFullYear() - d.getFullYear()) * 12 + (teraz.getMonth() - d.getMonth());
   if (mes < 12) {
     const m = Math.max(1, mes);
-    return { cislo: String(m), slovo: m === 1 ? 'mesiac v kronike' : m < 5 ? 'mesiace v kronike' : 'mesiacov v kronike' };
+    /* Angličtina počíta v dvoch tvaroch, slovenčina v troch. */
+    const tvar = poAnglicky()
+      ? t(m === 1 ? 'mesiac v kronike' : 'mesiacov v kronike')
+      : (m === 1 ? 'mesiac v kronike' : m < 5 ? 'mesiace v kronike' : 'mesiacov v kronike');
+    return { cislo: String(m), slovo: tvar };
   }
   const r = Math.floor(mes / 12);
-  return { cislo: String(r), slovo: r === 1 ? 'rok v kronike' : r < 5 ? 'roky v kronike' : 'rokov v kronike' };
+  const tvarR = poAnglicky()
+    ? t(r === 1 ? 'rok v kronike' : 'rokov v kronike')
+    : (r === 1 ? 'rok v kronike' : r < 5 ? 'roky v kronike' : 'rokov v kronike');
+  return { cislo: String(r), slovo: tvarR };
 }
 
 /** Relatívny čas — v kronike stačí hrubo. */
 function kedy(iso: string): string {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (s < 90) return 'pred chvíľou';
-  const m = Math.floor(s / 60); if (m < 60) return `pred ${m} min`;
-  const h = Math.floor(m / 60); if (h < 24) return `pred ${h} h`;
-  const d = Math.floor(h / 24); if (d < 31) return `pred ${d} dňami`;
-  return new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
+  const en = poAnglicky();
+  if (s < 90) return t('pred chvíľou');
+  const m = Math.floor(s / 60); if (m < 60) return en ? `${m} min ago` : `pred ${m} min`;
+  const h = Math.floor(m / 60); if (h < 24) return en ? `${h} h ago` : `pred ${h} h`;
+  const d = Math.floor(h / 24); if (d < 31) return en ? `${d} days ago` : `pred ${d} dňami`;
+  return datum(iso);
 }
 
-const datum = (iso: string) => new Date(iso).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
+/* Krátky dátum v jazyku stránky — `jazyk.ts` má dlhý tvar, sem sa hodí číselný. */
+const datum = (iso: string) => new Date(iso).toLocaleDateString(poAnglicky() ? 'en-GB' : 'sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
 /** Strapi vracia cesty relatívne k svojmu koreňu — bez predpony sa hľadajú
     na frontende a obrázok sa nenačíta. */
@@ -122,11 +131,11 @@ export function ProfilePage() {
   const vek = profil?.joinedAt ? vKronike(profil.joinedAt) : null;
 
   const register: { id: Sekcia; nazov: string; pocet: number | null }[] = useMemo(() => [
-    { id: 'ozvy', nazov: 'Ozvalo sa', pocet: ozvy?.length ?? null },
-    { id: 'prispevky', nazov: 'Moje príspevky', pocet: prispevky?.length ?? profil?.stats.comments ?? null },
-    { id: 'ulozene', nazov: 'Odložené', pocet: ulozene?.length ?? profil?.stats.favorites ?? null },
-    { id: 'fotky', nazov: 'Moje fotografie', pocet: fotky?.length ?? null },
-    { id: 'nastavenia', nazov: 'Nastavenia', pocet: null },
+    { id: 'ozvy', nazov: t('Ozvalo sa'), pocet: ozvy?.length ?? null },
+    { id: 'prispevky', nazov: t('Moje príspevky'), pocet: prispevky?.length ?? profil?.stats.comments ?? null },
+    { id: 'ulozene', nazov: t('Odložené'), pocet: ulozene?.length ?? profil?.stats.favorites ?? null },
+    { id: 'fotky', nazov: t('Moje fotografie'), pocet: fotky?.length ?? null },
+    { id: 'nastavenia', nazov: t('Nastavenia'), pocet: null },
   ], [ozvy, prispevky, ulozene, fotky, profil]);
 
   if (!token) {
@@ -143,7 +152,7 @@ export function ProfilePage() {
           <ol>
             <li><a href={odkaz('/')}>{t('Domov')}</a></li>
             <li aria-hidden="true">·</li>
-            <li>Môj profil</li>
+            <li>{t('Môj profil')}</li>
           </ol>
         </nav>
 
@@ -154,13 +163,13 @@ export function ProfilePage() {
           <div>
             <h1 className="lprof-meno">{meno || 'Môj profil'}</h1>
             <p className="lprof-udaje">
-              <b>{profil?.stats.comments ?? 0}</b> príspevkov
+              <b>{profil?.stats.comments ?? 0}</b> {t('príspevkov')}
               {vek && <> · <b>{vek.cislo}</b> {vek.slovo}</>}
             </p>
           </div>
           {/* Odhlásenie patrí sem, nie do nastavení: je to úkon, ktorý človek
               robí najčastejšie zo všetkých v profile, a hľadať ho pod
-              „Nastavenia účtu" znamená prejsť tri obrazovky pre jeden klik. */}
+              „{t('Nastavenia účtu')}" znamená prejsť tri obrazovky pre jeden klik. */}
           <div className="lprof-ukony">
             <button
               type="button"
@@ -175,20 +184,20 @@ export function ProfilePage() {
               className="lprof-nastavenia"
               onClick={() => { signOut(); prejdi('/'); }}
             >
-              Odhlásiť sa
+              {t('Odhlásiť sa')}
             </button>
           </div>
         </header>
 
         {profil?.preModerated && (
           <p className="lprof-vystraha" role="status">
-            Vaše príspevky pred zverejnením číta správca.
+            {t('Vaše príspevky pred zverejnením číta správca.')}
             {profil.warnsCount > 0 && ` Upozornení: ${profil.warnsCount}.`}
           </p>
         )}
 
         <div className="lprof-telo">
-          <nav className="lprof-register" aria-label="Časti profilu">
+          <nav className="lprof-register" aria-label={t('Časti profilu')}>
             {register.map((s) => (
               <button
                 key={s.id}
@@ -241,16 +250,16 @@ export function ProfilePage() {
 type DruhOzvy = 'reply' | 'like' | 'warning' | 'post';
 
 const DRUH: Record<DruhOzvy, { stitok: string; znak: string }> = {
-  reply:   { stitok: 'Odpoveď',      znak: '↩' },
+  reply:   { stitok: t('Odpoveď'),      znak: '↩' },
   like:    { stitok: 'Ocenenie',     znak: '♥' },
   warning: { stitok: 'Upozornenie',  znak: '!' },
-  post:    { stitok: 'Nový článok',  znak: '✦' },
+  post:    { stitok: t('Nový článok'),  znak: '✦' },
 };
 
 function Ozvy({ items }: { items: NotificationItem[] | null }) {
   if (items === null) return <Kostra n={3} />;
   if (!items.length) {
-    return <p className="lprof-prazdno">Zatiaľ sa nikto neozval. Záznam pribudne, keď niekto odpovie na váš príspevok alebo ho ocení.</p>;
+    return <p className="lprof-prazdno">{t('Zatiaľ sa nikto neozval. Záznam pribudne, keď niekto odpovie na váš príspevok alebo ho ocení.')}</p>;
   }
 
   return (
@@ -272,28 +281,32 @@ function Ozvy({ items }: { items: NotificationItem[] | null }) {
            `#k-<id>`, ktorá skočí na komentár a nakrátko ho zvýrazní. */
         const idKomentara = n.comment?.documentId || n.photoComment?.documentId || null;
         const doDiskusie = !n.post ? null
-          : kFotke && n.fileId ? { href: `/blog/${n.post.slug}?fotoFile=${n.fileId}`, popis: 'Otvoriť fotografiu' }
-          : idKomentara ? { href: `/blog/${n.post.slug}#k-${idKomentara}`, popis: 'Zobraziť v diskusii' }
+          : kFotke && n.fileId ? { href: `/blog/${n.post.slug}?fotoFile=${n.fileId}`, popis: t('Otvoriť fotografiu') }
+          : idKomentara ? { href: `/blog/${n.post.slug}#k-${idKomentara}`, popis: t('Zobraziť v diskusii') }
           : null;
 
         /* Kto sa ozval a čo urobil. Pri systémových ozvách nie je nikto —
            terč vtedy nesie znak, nie iniciálu. */
         let ktoText = kto;
-        let coText = 'sa ozval';
+        let coText = t('sa ozval');
         let osoba = true;
         if (druh === 'reply') {
-          coText = kFotke ? 'odpovedal na váš komentár k fotografii' : 'odpovedal na váš komentár';
+          coText = kFotke ? t('odpovedal na váš komentár k fotografii') : t('odpovedal na váš komentár');
         } else if (druh === 'like') {
-          ktoText = viac ? `${n.aggregateCount} čitateľov` : kto;
-          coText = `${viac ? 'ocenilo' : 'ocenil'} váš komentár${kFotke ? ' k fotografii' : ''}`;
+          ktoText = viac ? `${n.aggregateCount} ${t('čitateľov')}` : kto;
+          /* Slovenčina rozlišuje rod a číslo („ocenilo" / „ocenil"), angličtina
+             nie — tam je to jedna veta pre oba prípady. */
+          coText = poAnglicky()
+            ? (kFotke ? t('ocenil váš komentár k fotografii') : t('ocenil váš komentár'))
+            : `${viac ? 'ocenilo' : 'ocenil'} váš komentár${kFotke ? ' k fotografii' : ''}`;
           osoba = !viac;
         } else if (druh === 'warning') {
-          ktoText = 'Správca';
-          coText = 'upozorňuje na nedodržanie pravidiel diskusie';
+          ktoText = t('Správca');
+          coText = t('upozorňuje na nedodržanie pravidiel diskusie');
           osoba = false;
         } else {
-          ktoText = 'Kronika';
-          coText = 'pribudol nový článok';
+          ktoText = t('Kronika');
+          coText = t('pribudol nový článok');
           osoba = false;
         }
 
@@ -339,10 +352,10 @@ function Ozvy({ items }: { items: NotificationItem[] | null }) {
 /* Zverejnený príspevok stav nehlási — je to bežný prípad a štítok „Zverejnený"
    pri každom riadku by len šumel. Hlási sa len to, čo si žiada pozornosť. */
 const STAV: Record<string, string> = {
-  waiting: 'čaká na schválenie',
-  reported: 'nahlásený',
-  hidden: 'skrytý',
-  spam: 'odstránený',
+  waiting: t('čaká na schválenie'),
+  reported: t('nahlásený'),
+  hidden: t('skrytý'),
+  spam: t('odstránený'),
 };
 
 function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token: string; onZmena: () => void }) {
@@ -353,7 +366,7 @@ function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token
 
   if (items === null) return <Kostra n={3} />;
   if (!items.length) {
-    return <p className="lprof-prazdno">Zatiaľ ste nič nenapísali. Do diskusie sa dá zapojiť pod každým článkom.</p>;
+    return <p className="lprof-prazdno">{t('Zatiaľ ste nič nenapísali. Do diskusie sa dá zapojiť pod každým článkom.')}</p>;
   }
 
   const uloz = async (c: MyComment) => {
@@ -363,17 +376,17 @@ function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token
       await (c.source === 'photo' ? editPhotoComment : editComment)(token, c.documentId, text.trim());
       setUpravovany(null);
       onZmena();
-    } catch { setChyba('Úpravu sa nepodarilo uložiť. Skúste to prosím znova.'); }
+    } catch { setChyba(t('Úpravu sa nepodarilo uložiť. Skúste to prosím znova.')); }
     finally { setBusy(false); }
   };
 
   const zmaz = async (c: MyComment) => {
-    if (!window.confirm('Zmazať tento príspevok? Nedá sa to vrátiť.')) return;
+    if (!window.confirm(t('Zmazať tento príspevok? Nedá sa to vrátiť.'))) return;
     setBusy(true); setChyba('');
     try {
       await (c.source === 'photo' ? deletePhotoComment : deleteComment)(token, c.documentId);
       onZmena();
-    } catch { setChyba('Príspevok sa nepodarilo zmazať. Skúste to prosím znova.'); }
+    } catch { setChyba(t('Príspevok sa nepodarilo zmazať. Skúste to prosím znova.')); }
     finally { setBusy(false); }
   };
 
@@ -387,8 +400,8 @@ function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token
           return (
             <li key={c.documentId} className="lprof-zaznam">
               <div className="lprof-riadok">
-                <span className="lprof-co">{kFotke ? 'k fotografii' : 'pod článkom'}</span>
-                <span className="lprof-kedy">{c.editedAt ? `upravené ${kedy(c.editedAt)}` : kedy(c.createdAt)}</span>
+                <span className="lprof-co">{kFotke ? t('k fotografii') : t('pod článkom')}</span>
+                <span className="lprof-kedy">{c.editedAt ? `${t('upravené')} ${kedy(c.editedAt)}` : kedy(c.createdAt)}</span>
               </div>
               {c.post && (odkaz
                 ? <a className="lprof-kde" href={odkaz}>{c.post.title}</a>
@@ -396,7 +409,7 @@ function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token
 
               {upravovany === c.documentId ? (
                 <div className="lprof-uprava">
-                  <label htmlFor={`lprof-up-${c.documentId}`} className="lab-only-reader">Znenie príspevku</label>
+                  <label htmlFor={`lprof-up-${c.documentId}`} className="lab-only-reader">{t('Znenie príspevku')}</label>
                   <textarea
                     id={`lprof-up-${c.documentId}`}
                     value={text}
@@ -404,8 +417,8 @@ function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token
                     onChange={(e) => setText(e.target.value)}
                   />
                   <div className="lprof-tlacidla">
-                    <button type="button" className="lprof-hlavne" disabled={busy} onClick={() => uloz(c)}>Uložiť zmenu</button>
-                    <button type="button" onClick={() => setUpravovany(null)}>Zrušiť</button>
+                    <button type="button" className="lprof-hlavne" disabled={busy} onClick={() => uloz(c)}>{t('Uložiť zmenu')}</button>
+                    <button type="button" onClick={() => setUpravovany(null)}>{t('Zrušiť')}</button>
                   </div>
                 </div>
               ) : (
@@ -415,8 +428,8 @@ function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token
                     <span className="lprof-reakcie">{c.likes} ocenení · {c.replyCount} odpovedí</span>
                     {STAV[c.status] && <span className="lprof-stav">{STAV[c.status]}</span>}
                     <span className="lprof-akcie">
-                      <button type="button" onClick={() => { setUpravovany(c.documentId); setText(c.content); }}>Upraviť</button>
-                      <button type="button" disabled={busy} onClick={() => zmaz(c)}>Zmazať</button>
+                      <button type="button" onClick={() => { setUpravovany(c.documentId); setText(c.content); }}>{t('Upraviť')}</button>
+                      <button type="button" disabled={busy} onClick={() => zmaz(c)}>{t('Zmazať')}</button>
                     </span>
                   </div>
                 </>
@@ -435,7 +448,7 @@ function Prispevky({ items, token, onZmena }: { items: MyComment[] | null; token
 function Ulozene({ clanky, zdielane }: { clanky: FavoritePost[] | null; zdielane: MyShare[] | null }) {
   if (clanky === null) return <Kostra n={3} />;
   if (!clanky.length && !(zdielane || []).length) {
-    return <p className="lprof-prazdno">Zatiaľ ste si nič neodložili. Článok sa odkladá srdcom v jeho hlavičke.</p>;
+    return <p className="lprof-prazdno">{t('Zatiaľ ste si nič neodložili. Článok sa odkladá srdcom v jeho hlavičke.')}</p>;
   }
   return (
     <>
@@ -452,7 +465,7 @@ function Ulozene({ clanky, zdielane }: { clanky: FavoritePost[] | null; zdielane
 
       {(zdielane || []).length > 0 && (
         <section className="lprof-podskupina">
-          <h2>Poslané ďalej</h2>
+          <h2>{t('Poslané ďalej')}</h2>
           <ul className="lprof-zoznam">
             {zdielane!.map((s) => (
               <li key={s.documentId} className="lprof-zaznam">
@@ -518,8 +531,8 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
     try {
       await updateProfile(token, { displayName: meno, ...prefs });
       onProfil(await getProfile(token));
-      oznam('Uložené.');
-    } catch { zlyhalo('Zmeny sa nepodarilo uložiť. Skúste to prosím znova.'); }
+      oznam(t('Uložené.'));
+    } catch { zlyhalo(t('Zmeny sa nepodarilo uložiť. Skúste to prosím znova.')); }
     finally { setBusy(false); }
   };
 

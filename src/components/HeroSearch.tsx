@@ -629,7 +629,7 @@ export function HeroSearch() {
                     fontSize: 14, padding: 0, textDecoration: 'underline',
                   }}
                 >
-                  Zobraziť všetky výsledky
+                  {t('Zobraziť všetky výsledky')}
                 </button>
               )}
               <span style={{ marginLeft: 'auto' }}>{hits.length} výsledkov</span>

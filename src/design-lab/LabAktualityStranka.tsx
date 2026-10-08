@@ -94,10 +94,10 @@ export function LabAktualityStranka() {
 
         {/* Hlavička v reči kategórií: značka, názov, podtitul, počet. */}
         <header className="lakt-hlava">
-          <span className="lakt-znacka">Kronika</span>
+          <span className="lakt-znacka">{t('KRONIKA')}</span>
           <h1 className="lakt-titul">{t('Zo života združenia')}</h1>
           <p className="lakt-lead">
-            Výpravy, obnovy tabúľ, prednášky a nálezy.
+            {t('Výpravy, obnovy tabúľ, prednášky a nálezy.')}
           </p>
           {zaznamy.length > 0 && (
             <p className="lakt-suhrn">

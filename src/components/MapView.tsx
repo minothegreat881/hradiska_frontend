@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { t } from '../lib/jazyk';
 import { MapPin, Maximize2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Site } from '../data/mock-data';
@@ -111,7 +112,7 @@ export function MapView({ sites, selectedSiteId, onSiteSelect }: MapViewProps) {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-sky-600 ring-2 ring-sky-200 dark:ring-sky-800" />
-              <span>Vybraná</span>
+              <span>{t('Vybraná')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-sky-600 flex items-center justify-center text-white text-xs">

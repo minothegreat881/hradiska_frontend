@@ -81,7 +81,7 @@ export function LabHome() {
         {/* Handoff tu chcel „najnavštevovanejšie záznamy". Návštevnosť zatiaľ
             nemeriame, takže je to vybraný zoznam — keď pribudne analytika, dá
             sa nahradiť skutočným poradím. */}
-        <nav className="lhero-rychle" aria-label="Populárne hradiská">
+        <nav className="lhero-rychle" aria-label={t('Populárne hradiská')}>
           <span className="lhero-rychle-popis">{t('Populárne:')}</span>
           <a href={odkaz(`/blog/${populrneSlugy.bojna}`)}>Bojná</a>
           <span aria-hidden="true">·</span>

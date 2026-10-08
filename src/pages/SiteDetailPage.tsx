@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { t } from '../lib/jazyk';
 import { MapPin, Calendar, Layers, CheckCircle2, ArrowLeft, ExternalLink } from 'lucide-react';
 import { motion } from 'motion/react';
 import { mockSites, periods, siteTypes } from '../data/mock-data';
@@ -22,13 +23,13 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-stone-900 dark:text-stone-100 mb-4">
-            Lokalita nenájdená
+            {t('Lokalita nenájdená')}
           </h1>
           <a
             href="/search"
             className="text-sky-600 dark:text-sky-400 hover:underline"
           >
-            Späť na vyhľadávanie →
+            {t('Späť na vyhľadávanie')} →
           </a>
         </div>
       </div>
@@ -42,9 +43,9 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
   const typeLabel = siteTypes.find((t) => t.value === site.type)?.label;
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
-    { id: 'overview', label: 'Prehľad' },
-    { id: 'findings', label: 'Nálezy', count: site.findings.length },
-    { id: 'images', label: 'Obrázky', count: 3 },
+    { id: 'overview', label: t('Prehľad') },
+    { id: 'findings', label: t('Nálezy'), count: site.findings.length },
+    { id: 'images', label: t('Obrázky'), count: 3 },
     { id: 'bibliography', label: 'Bibliografia', count: site.bibliography.length },
     { id: 'map', label: 'Mapa' },
   ];
@@ -72,7 +73,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
               className="inline-flex items-center gap-2 mb-6 text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Späť na vyhľadávanie
+              {t('Späť na vyhľadávanie')}
             </a>
 
             {/* Title & badges */}
@@ -86,7 +87,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
                 {site.excavated && (
                   <span className="flex items-center gap-1 px-3 py-1 bg-white/90 dark:bg-stone-900/90 text-stone-700 dark:text-stone-300 text-sm rounded-full backdrop-blur-sm">
                     <CheckCircle2 className="w-4 h-4" />
-                    Archeologicky skúmané
+                    {t('Archeologicky skúmané')}
                   </span>
                 )}
                 <span className="px-3 py-1 bg-clay-100 dark:bg-clay-900/50 text-clay-700 dark:text-clay-300 text-sm rounded-full">
@@ -170,7 +171,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
             <div className="prose prose-stone dark:prose-invert article-content">
               <p>{site.description}</p>
 
-              <h3>História výskumu</h3>
+              <h3>{t('História výskumu')}</h3>
               <p>
                 Lokalita bola predmetom systematického archeologického výskumu
                 v priebehu posledných desaťročí. Výskumy priniesli významné
@@ -178,7 +179,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
                 pochopeniu kultúrneho vývoja regiónu.
               </p>
 
-              <h3>Význam lokality</h3>
+              <h3>{t('Význam lokality')}</h3>
               <p>
                 {site.name} patrí medzi významné archeologické lokality na
                 Slovensku. Nálezy z tejto lokality sú vystavené v múzeách a
@@ -200,7 +201,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
             className="max-w-4xl"
           >
             <h2 className="text-stone-900 dark:text-stone-50 mb-6">
-              Archeologické nálezy
+              {t('Archeologické nálezy')}
             </h2>
             <div className="grid gap-4">
               {site.findings.map((finding, idx) => (
@@ -217,7 +218,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
                         {finding}
                       </h3>
                       <p className="text-sm text-stone-600 dark:text-stone-400">
-                        Artefakt objavený počas archeologického výskumu lokality.
+                        {t('Artefakt objavený počas archeologického výskumu lokality.')}
                       </p>
                     </div>
                   </div>
@@ -236,7 +237,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
             id="panel-images"
             role="tabpanel"
           >
-            <h2 className="text-stone-900 dark:text-stone-50 mb-6">Galéria</h2>
+            <h2 className="text-stone-900 dark:text-stone-50 mb-6">{t('Galéria')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 'https://images.unsplash.com/photo-1753368226646-091196f6d706?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhbmNpZW50JTIwY2FzdGxlJTIwcnVpbnN8ZW58MXx8fHwxNzYyMTc5MDU1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
@@ -284,7 +285,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
                     </p>
                     <button
                       className="p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors flex-shrink-0"
-                      aria-label="Externý odkaz"
+                      aria-label={t('Externý odkaz')}
                     >
                       <ExternalLink className="w-4 h-4 text-stone-400 dark:text-stone-500" />
                     </button>
@@ -312,12 +313,12 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
             </div>
             <div className="mt-6 p-6 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800">
               <h3 className="text-stone-900 dark:text-stone-100 mb-4">
-                GPS súradnice
+                {t('GPS súradnice')}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="text-stone-500 dark:text-stone-400 mb-1">
-                    Zemepisná šírka
+                    {t('Zemepisná šírka')}
                   </div>
                   <div className="text-stone-900 dark:text-stone-100">
                     {site.coordinates.lat.toFixed(6)}°
@@ -325,7 +326,7 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
                 </div>
                 <div>
                   <div className="text-stone-500 dark:text-stone-400 mb-1">
-                    Zemepisná dĺžka
+                    {t('Zemepisná dĺžka')}
                   </div>
                   <div className="text-stone-900 dark:text-stone-100">
                     {site.coordinates.lng.toFixed(6)}°

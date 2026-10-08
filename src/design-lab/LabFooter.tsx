@@ -161,8 +161,8 @@ export function LabFooter() {
           </div>
 
           <div className="lfoot-cols">
-            <Col title="Kategórie" links={KATEGORIE} />
-            <Col title="Články" links={CLANKY} />
+            <Col title={t('Kategórie')} links={KATEGORIE} />
+            <Col title={t('Články')} links={CLANKY} />
           </div>
         </div>
 

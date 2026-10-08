@@ -268,7 +268,7 @@ function App() {
   if (route === 'admin') {
     return (
       <Suspense
-        fallback={<Nacitavanie celaVyska text="Načítavam administráciu…" />}
+        fallback={<Nacitavanie celaVyska text={t('Načítavam administráciu…')} />}
       >
         {/* Aj administrácia beží v šate — má vlastný rám mimo `.lab`, takže
             paletu berie zo značky na koreni dokumentu. Nosič sa tu musí
@@ -293,7 +293,7 @@ function App() {
       <Suspense fallback={
         /* Celá výška okna, nie 60 vh: pri nižšej hodnote sa počas načítania
            vysunie do obrazu pätička a po dotiahnutí stránky zasa odskočí. */
-        <Nacitavanie celaVyska velkost="velke" text="Načítavam…" />
+        <Nacitavanie celaVyska velkost="velke" text={t('Načítavam…')} />
       }>
         {route === 'home' && <><LabHome /><LabJoinUs /></>}
         {route === 'galeria' && <GalleryPagePecat />}

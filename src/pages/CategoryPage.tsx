@@ -206,7 +206,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     margin: 0,
                   }}
                 >
-                  Články a štúdie
+                  {t('Články a štúdie')}
                 </h2>
                 <p
                   style={{
@@ -217,7 +217,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     margin: '6px 0 0',
                   }}
                 >
-                  Odborné publikácie a výskum
+                  {t('Odborné publikácie a výskum')}
                 </p>
 
                 {/* Zlatý predel — plný segment + doznievajúca linka */}

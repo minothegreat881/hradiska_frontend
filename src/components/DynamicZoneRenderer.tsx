@@ -154,7 +154,7 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
     return (
       <figure className="my-8 clear-both not-prose">
         <EmptyBlockNotice
-          title="Video zatiaľ nemá adresu"
+          title={t('Video zatiaľ nemá adresu')}
           hint="Vložte odkaz na YouTube, Vimeo alebo Sketchfab do poľa „Adresa“ pod článkom."
         />
         {caption && (
