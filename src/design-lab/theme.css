@@ -3466,6 +3466,16 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lcin-rad { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   .lcin-popis { display: none; }
   .lcin-nazov { font-size: 14.5px; }
+  /* Nepárny počet dlaždíc necháva poslednú samu vľavo a rad vyzerá useknuto
+     — na domovskej je ich päť, pod článkom sedem. Posledná preto dostane
+     obidva stĺpce a postaví sa do stredu; šírku si drží tú istú, akú majú
+     dlaždice vedľa seba (polovica mínus polovica medzery). Tá istá úprava
+     už beží pri dlaždiciach kategórií. */
+  .lcin-rad > .lcin-dlazdica:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 7px);
+  }
 }
 
 .lakt-rok { margin-bottom: 54px; }
