@@ -75,6 +75,8 @@ export function odkazDoDruhehoJazyka(cesta: string): string {
    Kľúč je slovenský originál, aby sa v komponente dalo napísať
    `t('Mohlo by vás zaujímať')` a slovenská vetva ostala čitateľná. */
 const EN: Record<string, string> = {
+  'z toho': 'of which',
+  'zobrazených': 'shown',
   'lokalita': 'site',
   'lokalitu': 'site',
   'lokalít': 'sites',

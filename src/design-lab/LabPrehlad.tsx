@@ -300,7 +300,7 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
                   aria-current={c.label === aktivna.label ? 'true' : undefined}
                   onClick={() => onKategoria(c)}
                 >
-                  <span>{c.label}</span>
+                  <span>{kategoria(c.label)}</span>
                   {typeof c.count === 'number' && c.count > 0 && <span className="lprh-pocet">{c.count}</span>}
                 </button>
               ))}
@@ -312,11 +312,11 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
       <div className="lprh-hlavne">
         <header className="lprh-hlava">
           <div>
-            <h2>{aktivna.label}</h2>
+            <h2>{kategoria(aktivna.label)}</h2>
             <p className="lprh-suhrn">
               {clanky === null ? t('Načítavam…') : `${clanky.length} ${t('článkov')}`}
-              {maLokality && ` · z toho ${lokality.length} lokalít`}
-              {hladane.trim() && ` · zobrazených ${zobrazenych}`}
+              {maLokality && ` · ${t('z toho')} ${lokality.length} ${t('lokalít')}`}
+              {hladane.trim() && ` · ${t('zobrazených')} ${zobrazenych}`}
             </p>
           </div>
           <input
