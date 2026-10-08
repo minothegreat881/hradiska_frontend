@@ -20,6 +20,14 @@ export type Jazyk = 'sk' | 'en' | 'de';
 
 /** Jazyky s vlastnou predponou v adrese. Slovenčina je bez predpony. */
 export const JAZYKY: Jazyk[] = ['sk', 'en', 'de'];
+
+/**
+ * Jazyky, ktoré PONÚKA prepínač v hlavičke. Nemčina sa rozrába — adresy
+ * `/de/...` fungujú a dajú sa otvoriť priamo, ale kým nie sú preložené
+ * články, prepínač by návštevníka poslal na prázdny web. Keď bude obsah
+ * hotový, pridá sa sem `'de'` a nič iné sa meniť nemusí.
+ */
+export const VEREJNE_JAZYKY: Jazyk[] = ['sk', 'en'];
 const PREDPONY: Record<Exclude<Jazyk, 'sk'>, string> = { en: '/en', de: '/de' };
 
 /** Kód pre `toLocaleDateString` a formátovanie čísel. */
@@ -101,9 +109,13 @@ export function sledujDruhyOdkaz(f: () => void): () => void {
   return () => { poslucháči.delete(f); };
 }
 
-/** Jazyk, na ktorý prepne jedno klepnutie: sk → en → de → sk. */
-export const druhyJazyk = (j: Jazyk = aktualny): Jazyk =>
-  JAZYKY[(JAZYKY.indexOf(j) + 1) % JAZYKY.length];
+/** Jazyk, na ktorý prepne jedno klepnutie — cyklí po VEREJNÝCH jazykoch. */
+export const druhyJazyk = (j: Jazyk = aktualny): Jazyk => {
+  const i = VEREJNE_JAZYKY.indexOf(j);
+  /* Z rozrobeného jazyka vedie prepínač späť na slovenčinu. */
+  if (i < 0) return VEREJNE_JAZYKY[0];
+  return VEREJNE_JAZYKY[(i + 1) % VEREJNE_JAZYKY.length];
+};
 
 /** Kam vedie prepínač do konkrétneho jazyka (cesta je bez predpony). */
 export function odkazDoJazyka(cesta: string, j: Jazyk): string {
