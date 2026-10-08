@@ -117,5 +117,38 @@ export function initPwa(): void {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').catch(() => { /* neblokuj web */ });
     });
+
+    /* Keď nový worker prevezme riadenie, stránka sa raz obnoví — inak by
+       bežala so starým shellom, ktorý si pýta už neexistujúce súbory. */
+    let obnovene = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (obnovene) return;
+      obnovene = true;
+      window.location.reload();
+    });
+
+    /* Záchytka na bielu obrazovku: keď sa nepodarí načítať skript appky,
+       vymaže sa cache, odhlási worker a stránka sa raz obnoví. Značka v
+       `sessionStorage` bráni slučke, keby bola chyba inde. */
+    const ZNACKA = 'hradiska.zachrana-po-nasadeni';
+    const zachrana = async () => {
+      if (sessionStorage.getItem(ZNACKA)) return;
+      sessionStorage.setItem(ZNACKA, '1');
+      try {
+        const kluce = await caches.keys();
+        await Promise.all(kluce.map((k) => caches.delete(k)));
+        const registracie = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registracie.map((r) => r.unregister()));
+      } catch { /* aj tak skús obnoviť */ }
+      window.location.reload();
+    };
+    window.addEventListener('error', (e) => {
+      const ciel = e.target as HTMLElement | null;
+      if (ciel && (ciel.tagName === 'SCRIPT' || ciel.tagName === 'LINK')) void zachrana();
+    }, true);
+    window.addEventListener('unhandledrejection', (e) => {
+      const d = String((e as PromiseRejectionEvent).reason || '');
+      if (/dynamically imported module|Importing a module script failed|ChunkLoadError/i.test(d)) void zachrana();
+    });
   }
 }

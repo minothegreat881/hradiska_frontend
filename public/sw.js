@@ -14,8 +14,12 @@
    Po nasadení novej verzie si prehliadač ťahal staré súbory z cache a miešal
    ich s novou stránkou — administrácia potom vyzerala celá, ale časti
    prestali fungovať (prázdne okno udalosti na časovej osi, do ktorého sa
-   nedalo písať). Zvýšenie verzie zároveň vyhodí starý cache. */
-const CACHE = 'hradiska-v6';
+   nedalo písať). Zvýšenie verzie zároveň vyhodí starý cache.
+   v7: po dni s desiatimi nasadeniami ostávala na telefónoch biela obrazovka —
+   shell z cache si pýtal súbory, ktoré už na serveri nie sú. Spolu s touto
+   verziou pribudla v `pwa.ts` záchytka, ktorá cache zmaže a stránku raz
+   obnoví. */
+const CACHE = 'hradiska-v7';
 const PRECACHE = [
   '/',
   '/offline.html',
