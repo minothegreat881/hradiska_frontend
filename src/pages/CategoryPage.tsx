@@ -290,12 +290,11 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   </motion.div>
 
                   <h3 className="text-amber-950 dark:text-amber-50 mb-3">
-                    Zatiaľ žiadny obsah
+                    {t('Zatiaľ žiadny obsah')}
                   </h3>
 
                   <p className="text-amber-900/70 dark:text-amber-100/60 mb-8 leading-relaxed">
-                    V tejto kategórii zatiaľ nemáme pridané žiadne články.
-                    Pracujeme na pridávaní nového obsahu.
+                    {t('V tejto kategórii zatiaľ nemáme pridané žiadne články. Pracujeme na pridávaní nového obsahu.')}
                   </p>
 
                   <motion.a
@@ -305,7 +304,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                     whileTap={{ scale: 0.98 }}
                   >
                     <Crown className="w-5 h-5" />
-                    Preskúmať iné kategórie
+                    {t('Preskúmať iné kategórie')}
                   </motion.a>
                 </div>
               </div>

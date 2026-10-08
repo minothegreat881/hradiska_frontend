@@ -173,18 +173,12 @@ export function SiteDetailPage({ siteSlug }: SiteDetailPageProps) {
 
               <h3>{t('História výskumu')}</h3>
               <p>
-                Lokalita bola predmetom systematického archeologického výskumu
-                v priebehu posledných desaťročí. Výskumy priniesli významné
-                poznatky o osídlení v jednotlivých obdobiach a prispeli k
-                pochopeniu kultúrneho vývoja regiónu.
+                {t('Lokalita bola predmetom systematického archeologického výskumu v priebehu posledných desaťročí. Výskumy priniesli významné poznatky o osídlení v jednotlivých obdobiach a prispeli k pochopeniu kultúrneho vývoja regiónu.')}
               </p>
 
               <h3>{t('Význam lokality')}</h3>
               <p>
-                {site.name} patrí medzi významné archeologické lokality na
-                Slovensku. Nálezy z tejto lokality sú vystavené v múzeách a
-                sú predmetom odborných štúdií. Lokalita prispieva k poznaniu
-                dejín osídlenia a kultúrneho vývoja na našom území.
+                {site.name} {t('patrí medzi významné archeologické lokality na Slovensku. Nálezy z tejto lokality sú vystavené v múzeách a sú predmetom odborných štúdií. Lokalita prispieva k poznaniu dejín osídlenia a kultúrneho vývoja na našom území.')}
               </p>
             </div>
           </motion.div>

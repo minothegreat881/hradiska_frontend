@@ -75,6 +75,12 @@ export function odkazDoDruhehoJazyka(cesta: string): string {
    Kľúč je slovenský originál, aby sa v komponente dalo napísať
    `t('Mohlo by vás zaujímať')` a slovenská vetva ostala čitateľná. */
 const EN: Record<string, string> = {
+  'Lokalita bola predmetom systematického archeologického výskumu v priebehu posledných desaťročí. Výskumy priniesli významné poznatky o osídlení v jednotlivých obdobiach a prispeli k pochopeniu kultúrneho vývoja regiónu.': 'The site has been the subject of systematic archaeological excavation over recent decades. The work has brought important insights into the occupation in the individual periods and has contributed to an understanding of the cultural development of the region.',
+  'patrí medzi významné archeologické lokality na Slovensku. Nálezy z tejto lokality sú vystavené v múzeách a sú predmetom odborných štúdií. Lokalita prispieva k poznaniu dejín osídlenia a kultúrneho vývoja na našom území.': 'is among the important archaeological sites in Slovakia. Finds from it are displayed in museums and are the subject of specialist studies. The site contributes to our knowledge of the history of occupation and cultural development in this territory.',
+  'Zatiaľ žiadny obsah': 'No content yet',
+  'V tejto kategórii zatiaľ nemáme pridané žiadne články. Pracujeme na pridávaní nového obsahu.': 'We have not added any articles to this category yet. We are working on new content.',
+  'Preskúmať iné kategórie': 'Explore other categories',
+  'Fotografia je zmenená.': 'The photograph has been changed.',
   'k fotografii': 'on a photograph',
   'upravené': 'edited',
   'sa ozval': 'got in touch',

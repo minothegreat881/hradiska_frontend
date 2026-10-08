@@ -139,7 +139,7 @@ export function ProfilePage() {
   ], [ozvy, prispevky, ulozene, fotky, profil]);
 
   if (!token) {
-    return <div className="lprof"><div className="container lprof-in"><p className="lprof-prazdno">Načítavam…</p></div></div>;
+    return <div className="lprof"><div className="container lprof-in"><p className="lprof-prazdno">{t(t('Načítavam…'))}</p></div></div>;
   }
 
   const avatar = mediaUrl(profil?.avatar);
@@ -222,7 +222,7 @@ export function ProfilePage() {
             {sekcia === 'fotky' && <Fotky items={fotky} />}
             {sekcia === 'nastavenia' && (profil
               ? <Nastavenia profil={profil} token={token} onProfil={setProfil} onOdhlas={() => { signOut(); prejdi('/'); }} />
-              : <p className="lprof-prazdno">Načítavam…</p>)}
+              : <p className="lprof-prazdno">{t(t('Načítavam…'))}</p>)}
           </section>
         </div>
       </div>
@@ -545,7 +545,7 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
       /* Fotku nesie aj tlačidlo účtu v hlavičke — bez tohto by tam stará
          ostala až do obnovenia stránky. */
       await obnov();
-      oznam('Fotografia je zmenená.');
+      oznam(t('Fotografia je zmenená.'));
     } catch { zlyhalo('Fotografiu sa nepodarilo nahrať. Skúste JPG alebo PNG.'); }
     finally { setBusy(false); }
   };
