@@ -171,58 +171,52 @@ Každý hromadný skript preto pri 429 čaká a skúša znova a vypisuje, **koľ
 
 ---
 
-## 3d. Kde presne pokračovať v terminológii
+## 3d. Terminológia — hotová (8. 10. 2026)
 
-Dávky po desiatich článkoch sú uložené v repe backendu:
-`scripts/kontrola/davky-terminologia/f00`…`f23` (jeden slug na riadok).
-Čo je už skontrolované, drží `scripts/kontrola/terminologia-hotove.txt`.
+Agent `terminolog-hradiska` prešiel **všetkých 364 článkov** v 24 dávkach po
+desiatich (`scripts/kontrola/davky-terminologia/f00`…`f23`, hotové drží
+`scripts/kontrola/terminologia-hotove.txt`). Jeho rozhodnutia sú zapísané v
+slovníku `hradiska-strapi/docs/TERMINOLOGIA-EN.md` §11e — tam sa pozerá ako prvé,
+keď sa niečo prekladá nanovo.
 
-- **hotové:** 131 článkov z predchádzajúcich vĺn + dávky **f00–f11** → 251 článkov
-- **rozbehnuté 6. 10. 2026 a dokončené:** f12–f17 (ich opravy sú v commite
-  „Terminologia f12-f17")
-- **nespustené:** **f18–f23** (60 článkov) — pokračuje sa nimi
+Po dávkach prešli hromadné opravy, ktoré jedna dávka vidieť nemohla:
 
-Spustenie jednej dávky (agent `terminolog-hradiska`, 10 článkov naraz, pokojne
-šesť dávok paralelne):
+| priechod | skript | výsledok |
+|---|---|---|
+| poradie blokov podľa slovenčiny | `opravy/zrovnaj-bloky.mjs` | 25 súborov |
+| bloky, ktoré autor medzitým zmazal v slovenčine | `opravy/zahod-zmazane-bloky.mjs` | 9 článkov |
+| rozvrh obrázkov (width, position…) | `kontrola/rozvrh-suborov.mjs --oprav` | 155 rozdielov v 46 súboroch |
+| číselné rozsahy a percentá bez medzier | `opravy/rozsahy-en.mjs` | 247 |
+| celokorpusové zjednotenie termínov | `opravy/zjednot-en.mjs` | 146 (crest of the rampart, Central Europe, comital castle, on the ground…) |
+| polia nad limit schémy | `kontrola/odseknute-polia.mjs` | 7 skrátených |
 
-> Dávka f18 — skontroluj terminológiu anglických prekladov týchto 10 článkov…
-> Anglický text je vo **vstupnom súbore prekladu** `scripts/preklad/preklady/<slug>.json`
-> (na produkcii EN verziu nehľadaj dotazom na slovenský slug — má iný slug a
-> dotaz vráti prázdno). Slovenčinu ťahaj z produkčného API, nie z lokálnej
-> `.tmp/data.db`. Slovník `docs/TERMINOLOGIA-EN.md`, §11e rozhoduje. Do databázy
-> nezapisuj. Štruktúru blokov, rozvrh obrázkov ani položky Zdrojov nemeň.
-> Rozsahy, percentá, úvodzovky, Central Europe, comital castle, crest of the
-> rampart a „on the ground" rieši hromadný skript — tie nech nerieši.
-
-Po každej dávke pripíš jej slugy do `terminologia-hotove.txt` a commitni
-`scripts/preklad/preklady/`.
+**Stav po zápise:** 364/364 publikovaných, blokov aj rozvrhu obrázkov 1242/1242
+zhodných so slovenčinou, 0 článkov so slovenským titulkom, vnútorné odkazy 74,
+úvodzovky 494, fotokredity 26. Strojová kontrola terminológie hlási 2 tvrdé
+nálezy a **oba sú overené plané poplachy**: „our land" v dobovom Helmoldovom
+citáte a „the settling" pri usadzovaní medoviny.
 
 ---
 
-## 3c. Poradie dokončenia (6. 10. 2026)
+## 3e. Prečo sa angličtina kazí sama a čo ju stráži
 
-Terminologické dávky prepisujú tie isté vstupné súbory, takže hromadné opravy
-idú až po nich — inak si navzájom prepíšu zmeny. Poradie:
+Strapi 5 pri úprave slovenského článku zapíše ten istý text **aj do anglického
+konceptu**. Keď sa anglická verzia potom z akéhokoľvek dôvodu publikuje,
+slovenčina vyjde na web: článok má anglickú adresu a slovenský obsah. Za dva dni
+redakčnej práce (6.–8. 10. 2026) sa takto pokazilo **59 článkov z 364**.
 
-1. dobehnúť terminologické dávky (po desiatich, zoznam hotových v
-   `scripts/kontrola/terminologia-hotove.txt`);
-2. `node scripts/kontrola/rozvrh-suborov.mjs --oprav` — rozvrh obrázkov vo
-   vstupných súboroch na slovenské hodnoty. **Zapisovač berie `width`, `position`
-   a ostatné polia rozvrhu zo vstupného súboru, nie zo slovenčiny** (zo
-   slovenčiny dopĺňa len `image` a bibliografiu), takže čo si prekladateľ vymyslel,
-   to sa aj zapíše. Teraz je rozdielov 33 v trinástich článkoch;
-3. `node scripts/opravy/rozsahy-en.mjs --zapis` — číselné rozsahy a percentá
-   bez medzier (§11e);
-4. commit, push, `git pull` na serveri;
-5. `node scripts/preklad/zapis-davku.cjs --zapis --znova` — celý blog znova;
-6. `odkazy-en.cjs --zapis`, `uvodzovky-en.cjs --zapis`, `fotokredity-en.cjs --zapis`
-   (v tomto poradí, vždy po zápise) a `systemctl restart hradiska`;
-7. kontroly: `kontrola/slovencina-v-en.mjs` (má byť 0 článkov so slovenským
-   telom mimo bibliografie), `kontrola/rozvrh-obrazkov.cjs`,
-   `kontrola/terminologia-en.cjs` (tvrdé porušenia 0), `opravy/zrovnaj-bloky.mjs`
-   nasucho (0 rozídených);
-8. nový build Vercelu — prerenderované hlavičky a sitemap si ťahajú titulky
-   z databázy pri builde, takže bez builduu zostanú staré.
+Stráži to cron `35 * * * * /usr/local/bin/hradiska-straz.sh`:
+`kontrola/straz-anglictiny.mjs` porovná anglický a slovenský titulok, a čo sa
+rovná, prepíše `preklad/zapis-davku.cjs --znova` zo vstupných súborov prekladu.
+Log je `/opt/hradiska/straz.log`.
+
+Druhý cron (`*/10`) je zrkadlenie štruktúry; to má vlastnú poistku — keď by hoci
+jediný textový blok ostal po slovensky, článok preskočí a nahlási.
+
+**Keď autor upraví slovenský článok, treba upraviť aj vstupný súbor prekladu**
+(`scripts/preklad/preklady/<sk-slug>.json`) — inak najbližší zápis vráti starú
+anglickú verziu. Zmazané bloky vie dorovnať `opravy/zahod-zmazane-bloky.mjs`,
+nový odsek treba preložiť ručne.
 
 ---
 
