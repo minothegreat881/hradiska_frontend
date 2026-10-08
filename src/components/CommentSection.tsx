@@ -1,6 +1,6 @@
 'use client';
 
-import { t, poAnglicky } from '../lib/jazyk';
+import { odkaz, t, poAnglicky } from '../lib/jazyk';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ThumbsUp, Reply, Loader2, Trash2, Flag } from 'lucide-react';
@@ -325,7 +325,7 @@ function CommentItem({
               </div>
             ) : (
               <div style={{ marginTop: 10, fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
-                <button type="button" onClick={() => goTo('/prihlasenie')}
+                <button type="button" onClick={() => goTo(odkaz('/prihlasenie'))}
                         style={{ color: 'var(--hr-accent-soft)', background: 'none', border: 0, cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'Georgia, serif', fontSize: 13 }}>
                   {t('Prihláste sa')}
                 </button>{' '}{t('a zapojte sa do diskusie')}.
@@ -889,7 +889,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
-                onClick={() => goTo('/prihlasenie')}
+                onClick={() => goTo(odkaz('/prihlasenie'))}
                 style={{ padding: '9px 20px', borderRadius: 999, border: '1px solid #7c4a13',
                   background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
                   fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
@@ -897,7 +897,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
                 {t('Prihlásiť sa')}
               </button>
               <button
-                onClick={() => goTo('/registracia')}
+                onClick={() => goTo(odkaz('/registracia'))}
                 style={{ padding: '9px 20px', borderRadius: 999, border: '1px solid #d9c69a',
                   background: 'transparent', color: '#9a5d1f', fontFamily: 'Georgia, serif',
                   fontSize: 14, cursor: 'pointer' }}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { t, odkaz } from '../lib/jazyk';
 import { useMember } from '../auth/MemberAuth';
 import { ProfilePage } from './ProfilePage';
 import {
@@ -77,13 +78,13 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
   // ?overeny=1 po kliknutí v maile
   useEffect(() => {
     if (mode === 'login' && new URLSearchParams(window.location.search).get('overeny') === '1') {
-      setOk('E-mail overený. Teraz sa môžete prihlásiť.');
+      setOk(t('E-mail overený. Teraz sa môžete prihlásiť.'));
     }
   }, [mode]);
 
   // profil vyžaduje prihlásenie
   useEffect(() => {
-    if (mode === 'profile' && ready && !isLoggedIn) go('/prihlasenie');
+    if (mode === 'profile' && ready && !isLoggedIn) go(odkaz('/prihlasenie'));
   }, [mode, ready, isLoggedIn]);
 
   const submit = async (e: React.FormEvent) => {
@@ -94,22 +95,22 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
         await signIn(identifier.trim(), password);
         go('/');
       } else if (mode === 'register') {
-        if (password.length < 6) throw new AuthError(400, 'Heslo musí mať aspoň 6 znakov.');
-        if (!consent) throw new AuthError(400, 'Pre registráciu je potrebný súhlas so spracovaním údajov.');
+        if (password.length < 6) throw new AuthError(400, t('Heslo musí mať aspoň 6 znakov.'));
+        if (!consent) throw new AuthError(400, t('Pre registráciu je potrebný súhlas so spracovaním údajov.'));
         await register(username.trim(), email.trim(), password);
-        setOk('Účet vytvorený. Poslali sme vám overovací e-mail — kliknite na odkaz v ňom a potom sa prihláste.');
+        setOk(t('Účet vytvorený. Poslali sme vám overovací e-mail — kliknite na odkaz v ňom a potom sa prihláste.'));
       } else if (mode === 'forgot') {
         await forgotPassword(email.trim());
-        setOk('Ak taký e-mail existuje, poslali sme naň odkaz na obnovu hesla.');
+        setOk(t('Ak taký e-mail existuje, poslali sme naň odkaz na obnovu hesla.'));
       } else if (mode === 'reset') {
         if (password.length < 6) throw new AuthError(400, 'Heslo musí mať aspoň 6 znakov.');
         const code = new URLSearchParams(window.location.search).get('code') || '';
         await resetPassword(code, password);
-        setOk('Heslo zmenené. Presmerúvam na prihlásenie…');
-        setTimeout(() => go('/prihlasenie'), 1400);
+        setOk(t('Heslo zmenené. Presmerúvam na prihlásenie…'));
+        setTimeout(() => go(odkaz('/prihlasenie')), 1400);
       }
     } catch (e: any) {
-      setErr(e?.message || 'Niečo sa pokazilo.');
+      setErr(e?.message || t('Niečo sa pokazilo.'));
     } finally {
       setBusy(false);
     }
@@ -122,10 +123,10 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
   }
 
   const titles: Record<AccountMode, [string, string]> = {
-    login: ['Prihlásenie', 'Vitajte späť v komunite'],
-    register: ['Registrácia', 'Staňte sa členom a zapojte sa do diskusie'],
-    forgot: ['Zabudnuté heslo', 'Pošleme vám odkaz na obnovu'],
-    reset: ['Nové heslo', 'Zadajte nové heslo k svojmu účtu'],
+    login: [t('Prihlásenie'), t('Vitajte späť v komunite')],
+    register: [t('Registrácia'), t('Staňte sa členom a zapojte sa do diskusie')],
+    forgot: [t('Zabudnuté heslo'), t('Pošleme vám odkaz na obnovu')],
+    reset: [t('Nové heslo'), t('Zadajte nové heslo k svojmu účtu')],
     profile: ['', ''],
   };
 
@@ -140,9 +141,9 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
 
         {mode === 'register' && (
           <>
-            <label style={label} htmlFor="ac-user">Meno (zobrazí sa pri komentároch)</label>
+            <label style={label} htmlFor="ac-user">{t('Meno (zobrazí sa pri komentároch)')}</label>
             <input id="ac-user" style={field} value={username} onChange={e => setUsername(e.target.value)}
-                   placeholder="Jano Hradský" disabled={busy} autoComplete="nickname" />
+                   placeholder={t('Jano Hradský')} disabled={busy} autoComplete="nickname" />
           </>
         )}
 
@@ -164,7 +165,7 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
 
         {(mode === 'login' || mode === 'register' || mode === 'reset') && (
           <>
-            <label style={label} htmlFor="ac-pass">Heslo</label>
+            <label style={label} htmlFor="ac-pass">{t('Heslo')}</label>
             <input id="ac-pass" type="password" style={field} value={password} onChange={e => setPassword(e.target.value)}
                    placeholder="••••••••" disabled={busy}
                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
@@ -175,18 +176,17 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
           <label style={{ display: 'flex', gap: 9, alignItems: 'flex-start', marginBottom: 16, cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, color: 'var(--hr-body-2)', lineHeight: 1.5 }}>
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3 }} />
             <span>
-              Súhlasím so spracovaním e-mailu na účely účtu a diskusie. Údaje neposkytujeme
-              tretím stranám. Viac v{' '}
-              <button type="button" style={{ ...linkBtn, fontSize: 13 }} onClick={() => go('/ochrana-osobnych-udajov')}>
-                ochrane osobných údajov
+              {t('Súhlasím so spracovaním e-mailu na účely účtu a diskusie. Údaje neposkytujeme tretím stranám. Viac v')}{' '}
+              <button type="button" style={{ ...linkBtn, fontSize: 13 }} onClick={() => go(odkaz('/ochrana-osobnych-udajov'))}>
+                {t('ochrane osobných údajov')}
               </button>.
             </span>
           </label>
         )}
 
         <button type="submit" style={{ ...primaryBtn, opacity: busy ? 0.7 : 1 }} disabled={busy}>
-          {busy ? 'Moment…' : mode === 'login' ? 'Prihlásiť sa' : mode === 'register' ? 'Zaregistrovať sa'
-            : mode === 'forgot' ? 'Poslať odkaz' : 'Zmeniť heslo'}
+          {busy ? t('Moment…') : mode === 'login' ? t('Prihlásiť sa') : mode === 'register' ? t('Zaregistrovať sa')
+            : mode === 'forgot' ? t('Poslať odkaz') : t('Zmeniť heslo')}
         </button>
 
         {/* prepínače medzi režimami */}
@@ -194,25 +194,25 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
           {mode === 'login' && (
             <>
               <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: 'var(--hr-clear-text)' }}>
-                Nemáte účet? <button type="button" style={linkBtn} onClick={() => go('/registracia')}>Zaregistrujte sa</button>
+                {t('Nemáte účet?')} <button type="button" style={linkBtn} onClick={() => go(odkaz('/registracia'))}>{t('Zaregistrujte sa')}</button>
               </span>
-              <button type="button" style={linkBtn} onClick={() => go('/zabudnute-heslo')}>Zabudli ste heslo?</button>
+              <button type="button" style={linkBtn} onClick={() => go(odkaz('/zabudnute-heslo'))}>{t('Zabudli ste heslo?')}</button>
             </>
           )}
           {mode === 'register' && (
             <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: 'var(--hr-clear-text)' }}>
-              Už máte účet? <button type="button" style={linkBtn} onClick={() => go('/prihlasenie')}>Prihláste sa</button>
+              {t('Už máte účet?')} <button type="button" style={linkBtn} onClick={() => go(odkaz('/prihlasenie'))}>{t('Prihláste sa')}</button>
             </span>
           )}
           {(mode === 'forgot' || mode === 'reset') && (
-            <button type="button" style={linkBtn} onClick={() => go('/prihlasenie')}>Späť na prihlásenie</button>
+            <button type="button" style={linkBtn} onClick={() => go(odkaz('/prihlasenie'))}>{t('Späť na prihlásenie')}</button>
           )}
         </div>
 
         {mode === 'register' && ok && (
           <div style={{ textAlign: 'center', marginTop: 14 }}>
             <button type="button" style={linkBtn}
-                    onClick={() => resendConfirmation(email.trim()).then(() => setOk('Overovací e-mail sme poslali znova.')).catch(() => {})}>
+                    onClick={() => resendConfirmation(email.trim()).then(() => setOk(t('Overovací e-mail sme poslali znova.'))).catch(() => {})}>
               Neprišiel e-mail? Poslať znova
             </button>
           </div>

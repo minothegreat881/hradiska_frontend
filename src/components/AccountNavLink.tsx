@@ -1,4 +1,4 @@
-import { t } from '../lib/jazyk';
+import { odkaz, t } from '../lib/jazyk';
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -58,7 +58,7 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
       /* Na úzkom okne pri fotke nestojí meno — tam sa z tlačidla stane
          samotná fotografia (viď `.lnav-ucet--fotka` v theme.css). */
       className={isLoggedIn && fotka ? 'lnav-ucet--fotka' : undefined}
-      onClick={() => go(isLoggedIn ? '/profil' : '/prihlasenie')}
+      onClick={() => go(odkaz(isLoggedIn ? '/profil' : '/prihlasenie'))}
       title={label}
       aria-label={label}
       style={style}

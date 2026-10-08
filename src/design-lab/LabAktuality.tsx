@@ -405,7 +405,7 @@ export default function LabAktuality() {
             className={scrubbing ? 'lakv-track lakv-track-live' : 'lakv-track'}
             role="slider"
             tabIndex={0}
-            aria-label="Časová os zápisov"
+            aria-label={t('Časová os zápisov')}
             aria-valuemin={yearOldest}
             aria-valuemax={yearNewest}
             aria-valuenow={cursorYear}

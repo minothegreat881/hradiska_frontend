@@ -596,7 +596,7 @@ function RichTextRenderer({
   return (
     <div className="mb-6">
       {empty && editMode
-        ? <EmptyBlockNotice title="Prázdny odsek" hint="Kliknite sem a píšte." />
+        ? <EmptyBlockNotice title={t('Prázdny odsek')} hint="Kliknite sem a píšte." />
         : elements}
     </div>
   );

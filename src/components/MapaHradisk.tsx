@@ -369,7 +369,7 @@ export function MapaHradisk({ zvyraznene }: {
             bounds: [BOUNDS[0][0], BOUNDS[0][1], BOUNDS[1][0], BOUNDS[1][1]],
             attribution: poAnglicky()
               ? 'Relief: Copernicus DEM · Rivers: © OpenStreetMap contributors · Border: geoBoundaries'
-              : 'Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries',
+              : t('Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'),
           },
           /* Satelitná snímka ako druhý podklad. Reliéf ukáže tvar terénu —
              prečo hradisko stojí práve tam — ale nepovie, čo je na tom

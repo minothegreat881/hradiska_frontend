@@ -25,7 +25,7 @@ interface ArticleCardProps {
 
 // Fallback labely, ak Strapi nedodá display name kategórie (article.categoryName).
 const CATEGORY_LABELS: Record<string, string> = {
-  hradiska: 'Hradiská',
+  hradiska: 'Hradiská',   // názvy idú cez `t()` pri vykreslení
   kultura: 'Kultúra',
   archeologia: 'Archeológia',
   pramene: 'Pramene',

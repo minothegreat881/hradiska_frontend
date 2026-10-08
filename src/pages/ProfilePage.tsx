@@ -546,7 +546,7 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
          ostala až do obnovenia stránky. */
       await obnov();
       oznam(t('Fotografia je zmenená.'));
-    } catch { zlyhalo('Fotografiu sa nepodarilo nahrať. Skúste JPG alebo PNG.'); }
+    } catch { zlyhalo(t('Fotografiu sa nepodarilo nahrať. Skúste JPG alebo PNG.')); }
     finally { setBusy(false); }
   };
 
@@ -556,14 +556,14 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
       if (push) {
         await disablePush(token);
         setPush(false);
-        oznam('Upozornenia v zariadení sú vypnuté.');
+        oznam(t('Upozornenia v zariadení sú vypnuté.'));
       } else {
         const r = await enablePush(token);
         setPush(r.ok);
-        if (r.ok) oznam('Upozornenia v zariadení sú zapnuté.');
+        if (r.ok) oznam(t('Upozornenia v zariadení sú zapnuté.'));
         else zlyhalo(r.reason === 'denied'
-          ? 'Prehliadač má upozornenia zakázané. Povolíte ich v jeho nastaveniach pre túto stránku.'
-          : 'Upozornenia sa nepodarilo zapnúť.');
+          ? t('Prehliadač má upozornenia zakázané. Povolíte ich v jeho nastaveniach pre túto stránku.')
+          : t('Upozornenia sa nepodarilo zapnúť.'));
       }
     } finally { setBusy(false); }
   };
@@ -571,15 +571,15 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
   const zrusUcet = async () => {
     setBusy(true);
     try { await deleteMyAccount(token); onOdhlas(); }
-    catch { zlyhalo('Účet sa nepodarilo zrušiť. Skúste to prosím znova.'); setBusy(false); }
+    catch { zlyhalo(t('Účet sa nepodarilo zrušiť. Skúste to prosím znova.')); setBusy(false); }
   };
 
   const foto = mediaUrl(profil.avatar);
   const PREFS: { k: keyof Profile['prefs']; t: string }[] = [
-    { k: 'notifyReply', t: 'Keď mi niekto odpovie' },
-    { k: 'notifyLike', t: 'Keď niekto ocení môj príspevok' },
-    { k: 'notifyPost', t: 'Keď pribudne nový článok' },
-    { k: 'notifyEmail', t: 'Posielať aj e-mailom' },
+    { k: 'notifyReply', t: t('Keď mi niekto odpovie') },
+    { k: 'notifyLike', t: t('Keď niekto ocení môj príspevok') },
+    { k: 'notifyPost', t: t('Keď pribudne nový článok') },
+    { k: 'notifyEmail', t: t('Posielať aj e-mailom') },
   ];
 
   return (
@@ -588,9 +588,9 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
       {chyba && <p className="lprof-chyba" role="alert">{chyba}</p>}
 
       <section>
-        <h2>Ako sa podpisujem</h2>
+        <h2>{t('Ako sa podpisujem')}</h2>
         <div className="lprof-pole">
-          <label htmlFor="lprof-meno">Zobrazené meno</label>
+          <label htmlFor="lprof-meno">{t('Zobrazené meno')}</label>
           <input
             id="lprof-meno"
             value={meno}
@@ -599,17 +599,17 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
             onChange={(e) => setMeno(e.target.value)}
           />
         </div>
-        <p className="lprof-poznamka">Pod týmto menom vás uvidia ostatní pri príspevkoch. E-mail ({profil.email}) zostáva skrytý.</p>
+        <p className="lprof-poznamka">{t('Pod týmto menom vás uvidia ostatní pri príspevkoch. E-mail')} ({profil.email}) {t('zostáva skrytý.')}</p>
       </section>
 
       <section>
-        <h2>Fotografia</h2>
+        <h2>{t('Fotografia')}</h2>
         <div className="lprof-foto">
           {foto
             ? <img src={foto} alt="" width={56} height={56} />
             : <span className="lprof-pecat lprof-pecat-mala" aria-hidden="true">{iniciala(profil.displayName || profil.username)}</span>}
           <label className="lprof-subor">
-            {foto ? 'Zmeniť fotografiu' : 'Nahrať fotografiu'}
+            {foto ? t('Zmeniť fotografiu') : t('Nahrať fotografiu')}
             <input
               type="file"
               accept="image/*"
@@ -621,7 +621,7 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
       </section>
 
       <section>
-        <h2>Kedy mi dať vedieť</h2>
+        <h2>{t('Kedy mi dať vedieť')}</h2>
         <ul className="lprof-prefs">
           {PREFS.map(({ k, t }) => (
             <li key={k}>
@@ -640,13 +640,13 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
                   disabled={busy || pushPermission() === 'denied'}
                   onChange={prepniPush}
                 />
-                Upozorniť priamo v zariadení
+                {t('Upozorniť priamo v zariadení')}
               </label>
             </li>
           )}
         </ul>
         <div className="lprof-tlacidla">
-          <button type="button" className="lprof-hlavne" disabled={busy} onClick={uloz}>Uložiť zmeny</button>
+          <button type="button" className="lprof-hlavne" disabled={busy} onClick={uloz}>{t('Uložiť zmeny')}</button>
         </div>
       </section>
 
@@ -654,22 +654,20 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
           jedným klepnutím v okienku nahlásenia a bez tohto miesta by sa
           nedalo vrátiť. */}
       <section>
-        <h2>Zablokovaní členovia</h2>
+        <h2>{t('Zablokovaní členovia')}</h2>
         {blokovani.length === 0 ? (
           <p className="lprof-poznamka">
-            Nikoho nemáte zablokovaného. Zablokovať člena sa dá pri jeho príspevku,
-            cez „Nahlásiť".
+            {t('Nikoho nemáte zablokovaného. Zablokovať člena sa dá pri jeho príspevku, cez „Nahlásiť".')}
           </p>
         ) : (
           <>
             <p className="lprof-poznamka">
-              Príspevky týchto členov sa vám nezobrazujú. Oni o tom nevedia a ostatným
-              sa ich príspevky ukazujú ďalej.
+              {t('Príspevky týchto členov sa vám nezobrazujú. Oni o tom nevedia a ostatným sa ich príspevky ukazujú ďalej.')}
             </p>
             <ul className="lprof-blokovani">
               {blokovani.map((b) => (
                 <li key={b.documentId}>
-                  <span>{b.kohoMeno || `Účet č. ${b.kohoId}`}</span>
+                  <span>{b.kohoMeno || `${t('Účet č.')} ${b.kohoId}`}</span>
                   <button
                     type="button"
                     onClick={async () => {
@@ -697,12 +695,12 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
         {rusim && (
           <div className="lprof-zrusenie">
             <p>
-              Účet sa zmaže natrvalo. Vaše príspevky zostanú v diskusiách podpísané ako <b>Zmazaný účet</b>.
-              Vrátiť sa to nedá.
+              {t('Účet sa zmaže natrvalo. Vaše príspevky zostanú v diskusiách podpísané ako')} <b>{t('Zmazaný účet')}</b>.
+              {t('Vrátiť sa to nedá.')}
             </p>
             <div className="lprof-tlacidla">
-              <button type="button" onClick={() => setRusim(false)}>Ponechať účet</button>
-              <button type="button" className="lprof-hlavne lprof-zmazat" disabled={busy} onClick={zrusUcet}>Zmazať natrvalo</button>
+              <button type="button" onClick={() => setRusim(false)}>{t('Ponechať účet')}</button>
+              <button type="button" className="lprof-hlavne lprof-zmazat" disabled={busy} onClick={zrusUcet}>{t('Zmazať natrvalo')}</button>
             </div>
           </div>
         )}

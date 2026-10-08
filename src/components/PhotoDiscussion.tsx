@@ -1,6 +1,6 @@
 'use client';
 
-import { t } from '../lib/jazyk';
+import { odkaz, t } from '../lib/jazyk';
 import { useEffect, useRef, useState } from 'react';
 import { ThumbsUp, MessageCircle, Share2, Heart, Send, Loader2 } from 'lucide-react';
 import { Nacitavanie } from '../design-lab/Nacitavanie';
@@ -116,7 +116,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
   const liked = !!myReaction;
 
   const toggleLike = async () => {
-    if (!isLoggedIn || !token) { go('/prihlasenie'); return; }
+    if (!isLoggedIn || !token) { go(odkaz('/prihlasenie')); return; }
     setMyReaction(liked ? null : 'pending');
     setLikeCount((n) => n + (liked ? -1 : 1));
     try {
@@ -129,7 +129,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
   };
 
   const focusInput = () => {
-    if (!isLoggedIn) { go('/prihlasenie'); return; }
+    if (!isLoggedIn) { go(odkaz('/prihlasenie')); return; }
     inputRef.current?.focus();
     inputRef.current?.scrollIntoView({ block: 'nearest' });
   };
@@ -156,7 +156,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
 
   // Lajk/unlike foto-komentára — optimisticky (aj vo vnorených odpovediach).
   const toggleCommentLike = async (c: PhotoCommentNode) => {
-    if (!isLoggedIn || !token) { go('/prihlasenie'); return; }
+    if (!isLoggedIn || !token) { go(odkaz('/prihlasenie')); return; }
     const liked = !!c.myLikeId;
     setComments(prev => patchNode(prev, c.documentId, {
       myLikeId: liked ? null : 'pending',
@@ -369,7 +369,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
           </>
         ) : (
           <button
-            onClick={() => go('/prihlasenie')}
+            onClick={() => go(odkaz('/prihlasenie'))}
             className="pl-focusable"
             style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--pl-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}
           >
