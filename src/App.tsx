@@ -227,17 +227,36 @@ function App() {
     };
   }, []);
 
-  // Mobilné gesto: potiahnutie prstom DOĽAVA cez obsah = späť (história prehliadača).
-  // Vylúčené stránky/oblasti s vlastnými horizontálnymi gestami (mapa, galéria,
-  // lightbox fotky, mapy, canvas, polia na písanie).
+  /* Mobilné gesto: ťah prstom DOPRAVA = späť, DOĽAVA = dopredu — tak, ako to
+     robí systém od okraja obrazovky na Androide aj na iPhone. Do júla 2026 to
+     web mal naopak a gesto šlo proti systémovému: tým istým smerom sa dalo
+     podľa miesta začiatku ísť raz späť, raz dopredu.
+
+     Vylúčené sú oblasti s vlastnými vodorovnými gestami (mapa, galéria,
+     svetlík fotky, plátna, polia na písanie) a čokoľvek, čo sa samo posúva
+     do strán — pás zápisov v kronike aj rad kategórií sa listuje prstom
+     a to nie je povel na opustenie stránky. */
   useEffect(() => {
     if (route === 'galeria') return;
     let x0 = 0, y0 = 0, t0 = 0, skip = false;
+
+    /** Posúva sa niečo nad prstom do strán? */
+    const vPosuvnomPase = (el: HTMLElement | null): boolean => {
+      for (let n: HTMLElement | null = el; n && n !== document.body; n = n.parentElement) {
+        if (n.scrollWidth > n.clientWidth + 8) {
+          const ox = getComputedStyle(n).overflowX;
+          if (ox === 'auto' || ox === 'scroll') return true;
+        }
+      }
+      return false;
+    };
+
     const onStart = (e: TouchEvent) => {
       const t = e.touches[0];
       x0 = t.clientX; y0 = t.clientY; t0 = Date.now();
       const el = e.target as HTMLElement | null;
-      skip = !!el?.closest?.('.pl-overlay, .map-3d-box, .maplibregl-map, .mapboxgl-map, canvas, input, textarea, [data-swipe-ignore]');
+      skip = !!el?.closest?.('.pl-overlay, .map-3d-box, .maplibregl-map, .mapboxgl-map, canvas, input, textarea, [data-swipe-ignore]')
+        || vPosuvnomPase(el);
     };
     const onEnd = (e: TouchEvent) => {
       if (skip) return;
@@ -245,9 +264,14 @@ function App() {
       const dx = t.clientX - x0;
       const dy = t.clientY - y0;
       const dt = Date.now() - t0;
-      // Výrazne doľava, dominantne horizontálne, dosť rýchle → späť.
-      if (dx < -90 && Math.abs(dx) > Math.abs(dy) * 1.8 && dt < 800) {
+      // Dominantne vodorovné, výrazné a dosť rýchle — inak je to rolovanie.
+      if (Math.abs(dx) < 90 || Math.abs(dx) < Math.abs(dy) * 1.8 || dt >= 800) return;
+      if (dx > 0) {
         if (window.history.length > 1) window.history.back();
+      } else {
+        /* Keď dopredu niet kam, prehliadač neurobí nič — vlastnú kontrolu
+           na to nemáme, história dopredu sa z JavaScriptu prečítať nedá. */
+        window.history.forward();
       }
     };
     window.addEventListener('touchstart', onStart, { passive: true });
