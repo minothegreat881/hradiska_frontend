@@ -31,7 +31,7 @@ import { getStrapiImageUrl, convertStrapiPostToArticle } from '../lib/strapi';
 import { getRelated, type RelatedCard } from '../lib/related';
 import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 import { ArticleSidebar, KeyFactsCard, TimelineCard } from '../components/ArticleSidebar';
-import { t, datum as datumJazyka, odkaz, poAnglicky, kategoria, jazyk } from '../lib/jazyk';
+import { t, datum as datumJazyka, odkaz, poAnglicky, kategoria, jazyk, nastavDruhyOdkaz, druhyJazyk } from '../lib/jazyk';
 import { HistoricalGallery } from '../components/HistoricalGallery';
 import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
@@ -87,6 +87,21 @@ export function LabArticle({ slug }: { slug: string }) {
   /* Poistka pre prípad, že sa fotografia nestihne — viď `.lart-hero-mini`. */
   const [ostraTu, setOstraTu] = useState(false);
   useEffect(() => { setOstraTu(false); }, [slug]);
+
+  /* Článok má v každom jazyku vlastný slug, takže prepínač v hlavičke sa cieľ
+     nemá ako dopočítať — ohlási mu ho stránka. Keď druhá verzia neexistuje,
+     ohlási sa `null` a prepínač prepne aspoň na domovskú stránku v druhom
+     jazyku, nie na 404. */
+  useEffect(() => {
+    const druhy = (post?.localizations || []).find((x: { locale?: string }) => x.locale !== (post?.locale || 'sk'));
+    /* Keď druhá verzia článku neexistuje (nový slovenský článok pred
+       prekladom), prepínač vedie na domovskú stránku v druhom jazyku —
+       lepšie než odkaz na „Článok sa nenašiel". */
+    nastavDruhyOdkaz(druhy
+      ? (druhy.locale === 'en' ? `/en/blog/${druhy.slug}` : `/blog/${druhy.slug}`)
+      : odkaz('/', druhyJazyk()));
+    return () => nastavDruhyOdkaz(null);
+  }, [post]);
 
   const cover = post?.coverImage ? getStrapiImageUrl(post.coverImage) : null;
   const miniatura = post?.coverImage?.formats?.thumbnail?.url
@@ -254,20 +269,9 @@ export function LabArticle({ slug }: { slug: string }) {
           <div className="grid-layout article-grid">
             <div className="article-main-col lart-hero-textcol">
         <div className="lart-hero-text">
-          {/* Prepínač jazyka — ukáže sa len vtedy, keď druhá jazyková verzia
-              článku naozaj existuje. Bez toho by odkaz viedol na 404. */}
-          {(() => {
-            const druhy = (post.localizations || []).find((x) => x.locale !== (post.locale || 'sk'));
-            if (!druhy) return null;
-            const doAnglictiny = druhy.locale === 'en';
-            return (
-              <a className="lart-jazyk" href={doAnglictiny ? `/en/blog/${druhy.slug}` : `/blog/${druhy.slug}`}
-                 hrefLang={druhy.locale} lang={druhy.locale}>
-                {/* Jazyk sa uvádza vlastným menom (endonym): „English", „Slovenčina". */}
-                {doAnglictiny ? 'English' : 'Slovenčina'}
-              </a>
-            );
-          })()}
+          {/* Prepínač jazyka je v hlavičke (`PrepinacJazyka` v `LabNav`), nech je
+              na každej stránke na tom istom mieste. Adresu druhej jazykovej
+              verzie mu ohlasuje `useEffect` vyššie. */}
           <nav className="lart-crumbs" aria-label="Omrvinky">
             <a href={odkaz('/')}>{t('Domov')}</a>
             <span aria-hidden="true">›</span>

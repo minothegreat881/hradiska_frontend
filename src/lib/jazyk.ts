@@ -40,6 +40,37 @@ export function odkaz(cesta: string, j: Jazyk = aktualny): string {
   return cesta === '/' ? '/en' : `/en${cesta}`;
 }
 
+/* ── Prepnutie na druhý jazyk ─────────────────────────────────────────────
+   Väčšinu adries vie prepnúť predpona `/en`, lenže článok má v každom jazyku
+   vlastný slug (`/blog/devin` ↔ `/en/blog/devin-great-moravian-dowina-hillfort`).
+   Tú adresu pozná len stránka článku, preto ju sem ohlási a hlavička si ju
+   vypýta. Keď nie je ohlásená, prepne sa predponou. */
+
+let druhyOdkaz: string | null = null;
+const poslucháči = new Set<() => void>();
+
+/** Ohlási adresu tej istej stránky v druhom jazyku; `null` ju zruší. */
+export function nastavDruhyOdkaz(url: string | null): void {
+  if (druhyOdkaz === url) return;
+  druhyOdkaz = url;
+  poslucháči.forEach((f) => f());
+}
+
+export const dajDruhyOdkaz = (): string | null => druhyOdkaz;
+
+/** Prihlásenie na zmenu — pre `useSyncExternalStore` v hlavičke. */
+export function sledujDruhyOdkaz(f: () => void): () => void {
+  poslucháči.add(f);
+  return () => { poslucháči.delete(f); };
+}
+
+export const druhyJazyk = (j: Jazyk = aktualny): Jazyk => (j === 'sk' ? 'en' : 'sk');
+
+/** Kam vedie prepínač jazyka z danej cesty (bez jazykovej predpony). */
+export function odkazDoDruhehoJazyka(cesta: string): string {
+  return druhyOdkaz || odkaz(cesta, druhyJazyk());
+}
+
 /* ── Texty rozhrania ──────────────────────────────────────────────────────
    Kľúč je slovenský originál, aby sa v komponente dalo napísať
    `t('Mohlo by vás zaujímať')` a slovenská vetva ostala čitateľná. */

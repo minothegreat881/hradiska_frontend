@@ -1,4 +1,4 @@
-import { t, kategoria, odkaz, poAnglicky } from '../lib/jazyk';
+import { t, kategoria, odkaz, poAnglicky, rozdelAdresu, druhyJazyk, sledujDruhyOdkaz, dajDruhyOdkaz } from '../lib/jazyk';
 'use client';
 
 /**
@@ -21,7 +21,7 @@ import { t, kategoria, odkaz, poAnglicky } from '../lib/jazyk';
  * Farby idú výhradne cez tokeny `--hr-*`.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigationData } from '../hooks/useNavigationData';
 import { AccountNavLink } from '../components/AccountNavLink';
 import { Nacitavanie } from './Nacitavanie';
@@ -78,6 +78,44 @@ const shortLabel = (i: NavigationItem) =>
   poAnglicky()
     ? (SHORT_EN[catSlug(i)] ?? kategoria(i.label))
     : (SHORT[catSlug(i)] ?? i.label);
+
+/**
+ * Prepínač jazyka v hlavičke.
+ *
+ * Predtým visel v titulke článku ako holý odkaz „English" — teda na mieste,
+ * kde ho na iných stránkach nebolo vidieť vôbec. Tu je na každej stránke a
+ * nesie skratku jazyka, do KTORÉHO prepne (na slovenskej stránke „EN").
+ *
+ * Článok má v každom jazyku vlastnú adresu, preto ju stránka článku ohlási
+ * cez `nastavDruhyOdkaz`; inde stačí jazyková predpona.
+ */
+function PrepinacJazyka() {
+  const druhyOdkaz = useSyncExternalStore(sledujDruhyOdkaz, dajDruhyOdkaz, () => null);
+  const cesta = typeof window === 'undefined' ? '/' : rozdelAdresu(window.location.pathname).cesta;
+  const ciel = druhyOdkaz || odkaz(cesta, druhyJazyk());
+  const doAnglictiny = !poAnglicky();
+  const skratka = doAnglictiny ? 'EN' : 'SK';
+  const popis = doAnglictiny ? 'Switch to English' : 'Prepnúť do slovenčiny';
+  return (
+    <a
+      className="lnav-jazyk"
+      href={ciel}
+      hrefLang={doAnglictiny ? 'en' : 'sk'}
+      lang={doAnglictiny ? 'en' : 'sk'}
+      title={popis}
+      aria-label={popis}
+    >
+      {/* Zemeguľa s poludníkmi — zrozumiteľná bez textu a bez vlajky
+          (vlajka by jazyk zamieňala s krajinou). */}
+      <svg className="lnav-jazyk-i" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M3 12h18" />
+        <path d="M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21C9.5 18.4 8.2 15.3 8.2 12S9.5 5.6 12 3z" />
+      </svg>
+      <span className="lnav-jazyk-t">{skratka}</span>
+    </a>
+  );
+}
 
 export function LabNav() {
   const { items, loading, nacitajClanky } = useNavigationData();
@@ -210,8 +248,9 @@ export function LabNav() {
         </div>
 
         <div className="lnav-right">
-          <a href="/galeria" className="lnav-link">{t('Galéria')}</a>
-          <a href="/aktuality" className="lnav-link">{t('Aktuality')}</a>
+          <a href={odkaz('/galeria')} className="lnav-link">{t('Galéria')}</a>
+          <a href={odkaz('/aktuality')} className="lnav-link">{t('Aktuality')}</a>
+          <PrepinacJazyka />
           <AccountNavLink />
           {/* Ponuka pre dotyk. Cieľ má 44 × 44 px — menšie sa palcom trafí ťažko. */}
           <button
@@ -271,8 +310,8 @@ export function LabNav() {
             </div>
           ))}
           <div className="lnav-m-group lnav-m-service">
-            <a href="/galeria" onClick={() => setMenuOpen(false)}>{t('Galéria')}</a>
-            <a href="/aktuality" onClick={() => setMenuOpen(false)}>{t('Aktuality')}</a>
+            <a href={odkaz('/galeria')} onClick={() => setMenuOpen(false)}>{t('Galéria')}</a>
+            <a href={odkaz('/aktuality')} onClick={() => setMenuOpen(false)}>{t('Aktuality')}</a>
           </div>
         </div>
       )}
