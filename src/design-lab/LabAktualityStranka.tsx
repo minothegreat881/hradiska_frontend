@@ -31,8 +31,7 @@ import { ArticleCard } from '../components/ArticleCard';
 import { Nacitavanie } from './Nacitavanie';
 import { getKronikaAll, getCategoryPostCounts, type KronikaItem } from '../lib/strapi';
 import { CINNOSTI, cinnostZapisu, type KlucCinnosti } from '../data/cinnost';
-import { variant } from '../data/categories';
-import { zakladStrapi } from '../data/rozcestnik';
+import { LabCinnost } from './LabCinnost';
 import type { Article } from '../data/mock-data';
 
 /** Zápis z kroniky do tvaru, ktorému rozumie karta článku. */
@@ -118,11 +117,17 @@ export function LabAktualityStranka() {
     const u = new URL(window.location.href);
     if (k) u.searchParams.set('cinnost', k); else u.searchParams.delete('cinnost');
     window.history.pushState(null, '', u.toString());
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    /* Skok na ZOZNAM, nie na začiatok stránky. Dlaždice zaberajú na telefóne
+       celé okno, takže po výbere témy bolo vidieť zasa len ich a zúžený
+       zoznam ostal pod nimi — klepnutie potom vyzeralo, že nič neurobilo.
+       Čaká sa na prekreslenie, inak sa meria ešte starý rozvrh. */
+    requestAnimationFrame(() => {
+      const ciel = document.querySelector(k ? '.lcin-vyber' : '.lcin');
+      ciel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   };
 
   const zvolena = CINNOSTI.find((c) => c.kluc === vybrana) || null;
-  const zaklad = zakladStrapi();
 
   return (
     <div className="lakt">
@@ -153,48 +158,14 @@ export function LabAktualityStranka() {
           )}
         </header>
 
-        {/* ── Činnosť združenia ──────────────────────────────────────────
-            Dlaždice nad kronikou. Tie, čo majú vlastnú kategóriu, vedú do
-            nej; ostatné zúžia kroniku pod sebou. */}
-        <section className="lcin" aria-label={t('Činnosť združenia')}>
-          <div className="lcin-h">
-            <h2>{t('Čo združenie robí')}</h2>
-            <span className="lcin-ciara" aria-hidden="true" />
-          </div>
-          <div className="lcin-rad">
-            {CINNOSTI.map((c) => {
-              const pocet = c.kategoria ? poctyKategorii[c.kategoria] : pocty[c.kluc];
-              const obrazok = c.vlastny ? c.obrazok : `${zaklad}${variant(c.obrazok, 'small')}`;
-              const obsah = (
-                <>
-                  <span className={c.vlastny ? 'lcin-ram lcin-ram--znak' : 'lcin-ram'}>
-                    <img src={obrazok} alt="" loading="lazy" decoding="async" />
-                  </span>
-                  <span className="lcin-text">
-                    <span className="lcin-nazov">{t(c.nazov)}</span>
-                    {typeof pocet === 'number' && pocet > 0 && <span className="lcin-pocet">{pocet}</span>}
-                  </span>
-                  <span className="lcin-popis">{t(c.popis)}</span>
-                </>
-              );
-              /* Tabule a 3D rekonštrukcie nie sú zápisy kroniky, ale vlastná
-                 kategória — dlaždica preto vedie tam, nie do filtra. */
-              return c.kategoria ? (
-                <a key={c.kluc} className="lcin-dlazdica" href={odkaz(`/category/${c.kategoria}`)}>{obsah}</a>
-              ) : (
-                <button
-                  key={c.kluc}
-                  type="button"
-                  className={vybrana === c.kluc ? 'lcin-dlazdica is-on' : 'lcin-dlazdica'}
-                  aria-pressed={vybrana === c.kluc}
-                  onClick={() => prepni(vybrana === c.kluc ? null : c.kluc)}
-                >
-                  {obsah}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+        {/* Dlaždice činnosti. Tu majú počty a zužujú kroniku pod sebou;
+            pod článkom je ten istý diel, len ako odkazy. */}
+        <LabCinnost
+          pocty={pocty}
+          poctyKategorii={poctyKategorii}
+          vybrana={vybrana}
+          onVyber={prepni}
+        />
 
         {zvolena && (
           <div className="lcin-vyber">

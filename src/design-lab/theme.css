@@ -2508,6 +2508,15 @@ body[data-lab-theme] .pl-overlay,
 }
 body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans-serif !important; }
 
+/* ── Činnosť združenia pod článkom ─────────────────────────────────────────
+   Posledný pás stránky. Súvisiace články nad ním stoja na tmavšom papieri,
+   tento je svetlý — inak by z konca článku bol jeden dlhý sivý blok. */
+.lart-cinnost { padding: 56px 0 72px; background: var(--l-paper); border-top: 1px solid var(--l-line); }
+.lart-cinnost .lcin { margin: 0; }
+/* Tichší nadpis: pod článkom je to doplnok, nie hlavná vec stránky. */
+.lcin--ticha .lcin-h h2 { font-size: clamp(18px, 2vw, 22px); color: var(--l-body); }
+@media (max-width: 700px) { .lart-cinnost { padding: 40px 0 48px; } }
+
 /* ── Súvisiace články ──────────────────────────────────────────────────── */
 .lart-more { padding: 72px 0 88px; background: var(--l-paper-2); border-top: 1px solid var(--l-line); }
 .lart .lart-more-h {
@@ -3373,7 +3382,7 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
    združenie zaoberá, bez toho, aby ju niekto musel vyčítať z osemdesiatich
    zápisov. Dve z nich (tabule, 3D) vedú do vlastnej kategórie, ostatné
    zúžia kroniku pod sebou. */
-.lcin { margin: 0 0 50px; }
+.lcin { margin: 0 0 50px; scroll-margin-top: 92px; }
 .lcin-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; }
 .lcin-h h2 {
   margin: 0; font-family: 'Fraunces', Georgia, serif; font-weight: 600;
@@ -3430,6 +3439,8 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 /* Oznam, že kronika je zúžená — inak sa chýbajúce roky čítajú ako chyba. */
 .lcin-vyber {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  /* Horná lišta je lepivá — bez odstupu by skok na oznam skončil pod ňou. */
+  scroll-margin-top: 92px;
   flex-wrap: wrap; margin: 0 0 30px; padding: 12px 16px;
   border-radius: 14px; background: var(--l-paper-2); border: 1px solid var(--l-line);
 }

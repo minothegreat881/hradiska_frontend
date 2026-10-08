@@ -38,6 +38,7 @@ import { SocialShare } from '../components/SocialShare';
 import { ArticleCard } from '../components/ArticleCard';
 import LabKategorieLista from './LabKategorieLista';
 import { MapaAzKedTreba } from './MapaAzKedTreba';
+import { LabCinnost } from './LabCinnost';
 
 function skDate(iso?: string | null): string {
   if (!iso) return '';
@@ -417,6 +418,19 @@ export function LabArticle({ slug }: { slug: string }) {
           </div>
         </section>
       )}
+
+      {/* Činnosť združenia — posledná vec pod článkom. Kto dočítal text
+          o hradisku, je presne ten, komu stojí za to povedať, že tabuľu pri
+          ňom osadilo združenie, že o ňom vyšiel zborník a že sa to platí
+          z 2 % z daní. Do kroniky, kde to všetko je, zájde málokto.
+          Dlaždice sú tu odkazy — kronika na stránke článku nie je, takže
+          niet čo zúžiť; počty by znamenali stiahnuť osemdesiat zápisov
+          kvôli siedmim číslam. */}
+      <section className="lart-cinnost">
+        <div className="container">
+          <LabCinnost tichy />
+        </div>
+      </section>
     </div>
   );
 }

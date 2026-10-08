@@ -171,6 +171,12 @@ function Figcaption({ caption, credit, sourceUrl, align = 'center', show = true 
 
 interface ImageWrapperProps {
   src: string;
+  /* Sada zdrojov a `sizes` sa sem dostali pri zľahčovaní obrázkov, ale do
+     tohto rozhrania ich vtedy nikto nedopísal — komponent ich prijímal
+     a používal, typy o nich nevedeli. Vite preklad nekontroluje, takže sa
+     na to prišlo až pri `tsc`. */
+  srcSet?: string;
+  sizes?: string;
   alt: string;
   aspectRatio?: BlogMediaAspectRatio;
   objectPosition?: string;
