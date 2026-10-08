@@ -50,6 +50,11 @@ const escAttr = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&qu
 const escText = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const jsonld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`;
 
+/* Cudzie jazyky webu. Pridanie ďalšieho je jeden riadok — prerender aj
+   sitemap cyklia cez tento zoznam. Slovenčina je bez predpony a nie je tu. */
+const CUDZIE_JAZYKY = ['en', 'de'];
+const OG_LOCALE = { sk: 'sk_SK', en: 'en_GB', de: 'de_DE' };
+
 const ORG = { '@type': 'Organization', name: 'Hradiská.sk', url: SITE + '/', logo: `${SITE}/logo_slovanske_hradiska_256.jpg` };
 
 function buildHead({ title, description, canonical, ogType = 'website', image = DEFAULT_OG, publishedTime, ld = [], alternaty = [], jazyk = 'sk' }) {
@@ -60,7 +65,7 @@ function buildHead({ title, description, canonical, ogType = 'website', image = 
     ...(alternaty || []).map((a) => `<link rel="alternate" hreflang="${a.jazyk}" href="${escAttr(a.url)}" />`),
     `<meta property="og:type" content="${ogType}" />`,
     `<meta property="og:site_name" content="Hradiská.sk" />`,
-    `<meta property="og:locale" content="${jazyk === 'en' ? 'en_GB' : 'sk_SK'}" />`,
+    `<meta property="og:locale" content="${OG_LOCALE[jazyk] || 'sk_SK'}" />`,
     `<meta property="og:title" content="${escAttr(title)}" />`,
     `<meta property="og:description" content="${escAttr(description)}" />`,
     `<meta property="og:url" content="${escAttr(canonical)}" />`,
@@ -129,12 +134,15 @@ async function main() {
 
   /* Anglické verzie — mapa `slovenský slug → anglický článok`. Keď Strapi
      odpovedá chybou (napr. preklady ešte nie sú zapnuté), ide sa ďalej bez nich. */
-  const anglicke = new Map();
+  /* Mapa jazyk → (slovenský slug → článok v tom jazyku). */
+  const cudzie = new Map(CUDZIE_JAZYKY.map((j) => [j, new Map()]));
+  for (const jazykVerzie of CUDZIE_JAZYKY) {
+  const anglicke = cudzie.get(jazykVerzie);
   try {
     /* STRÁNKOVAŤ: `pageSize` nad 100 Strapi ticho oreže na stovku a prerender
-       by vyrobil hlavičky len prvej stovke anglických článkov. */
+       by vyrobil hlavičky len prvej stovke článkov daného jazyka. */
     for (let page = 1; page <= 20; page++) {
-    const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[page]=${page}&pagination[pageSize]=100`
+    const r = await fetch(`${STRAPI}/api/blog-posts?locale=${jazykVerzie}&pagination[page]=${page}&pagination[pageSize]=100`
       + `&fields[0]=title&fields[1]=slug&fields[2]=excerpt&fields[3]=metaTitle&fields[4]=metaDescription`
       + `&fields[5]=authorName&fields[6]=originalPublishedDate`
       + `&populate[coverImage][fields][0]=url&populate[coverImage][fields][1]=formats`
@@ -158,7 +166,8 @@ async function main() {
     }
     }
   } catch (e) {
-    console.warn(`[prerender] anglické verzie sa nenačítali (${e.message}) — pokračujem bez nich.`);
+    console.warn(`[prerender] ${jazykVerzie} verzie sa nenačítali (${e.message}) — pokračujem bez nich.`);
+  }
   }
 
   let n = 0;
@@ -198,10 +207,14 @@ async function main() {
       });
     }
 
-    const en = anglicke.get(a.slug);
-    const alternaty = en ? [
+    /* Hreflang dostane každý jazyk, v ktorom článok naozaj existuje —
+       odkaz na nepreloženú verziu by bol odkaz na 404. */
+    const inojazycne = CUDZIE_JAZYKY
+      .map((j) => ({ jazyk: j, verzia: cudzie.get(j).get(a.slug) }))
+      .filter((x) => x.verzia);
+    const alternaty = inojazycne.length ? [
       { jazyk: 'sk', url: canonical },
-      { jazyk: 'en', url: `${SITE}/en/blog/${en.slug}` },
+      ...inojazycne.map((x) => ({ jazyk: x.jazyk, url: `${SITE}/${x.jazyk}/blog/${x.verzia.slug}` })),
       { jazyk: 'x-default', url: canonical },
     ] : [];
 
@@ -209,33 +222,41 @@ async function main() {
     n++;
   }
 
-  /* Anglické články. Obsah je v Strapi pod jazykom `en`; zoznam sa ťahá priamo
-     z API, lebo vyhľadávací index je slovenský. */
+  /* Články v cudzích jazykoch. Obsah je v Strapi pod daným jazykom; zoznam sa
+     ťahá priamo z API, lebo vyhľadávací index je slovenský. */
   let m = 0;
-  for (const [skSlug, en] of anglicke) {
-    const canonical = `${SITE}/en/blog/${en.slug}`;
+  for (const jazykVerzie of CUDZIE_JAZYKY) {
+  for (const [skSlug, en] of cudzie.get(jazykVerzie)) {
+    const canonical = `${SITE}/${jazykVerzie}/blog/${en.slug}`;
     const image = en.cover ? (en.cover.startsWith('http') ? en.cover : MEDIA + en.cover) : DEFAULT_OG;
     const article = {
       '@context': 'https://schema.org', '@type': 'Article',
-      headline: en.title, description: en.metaDescription || en.excerpt || '', image, inLanguage: 'en',
+      headline: en.title, description: en.metaDescription || en.excerpt || '', image, inLanguage: jazykVerzie,
       author: { '@type': 'Person', name: en.authorName || 'Hradiská' },
       publisher: ORG, mainEntityOfPage: canonical,
     };
     if (en.date) article.datePublished = en.date;
+    /* Aj tu sa vymenujú všetky jazyky článku, nielen slovenčina a tento —
+       inak by sa nemecká a anglická verzia o sebe navzájom nedozvedeli. */
     const alternaty = [
       { jazyk: 'sk', url: `${SITE}/blog/${skSlug}` },
-      { jazyk: 'en', url: canonical },
+      ...CUDZIE_JAZYKY
+        .map((j) => ({ jazyk: j, verzia: cudzie.get(j).get(skSlug) }))
+        .filter((x) => x.verzia)
+        .map((x) => ({ jazyk: x.jazyk, url: `${SITE}/${x.jazyk}/blog/${x.verzia.slug}` })),
       { jazyk: 'x-default', url: `${SITE}/blog/${skSlug}` },
     ];
-    writePage(`/en/blog/${en.slug}`, buildHead({
+    writePage(`/${jazykVerzie}/blog/${en.slug}`, buildHead({
       title: en.metaTitle || en.title,
       description: en.metaDescription || en.excerpt || '',
       canonical, ogType: 'article', image, publishedTime: en.date, ld: [article],
-      alternaty, jazyk: 'en',
+      alternaty, jazyk: jazykVerzie,
     }));
     m++;
   }
-  console.log(`[prerender] hlavičky: ${STATIC.length} statických + ${n} slovenských + ${m} anglických článkov`);
+  }
+  const poJazykoch = CUDZIE_JAZYKY.map((j) => `${j}: ${cudzie.get(j).size}`).join(', ');
+  console.log(`[prerender] hlavičky: ${STATIC.length} statických + ${n} slovenských + ${m} cudzojazyčných článkov (${poJazykoch})`);
 }
 
 main();

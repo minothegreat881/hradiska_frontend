@@ -56,6 +56,381 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/blog/pohanska-brana</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/pohanska-svatyna-most-pri-bratislave-nove-3d</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/zvolen-motova-kresba</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/rondel-vo-svodine-3d</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/zvolen-motova-3d-panorama</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/peter-schreiber-osidlenie-ziliny-a-okolia-od-doby-rimskej-po-stredovek-lokalita-divinka</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/robert-muller-okolie-rieky-zala-v-8-10-storoci</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/sidliska-otomanskej-kultury-na-vychodnom-slovensku</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/tragedia-jedneho-uspesneho-obsadenia-vlasti</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/z-stegmann-rajtar-predbezne-vysledky-archeologickeho-vyskumu-na-zibrici-vyskumy-v-r-2002-2003-a-2005-2006</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/informacna-tabula-pruzina</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/informacne-tabule-predna-horka-a-klape</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/informacne-tabule-prosne-zlaty-kon-a-uhliska</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/nase-tabule-visolaje-slovansky-mohylnik</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/oprava-tabule-v-pruzine</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/socha-a-tabula-na-orgonovej-kycere</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/tabula-na-hradisku-holis-nimnica</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/tabula-nosice-hradisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kostol-sv-margity-antiochijskej-najstarsia-stojaca-stavba-na-slovensku</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/mohylnik-sverepec-podvrscie</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/most-pri-bratislave-prva-staroslovanska-svatyna-na-slovensku</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/mytologia-smrti-u-slovanov-a-inych-etnik</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/pohanska-viera-slovanov-a-jej-dokazy-v-archeologickych-nalezoch</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/prosne-keltske-obetisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/s-melis-stopy-pohanskych-bohov</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/skalka-zahadny-kostolik-na-hradisku</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/stredoeuropske-a-slovenske-mohylove-oblasti-zapadnych-slovanov</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/tajomne-znaky-na-skalach-na-povazi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/upiri-na-velkej-morave</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/visolaje-slovansky-mohylnik</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/zbrucsky-idol</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/zemplin-keltske-dacke-obetisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/bohyna-lada-na-hrade-lietava</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/gorazd-petresovicz-zamcisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/hradisko-zilin-papradno</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/ladislav-nadasi-jege-svatopluk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kamenec-pod-vtacnikom-bystricany-povesti</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/perunov-haj-pri-ubrezi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/povest-modlatin</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/povesti-viazane-k-poloham-hradiste-a-koscelisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/stary-orgon-na-kycere</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/strasny-muromar</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/sumrak-velkej-moravy-povest-z-10-storocia</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/utok-frankov-na-hradisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/archeologicke-kultury-na-slovensku-datovanie</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/bavorsky-geograf-prva-pisomna-zmienka-o-nitrianskych-slovenoch</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/bohatstvo-slovenov-slavic-wealth</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/bojova-taktika-madarov-a-inych-kocovnikov</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/domy-slovenov</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/hradiska-keltov-na-uzemi-slovenska-ako-centra-remeselnej-vyroby</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kedy-prisli-slovania-na-slovensko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kocovni-pastevci-jakozto-najezdnici-od-vychodu</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/konstrukcia-slovanskych-hradisk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kovacstvo-a-zelezne-hrivny-v-staroveku-a-v-slovanskom-obdobi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/krizova-vyprava-proti-slovanom-1147</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/krasa-slovanskych-sperkov</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/markomani-a-kvadi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/povod-vyznam-a-historia-najstarsich-hradisk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/stefan-jansak-nedobytne-hradiska</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/stefanovicova-slovensko-v-casoch-svatoplukovych</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/tisicrocne-hradiska-slovanov</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/tollens-bitka-z-doby-bronzovej</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/vojenstvo-na-velkej-morave-a-taktika-obrany-hradisk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/zbrane-nitranov-v-casoch-velkej-moravy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/anton-intibus-1855-o-okoli-trnavy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/cividalsky-evanieliar-pribina-kocel-rastislav-a-svatopluk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/falosne-runove-napisy-na-skalach</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/frankovia-rokuju-s-moravanmi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/fuldske-analy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/gaius-iulius-caesar-konstrukcia-keltskych-hradisk-a-dobyvanie-avarica</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kronika-dusi-roman-o-tatarskom-vpade</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/humno-najstarsia-zmienka</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kyjevske-listy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/kniha-vzacnych-drahocennosti</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/blog/madari-v-pisomnych-pramenoch</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/blog/moslimovia-o-madaroch-pred-zaujatim-vlasti</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -266,177 +641,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/zbrane-nitranov-v-casoch-velkej-moravy</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/vojenstvo-na-velkej-morave-a-taktika-obrany-hradisk</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/tollens-bitka-z-doby-bronzovej</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/tisicrocne-hradiska-slovanov</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/stefanovicova-slovensko-v-casoch-svatoplukovych</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/stefan-jansak-nedobytne-hradiska</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/povod-vyznam-a-historia-najstarsich-hradisk</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/markomani-a-kvadi</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/krizova-vyprava-proti-slovanom-1147</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/krasa-slovanskych-sperkov</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kovacstvo-a-zelezne-hrivny-v-staroveku-a-v-slovanskom-obdobi</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/konstrukcia-slovanskych-hradisk</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kocovni-pastevci-jakozto-najezdnici-od-vychodu</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kedy-prisli-slovania-na-slovensko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/hradiska-keltov-na-uzemi-slovenska-ako-centra-remeselnej-vyroby</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/domy-slovenov</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/bojova-taktika-madarov-a-inych-kocovnikov</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/bohatstvo-slovenov-slavic-wealth</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/bavorsky-geograf-prva-pisomna-zmienka-o-nitrianskych-slovenoch</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/archeologicke-kultury-na-slovensku-datovanie</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/alexander-ruttkay-o-svatoplukovi-a-nitre</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/zemplin-keltske-dacke-obetisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/zbrucsky-idol</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/visolaje-slovansky-mohylnik</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/upiri-na-velkej-morave</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/tajomne-znaky-na-skalach-na-povazi</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/stredoeuropske-a-slovenske-mohylove-oblasti-zapadnych-slovanov</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/skalka-zahadny-kostolik-na-hradisku</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/s-melis-stopy-pohanskych-bohov</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/prosne-keltske-obetisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/pohanska-viera-slovanov-a-jej-dokazy-v-archeologickych-nalezoch</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/mytologia-smrti-u-slovanov-a-inych-etnik</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/most-pri-bratislave-prva-staroslovanska-svatyna-na-slovensku</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/mohylnik-sverepec-podvrscie</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kostol-sv-margity-antiochijskej-najstarsia-stojaca-stavba-na-slovensku</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -741,41 +946,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/utok-frankov-na-hradisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/sumrak-velkej-moravy-povest-z-10-storocia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/strasny-muromar</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/stary-orgon-na-kycere</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/povesti-viazane-k-poloham-hradiste-a-koscelisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/povest-modlatin</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/perunov-haj-pri-ubrezi</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/o-starom-kristofovi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -786,62 +956,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/ladislav-nadasi-jege-svatopluk</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kamenec-pod-vtacnikom-bystricany-povesti</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/hradisko-zilin-papradno</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/gorazd-petresovicz-zamcisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/bohyna-lada-na-hrade-lietava</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/basen-o-orgonovi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/z-stegmann-rajtar-predbezne-vysledky-archeologickeho-vyskumu-na-zibrici-vyskumy-v-r-2002-2003-a-2005-2006</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/tragedia-jedneho-uspesneho-obsadenia-vlasti</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/simunky-siroka-hradiste-koscelisko-mozne-suvislosti</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/sidliska-otomanskej-kultury-na-vychodnom-slovensku</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/robert-muller-okolie-rieky-zala-v-8-10-storoci</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/peter-schreiber-osidlenie-ziliny-a-okolia-od-doby-rimskej-po-stredovek-lokalita-divinka</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1066,61 +1186,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/madari-v-pisomnych-pramenoch</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kyjevske-listy</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kronika-dusi-roman-o-tatarskom-vpade</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/kniha-vzacnych-drahocennosti</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/humno-najstarsia-zmienka</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/gaius-iulius-caesar-konstrukcia-keltskych-hradisk-a-dobyvanie-avarica</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/fuldske-analy</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/frankovia-rokuju-s-moravanmi</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/falosne-runove-napisy-na-skalach</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/cividalsky-evanieliar-pribina-kocel-rastislav-a-svatopluk</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/anton-intibus-1855-o-okoli-trnavy</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/wogastisburg-najvyznamnejsie-hradisko-samovej-rise</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1151,47 +1216,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/tabula-nosice-hradisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/tabula-na-hradisku-holis-nimnica</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/socha-a-tabula-na-orgonovej-kycere</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/oprava-tabule-v-pruzine</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/nase-tabule-visolaje-slovansky-mohylnik</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/informacne-tabule-prosne-zlaty-kon-a-uhliska</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/informacne-tabule-predna-horka-a-klape</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/informacne-tabule-dolne-oresany-slepy-vrch</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/informacna-tabula-pruzina</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1616,16 +1641,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/zvolen-motova-kresba</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/zvolen-motova-3d-panorama</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/zlaty-kon-kresba-p-brosa</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -1711,27 +1726,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/blog/rondel-vo-svodine-3d</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/blog/rekonstrukcia-opevnenia-hradisk</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hradiska.sk/blog/prosne-zlaty-kon-kresba-a-lacka</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/pohanska-svatyna-most-pri-bratislave-nove-3d</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/blog/pohanska-brana</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1876,202 +1876,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/molpir-hallstatt-hillfort-smolenice</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/rekomberek-hillfort-horne-oresany</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/detva-kalamarka-guard-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/velky-tribec-prehistoric-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/en/blog/two-percent-tax-donation-2025</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/bojna-in-winter-snow-covered-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bojna-slavic-life-on-the-hillfort-in-winter</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/celts-lecture-at-tvrdosovce</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/seasons-greetings-from-hradiska</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/interview-about-the-hradiska-civic-association</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/utgard-2018-early-medieval-festival</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/en/blog/two-percent-of-taxes-for-hradiska-2016</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/how-to-collect-antiquities-kmet-1904</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/donate-2-percent-of-your-tax-2016</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/donate-2-percent-of-your-tax-2018</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hradiska-discussion-group</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/forged-runic-inscriptions-on-rocks-1933</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/gorazd-petresovicz-zamcisko-poem</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/celts-in-the-lesser-carpathians-lecture</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/ozivena-archeologia-book-of-visualisations</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/beauty-of-prehistoric-pottery-zilina-exhibition</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/drawings-of-the-early-slavs</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/ladislav-nadasi-jege-svatopluk-novel</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/map-of-medieval-trade-routes</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/pruzina-mesciska-information-panel-repair</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/podcast-celts-in-southern-slovakia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/podcast-prehistoric-swords</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hidden-treasures-tvrdosovce-finds</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/slovanka-slavic-semi-sunken-log-building-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/slavic-magnates-residence-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/old-church-slavonic-dictionary-online</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/surany-3d-animation-museum-night</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/velkomoravske-hradiska-new-book</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/rural-fortified-settlement-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/eneolithic-wagon-baden-culture-reconstruction</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hillfort-volume-svedkovia-davnych-cias-published</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hillfort-volume-two-has-been-printed</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hillfort-volume-selling-fast</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hradiska-proceedings-free-on-academia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zvolen-motova-hillfort-3d-panorama</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2096,7 +1906,62 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/gaspar-puchov-culture-surface-finds-vah-region</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/namerova-steppe-pyramids-scythian-kurgans-ukraine</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/how-to-collect-antiquities-kmet-1904</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ruttkay-on-svatopluk-and-nitra</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/poll-amnesty-for-archaeological-finds-2014</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/survey-archaeological-amnesty</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/anton-intibus-1855-antiquities-around-trnava</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/archaeological-cultures-slovakia-dating</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/poem-about-orgon-last-slavic-druid</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bavarian-geographer-first-written-mention-of-nitra-slavs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bina-earthwork-hillfort-hron</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/blatnohrad-pribina-seat-pannonia</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2106,7 +1971,62 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/goddess-lada-at-lietava-castle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bojna-3d-reconstruction-slavic-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bojna-in-winter-snow-covered-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bojna-slavic-life-on-the-hillfort-in-winter</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bojnice-slavic-hillfort-tar-production-centre</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bosaca-srniansky-haj-guard-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bratislava-brezalauspurc-great-moravian-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/breclav-pohansko-great-moravian-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/brekov-slavic-hillfort-above-laborec</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/volunteer-day-dolna-marikova-siroka-small-fort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/brodske-veles-hillfort-dating-puzzles</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bronze-hoard-hillfort-middle-vah-region</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2116,12 +2036,112 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/cividale-gospel-book-great-moravian-names</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/danuvina-alacris-roman-patrol-boat-replica-danube</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/donate-2-percent-of-your-tax-2016</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/donate-2-percent-of-your-tax-2018</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/metal-detector-survey-of-a-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/devin-great-moravian-dowina-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hradiska-discussion-group</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/divin-castle-3d-reconstruction</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/dolne-vestenice-slavic-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/houses-of-the-slavs-early-medieval-dwellings</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/drazovce-hillfort-and-church-near-nitra</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ducove-kostolec-great-moravian-court</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/forged-runic-inscriptions-on-rocks-1933</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/annals-of-fulda-great-moravia-source</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/caesar-celtic-hillfort-walls-siege-of-avaricum</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/gars-thunau-great-moravian-hillfort-in-austria</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/gbelany-puchov-culture-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/gorazd-petresovicz-zamcisko-poem</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hainburg-braunsberg-celtic-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hana-chorvatova-lunula-pendants-and-their-meaning</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hatne-hradok-masonry-architecture-fragments</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hatne-two-hillforts-marikovska-valley</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2141,7 +2161,47 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/humno-earliest-written-mention</loc>
+    <loc>https://hradiska.sk/en/blog/horne-plachtince-pohansky-vrch-central-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hricov-castle-3d-reconstruction</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hradec-prievidza-celtic-slavic-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/nitrianska-blatnica-rotunda-st-george-blatnicky-durko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hradiste-pod-vratnom-brezova-pass-hillforts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hradiste-near-partizanske-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hronsky-benadik-slavic-hillfort-on-benadicka-skala</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/information-panel-hatne-fortlets</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/dolne-oresany-slepy-vrch-information-panels</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2156,6 +2216,36 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/istebne-hradok-hallstatt-hillfort-orava</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/janovce-machalovce-puchov-culture-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/jasenica-predna-horka-puchov-culture-fort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/kamenec-pod-vtacnikom-hradok-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/celts-in-the-lesser-carpathians-lecture</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/celts-lecture-at-tvrdosovce</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/celtic-settlement-3d-visualisation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -2166,7 +2256,82 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/klapy-celtic-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/klucov-early-slavic-hillfort-power-centre</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ozivena-archeologia-book-of-visualisations</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/books-about-the-slavs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/nomadic-herders-raiders-from-the-east</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/construction-of-slavic-hillforts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/church-of-st-margaret-of-antioch-kopcany</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/smithing-iron-axe-shaped-currency-bars</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/beauty-of-prehistoric-pottery-zilina-exhibition</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/drawings-of-the-early-slavs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/kusin-slavic-hillfort-hradek-hill</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ladce-tunezice-nozdrovice-puchov-culture-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ladislav-nadasi-jege-svatopluk-novel</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/legend-of-orgonova-kycera</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/mosaburg-zalavar-blatnohrad-new-excavations</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/majcichov-lowland-fortified-settlement</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2176,7 +2341,17 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/michalovce-life-in-great-moravia-event</loc>
+    <loc>https://hradiska.sk/en/blog/map-of-medieval-trade-routes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/marianka-barania-luka-bazgovic-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/maros-demko-kyiv-pantheon-slavic-gods</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2191,17 +2366,57 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/molpir-hallstatt-hillfort-smolenice</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/moravany-nad-vahom-hradiste-fortified-hilltop</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/two-percent-of-taxes-for-hradiska-2014</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/new-celtic-symbol-discovered-in-slovakia</loc>
+    <loc>https://hradiska.sk/en/blog/muzla-cenkov-slavic-hillfort-on-the-danube</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/mythology-of-death-slavs-and-other-peoples</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/chieftains-princes-kings-veleti-obodrites-salkovsky</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sorbian-lusatian-spree-havel-slavs-elites</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/oldest-recipe-for-mead-14th-century</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://hradiska.sk/en/blog/dolna-marikova-simunky-siroka-hillfort-finds</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/visolaje-slavic-barrow-cemetery-panels</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/divinka-velky-vrch-educational-trail</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2216,7 +2431,27 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/nitrianska-blatnica-rotunda-3d-reconstruction</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/nizna-mysla-bronze-age-town</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/nosice-hradisko-puchov-fort-slavic-graves</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/novohrad-nograd-hillfort-hungary</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/old-kristof-legend-kamenec-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2226,7 +2461,22 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/reporting-archaeological-find-finders-reward</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/pruzina-mesciska-information-panel-repair</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/oresany-slepy-vrch-hillfort-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/oresany-slepy-vrch-early-celtic-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2246,12 +2496,97 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/schreiber-early-medieval-marikovska-valley</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/anton-petrovsky-sichman-fifty-years-since-his-death</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/constantine-porphyrogenitus-and-his-moravias</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/seasons-greetings-from-hradiska</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/schreiber-second-life-of-prehistoric-stone-industry</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/schreiber-finger-ring-from-horna-marikova</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/schreiber-zilina-region-occupation-divinka</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/nove-zamky-fortress-3d-reconstruction</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/pezinok-stary-zamok-ii-timber-fortlet</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sailing-the-danube-in-a-roman-ship-part-1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/pobedim-slavic-lowland-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/podcast-celts-in-southern-slovakia</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/podcast-prehistoric-swords</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/arson-at-the-prestavlky-open-air-museum</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/podturen-basta-velinok-varta-hillforts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/povazska-bystrica-dedovec-fortified-settlement</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/legend-of-modlatin-ziar-hill</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/origins-of-the-oldest-slavic-hillforts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sitno-prehistoric-lusatian-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2271,7 +2606,52 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/pribina-retinue-names-of-magnates</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/procopius-on-the-slavs-6th-century</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/prosiek-hradok-puchov-slavic-fort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/roman-remains-in-africa-carthage-pupput</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/rekomberek-hillfort-horne-oresany</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/reconstruction-of-slavic-hillfort-defences</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/svodin-neolithic-roundel-3d</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/interview-about-the-hradiska-civic-association</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/rybnik-krivin-hillfort-slovak-gate</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sarisske-sokolovce-slavic-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2281,7 +2661,52 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/selce-hradok-limestone-summit-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sena-varhely-slavic-fort-kosice</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/otomani-culture-fortified-settlements-eastern-slovakia</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/skalka-nad-vahom-chochel-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sklabina-macaci-hradok-puchov-fortlet</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hidden-treasures-tvrdosovce-finds</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/slepy-vrch-oresany-educational-trail-completed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/slovanka-slavic-semi-sunken-log-building-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/slavic-gods-in-written-sources</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/slavic-magnates-residence-drawing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2291,7 +2716,72 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/spisske-tomasovce-principality-of-nitra-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/spissky-stvrtok-slovak-mycenae</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/statement-on-the-slavic-aryan-vedas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stare-mesto-velehrad-great-moravian-centre</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/old-church-slavonic-dictionary-online</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stary-konus-bronze-age-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stary-tekov-hillfort-tekov-county-seat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stefanovicova-slovakia-in-the-time-of-svatopluk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stupava-draci-hradok-medieval-fort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stupne-zeravica-hillfort-cult-place</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sucany-skala-hillfort-on-the-crag</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/surany-castle-3d-reconstruction</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/surany-3d-animation-museum-night</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/surany-in-the-16th-century-3d</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2311,7 +2801,42 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/secret-history-of-slovakia-book-review</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/tollense-bronze-age-battle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/turcianska-blatnica-plesovica-cult-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/turcianske-jaseno-hradiste-promontory-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/turie-hradek-fortlet-rajecka-valley</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/sword-stolen-from-puchovska-skala</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/unin-zamcisko-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/utgard-2018-early-medieval-festival</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2321,87 +2846,17 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/first-issue-of-digitalne-hradiska-magazine</loc>
+    <loc>https://hradiska.sk/en/blog/varin-gabrisova-puchov-culture-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/making-planks-for-the-bojna-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/velkomoravske-hradiska-new-book</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/augmented-reality-popularising-archaeology</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stolen-helmet-from-bojna-reconstructed</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/poll-amnesty-for-archaeological-finds-2014</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/survey-archaeological-amnesty</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/goddess-lada-at-lietava-castle</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/liptovska-stiavnica-lucny-hrib-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/divinka-velky-vrch-educational-trail</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/nitrianska-blatnica-rotunda-3d-reconstruction</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/schreiber-zilina-region-occupation-divinka</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/legends-hradiste-koscelisko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/procopius-on-the-slavs-6th-century</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/melis-traces-of-the-pagan-gods</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stary-konus-bronze-age-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/surany-castle-3d-reconstruction</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/surany-in-the-16th-century-3d</loc>
+    <loc>https://hradiska.sk/en/blog/velky-tribec-prehistoric-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2411,72 +2866,52 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/hradiska-svedkovia-davnych-cias-proceedings</loc>
+    <loc>https://hradiska.sk/en/blog/rural-fortified-settlement-drawing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/breclav-pohansko-great-moravian-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/visegrad-great-moravian-hillfort-hungary</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/horne-plachtince-pohansky-vrch-central-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/visolaje-slavic-barrow-cemetery</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/information-panel-hatne-fortlets</loc>
+    <loc>https://hradiska.sk/en/blog/victory-drawing-old-hungarian-raids</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/klapy-celtic-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/eneolithic-wagon-baden-culture-reconstruction</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/liptovsky-hrad-3d-visualisation</loc>
+    <loc>https://hradiska.sk/en/blog/vrable-fidvar-bronze-age-town-b</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/marianka-barania-luka-bazgovic-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/vrsatec-smith-great-moravia</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/schreiber-second-life-of-prehistoric-stone-industry</loc>
+    <loc>https://hradiska.sk/en/blog/first-issue-of-digitalne-hradiska-magazine</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/schreiber-finger-ring-from-horna-marikova</loc>
+    <loc>https://hradiska.sk/en/blog/expedition-to-the-vikings-2013-part-1</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/ponicka-huta-na-klastore-copper-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/povazska-bystrica-sibenicny-vrsok-puchov-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/legend-of-modlatin-ziar-hill</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/svodin-neolithic-roundel-3d</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/secret-history-of-slovakia-book-review</loc>
+    <loc>https://hradiska.sk/en/blog/polish-hillforts-expedition-2-biskupin-wenecja-wyszogrod</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2486,7 +2921,52 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/hillfort-volume-svedkovia-davnych-cias-published</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/excavation-simunky-hillfort-dolna-marikova</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ostra-skala-vysny-kubin-celtic-slav-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/vysny-kubin-tupa-skala-lusatian-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/augmented-reality-popularising-archaeology</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/wogastisburg-hillfort-samos-empire</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/stegmann-rajtar-zibrica-hillfort-excavation-results</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/basic-principles-hradiska-civic-association</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zamcisko-modra-slavic-refuge-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zamcisko-nova-bana-hillfort-velky-inovec</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2501,242 +2981,27 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/hradiska-svedkovia-davnych-cias-proceedings</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hillfort-volume-two-has-been-printed</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hillfort-volume-selling-fast</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hradiska-proceedings-free-on-academia</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/zbruch-idol-slavic-stone-god</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zemplin-celtic-dacian-sacrificial-site</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/anton-intibus-1855-antiquities-around-trnava</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/brekov-slavic-hillfort-above-laborec</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/cividale-gospel-book-great-moravian-names</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/drevenik-slavic-hillfort-spis-castle</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/gbelany-puchov-culture-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hatne-hradok-masonry-architecture-fragments</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hricov-castle-3d-reconstruction</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hradec-prievidza-celtic-slavic-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hradiste-pod-vratnom-brezova-pass-hillforts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/book-of-precious-records-ibn-rusta-on-svatopluk</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/kusin-slavic-hillfort-hradek-hill</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/maly-manin-hillfort-manin-gorge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/novohrad-nograd-hillfort-hungary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/old-kristof-legend-kamenec-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/pribina-retinue-names-of-magnates</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/reconstruction-of-slavic-hillfort-defences</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/selce-hradok-limestone-summit-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stupne-zeravica-hillfort-cult-place</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/living-history-in-july-two-events</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/belusske-slatiny-hradiste-puchov-refuge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/brodske-veles-hillfort-dating-puzzles</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/danuvina-alacris-roman-patrol-boat-replica-danube</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/dolne-vestenice-slavic-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hainburg-braunsberg-celtic-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zilin-papradno-legend-black-dogs</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hradok-nad-vahom-great-moravian-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/istebne-hradok-hallstatt-hillfort-orava</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/janovce-machalovce-puchov-culture-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/kamenec-pod-vtacnikom-hradok-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/klatova-nova-ves-siance-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/oldest-recipe-for-mead-14th-century</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/schreiber-early-medieval-marikovska-valley</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sitno-prehistoric-lusatian-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sklabina-macaci-hradok-puchov-fortlet</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stary-plast-hillfort-plavecky-mikulas</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/muromar-the-dreadful-papradno-valley-legend</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stupava-draci-hradok-medieval-fort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sutovo-ratkovo-puchov-culture-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/trzcinica-carpathian-troy-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/turcianske-jaseno-hradiste-promontory-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/unin-zamcisko-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/visolaje-slavic-barrow-cemetery</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/expedition-to-the-vikings-2013-part-1</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/excavation-simunky-hillfort-dolna-marikova</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/vysny-kubin-tupa-skala-lusatian-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/basic-principles-hradiska-civic-association</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2746,122 +3011,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/zemplin-celtic-dacian-sacrificial-site</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/zemplin-hillfort-on-the-bodrog</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zilina-zavodie-refuge-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/archaeological-cultures-slovakia-dating</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/battle-tactics-of-the-magyars-and-other-nomads</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bosaca-srniansky-haj-guard-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hatne-two-hillforts-marikovska-valley</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/nitrianska-blatnica-rotunda-st-george-blatnicky-durko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hricovske-podhradie-hricov-castle-hill</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/klucov-early-slavic-hillfort-power-centre</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/church-of-st-margaret-of-antioch-kopcany</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/kronika-dusi-novel-about-the-mongol-invasion</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/moravany-nad-vahom-hradiste-fortified-hilltop</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/reporting-archaeological-find-finders-reward</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/oresany-slepy-vrch-early-celtic-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/podbranc-stary-hrad-hillfort-land-gate</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/prosne-celtic-sacrificial-site</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/conversio-bagoariorum-et-carantanorum-9th-century</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/spissky-stvrtok-slovak-mycenae</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stary-tekov-hillfort-tekov-county-seat</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/tlmace-festunok-slavic-hillfort-slovenska-brana</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/trencianske-teplice-certova-skala-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/turie-hradek-fortlet-rajecka-valley</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zamcisko-nova-bana-hillfort-velky-inovec</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/martakova-skala-hillfort-bosaca-valley</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2871,467 +3026,27 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/chotebuz-podobora-slavic-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/zilina-zavodie-refuge-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/pezinok-stary-zamok-ii-timber-fortlet</loc>
+    <loc>https://hradiska.sk/en/blog/living-history-in-july-two-events</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/povazska-bystrica-dedovec-fortified-settlement</loc>
+    <loc>https://hradiska.sk/en/blog/stolen-helmet-from-bojna-reconstructed</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/stare-mesto-velehrad-great-moravian-centre</loc>
+    <loc>https://hradiska.sk/en/blog/zvolen-motova-hillfort-3d-panorama</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/turcianska-blatnica-plesovica-cult-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/ruttkay-on-svatopluk-and-nitra</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/ancient-greek-navy-penteconters-triremes</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/marcomanni-and-quadi-germanic-tribes</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/wogastisburg-hillfort-samos-empire</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bina-earthwork-hillfort-hron</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bojna-great-moravian-centre-valy-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/devin-great-moravian-dowina-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/salkovsky-slavic-chieftains-princes-kings-and-their-strongholds</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/otomani-culture-fortified-settlements-eastern-slovakia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/pobedim-slavic-lowland-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bratislava-brezalauspurc-great-moravian-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/maros-demko-kyiv-pantheon-slavic-gods</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/west-slav-barrow-regions-central-europe-slovakia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/namerova-steppe-pyramids-scythian-kurgans-ukraine</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/caesar-celtic-hillfort-walls-siege-of-avaricum</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/nitrianske-pravno-vysehrad-hillfort-ziar-ridge</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/podturen-basta-velinok-varta-hillforts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/prasnik-hradok-hillfort-lesser-carpathian-pass</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sarisske-sokolovce-slavic-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/skalka-nad-vahom-chochel-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/spisske-tomasovce-principality-of-nitra-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/tollense-bronze-age-battle</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/trencin-great-moravian-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zakon-sudnyj-ljudem-great-moravian-law-code</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/annals-of-fulda-great-moravia-source</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/svaty-jur-nestich-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/wendish-crusade-1147-against-slavs</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/ladce-tunezice-nozdrovice-puchov-culture-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/mosaburg-zalavar-blatnohrad-new-excavations</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/majcichov-lowland-fortified-settlement</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/chieftains-princes-kings-veleti-obodrites-salkovsky</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/nizna-mysla-bronze-age-town</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/robert-muller-river-zala-region-8th-10th-century</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sena-varhely-slavic-fort-kosice</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/devin-urbs-antiqua-rastizi-record-of-871</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zamcisko-modra-slavic-refuge-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bronze-hoard-hillfort-middle-vah-region</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/drazovce-hillfort-and-church-near-nitra</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/chorvatova-amulet-pendants-early-medieval-cemeteries</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/smithing-iron-axe-shaped-currency-bars</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stefanovicova-slovakia-in-the-time-of-svatopluk</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/muzla-cenkov-slavic-hillfort-on-the-danube</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sorbian-lusatian-spree-havel-slavs-elites</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sailing-the-danube-in-a-roman-ship-part-1</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/roman-remains-in-africa-carthage-pupput</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bojnice-slavic-hillfort-tar-production-centre</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/houses-of-the-slavs-early-medieval-dwellings</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/most-pri-bratislave-first-old-slavic-sanctuary</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/ostra-skala-vysny-kubin-celtic-slav-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/ducove-kostolec-great-moravian-court</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/libice-main-hillfort-slavnik-dynasty-cz</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/gaspar-puchov-culture-surface-finds-vah-region</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/gars-thunau-great-moravian-hillfort-in-austria</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hana-chorvatova-lunula-pendants-and-their-meaning</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hronsky-benadik-slavic-hillfort-on-benadicka-skala</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/construction-of-slavic-hillforts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/kiev-missal-oldest-old-church-slavonic-manuscript</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/anton-petrovsky-sichman-fifty-years-since-his-death</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/perunov-haj-ubrez-slavic-cult-place</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stefan-jansak-impregnable-hillforts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/thousand-year-old-slavic-hillforts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/trstin-novy-hradok-lidar-fortlet</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/varin-gabrisova-puchov-culture-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/beckov-slavic-hillfort-castle-crag</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/jasenica-predna-horka-puchov-culture-fort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/rybnik-krivin-hillfort-slovak-gate</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/vrsatec-smith-great-moravia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/weapons-of-the-nitrans-great-moravia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/blatnohrad-pribina-seat-pannonia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/nomadic-herders-raiders-from-the-east</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/obisovce-straza-hillfort-eastern-slovakia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/sucany-skala-hillfort-on-the-crag</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/polish-hillforts-expedition-2-biskupin-wenecja-wyszogrod</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/legend-of-orgonova-kycera</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/pohanska-celtic-oppidum-plavecke-podhradie</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zemianske-podhradie-hradiska-lusatian-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/dolne-oresany-slepy-vrch-information-panels</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zibrica-hallstatt-guard-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hradiste-near-partizanske-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/skalica-kalvaria-hillfort-rotunda</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/vrable-fidvar-bronze-age-town-b</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/bratislava-breslava-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/drevenik-hillfort-from-a-birds-eye-view</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/pohanska-oppidum-gateway-reconstruction</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/most-pri-bratislave-pagan-sanctuary-new-3d-video</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/spisske-tomasovce-hillfort-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/svaty-jur-nestich-3d-visualisation</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/great-moravian-smith-from-vrsatec-drawing</loc>
+    <loc>https://hradiska.sk/en/blog/arkona-rethra-pagan-sanctuaries-western-slavs</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3341,7 +3056,27 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/bratislava-breslava-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/detva-kalamarka-3d-visualisation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/devin-great-moravian-palace-with-church-3d</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/divinka-velky-vrch-in-the-la-tene-period-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/dolna-marikova-simunky-rock-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3356,6 +3091,41 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/drevenik-hillfort-from-a-birds-eye-view</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/franks-negotiate-with-moravians-diplomacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hatne-skala-and-hradok-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/havranok-liptovska-mara-celtic-cult-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/celtic-hillforts-slovakia-craft-production-centres</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/divinka-velky-vrch-central-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/information-panel-maly-manin-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/information-panel-marikova-simunky</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -3366,7 +3136,12 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/pruzina-mesciska-information-panel</loc>
+    <loc>https://hradiska.sk/en/blog/information-panels-prosne-zlaty-kon-uhliska</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/kamenec-pod-vtacnikom-bystricany-stone-lord-legend</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3377,6 +3152,16 @@
   </url>
   <url>
     <loc>https://hradiska.sk/en/blog/klapy-udica-puchov-culture-hillfort-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/old-hungarians-in-written-sources</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/mikulcice-kopcany-great-moravian-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3396,157 +3181,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/nosice-puchov-culture-hillfort-3d</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/pobedim-hradistia-hillfort-3d-reconstruction</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/prosne-zlaty-kon-drawing-by-a-lacko</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/slavic-sanctuary-most-pri-bratislave-drawings</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/most-pri-bratislave-slavic-sanctuary-3d</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/stary-orgon-on-kycera-painting</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/nosice-hillfort-information-panel</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zvolen-motova-great-moravian-hillfort-3d</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/holasky-1-hallstatt-magnate-barrow</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/polish-hillforts-expedition-krakow-bnin-day-1</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zlaty-kon-fortlet-drawing-by-peter-bros</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/detva-kalamarka-3d-visualisation</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/devin-great-moravian-palace-with-church-3d</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/hatne-skala-and-hradok-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/information-panel-maly-manin-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/living-antiquity-at-havranok-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/information-panels-prosne-zlaty-kon-uhliska</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/beauty-of-slavic-jewellery</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://hradiska.sk/en/blog/nitra-in-the-9th-century-hillfort-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/skalka-mysterious-church-on-chochel-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/zvolen-motova-hillfort-drawing</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/kamenec-pod-vtacnikom-bystricany-stone-lord-legend</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/prasnik-tlsta-hora-hallstatt-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/prosne-zlaty-kon-puchov-culture-fortlet</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/mysterious-rock-carvings-vah-region</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/franks-negotiate-with-moravians-diplomacy</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/old-hungarians-in-written-sources</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/journey-to-the-vikings-2013-part-2-gotland</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/when-did-the-slavs-arrive-in-slovakia</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/okopanec-borinka-hillfort-three-summits</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/divinka-velky-vrch-central-hillfort</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3556,27 +3191,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/havranok-liptovska-mara-celtic-cult-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/celtic-hillforts-slovakia-craft-production-centres</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/dolna-marikova-simunky-rock-hillfort</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/tragedy-of-a-successful-homeland-conquest</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://hradiska.sk/en/blog/great-moravian-warfare-hillfort-defence</loc>
+    <loc>https://hradiska.sk/en/blog/nosice-puchov-culture-hillfort-3d</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3591,17 +3206,32 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/slavic-hillforts-in-germany</loc>
+    <loc>https://hradiska.sk/en/blog/pobedim-hradistia-hillfort-3d-reconstruction</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/zvolen-motova-priekopa-fortlet</loc>
+    <loc>https://hradiska.sk/en/blog/pohanska-oppidum-gateway-reconstruction</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/arkona-rethra-pagan-sanctuaries-western-slavs</loc>
+    <loc>https://hradiska.sk/en/blog/most-pri-bratislave-pagan-sanctuary-new-3d-video</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/prasnik-tlsta-hora-hallstatt-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/prosne-zlaty-kon-drawing-by-a-lacko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/prosne-zlaty-kon-puchov-culture-fortlet</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3611,7 +3241,22 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/twilight-of-great-moravia-legend-10th-century</loc>
+    <loc>https://hradiska.sk/en/blog/simunky-hradiste-koscelisko-possible-links</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/skalka-mysterious-church-on-chochel-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/slavic-sanctuary-most-pri-bratislave-drawings</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/most-pri-bratislave-slavic-sanctuary-3d</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3621,42 +3266,122 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hradiska.sk/en/blog/slavic-hillforts-in-germany</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://hradiska.sk/en/blog/slavic-hillforts-lower-austria-guard-sites</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/simunky-hradiste-koscelisko-possible-links</loc>
+    <loc>https://hradiska.sk/en/blog/spisske-tomasovce-hillfort-drawing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/vampires-in-great-moravia</loc>
+    <loc>https://hradiska.sk/en/blog/stary-orgon-on-kycera-painting</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/mikulcice-kopcany-great-moravian-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/twilight-of-great-moravia-legend-10th-century</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/bojna-3d-reconstruction-slavic-hillfort</loc>
+    <loc>https://hradiska.sk/en/blog/svaty-jur-nestich-3d-visualisation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/visolaje-slavic-barrow-cemetery-panels</loc>
+    <loc>https://hradiska.sk/en/blog/nosice-hillfort-information-panel</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/victory-drawing-old-hungarian-raids</loc>
+    <loc>https://hradiska.sk/en/blog/zvolen-motova-great-moravian-hillfort-3d</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/slavic-gods-in-written-sources</loc>
+    <loc>https://hradiska.sk/en/blog/great-moravian-smith-from-vrsatec-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/journey-to-the-vikings-2013-part-2-gotland</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/polish-hillforts-expedition-krakow-bnin-day-1</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/living-antiquity-at-havranok-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zlaty-kon-fortlet-drawing-by-peter-bros</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zvolen-motova-priekopa-fortlet</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zvolen-motova-hillfort-drawing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/bojna-great-moravian-centre-valy-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/detva-kalamarka-guard-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/chorvatova-amulet-pendants-early-medieval-cemeteries</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/svaty-jur-nestich-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/kronika-dusi-novel-about-the-mongol-invasion</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/libice-main-hillfort-slavnik-dynasty-cz</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/liptovska-stiavnica-lucny-hrib-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ancient-greek-navy-penteconters-triremes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/michalovce-life-in-great-moravia-event</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3666,7 +3391,207 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/constantine-porphyrogenitus-and-his-moravias</loc>
+    <loc>https://hradiska.sk/en/blog/new-celtic-symbol-discovered-in-slovakia</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/obisovce-straza-hillfort-eastern-slovakia</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/perunov-haj-ubrez-slavic-cult-place</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/podbranc-stary-hrad-hillfort-land-gate</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/pohanska-celtic-oppidum-plavecke-podhradie</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/povazska-bystrica-sibenicny-vrsok-puchov-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/prasnik-hradok-hillfort-lesser-carpathian-pass</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/conversio-bagoariorum-et-carantanorum-9th-century</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/devin-urbs-antiqua-rastizi-record-of-871</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stefan-jansak-impregnable-hillforts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/muromar-the-dreadful-papradno-valley-legend</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/tlmace-festunok-slavic-hillfort-slovenska-brana</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/trencianske-teplice-certova-skala-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zakon-sudnyj-ljudem-great-moravian-law-code</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/tragedy-of-a-successful-homeland-conquest</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/great-moravian-warfare-hillfort-defence</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/belusske-slatiny-hradiste-puchov-refuge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/chotebuz-podobora-slavic-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/drevenik-slavic-hillfort-spis-castle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hradok-nad-vahom-great-moravian-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/hricovske-podhradie-hricov-castle-hill</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/humno-earliest-written-mention</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/klatova-nova-ves-siance-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/wendish-crusade-1147-against-slavs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/kiev-missal-oldest-old-church-slavonic-manuscript</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/maly-manin-hillfort-manin-gorge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/nitrianske-pravno-vysehrad-hillfort-ziar-ridge</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/ponicka-huta-na-klastore-copper-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/prosne-celtic-sacrificial-site</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/skalica-kalvaria-hillfort-rotunda</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/sutovo-ratkovo-puchov-culture-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/trencin-great-moravian-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/trstin-novy-hradok-lidar-fortlet</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/trzcinica-carpathian-troy-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/making-planks-for-the-bojna-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/okopanec-borinka-hillfort-three-summits</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/beckov-slavic-hillfort-castle-crag</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/stary-plast-hillfort-plavecky-mikulas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zemianske-podhradie-hradiska-lusatian-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zibrica-hallstatt-guard-hillfort</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/most-pri-bratislave-first-old-slavic-sanctuary</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -3676,22 +3601,97 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/origins-of-the-oldest-slavic-hillforts</loc>
+    <loc>https://hradiska.sk/en/blog/west-slav-barrow-regions-central-europe-slovakia</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/bavarian-geographer-first-written-mention-of-nitra-slavs</loc>
+    <loc>https://hradiska.sk/en/blog/battle-tactics-of-the-magyars-and-other-nomads</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/mythology-of-death-slavs-and-other-peoples</loc>
+    <loc>https://hradiska.sk/en/blog/when-did-the-slavs-arrive-in-slovakia</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://hradiska.sk/en/blog/visegrad-great-moravian-hillfort-hungary</loc>
+    <loc>https://hradiska.sk/en/blog/beauty-of-slavic-jewellery</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/pruzina-mesciska-information-panel</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/martakova-skala-hillfort-bosaca-valley</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/marcomanni-and-quadi-germanic-tribes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/mysterious-rock-carvings-vah-region</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/vampires-in-great-moravia</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/book-of-precious-records-ibn-rusta-on-svatopluk</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/salkovsky-slavic-chieftains-princes-kings-and-their-strongholds</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/thousand-year-old-slavic-hillforts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/zilin-papradno-legend-black-dogs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/legends-hradiste-koscelisko</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/robert-muller-river-zala-region-8th-10th-century</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/melis-traces-of-the-pagan-gods</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/liptovsky-hrad-3d-visualisation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/holasky-1-hallstatt-magnate-barrow</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://hradiska.sk/en/blog/weapons-of-the-nitrans-great-moravia</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

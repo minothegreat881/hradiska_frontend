@@ -67,26 +67,34 @@ async function main() {
     console.warn('[sitemap] Zapisujem len statické stránky.');
   }
 
-  /* Anglické verzie článkov. Keď ešte nie sú, nič sa nepridá. */
-  let anglickych = 0;
-  try {
-    /* STRÁNKOVAŤ. Strapi má strop `pageSize` 100, takže `500` ticho vráti
-       prvú stovku — mapa stránok potom mlčky vynechá zvyšok prekladov. */
-    for (let page = 1; page <= 20; page++) {
-      const r = await fetch(`${STRAPI}/api/blog-posts?locale=en&pagination[page]=${page}&pagination[pageSize]=100&fields[0]=slug`);
-      if (!r.ok) break;
-      const j = await r.json();
-      const davka = j.data || [];
-      for (const p of davka) { entries.push(urlEntry(`/en/blog/${p.slug}`, '0.8')); anglickych++; }
-      const celkom = j.meta?.pagination?.total ?? 0;
-      if (davka.length < 100 || anglickych >= celkom) break;
-    }
-  } catch { /* bez angličtiny sa mapa stránok zapíše ďalej */ }
+  /* Cudzojazyčné verzie článkov. Jazyk, ktorý ešte nemá preklady, nepridá
+     nič — pridanie ďalšieho jazyka je jeden riadok v `CUDZIE_JAZYKY`. */
+  const CUDZIE_JAZYKY = ['en', 'de'];
+  const pocty = {};
+  for (const jazyk of CUDZIE_JAZYKY) {
+    let pocet = 0;
+    try {
+      /* STRÁNKOVAŤ. Strapi má strop `pageSize` 100, takže `500` ticho vráti
+         prvú stovku — mapa stránok potom mlčky vynechá zvyšok prekladov. */
+      for (let page = 1; page <= 20; page++) {
+        const r = await fetch(`${STRAPI}/api/blog-posts?locale=${jazyk}&pagination[page]=${page}&pagination[pageSize]=100&fields[0]=slug`);
+        if (!r.ok) break;
+        const j = await r.json();
+        const davka = j.data || [];
+        for (const p of davka) { entries.push(urlEntry(`/${jazyk}/blog/${p.slug}`, '0.8')); pocet++; }
+        const celkom = j.meta?.pagination?.total ?? 0;
+        if (davka.length < 100 || pocet >= celkom) break;
+      }
+    } catch { /* bez tohto jazyka sa mapa stránok zapíše ďalej */ }
+    pocty[jazyk] = pocet;
+  }
+  const anglickych = Object.values(pocty).reduce((a, b) => a + b, 0);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, xml, 'utf8');
-  console.log(`[sitemap] zapísané ${entries.length} URL (${articleCount} slovenských + ${anglickych} anglických) → public/sitemap.xml`);
+  const rozpis = Object.entries(pocty).map(([j, n]) => `${n} ${j}`).join(' + ');
+  console.log(`[sitemap] zapísané ${entries.length} URL (${articleCount} slovenských + ${rozpis}) → public/sitemap.xml`);
 }
 
 main();
