@@ -10,6 +10,9 @@ import { PhotoDiscussion } from './PhotoDiscussion';
 
 export interface GalleryImage {
   url: string;
+  /** Zmenšenina pre mriežku. Bez nej sa do dlaždice 4:3 ťahal originál —
+      na článku o Devíne to bolo 38 fotografií a 57 MB. */
+  thumb?: string;
   caption?: string;
   alt?: string;
   author?: string;
@@ -441,10 +444,12 @@ export function HistoricalGallery({ images, title, columns = 3 }: HistoricalGall
           >
             <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 8, border: '1px solid var(--hr-line)', pointerEvents: 'none' }}>
               <ImageWithFallback
-                src={image.url}
+                src={image.thumb || image.url}
                 alt={image.alt || image.caption || `${t('Obrázok')} ${idx + 1}`}
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ pointerEvents: 'none' }}
+                loading="lazy"
+                decoding="async"
               />
             </div>
             {image.caption && (

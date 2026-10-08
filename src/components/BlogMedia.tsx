@@ -29,6 +29,11 @@ export interface BlogMediaProps {
 
   // Primary image (required)
   src: string;
+  /* Sada menších variantov zo Strapi. `src` ostáva originál (na ňom visí
+     otvorenie fotky v galérii), ale prehliadač si podľa `sizes` stiahne
+     menší — v tele článku má obrázok najviac ~800 px, nie 3 000. */
+  srcSet?: string;
+  sizes?: string;
   alt: string;
   width?: number;
   height?: number;
@@ -182,6 +187,8 @@ interface ImageWrapperProps {
 
 function ImageWrapper({
   src,
+  srcSet,
+  sizes,
   alt,
   aspectRatio = 'auto',
   objectPosition = 'center center',
@@ -216,6 +223,8 @@ function ImageWrapper({
     >
       <ImageWithFallback
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         {...imgProps}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         style={{ objectPosition }}
@@ -241,6 +250,8 @@ function ImageWrapper({
 function FloatLayout({
   variant,
   src,
+  srcSet,
+  sizes,
   alt,
   widthPercent,
   aspectRatio = 'auto',
@@ -277,6 +288,8 @@ function FloatLayout({
     >
       <ImageWrapper
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         aspectRatio={aspectRatio}
         objectPosition={objectPosition}
@@ -305,6 +318,8 @@ function FloatLayout({
 
 function FullWidthLayout({
   src,
+  srcSet,
+  sizes,
   alt,
   aspectRatio = 'auto',
   objectPosition = 'center center',
@@ -327,6 +342,8 @@ function FullWidthLayout({
     >
       <ImageWrapper
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         aspectRatio={aspectRatio}
         objectPosition={objectPosition}
@@ -355,6 +372,8 @@ function FullWidthLayout({
 
 function BreakoutLayout({
   src,
+  srcSet,
+  sizes,
   alt,
   aspectRatio = 'auto',
   objectPosition = 'center center',
@@ -388,6 +407,8 @@ function BreakoutLayout({
     >
       <ImageWrapper
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         aspectRatio={aspectRatio}
         objectPosition={objectPosition}
@@ -416,6 +437,8 @@ function BreakoutLayout({
 
 function CenterLayout({
   src,
+  srcSet,
+  sizes,
   alt,
   widthPercent,
   aspectRatio = 'auto',
@@ -452,6 +475,8 @@ function CenterLayout({
     >
       <ImageWrapper
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         aspectRatio={aspectRatio}
         objectPosition={objectPosition}

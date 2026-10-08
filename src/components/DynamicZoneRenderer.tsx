@@ -339,6 +339,8 @@ function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps
         >
           <ImageWithFallback
             src={getStrapiImageUrl(block.image)}
+            srcSet={sadaZdrojov(block.image)}
+            sizes="(max-width: 860px) 100vw, 800px"
             alt={altText}
             loading={editMode ? 'eager' : 'lazy'}
             decoding="async"
@@ -627,6 +629,8 @@ function ImageBlockRenderer({ block, editMode }: { block: ImageBlock; editMode?:
       aspectRatio={(block.aspectRatio || 'auto') as BlogMediaAspectRatio}
       objectPosition={block.objectPosition || 'center center'}
       src={getStrapiImageUrl(block.image)}
+      srcSet={sadaZdrojov(block.image)}
+      sizes="(max-width: 860px) 100vw, 800px"
       alt={altText}
       width={block.image?.width}
       height={block.image?.height}
@@ -902,6 +906,20 @@ export const hasRealParagraph = (b: any) =>
     n.type === 'paragraph' &&
     (n.children || []).some((c: any) => ((c.text ?? c.children?.map((x: any) => x.text).join('')) || '').trim())
   );
+
+/* Menšie varianty obrázka zo Strapi. Originál ostáva v `src` (na ňom visí
+   otvorenie v galérii), prehliadač si však podľa `sizes` stiahne ten, ktorý
+   naozaj potrebuje — telo článku má najviac ~800 px. */
+function sadaZdrojov(obrazok: any): string | undefined {
+  const f = obrazok?.formats;
+  if (!f) return undefined;
+  const kusy: string[] = [];
+  for (const k of ['small', 'medium', 'large'] as const) {
+    if (f[k]?.url && f[k]?.width) kusy.push(`${getStrapiImageUrl(obrazok, k)} ${f[k].width}w`);
+  }
+  if (obrazok?.width) kusy.push(`${getStrapiImageUrl(obrazok)} ${obrazok.width}w`);
+  return kusy.length > 1 ? kusy.join(', ') : undefined;
+}
 
 export function DynamicZoneRenderer({ blocks, editMode }: DynamicZoneRendererProps) {
   /* Všetky fotky tela článku v poradí, v akom sú v texte: obrázky aj galérie.

@@ -571,7 +571,9 @@ export async function getKronikaPhotos(options?: { posts?: number; minGallery?: 
     const gallery = post.gallery || [];
     if (gallery.length < minGallery) continue;        // oznam, nie reportáž
     for (const img of gallery) {
-      const fmt = img.formats?.medium || img.formats?.small;
+      /* Do mriežky stačí `small` (500 px) — dlaždica má okolo 300 px.
+         `medium` znamenalo na fotoarchíve 4,7 MB namiesto 1,5 MB. */
+      const fmt = img.formats?.small || img.formats?.medium;
       if (!fmt?.url || seen.has(img.url)) continue;   // bez varianty by sa ťahal originál (aj niekoľko MB)
       if (NON_PHOTO.test(img.url)) continue;          // banner / logo / plagát
       seen.add(img.url);
@@ -635,7 +637,9 @@ export async function getGalleryPhotos(options?: { page?: number; pageSize?: num
       if (typeof m.mediaId === 'number') popisy.set(m.mediaId, m);
     }
     for (const img of post.gallery || []) {
-      const fmt = img.formats?.medium || img.formats?.small;
+      /* Do mriežky stačí `small` (500 px) — dlaždica má okolo 300 px.
+         `medium` znamenalo na fotoarchíve 4,7 MB namiesto 1,5 MB. */
+      const fmt = img.formats?.small || img.formats?.medium;
       if (!fmt?.url) continue;         // bez varianty by sa do mriežky ťahal originál (aj niekoľko MB)
       if (NON_PHOTO.test(img.url)) continue;   // banner / logo / plagát, nie fotka
       photos.push({

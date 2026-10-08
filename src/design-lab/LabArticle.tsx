@@ -202,6 +202,11 @@ export function LabArticle({ slug }: { slug: string }) {
     const zBloku = popisyZBlokov.get(img.id);
     return {
       url: getStrapiImageUrl(img),
+      /* Do mriežky ide najmenší rozumný formát; originál si vypýta až
+         svetelný box, keď fotku niekto naozaj otvorí. */
+      thumb: img.formats?.small?.url || img.formats?.medium?.url || img.formats?.thumbnail?.url
+        ? getStrapiImageUrl(img, img.formats?.small ? 'small' : img.formats?.medium ? 'medium' : 'thumbnail')
+        : getStrapiImageUrl(img),
       /* Poradie je dôležité: čo je v jazyku stránky, ide prvé, a slovenský
          popis z knižnice médií sa v angličtine použije až vtedy, keď niet
          ničoho iného — predtým sa cez neho preskakoval anglický `alt`
@@ -356,7 +361,7 @@ export function LabArticle({ slug }: { slug: string }) {
 
                 {gallery.length > 0 && (
                   <HistoricalGallery
-                    images={gallery as { url: string; caption?: string; alt?: string }[]}
+                    images={gallery as { url: string; thumb?: string; caption?: string; alt?: string }[]}
                     columns={(post as any).galleryColumns || 3}
                   />
                 )}
