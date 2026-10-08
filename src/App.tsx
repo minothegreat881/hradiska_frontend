@@ -198,8 +198,20 @@ function App() {
         return;
       }
 
+      /* SÚBOR NIE JE STRÁNKA. Odkaz na stiahnutie appky viedol na rovnaký
+         pôvod (`/strapi/app/hradiska.apk`), takže ho smerovanie zobralo ako
+         prechod na ďalšiu stránku: adresa sa prepísala, nič sa nestiahlo
+         a návštevník skončil na 404. Preskakuje sa preto všetko, čo nie je
+         stránka webu: odkazy s `download`, odkazy otvárané inam (`target`),
+         cesty do Strapi (`/strapi/`, `/uploads/`) a súbory podľa prípony. */
+      const cesta = (() => { try { return new URL(link.href).pathname; } catch { return ''; } })();
+      const jeSubor = link.hasAttribute('download')
+        || (link.target && link.target !== '_self')
+        || /^\/(strapi|uploads|app)\//.test(cesta)
+        || /\.(apk|pdf|zip|csv|xlsx?|docx?|mp3|mp4|webm|json|xml|txt|ics)$/i.test(cesta);
+
       // Skip external links and non-origin links
-      if (link.href.startsWith(window.location.origin) && !link.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+      if (!jeSubor && link.href.startsWith(window.location.origin) && !link.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
         e.preventDefault();
         setRestoreScroll(false); // forward navigation — go to top, don't restore
         /* Prepnutie jazyka je tá istá stránka inými slovami, nie ďalší krok
