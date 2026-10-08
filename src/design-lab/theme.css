@@ -3353,7 +3353,10 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lakt { background: var(--l-paper); min-height: 100vh; }
 .lakt-in { padding: 30px 0 90px; max-width: 1280px; }
 
-.lakt-hlava { max-width: 60ch; margin-bottom: 40px; }
+.lakt-hlava { max-width: 60ch; margin-bottom: 40px; scroll-margin-top: 92px; }
+/* Mriežka článkov témy stojí hneď pod hlavičkou, bez medzinadpisu roka. */
+.lakt-mriezka--tema { margin-bottom: 56px; }
+.lakt-suhrn a { color: var(--l-second-deep); text-decoration: none; border-bottom: 1px solid currentColor; }
 .lakt-znacka {
   display: inline-block; margin-bottom: 14px;
   padding: 5px 13px; border-radius: 999px;

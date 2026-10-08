@@ -62,8 +62,16 @@ function malbaPre(article: Article): string {
     : undefined;
   if (vlastna) return vlastna;
   const kluc = article.slug || article.title || '';
-  let h = 0;
-  for (let i = 0; i < kluc.length; i++) h = (h * 31 + kluc.charCodeAt(i)) >>> 0;
+  /* FNV-1a, nie „h * 31 + znak": výzvy na 2 % majú slugy s rovnakým
+     začiatkom (`2-pre-hradiska`, `2-pre-hradiska-v-roku-2025`) a jednoduchý
+     súčet im dal tú istú kresbu — v zozname témy potom stáli dve rovnaké
+     karty nad sebou. Odtlačok sa tým nemení z vykreslenia na vykreslenie,
+     len sa rozloží rovnomernejšie. */
+  let h = 0x811c9dc5;
+  for (let i = 0; i < kluc.length; i++) {
+    h ^= kluc.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
   return MALBY[h % MALBY.length];
 }
 

@@ -121,9 +121,10 @@ export function LabAktualityStranka() {
        celé okno, takže po výbere témy bolo vidieť zasa len ich a zúžený
        zoznam ostal pod nimi — klepnutie potom vyzeralo, že nič neurobilo.
        Čaká sa na prekreslenie, inak sa meria ešte starý rozvrh. */
+    /* Hore na hlavičku: pri zvolenej téme je tam jej názov a hneď pod ním
+       články, takže je na prvý pohľad vidieť, kam sa človek dostal. */
     requestAnimationFrame(() => {
-      const ciel = document.querySelector(k ? '.lcin-vyber' : '.lcin');
-      ciel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelector('.lakt-hlava')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   };
 
@@ -137,60 +138,97 @@ export function LabAktualityStranka() {
           <ol>
             <li><a href={odkaz('/')}>{t('Domov')}</a></li>
             <li aria-hidden="true">·</li>
-            <li>{t('Kronika združenia')}</li>
+            {zvolena ? (
+              <>
+                <li><a href={odkaz('/aktuality')}>{t('Kronika združenia')}</a></li>
+                <li aria-hidden="true">·</li>
+                <li aria-current="page">{t(zvolena.nazov)}</li>
+              </>
+            ) : (
+              <li aria-current="page">{t('Kronika združenia')}</li>
+            )}
           </ol>
         </nav>
 
-        {/* Hlavička v reči kategórií: značka, názov, podtitul, počet. */}
+        {/* Hlavička v reči kategórií: značka, názov, podtitul, počet. Pri
+            zvolenej činnosti hovorí o nej — stránka je vtedy stránkou témy,
+            nie kronikou so skrytými zápismi. */}
         <header className="lakt-hlava">
-          <span className="lakt-znacka">{t('KRONIKA')}</span>
-          <h1 className="lakt-titul">{t('Zo života združenia')}</h1>
+          <span className="lakt-znacka">{zvolena ? t('ČINNOSŤ') : t('KRONIKA')}</span>
+          <h1 className="lakt-titul">{zvolena ? t(zvolena.nazov) : t('Zo života združenia')}</h1>
           <p className="lakt-lead">
-            {t('Výpravy, obnovy tabúľ, prednášky a nálezy.')}
+            {zvolena ? t(zvolena.popis) : t('Výpravy, obnovy tabúľ, prednášky a nálezy.')}
           </p>
-          {zaznamy.length > 0 && (
-            <p className="lakt-suhrn">
-              <b>{zaznamy.length}</b> {t('zápisov')} · <b>{roky.length}</b>{' '}
-              {poAnglicky()
-                ? t(roky.length === 1 ? 'rok' : 'rokov')
-                : (roky.length === 1 ? 'rok' : roky.length < 5 ? 'roky' : 'rokov')}
-            </p>
+          {zvolena ? (
+            vybrane.length > 0 && (
+              <p className="lakt-suhrn">
+                <b>{vybrane.length}</b>{' '}
+                {poAnglicky()
+                  ? t(vybrane.length === 1 ? 'článok' : 'článkov')
+                  : (vybrane.length === 1 ? 'článok' : vybrane.length < 5 ? 'články' : 'článkov')}
+                {' · '}
+                <a href={odkaz('/aktuality')} onClick={(e) => { e.preventDefault(); prepni(null); }}>
+                  {t('Celá kronika')}
+                </a>
+              </p>
+            )
+          ) : (
+            zaznamy.length > 0 && (
+              <p className="lakt-suhrn">
+                <b>{zaznamy.length}</b> {t('zápisov')} · <b>{roky.length}</b>{' '}
+                {poAnglicky()
+                  ? t(roky.length === 1 ? 'rok' : 'rokov')
+                  : (roky.length === 1 ? 'rok' : roky.length < 5 ? 'roky' : 'rokov')}
+              </p>
+            )
           )}
         </header>
 
-        {/* Dlaždice činnosti. Tu majú počty a zužujú kroniku pod sebou;
-            pod článkom je ten istý diel, len ako odkazy. */}
-        <LabCinnost
-          pocty={pocty}
-          poctyKategorii={poctyKategorii}
-          vybrana={vybrana}
-          onVyber={prepni}
-        />
-
-        {zvolena && (
-          <div className="lcin-vyber">
-            <p>
-              <b>{vybrane.length}</b>{' '}
-              {t('zápisov v téme')} <b>{t(zvolena.nazov)}</b>
-            </p>
-            <button type="button" onClick={() => prepni(null)}>{t('Celá kronika')} ×</button>
-          </div>
+        {/* Dlaždice činnosti stoja nad kronikou; pri zvolenej téme idú dole
+            pod články — hore je vtedy hlavička témy a hneď za ňou články,
+            tak ako na stránke kategórie. */}
+        {!zvolena && (
+          <LabCinnost
+            pocty={pocty}
+            poctyKategorii={poctyKategorii}
+            vybrana={vybrana}
+            onVyber={prepni}
+          />
         )}
 
         {chyba && <div role="alert" className="lgal-chyba">{chyba}</div>}
 
-        {roky.map(([rok, polozky]) => (
-          <section key={rok} className="lakt-rok">
-            <div className="lakt-rok-h">
-              <h2>{rok}</h2>
-              <span className="lakt-rok-n">{String(polozky.length).padStart(2, '0')}</span>
-              <span className="lakt-rok-ciara" aria-hidden="true" />
-            </div>
-            <div className="lakt-mriezka">
-              {polozky.map(z => <ArticleCard key={z.documentId} article={naKartu(z)} stitok={false} />)}
-            </div>
-          </section>
-        ))}
+        {/* ČLÁNKY TÉMY — jedna mriežka pod spoločným nadpisom. Hlavičky rokov
+            by z deviatich článkov spravili osem skupín po jednom. */}
+        {zvolena ? (
+          <div className="lakt-mriezka lakt-mriezka--tema">
+            {vybrane.map(z => <ArticleCard key={z.documentId} article={naKartu(z)} stitok={false} />)}
+          </div>
+        ) : (
+          roky.map(([rok, polozky]) => (
+            <section key={rok} className="lakt-rok">
+              <div className="lakt-rok-h">
+                <h2>{rok}</h2>
+                <span className="lakt-rok-n">{String(polozky.length).padStart(2, '0')}</span>
+                <span className="lakt-rok-ciara" aria-hidden="true" />
+              </div>
+              <div className="lakt-mriezka">
+                {polozky.map(z => <ArticleCard key={z.documentId} article={naKartu(z)} stitok={false} />)}
+              </div>
+            </section>
+          ))
+        )}
+
+        {/* Prepnutie na inú činnosť — na konci, ako rozcestník. */}
+        {zvolena && !busy && (
+          <LabCinnost
+            pocty={pocty}
+            poctyKategorii={poctyKategorii}
+            vybrana={vybrana}
+            onVyber={prepni}
+            tichy
+          />
+        )}
 
         {busy && <Nacitavanie text={t('Načítavam…')} />}
         {!busy && zaznamy.length === 0 && !chyba && (
