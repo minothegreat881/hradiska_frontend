@@ -555,6 +555,12 @@ export async function getKronikaPhotos(options?: { posts?: number; minGallery?: 
     'populate[gallery][fields][1]=formats',
     'populate[gallery][fields][2]=alternativeText',
     'populate[gallery][fields][3]=caption',
+    /* Popisy fotiek sú v knižnici médií spoločné pre oba jazyky; anglické
+       znenie nesie `mediaTexts` článku. Bez nich by fotoarchív ukazoval
+       slovenské popisky aj na anglickej stránke. */
+    'populate[mediaTexts][fields][0]=mediaId',
+    'populate[mediaTexts][fields][1]=caption',
+    'populate[mediaTexts][fields][2]=alt',
   ].join('&');
 
   const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(`/blog-posts?${query}`);
@@ -574,8 +580,8 @@ export async function getKronikaPhotos(options?: { posts?: number; minGallery?: 
         thumb: fmt.url.startsWith('http') ? fmt.url : `${STRAPI_URL}${fmt.url}`,
         width: fmt.width ?? img.width ?? 0,
         height: fmt.height ?? img.height ?? 0,
-        alt: img.alternativeText || '',
-        caption: img.caption || '',
+        alt: popisy.get(img.id)?.alt || img.alternativeText || '',
+        caption: popisy.get(img.id)?.caption || img.caption || '',
         postTitle: post.title,
         postSlug: post.slug,
         fileId: img.id,
@@ -613,12 +619,21 @@ export async function getGalleryPhotos(options?: { page?: number; pageSize?: num
     'populate[gallery][fields][1]=formats',
     'populate[gallery][fields][2]=alternativeText',
     'populate[gallery][fields][3]=caption',
+    /* Anglické popisy fotiek — v knižnici médií je popis spoločný pre oba
+       jazyky, anglické znenie nesie `mediaTexts` článku. */
+    'populate[mediaTexts][fields][0]=mediaId',
+    'populate[mediaTexts][fields][1]=caption',
+    'populate[mediaTexts][fields][2]=alt',
   ].join('&');
 
   const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(`/blog-posts?${query}`);
 
   const photos: KronikaPhoto[] = [];
   for (const post of response.data) {
+    const popisy = new Map<number, { caption?: string; alt?: string }>();
+    for (const m of (post as { mediaTexts?: Array<{ mediaId?: number; caption?: string; alt?: string }> }).mediaTexts || []) {
+      if (typeof m.mediaId === 'number') popisy.set(m.mediaId, m);
+    }
     for (const img of post.gallery || []) {
       const fmt = img.formats?.medium || img.formats?.small;
       if (!fmt?.url) continue;         // bez varianty by sa do mriežky ťahal originál (aj niekoľko MB)
@@ -628,8 +643,8 @@ export async function getGalleryPhotos(options?: { page?: number; pageSize?: num
         thumb: fmt.url.startsWith('http') ? fmt.url : `${STRAPI_URL}${fmt.url}`,
         width: fmt.width ?? img.width ?? 0,
         height: fmt.height ?? img.height ?? 0,
-        alt: img.alternativeText || '',
-        caption: img.caption || '',
+        alt: popisy.get(img.id)?.alt || img.alternativeText || '',
+        caption: popisy.get(img.id)?.caption || img.caption || '',
         postTitle: post.title,
         postSlug: post.slug,
         fileId: img.id,

@@ -75,6 +75,9 @@ export function odkazDoDruhehoJazyka(cesta: string): string {
    Kľúč je slovenský originál, aby sa v komponente dalo napísať
    `t('Mohlo by vás zaujímať')` a slovenská vetva ostala čitateľná. */
 const EN: Record<string, string> = {
+  'Zrušiť blokovanie': 'Unblock',
+  'Neprišiel e-mail? Poslať znova': 'No e-mail? Send it again',
+  'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries': 'Satellite imagery: Esri, Maxar, Earthstar Geographics · Place names: © OpenStreetMap contributors · Border: geoBoundaries',
   'Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries': 'Relief: Copernicus DEM · Rivers: © OpenStreetMap contributors · Border: geoBoundaries',
   'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap': 'Satellite imagery: Esri, Maxar, Earthstar Geographics · Place names: © OpenStreetMap contributors',
   'Časová os zápisov': 'The timeline of the entries',

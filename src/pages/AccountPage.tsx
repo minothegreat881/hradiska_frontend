@@ -213,7 +213,7 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
           <div style={{ textAlign: 'center', marginTop: 14 }}>
             <button type="button" style={linkBtn}
                     onClick={() => resendConfirmation(email.trim()).then(() => setOk(t('Overovací e-mail sme poslali znova.'))).catch(() => {})}>
-              Neprišiel e-mail? Poslať znova
+              {t('Neprišiel e-mail? Poslať znova')}
             </button>
           </div>
         )}

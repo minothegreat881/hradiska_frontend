@@ -177,7 +177,7 @@ export function ProfilePage() {
               aria-pressed={sekcia === 'nastavenia'}
               onClick={() => setSekcia('nastavenia')}
             >
-              Nastavenia účtu
+              {t('Nastavenia účtu')}
             </button>
             <button
               type="button"
@@ -676,7 +676,7 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
                       catch { /* zoznam sa obnoví pri ďalšom otvorení */ }
                     }}
                   >
-                    Zrušiť blokovanie
+                    {t('Zrušiť blokovanie')}
                   </button>
                 </li>
               ))}
@@ -688,9 +688,9 @@ function Nastavenia({ profil, token, onProfil, onOdhlas }: {
       {/* Odhlásenie je v hlavičke profilu — tu ostáva len to, čo sa nedá
           vrátiť, aby si to nikto nepomýlil s odhlásením. */}
       <section className="lprof-ucet">
-        <h2>Zrušenie účtu</h2>
+        <h2>{t('Zrušenie účtu')}</h2>
         <div className="lprof-tlacidla">
-          {!rusim && <button type="button" className="lprof-zrusit" onClick={() => setRusim(true)}>Zrušiť účet</button>}
+          {!rusim && <button type="button" className="lprof-zrusit" onClick={() => setRusim(true)}>{t('Zrušiť účet')}</button>}
         </div>
         {rusim && (
           <div className="lprof-zrusenie">

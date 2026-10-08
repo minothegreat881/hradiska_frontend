@@ -1226,7 +1226,7 @@ export function MapaHradisk({ zvyraznene }: {
           {podklad === 'satelit'
             ? (poAnglicky()
               ? 'Satellite imagery: Esri, Maxar, Earthstar Geographics · Place names: © OpenStreetMap contributors · Border: geoBoundaries'
-              : 'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries')
+              : t('Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'))
             : (poAnglicky()
               ? 'Relief: Copernicus DEM · Rivers and place names: © OpenStreetMap contributors · Border: geoBoundaries'
               : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries')}
