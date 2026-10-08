@@ -24,7 +24,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { t, kategoria } from '../lib/jazyk';
+import { odkaz, t, kategoria } from '../lib/jazyk';
 import { X } from 'lucide-react';
 import { Nacitavanie } from './Nacitavanie';
 import lokalityData from '../data/lokality.json';
@@ -216,7 +216,7 @@ export function Skupiny({ skupiny, mobil, onOdkaz }: {
           <ul className="lprh-zoznam">
             {s.polozky.map((p) => (
               <li key={p.slug}>
-                <a href={p.slug} onClick={onOdkaz}>
+                <a href={odkaz(p.slug)} onClick={onOdkaz}>
                   {mobil && <span className="lprh-bodka" aria-hidden="true" />}
                   <span className="lprh-nazov">{p.nazov}</span>
                   {p.meta && <span className="lprh-meta">{p.meta}</span>}
@@ -340,8 +340,8 @@ export function MegaPonuka({ kategorie, aktivna, onKategoria, onZavri, zoskupeni
 
         <footer className="lprh-pata">
           {aktivna.slug && (
-            <a href={aktivna.slug} onClick={onZavri}>
-              Zobraziť všetky{typeof aktivna.count === 'number' ? ` (${aktivna.count})` : ''} <span aria-hidden="true">→</span>
+            <a href={odkaz(aktivna.slug)} onClick={onZavri}>
+              {t('Zobraziť všetky')}{typeof aktivna.count === 'number' ? ` (${aktivna.count})` : ''} <span aria-hidden="true">→</span>
             </a>
           )}
           {/* Náušnica z listu značiek — predtým stála vo footeri webu. V päte

@@ -299,7 +299,7 @@ export function LabNav() {
                           onOdkaz={() => setMenuOpen(false)}
                         />
                         {cat.slug && (
-                          <a className="lnav-m-all" href={cat.slug} onClick={() => setMenuOpen(false)}>
+                          <a className="lnav-m-all" href={odkaz(cat.slug)} onClick={() => setMenuOpen(false)}>
                             {t('Zobraziť všetky')}{typeof cat.count === 'number' && cat.count > 0 ? ` (${cat.count})` : ''} <span aria-hidden="true">→</span>
                           </a>
                         )}

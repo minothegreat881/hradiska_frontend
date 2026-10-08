@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { t, poAnglicky } from '../lib/jazyk';
+import { odkaz, t, poAnglicky } from '../lib/jazyk';
 import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, MapPin } from 'lucide-react';
@@ -165,7 +165,7 @@ export function MegaMenu({ item, isOpen, onToggle, onClose }: MegaMenuProps) {
               {displayedItems.map((child) => (
                 <a
                   key={(child.slug || child.label) + child.label}
-                  href={child.slug || '#'}
+                  href={child.slug ? odkaz(child.slug) : '#'}
                   onClick={onClose}
                   role="menuitem"
                   style={{
@@ -221,7 +221,7 @@ export function MegaMenu({ item, isOpen, onToggle, onClose }: MegaMenuProps) {
                 }}
               >
                 <a
-                  href={item.slug}
+                  href={odkaz(item.slug)}
                   onClick={onClose}
                   style={{
                     display: 'flex',
