@@ -191,10 +191,10 @@ export function TermsPage() {
             className="font-semibold tracking-wide"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 'clamp(28px, 4vw, 40px)', color: 'var(--hr-ink)', letterSpacing: '0.04em' }}
           >
-            {poAnglicky() ? 'Terms of use' : 'Podmienky používania'}
+            {t('Podmienky používania')}
           </h1>
           <p className="mt-3 text-sm" style={{ color: 'var(--hr-clear-text)', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-            {poAnglicky() ? 'Last updated: 22 July 2026' : 'Posledná aktualizácia: 22. júla 2026'}
+            {t('Posledná aktualizácia: 22. júla 2026')}
           </p>
         </div>
 

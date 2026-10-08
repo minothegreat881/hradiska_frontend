@@ -21,7 +21,7 @@ import LabKategorieRychle from './LabKategorieRychle';
 import LabDalsiObsah from './LabDalsiObsah';
 import { useEffect, useState } from 'react';
 import { anglickeSlugy } from '../lib/strapi';
-import { t, odkaz, poAnglicky } from '../lib/jazyk';
+import { jazyk, poSlovensky, t, odkaz, poAnglicky } from '../lib/jazyk';
 
 /* Tri ukážkové hradiská pod hľadaním. Článok má v každom jazyku vlastný slug,
    takže anglickú adresu si vypýtame z dát — napísaná v kóde by po premenovaní
@@ -36,9 +36,9 @@ const POPULARNE = {
 export function LabHome() {
   const [populrneSlugy, setPopulrneSlugy] = useState(POPULARNE);
   useEffect(() => {
-    if (!poAnglicky()) return;
+    if (poSlovensky()) return;
     let zrusene = false;
-    anglickeSlugy(Object.values(POPULARNE))
+    anglickeSlugy(Object.values(POPULARNE), jazyk())
       .then((m) => {
         if (zrusene) return;
         setPopulrneSlugy({

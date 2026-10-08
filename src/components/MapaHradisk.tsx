@@ -366,9 +366,7 @@ export function MapaHradisk({ zvyraznene }: {
             minzoom: 6,
             maxzoom: 12,
             bounds: [BOUNDS[0][0], BOUNDS[0][1], BOUNDS[1][0], BOUNDS[1][1]],
-            attribution: poAnglicky()
-              ? 'Relief: Copernicus DEM · Rivers: © OpenStreetMap contributors · Border: geoBoundaries'
-              : t('Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'),
+            attribution: t('Reliéf: Copernicus DEM · Rieky: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'),
           },
           /* Satelitná snímka ako druhý podklad. Reliéf ukáže tvar terénu —
              prečo hradisko stojí práve tam — ale nepovie, čo je na tom
@@ -422,7 +420,7 @@ export function MapaHradisk({ zvyraznene }: {
       /* MapLibre pomenúva plátno po anglicky („Map"), hoci stránka je
          slovenská. Čítačka to ohlási v cudzom jazyku uprostred slovenského
          dokumentu. */
-      locale: { 'Map.Title': poAnglicky() ? 'Map of hillforts' : 'Mapa hradísk' },
+      locale: { 'Map.Title': t('Mapa hradísk') },
       canvasContextAttributes: { alpha: true, antialias: true },
       dragRotate: false,
       pitchWithRotate: false,
@@ -1189,9 +1187,7 @@ export function MapaHradisk({ zvyraznene }: {
           <h2 className="lmap-title">{t('Hradiská')}</h2>
           <div className="lmap-sub">{t('Slovenska')}</div>
           <p className="lmap-lead">
-            {poAnglicky()
-              ? 'An interactive map of the sites. Click into it to enable the scroll wheel for zooming and drag to pan — clusters break apart into single points as you zoom in. Hover over a point to open the site card; click into the map to close it.'
-              : 'Interaktívna mapa lokalít. Kliknutím do nej zapnete koliesko na približovanie, ťahaním posúvate — zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode otvoríte kartu lokality, klikom do mapy ju zavriete.'}
+            {t('Interaktívna mapa lokalít. Kliknutím do nej zapnete koliesko na približovanie, ťahaním posúvate — zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode otvoríte kartu lokality, klikom do mapy ju zavriete.')}
           </p>
           {outside > 0 && (
             <button type="button" className="lmap-outside" onClick={() => mapRef.current?.fitBounds(ROAM, { padding: 40, duration: 600 })}>
@@ -1241,12 +1237,8 @@ export function MapaHradisk({ zvyraznene }: {
             zarovno s panelom. */}
         <p className="lmap-attrib">
           {podklad === 'satelit'
-            ? (poAnglicky()
-              ? 'Satellite imagery: Esri, Maxar, Earthstar Geographics · Place names: © OpenStreetMap contributors · Border: geoBoundaries'
-              : t('Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries'))
-            : (poAnglicky()
-              ? 'Relief: Copernicus DEM · Rivers and place names: © OpenStreetMap contributors · Border: geoBoundaries'
-              : 'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries')}
+            ? t('Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries')
+            : t('Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries')}
         </p>
       </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { odkaz, t, poAnglicky } from '../lib/jazyk';
+import { poSlovensky, odkaz, t, poAnglicky } from '../lib/jazyk';
 import { Search, MapPin } from 'lucide-react';
 import {
   searchArticles, makeSnippet, highlightTerm, coverToUrl, type SearchHit,
@@ -103,9 +103,9 @@ export function SearchResultsPage({ query = '' }: SearchResultsPageProps) {
             <>{t('Pre')} „<strong style={{ color: T.amber }}>{q}</strong>" — {loading
               ? t('hľadám…')
               /* Slovenčina má tri tvary, angličtina dva. */
-              : `${hits.length} ${poAnglicky()
-                ? t(hits.length === 1 ? 'výsledok' : 'výsledkov')
-                : (hits.length === 1 ? 'výsledok' : hits.length < 5 ? 'výsledky' : 'výsledkov')}`}</>
+              : `${hits.length} ${poSlovensky()
+                ? (hits.length === 1 ? 'výsledok' : hits.length < 5 ? 'výsledky' : 'výsledkov')
+                : t(hits.length === 1 ? 'výsledok' : 'výsledkov')}`}</>
           ) : (
             t('Zadajte hľadaný výraz v poli vyhľadávania.')
           )}

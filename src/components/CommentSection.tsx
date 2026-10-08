@@ -1,6 +1,6 @@
 'use client';
 
-import { odkaz, t, poAnglicky } from '../lib/jazyk';
+import { narodneProstredie, odkaz, t, poAnglicky } from '../lib/jazyk';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ThumbsUp, Reply, Loader2, Trash2, Flag } from 'lucide-react';
@@ -357,7 +357,7 @@ function CommentItem({
 function formatDate(iso?: string) {
   if (!iso) return '';
   try {
-    return new Date(iso).toLocaleDateString(poAnglicky() ? 'en-GB' : 'sk-SK', {
+    return new Date(iso).toLocaleDateString(narodneProstredie(), {
       day: 'numeric',
       month: 'long',
       year: 'numeric',

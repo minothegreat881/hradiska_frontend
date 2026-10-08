@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { odkaz, t, poAnglicky } from '../lib/jazyk';
+import { poSlovensky, odkaz, t, poAnglicky } from '../lib/jazyk';
 import { NavigationItem } from '../data/navigation-structure';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, MapPin } from 'lucide-react';
@@ -23,8 +23,8 @@ const BORDER_GOLD = 'var(--hr-line)';
 const PILL_BG = 'var(--hr-line)';
 
 function pluralLokalit(n: number): string {
-  /* Angličtina počíta v dvoch tvaroch, slovenčina v troch. */
-  if (poAnglicky()) return t(n === 1 ? 'lokalitu' : 'lokalít');
+  /* Slovenčina počíta v troch tvaroch, angličtina aj nemčina v dvoch. */
+  if (!poSlovensky()) return t(n === 1 ? 'lokalitu' : 'lokalít');
   if (n === 1) return 'lokalitu';
   if (n < 5) return 'lokality';
   return 'lokalít';

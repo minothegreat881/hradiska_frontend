@@ -133,9 +133,7 @@ export function LabFooter() {
             </a>
 
             <p className="lfoot-desc">
-              {poAnglicky()
-                ? 'A civic association devoted to the Slavic hillforts, castles and manors of Slovakia.'
-                : 'Občianske združenie venované slovanským hradiskám, hradom a zámkom Slovenska.'}
+              {t('Občianske združenie venované slovanským hradiskám, hradom a zámkom Slovenska.')}
             </p>
 
             {/* Náušnica, ktorá tu stála vedľa ikon, sa presťahovala do päty

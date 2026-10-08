@@ -31,7 +31,7 @@ import { getStrapiImageUrl, convertStrapiPostToArticle, anglickeSlugy } from '..
 import { getRelated, type RelatedCard } from '../lib/related';
 import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 import { ArticleSidebar, KeyFactsCard, TimelineCard } from '../components/ArticleSidebar';
-import { t, datum as datumJazyka, odkaz, poAnglicky, kategoria, jazyk, nastavDruhyOdkaz, druhyJazyk } from '../lib/jazyk';
+import { poSlovensky, t, datum as datumJazyka, odkaz, poAnglicky, kategoria, jazyk, nastavDruhyOdkaz, druhyJazyk } from '../lib/jazyk';
 import { HistoricalGallery } from '../components/HistoricalGallery';
 import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
@@ -145,9 +145,10 @@ export function LabArticle({ slug }: { slug: string }) {
      neexistuje. Namiesto „Article not found" sa dohľadá slovenský článok,
      z neho anglická verzia a stránka sa naň presmeruje. */
   useEffect(() => {
-    if (loading || post || !poAnglicky() || !slug) return;
+    /* Záchrana pre adresu so slovenským slugom v cudzom jazyku. */
+    if (loading || post || poSlovensky() || !slug) return;
     let zrusene = false;
-    anglickeSlugy([slug])
+    anglickeSlugy([slug], jazyk())
       .then((m) => {
         const en = m[slug];
         if (zrusene || !en) return;
@@ -213,9 +214,9 @@ export function LabArticle({ slug }: { slug: string }) {
          ničoho iného — predtým sa cez neho preskakoval anglický `alt`
          a pod fotkou v galérii stál slovenský text. */
       caption: vJazyku?.caption || zBloku?.caption || vJazyku?.alt
-        || (poAnglicky() ? '' : (img.caption || img.alternativeText || '')),
+        || (poSlovensky() ? (img.caption || img.alternativeText || '') : ''),
       alt: vJazyku?.alt || zBloku?.alt || vJazyku?.caption
-        || (poAnglicky() ? post.title : (img.alternativeText || img.caption || '')),
+        || (poSlovensky() ? (img.alternativeText || img.caption || '') : post.title),
       fileId: img.id,
     };
   });
@@ -269,7 +270,7 @@ export function LabArticle({ slug }: { slug: string }) {
               /* Fotografia už nie je podklad pod textom, ale obsah — patrí jej
                  zmysluplný popis. */
               alt={popisyJazyka.get((post.coverImage as any)?.id)?.alt
-                || (poAnglicky() ? post.title : ((post.coverImage as any)?.alternativeText || post.title))}
+                || (poSlovensky() ? ((post.coverImage as any)?.alternativeText || post.title) : post.title)}
               /* Malým písmom zámerne: React 18 camelCase `fetchPriority`
                  nepozná, ohlási ho ako neznámu vlastnosť a na prvok ho
                  nedá — prednosť pri sťahovaní by sa tým stratila. */

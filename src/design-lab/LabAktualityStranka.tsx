@@ -26,7 +26,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { poAnglicky, odkaz, t } from '../lib/jazyk';
+import { poSlovensky, poAnglicky, odkaz, t } from '../lib/jazyk';
 import { ArticleCard } from '../components/ArticleCard';
 import { Nacitavanie } from './Nacitavanie';
 import { getKronikaAll, getCategoryPostCounts, type KronikaItem } from '../lib/strapi';
@@ -163,9 +163,9 @@ export function LabAktualityStranka() {
             vybrane.length > 0 && (
               <p className="lakt-suhrn">
                 <b>{vybrane.length}</b>{' '}
-                {poAnglicky()
-                  ? t(vybrane.length === 1 ? 'článok' : 'článkov')
-                  : (vybrane.length === 1 ? 'článok' : vybrane.length < 5 ? 'články' : 'článkov')}
+                {poSlovensky()
+                  ? (vybrane.length === 1 ? 'článok' : vybrane.length < 5 ? 'články' : 'článkov')
+                  : t(vybrane.length === 1 ? 'článok' : 'článkov')}
                 {' · '}
                 <a href={odkaz('/aktuality')} onClick={(e) => { e.preventDefault(); prepni(null); }}>
                   {t('Celá kronika')}
@@ -176,9 +176,9 @@ export function LabAktualityStranka() {
             zaznamy.length > 0 && (
               <p className="lakt-suhrn">
                 <b>{zaznamy.length}</b> {t('zápisov')} · <b>{roky.length}</b>{' '}
-                {poAnglicky()
-                  ? t(roky.length === 1 ? 'rok' : 'rokov')
-                  : (roky.length === 1 ? 'rok' : roky.length < 5 ? 'roky' : 'rokov')}
+                {poSlovensky()
+                  ? (roky.length === 1 ? 'rok' : roky.length < 5 ? 'roky' : 'rokov')
+                  : t(roky.length === 1 ? 'rok' : 'rokov')}
               </p>
             )
           )}

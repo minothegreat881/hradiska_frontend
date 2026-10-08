@@ -19,7 +19,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { odkaz, t, poAnglicky, datum } from '../lib/jazyk';
+import { poSlovensky, odkaz, t, poAnglicky, datum } from '../lib/jazyk';
 import {
   getBlogPosts, getDomovskaGaleria, getKronikaAll, getKronikaIntro, getKronikaPhotos,
   getStrapiImageUrl, KRONIKA_INTRO_SLUG, KronikaItem, KronikaPhoto, StrapiImage,
@@ -92,7 +92,7 @@ function formatSkDate(iso: string): string {
   /* V angličtine dátum skladá `datum()` z prekladovej vrstvy — mesiace
      vypísané po slovensky boli na anglickej stránke posledná vec, ktorá
      prezrádzala, že je to preklad. */
-  if (poAnglicky()) return datum(iso);
+  if (!poSlovensky()) return datum(iso);
   const d = new Date(iso);
   const months = ['januára','februára','marca','apríla','mája','júna','júla','augusta','septembra','októbra','novembra','decembra'];
   return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;

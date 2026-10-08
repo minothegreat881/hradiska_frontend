@@ -1,4 +1,4 @@
-import { t, kategoria, odkaz, poAnglicky, rozdelAdresu, druhyJazyk, odkazDoJazyka, sledujDruhyOdkaz, dajDruhyOdkaz } from '../lib/jazyk';
+import { poNemecky, poSlovensky, t, kategoria, odkaz, poAnglicky, rozdelAdresu, druhyJazyk, odkazDoJazyka, sledujDruhyOdkaz, dajDruhyOdkaz } from '../lib/jazyk';
 'use client';
 
 /**
@@ -65,8 +65,9 @@ const SHORT: Record<string, string> = {
   '3d-modely': '3D modely',
   'informacne-tabule': 'Tabule',
 };
-/* V angličtine sa skratky nepoužívajú — anglické názvy kategórií sú krátke
-   samy osebe a skrátené tvary („Všeobecne") by nedávali zmysel. */
+/* Skrátené tvary pre lištu v cudzích jazykoch. Doslovný preklad slovenskej
+   skratky („Všeobecne" → „Allgemein") by nedával zmysel, preto má každý
+   jazyk vlastnú dvojicu. */
 const SHORT_EN: Record<string, string> = {
   'strazna-funkcia': 'Guard function',
   'listiny-a-pisomne-zdroje': 'Written sources',
@@ -74,10 +75,21 @@ const SHORT_EN: Record<string, string> = {
   'vseobecne-o-hradiskach': 'About hillforts',
   'informacne-tabule': 'Panels',
 };
-const shortLabel = (i: NavigationItem) =>
-  poAnglicky()
-    ? (SHORT_EN[catSlug(i)] ?? kategoria(i.label))
-    : (SHORT[catSlug(i)] ?? i.label);
+const SHORT_DE: Record<string, string> = {
+  'strazna-funkcia': 'Wachfunktion',
+  'listiny-a-pisomne-zdroje': 'Urkunden',
+  'svatyne-a-sakralne-objekty': 'Heiligtümer',
+  'vseobecne-o-hradiskach': 'Allgemein',
+  'informacne-tabule': 'Tafeln',
+  'kniezacie-sidla': 'Fürstensitze',
+  'mocenske-centra': 'Machtzentren',
+  'staroveke-sidla': 'Vorzeit',
+};
+const shortLabel = (i: NavigationItem) => {
+  if (poSlovensky()) return SHORT[catSlug(i)] ?? i.label;
+  const skratky = poNemecky() ? SHORT_DE : SHORT_EN;
+  return skratky[catSlug(i)] ?? kategoria(i.label);
+};
 
 /**
  * Prepínač jazyka v hlavičke.
@@ -204,8 +216,8 @@ export function LabNav() {
   const openCat = open ? cats.find(c => c.label === open.label) ?? null : null;
 
   const rows = [
-    { label: poAnglicky() ? 'Types of hillforts' : 'Typy hradísk', items: cats.filter(c => PRIMARY_SLUGS.has(catSlug(c))) },
-    { label: poAnglicky() ? 'More content' : 'Ďalší obsah', items: cats.filter(c => !PRIMARY_SLUGS.has(catSlug(c))) },
+    { label: t('Typy hradísk'), items: cats.filter(c => PRIMARY_SLUGS.has(catSlug(c))) },
+    { label: t('Ďalší obsah'), items: cats.filter(c => !PRIMARY_SLUGS.has(catSlug(c))) },
   ];
   const secondaryOpen = open !== null && rows[1].items.some(c => c.label === open.label);
 
@@ -236,11 +248,11 @@ export function LabNav() {
             zalamovať. */}
         <div className="lnav-cats" ref={catsRef} data-overflow={overflow ? 'true' : undefined} data-scrolled={scrolled ? 'true' : undefined}>
           {rows.slice(0, 1).map(row => (
-            <div className="lnav-cats-row" key={row.label} data-secondary={row.label === (poAnglicky() ? 'More content' : 'Ďalší obsah') ? 'true' : undefined}>
+            <div className="lnav-cats-row" key={row.label} data-secondary={row.label === t('Ďalší obsah') ? 'true' : undefined}>
               {/* Názov nesie len druhý rad — ten sa vysúva a treba povedať, čo
                   pribudlo. Prvý rad je hlavná navigácia a popisovať ju je šum;
                   navyše tým získa 122 px, vďaka čomu sa zmestí na jeden riadok. */}
-              {row.label === (poAnglicky() ? 'More content' : 'Ďalší obsah') && <span className="lnav-rowlabel">{row.label}</span>}
+              {row.label === t('Ďalší obsah') && <span className="lnav-rowlabel">{row.label}</span>}
               {row.items.map(cat => (
                 <CatButton
                   key={cat.label}

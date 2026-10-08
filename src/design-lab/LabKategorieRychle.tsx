@@ -32,7 +32,7 @@ import {
   type PolozkaRozcestnika as Polozka,
 } from '../data/rozcestnik';
 import { getCategoryPostCounts } from '../lib/strapi';
-import { t, odkaz, poAnglicky } from '../lib/jazyk';
+import { poSlovensky, t, odkaz, poAnglicky } from '../lib/jazyk';
 
 function Dlazdica({ d, pocet, poradie }: { d: Polozka; pocet?: number; poradie: number }) {
   const k = hradiskaCategories.find((c) => c.slug === d.slug);
@@ -63,7 +63,7 @@ function Dlazdica({ d, pocet, poradie }: { d: Polozka; pocet?: number; poradie: 
           <span className="lkat-pocet">
             {/* Slovenčina počíta v troch tvaroch, angličtina v jednom —
                  v nej stačí množné číslo z tretieho tvaru. */}
-            <b>{pocet}</b> {poAnglicky() ? t(d.tvary[2]) : tvarPoctu(pocet, d.tvary)}
+            <b>{pocet}</b> {poSlovensky() ? tvarPoctu(pocet, d.tvary) : t(d.tvary[2])}
           </span>
         )}
       </span>

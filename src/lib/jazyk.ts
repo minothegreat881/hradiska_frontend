@@ -131,6 +131,26 @@ export function odkazDoDruhehoJazyka(cesta: string): string {
    Kľúč je slovenský originál, aby sa v komponente dalo napísať
    `t('Mohlo by vás zaujímať')` a slovenská vetva ostala čitateľná. */
 const EN: Record<string, string> = {
+  'Občianske združenie venované slovanským hradiskám, hradom a zámkom Slovenska.':
+    'A civic association devoted to the Slavic hillforts, castles and manors of Slovakia.',
+  'Súhlas s cookies':
+    'Cookie consent',
+  'Vyberte, ktoré cookies smú stráže použiť. Nevyhnutné potrebujeme na chod hradiska, o analytické vás slušne prosíme.':
+    'Choose which cookies the guards may use. The essential ones keep the hillfort running; for the analytics ones we are politely asking.',
+  'Držia brány otvorené — prihlásenie a zapamätanie tohto rozhodnutia. Bez nich hradisko nefunguje, preto sa nedajú vypnúť.':
+    'They keep the gates open — signing in, and remembering this very choice. The hillfort does not work without them, so they cannot be switched off.',
+  'Anonymne nám prezradia, z ktorého kmeňa prichádzate a ktoré články čítate — aby sme blog vylepšovali. Bez cookies tretích strán.':
+    'They tell us anonymously which tribe you come from and which articles you read — so that we can improve the blog. No third-party cookies.',
+  'Analytické cookies':
+    'Analytics cookies',
+  'Mapa hradísk':
+    'Map of hillforts',
+  'Interaktívna mapa lokalít. Kliknutím do nej zapnete koliesko na približovanie, ťahaním posúvate — zhluky sa priblížením rozpadnú na jednotlivé body. Prejdením po bode otvoríte kartu lokality, klikom do mapy ju zavriete.':
+    'An interactive map of the sites. Click into it to enable the scroll wheel for zooming and drag to pan — clusters break apart into single points as you zoom in. Hover over a point to open the site card; click into the map to close it.',
+  'Reliéf: Copernicus DEM · Rieky a názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries':
+    'Relief: Copernicus DEM · Rivers and place names: © OpenStreetMap contributors · Border: geoBoundaries',
+  'Posledná aktualizácia: 22. júla 2026':
+    'Last updated: 22 July 2026',
   'ČINNOSŤ': 'WHAT WE DO',
   'Činnosť združenia':
     'What the association does',

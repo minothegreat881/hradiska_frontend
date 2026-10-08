@@ -1,4 +1,4 @@
-import { t, poAnglicky } from '../lib/jazyk';
+import { poNemecky, t, poAnglicky } from '../lib/jazyk';
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -43,7 +43,7 @@ export function CookieBanner() {
 
   return (
     <div className="ck-root ck-dock">
-      <div className="ck-card" role="dialog" aria-modal="false" aria-label={poAnglicky() ? 'Cookie consent' : 'Súhlas s cookies'}>
+      <div className="ck-card" role="dialog" aria-modal="false" aria-label={t('Súhlas s cookies')}>
         {/* Zlatý lem s vlnovkou */}
         <div className="ck-rim-bar" aria-hidden="true">
           <svg width="100%" height="12" preserveAspectRatio="none">
@@ -68,6 +68,8 @@ export function CookieBanner() {
             {mode === 'banner' ? (
               <>
                 <h2 className="ck-title">{t('Stoj! Kto tam?')}</h2>
+                {/* Tieto dva odstavce majú vnútri značky, takže do slovníka
+                    nejdú — každý jazyk má vlastnú vetvu. */}
                 {poAnglicky() ? (
                   <>
                     <p className="ck-p">
@@ -79,6 +81,21 @@ export function CookieBanner() {
                     <p className="ck-p">
                       Clicking <span className="ck-accent-i">“I agree”</span> will calm the guards
                       and help us improve this blog. <span className="ck-strong">No pillaging, we promise!</span>
+                    </p>
+                  </>
+                ) : poNemecky() ? (
+                  <>
+                    <p className="ck-p">
+                      Die Wache auf der Palisade meldet, dass dieser Burgwall{' '}
+                      <span className="ck-accent">„Cookies“</span> verwendet. Nicht jene, die nebenan
+                      im Grubenhaus auf der Feuerstelle gebacken werden, sondern die digitalen. Wir
+                      brauchen sie, um die Tore offen zu halten und zu erfahren, aus welchem Stamm
+                      Sie zu uns kommen.
+                    </p>
+                    <p className="ck-p">
+                      Ein Klick auf <span className="ck-accent-i">„Ich stimme zu“</span> beruhigt die
+                      Wachen und hilft uns, diesen Blog zu verbessern.{' '}
+                      <span className="ck-strong">Keine Plünderung, versprochen!</span>
                     </p>
                   </>
                 ) : (
@@ -115,15 +132,13 @@ export function CookieBanner() {
             ) : (
               <>
                 <h2 className="ck-title">{t('Zvyky hradiska')}</h2>
-                <p className="ck-p">{poAnglicky() ? 'Choose which cookies the guards may use. The essential ones keep the hillfort running; for the analytics ones we are politely asking.' : 'Vyberte, ktoré cookies smú stráže použiť. Nevyhnutné potrebujeme na chod hradiska, o analytické vás slušne prosíme.'}</p>
+                <p className="ck-p">{t('Vyberte, ktoré cookies smú stráže použiť. Nevyhnutné potrebujeme na chod hradiska, o analytické vás slušne prosíme.')}</p>
 
                 <div className="ck-settings" style={{ padding: 0, marginTop: 14 }}>
                   <div className="ck-cat">
                     <div>
                       <h3>{t('Nevyhnutné')}</h3>
-                      <p>{poAnglicky()
-                        ? 'They keep the gates open — signing in, and remembering this very choice. The hillfort does not work without them, so they cannot be switched off.'
-                        : 'Držia brány otvorené — prihlásenie a zapamätanie tohto rozhodnutia. Bez nich hradisko nefunguje, preto sa nedajú vypnúť.'}</p>
+                      <p>{t('Držia brány otvorené — prihlásenie a zapamätanie tohto rozhodnutia. Bez nich hradisko nefunguje, preto sa nedajú vypnúť.')}</p>
                     </div>
                     <div className="ck-cat-ctl"><span className="ck-fixed-tag">{t('VŽDY ZAPNUTÉ')}</span></div>
                   </div>
@@ -131,16 +146,14 @@ export function CookieBanner() {
                   <div className="ck-cat">
                     <div>
                       <h3>{t('Analytické')}</h3>
-                      <p>{poAnglicky()
-                        ? 'They tell us anonymously which tribe you come from and which articles you read — so that we can improve the blog. No third-party cookies.'
-                        : 'Anonymne nám prezradia, z ktorého kmeňa prichádzate a ktoré články čítate — aby sme blog vylepšovali. Bez cookies tretích strán.'}</p>
+                      <p>{t('Anonymne nám prezradia, z ktorého kmeňa prichádzate a ktoré články čítate — aby sme blog vylepšovali. Bez cookies tretích strán.')}</p>
                     </div>
                     <div className="ck-cat-ctl">
                       <button
                         type="button"
                         role="switch"
                         aria-checked={analytics}
-                        aria-label={poAnglicky() ? 'Analytics cookies' : 'Analytické cookies'}
+                        aria-label={t('Analytické cookies')}
                         className="ck-toggle"
                         onClick={() => setAnalytics((v) => !v)}
                       >

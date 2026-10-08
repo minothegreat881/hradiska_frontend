@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { kategoria, odkaz, poAnglicky } from '../lib/jazyk';
+import { narodneProstredie, kategoria, odkaz, poAnglicky } from '../lib/jazyk';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { Article } from '../data/mock-data';
 import { hradiskaCategories, variant } from '../data/categories';
@@ -96,7 +96,7 @@ export function ArticleCard({ article, stitok = true, znak = false }: ArticleCar
   );
 
   const dateLabel = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString(poAnglicky() ? 'en-GB' : 'sk-SK', {
+    ? new Date(article.publishedAt).toLocaleDateString(narodneProstredie(), {
         day: 'numeric',
         month: 'short',
         year: 'numeric',

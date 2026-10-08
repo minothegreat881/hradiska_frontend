@@ -22,7 +22,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { poAnglicky, t, odkaz } from '../lib/jazyk';
+import { poSlovensky, narodneProstredie, poAnglicky, t, odkaz } from '../lib/jazyk';
 import { useMember } from '../auth/MemberAuth';
 import { deleteMyAccount } from '../lib/memberApi';
 import {
@@ -52,15 +52,16 @@ function vKronike(iso: string): { cislo: string; slovo: string } {
   if (mes < 12) {
     const m = Math.max(1, mes);
     /* Angličtina počíta v dvoch tvaroch, slovenčina v troch. */
-    const tvar = poAnglicky()
-      ? t(m === 1 ? 'mesiac v kronike' : 'mesiacov v kronike')
-      : (m === 1 ? 'mesiac v kronike' : m < 5 ? 'mesiace v kronike' : 'mesiacov v kronike');
+    /* Slovenčina má tri tvary (1 / 2–4 / 5+), angličtina aj nemčina dva. */
+    const tvar = poSlovensky()
+      ? (m === 1 ? 'mesiac v kronike' : m < 5 ? 'mesiace v kronike' : 'mesiacov v kronike')
+      : t(m === 1 ? 'mesiac v kronike' : 'mesiacov v kronike');
     return { cislo: String(m), slovo: tvar };
   }
   const r = Math.floor(mes / 12);
-  const tvarR = poAnglicky()
-    ? t(r === 1 ? 'rok v kronike' : 'rokov v kronike')
-    : (r === 1 ? 'rok v kronike' : r < 5 ? 'roky v kronike' : 'rokov v kronike');
+  const tvarR = poSlovensky()
+    ? (r === 1 ? 'rok v kronike' : r < 5 ? 'roky v kronike' : 'rokov v kronike')
+    : t(r === 1 ? 'rok v kronike' : 'rokov v kronike');
   return { cislo: String(r), slovo: tvarR };
 }
 
@@ -76,7 +77,7 @@ function kedy(iso: string): string {
 }
 
 /* Krátky dátum v jazyku stránky — `jazyk.ts` má dlhý tvar, sem sa hodí číselný. */
-const datum = (iso: string) => new Date(iso).toLocaleDateString(poAnglicky() ? 'en-GB' : 'sk-SK', { day: 'numeric', month: 'numeric', year: 'numeric' });
+const datum = (iso: string) => new Date(iso).toLocaleDateString(narodneProstredie(), { day: 'numeric', month: 'numeric', year: 'numeric' });
 
 /** Strapi vracia cesty relatívne k svojmu koreňu — bez predpony sa hľadajú
     na frontende a obrázok sa nenačíta. */
@@ -296,9 +297,9 @@ function Ozvy({ items }: { items: NotificationItem[] | null }) {
           ktoText = viac ? `${n.aggregateCount} ${t('čitateľov')}` : kto;
           /* Slovenčina rozlišuje rod a číslo („ocenilo" / „ocenil"), angličtina
              nie — tam je to jedna veta pre oba prípady. */
-          coText = poAnglicky()
-            ? (kFotke ? t('ocenil váš komentár k fotografii') : t('ocenil váš komentár'))
-            : `${viac ? 'ocenilo' : 'ocenil'} váš komentár${kFotke ? ' k fotografii' : ''}`;
+          coText = poSlovensky()
+            ? `${viac ? 'ocenilo' : 'ocenil'} váš komentár${kFotke ? ' k fotografii' : ''}`
+            : (kFotke ? t('ocenil váš komentár k fotografii') : t('ocenil váš komentár'));
           osoba = !viac;
         } else if (druh === 'warning') {
           ktoText = t('Správca');
