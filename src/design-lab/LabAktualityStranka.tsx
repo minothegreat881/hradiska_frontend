@@ -19,7 +19,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { odkaz, t } from '../lib/jazyk';
+import { poAnglicky, odkaz, t } from '../lib/jazyk';
 import { ArticleCard } from '../components/ArticleCard';
 import { Nacitavanie } from './Nacitavanie';
 import { getKronika, type KronikaItem } from '../lib/strapi';
@@ -60,7 +60,7 @@ export function LabAktualityStranka() {
       setStrana(dalsia);
       setChyba('');
     } catch {
-      setChyba('Zápisy sa nepodarilo načítať. Skúste to prosím o chvíľu znova.');
+      setChyba(t('Zápisy sa nepodarilo načítať. Skúste to prosím o chvíľu znova.'));
     } finally {
       setBusy(false);
     }
@@ -73,7 +73,7 @@ export function LabAktualityStranka() {
   const roky = useMemo(() => {
     const m = new Map<string, KronikaItem[]>();
     for (const z of zaznamy) {
-      const r = z.datum ? String(new Date(z.datum).getFullYear()) : 'bez dátumu';
+      const r = z.datum ? String(new Date(z.datum).getFullYear()) : t('bez dátumu');
       if (!m.has(r)) m.set(r, []);
       m.get(r)!.push(z);
     }
@@ -88,7 +88,7 @@ export function LabAktualityStranka() {
           <ol>
             <li><a href={odkaz('/')}>{t('Domov')}</a></li>
             <li aria-hidden="true">·</li>
-            <li>Kronika združenia</li>
+            <li>{t('Kronika združenia')}</li>
           </ol>
         </nav>
 
@@ -101,7 +101,10 @@ export function LabAktualityStranka() {
           </p>
           {zaznamy.length > 0 && (
             <p className="lakt-suhrn">
-              <b>{zaznamy.length}</b> zápisov · <b>{roky.length}</b> {roky.length === 1 ? 'rok' : roky.length < 5 ? 'roky' : 'rokov'}
+              <b>{zaznamy.length}</b> {t('zápisov')} · <b>{roky.length}</b>{' '}
+              {poAnglicky()
+                ? t(roky.length === 1 ? 'rok' : 'rokov')
+                : (roky.length === 1 ? 'rok' : roky.length < 5 ? 'roky' : 'rokov')}
             </p>
           )}
         </header>
@@ -121,17 +124,17 @@ export function LabAktualityStranka() {
           </section>
         ))}
 
-        {busy && <Nacitavanie text="Načítavam…" />}
+        {busy && <Nacitavanie text={t('Načítavam…')} />}
         {!busy && zaznamy.length === 0 && !chyba && (
-          <p className="lgal-prazdno">Zatiaľ tu nie je ani jeden zápis.</p>
+          <p className="lgal-prazdno">{t('Zatiaľ tu nie je ani jeden zápis.')}</p>
         )}
 
         {este && !busy && (
           <div className="lgal-viac">
-            <button type="button" onClick={() => void nacitaj(strana + 1)}>Staršie zápisy</button>
+            <button type="button" onClick={() => void nacitaj(strana + 1)}>{t('Staršie zápisy')}</button>
           </div>
         )}
-        {!este && zaznamy.length > 0 && <p className="lgal-koniec" aria-hidden="true">— začiatok kroniky —</p>}
+        {!este && zaznamy.length > 0 && <p className="lgal-koniec" aria-hidden="true">— {t('začiatok kroniky')} —</p>}
       </div>
     </div>
   );

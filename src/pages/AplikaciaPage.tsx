@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { t, odkaz } from '../lib/jazyk';
 import { Download, Smartphone, WifiOff, BellRing, Map as MapIcon, ShieldCheck } from 'lucide-react';
 import { STRAPI_URL } from '../lib/api-adresa';
 import { APLIKACIA } from '../data/aplikacia';
@@ -33,7 +34,7 @@ function urcSystem(): System {
 }
 
 const VYHODY = [
-  { ikona: WifiOff, nadpis: 'Funguje aj bez signálu', text: 'Mapa hradísk je celá v aplikácii. V teréne, kde nechytá dáta, ju otvoríte rovnako ako doma.' },
+  { ikona: WifiOff, nadpis: 'Funguje aj bez signálu', text: 'Mapa hradísk je celá v aplikácii. V teréne, kde nechytá dáta, ju otvoríte rovnako ako doma.' },   // nadpisy a texty idú cez `t()` pri vykreslení
   { ikona: MapIcon, nadpis: 'Hradiská v okolí', text: 'Aplikácia vie, kde stojíte, a ukáže, čo máte na dosah.' },
   { ikona: BellRing, nadpis: 'Upozornenia', text: 'Keď na váš komentár niekto odpovie alebo pribudne nový článok, dozviete sa to hneď.' },
   { ikona: ShieldCheck, nadpis: 'Bez reklám a sledovania', text: 'To isté, čo web — nič navyše nezbiera.' },
@@ -46,16 +47,15 @@ export function AplikaciaPage() {
   return (
     <div className="lapp">
       <div className="lapp-in">
-        <nav className="lart-crumbs" aria-label="Omrvinky">
-          <a href="/">Domov</a>
+        <nav className="lart-crumbs" aria-label={t('Omrvinky')}>
+          <a href={odkaz('/')}>{t('Domov')}</a>
           <span aria-hidden="true">›</span>
-          <a className="je-tu" href="/aplikacia">Aplikácia</a>
+          <a className="je-tu" href={odkaz('/aplikacia')}>{t('Aplikácia')}</a>
         </nav>
 
-        <h1 className="lapp-nadpis">Hradiská vo vrecku</h1>
+        <h1 className="lapp-nadpis">{t('Hradiská vo vrecku')}</h1>
         <p className="lapp-perex">
-          Celá encyklopédia aj s mapou v aplikácii, ktorú si nainštalujete do telefónu.
-          Obsah je ten istý ako na webe a dopĺňa sa sám.
+          {t('Celá encyklopédia aj s mapou v aplikácii, ktorú si nainštalujete do telefónu. Obsah je ten istý ako na webe a dopĺňa sa sám.')}
         </p>
 
         {/* Ponuka pre systém, z ktorého sa človek práve pozerá, stojí prvá. */}
@@ -65,16 +65,15 @@ export function AplikaciaPage() {
               <Smartphone aria-hidden="true" />
               <div>
                 <h2>Android</h2>
-                <span>verzia {APLIKACIA.verzia} · {APLIKACIA.velkostMB} MB</span>
+                <span>{t('verzia')} {APLIKACIA.verzia} · {APLIKACIA.velkostMB} MB</span>
               </div>
             </div>
             <a className="lapp-stiahnut" href={APK} download>
-              <Download aria-hidden="true" /> Stiahnuť aplikáciu
+              <Download aria-hidden="true" /> {t('Stiahnuť aplikáciu')}
             </a>
             <p className="lapp-poznamka">
-              Aplikácia zatiaľ nie je v Google Play, preto sa telefón pri inštalácii spýta,
-              či súboru veríte — potvrďte <strong>Inštalovať aj tak</strong>. Je podpísaná
-              združením a nič iné do telefónu nepridá.
+              {t('Aplikácia zatiaľ nie je v Google Play, preto sa telefón pri inštalácii spýta, či súboru veríte — potvrďte')}{' '}
+              <strong>{t('Inštalovať aj tak')}</strong>. {t('Je podpísaná združením a nič iné do telefónu nepridá.')}
             </p>
           </div>
 
@@ -83,40 +82,35 @@ export function AplikaciaPage() {
               <Smartphone aria-hidden="true" />
               <div>
                 <h2>iPhone a iPad</h2>
-                <span>web na plochu</span>
+                <span>{t('web na plochu')}</span>
               </div>
             </div>
             <p className="lapp-text">
-              Apple dovoľuje inštalovať aplikácie iba cez App Store a my tam ísť nechceme.
-              Na iPhone si preto web pridajte na plochu — otvorí sa na celú obrazovku,
-              s vlastnou ikonou, ako aplikácia:
+              {t('Apple dovoľuje inštalovať aplikácie iba cez App Store a my tam ísť nechceme. Na iPhone si preto web pridajte na plochu — otvorí sa na celú obrazovku, s vlastnou ikonou, ako aplikácia:')}
             </p>
             <ol className="lapp-kroky">
-              <li>V Safari klepnite na <strong>Zdieľať</strong> (štvorček so šípkou nahor).</li>
-              <li>Vyberte <strong>Pridať na plochu</strong>.</li>
-              <li>Potvrďte <strong>Pridať</strong>.</li>
+              <li>{t('V Safari klepnite na')} <strong>{t('Zdieľať')}</strong> {t('(štvorček so šípkou nahor).')}</li>
+              <li>{t('Vyberte')} <strong>{t('Pridať na plochu')}</strong>.</li>
+              <li>{t('Potvrďte')} <strong>{t('Pridať')}</strong>.</li>
             </ol>
           </div>
         </div>
 
-        <h2 className="lapp-podnadpis">Čo aplikácia vie navyše</h2>
+        <h2 className="lapp-podnadpis">{t('Čo aplikácia vie navyše')}</h2>
         <ul className="lapp-vyhody">
           {VYHODY.map((v) => (
-            <li key={v.nadpis}>
+            <li key={t(v.nadpis)}>
               <v.ikona aria-hidden="true" />
               <div>
-                <strong>{v.nadpis}</strong>
-                <p>{v.text}</p>
+                <strong>{t(v.nadpis)}</strong>
+                <p>{t(v.text)}</p>
               </div>
             </li>
           ))}
         </ul>
 
         <p className="lapp-pata">
-          Aplikácia sa aktualizuje sama: nové verzie webu si stiahne na pozadí a nabudúce
-          sa otvorí už s nimi — nemusíte na nič klikať ani nič inštalovať znova.
-          Aplikáciu vydáva OZ Hradiská. Na čo natrafíte, napíšte v diskusii pod ktorýmkoľvek
-          článkom — čítame to.
+          {t('Aplikácia sa aktualizuje sama: nové verzie webu si stiahne na pozadí a nabudúce sa otvorí už s nimi — nemusíte na nič klikať ani nič inštalovať znova. Aplikáciu vydáva OZ Hradiská. Na čo natrafíte, napíšte v diskusii pod ktorýmkoľvek článkom — čítame to.')}
         </p>
       </div>
     </div>

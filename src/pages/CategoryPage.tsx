@@ -37,7 +37,9 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
      vrstva (`jazyk.ts`), rovnako ako v hlavičke a v omrvinkách. */
   const categoryName = kategoria(strapiCategory?.name || localCategory?.label || categorySlug);
   // Kurátorský popis má prednosť — je písaný podľa toho, čo v kategórii reálne je.
-  const categoryDescription = localCategory?.description || strapiCategory?.description || '';
+  /* Popis kategórie je kurátorský text z `data/categories.ts`; anglické
+     znenie drží prekladová vrstva pod slovenským kľúčom. */
+  const categoryDescription = t(localCategory?.description || strapiCategory?.description || '');
   // Obrázok je z článku v tej istej kategórii, servírovaný zo Strapi médií.
   const categoryImage = localCategory ? `${STRAPI_URL}${localCategory.image}` : null;
   const categoryIcon = localCategory?.icon || '📜';
@@ -55,7 +57,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
       <div className="container py-24 text-center">
         <h1 className="text-stone-900 dark:text-stone-50 mb-4">{t('Kategória nebola nájdená')}</h1>
         <a href="/" className="text-amber-700 dark:text-amber-400 hover:underline">
-          Návrat na domovskú stránku
+          {t('Návrat na domovskú stránku')}
         </a>
       </div>
     );
@@ -177,7 +179,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
           <div className="container">
             <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
               <p className="text-red-700 dark:text-red-300">
-                Nepodarilo sa načítať články. Skúste to prosím neskôr.
+                {t('Nepodarilo sa načítať články. Skúste to prosím neskôr.')}
               </p>
             </div>
           </div>

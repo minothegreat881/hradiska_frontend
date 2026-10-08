@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { t, odkaz } from '../lib/jazyk';
 import { Home, Search, Compass } from 'lucide-react';
 
 const go = (p: string) => { window.history.pushState({}, '', p); window.dispatchEvent(new PopStateEvent('popstate')); };
@@ -17,7 +18,7 @@ const go = (p: string) => { window.history.pushState({}, '', p); window.dispatch
 export function NotFoundPage() {
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = 'Stránka sa nenašla (404) — Hradiská.sk';
+    document.title = t('Stránka sa nenašla (404) — Hradiská.sk');
     const meta = document.createElement('meta');
     meta.name = 'robots';
     meta.content = 'noindex';
@@ -39,24 +40,23 @@ export function NotFoundPage() {
       <div style={{ maxWidth: 560, textAlign: 'center', fontFamily: 'var(--font-serif, Georgia, serif)' }}>
         <div style={{ fontSize: 84, fontWeight: 700, color: 'var(--hr-accent)', lineHeight: 1, fontFamily: 'var(--font-heading, Cinzel, serif)' }}>404</div>
         <h1 style={{ fontSize: 28, fontWeight: 600, color: 'var(--hr-ink-3)', margin: '14px 0 10px' }}>
-          Táto stránka sa nenašla
+          {t('Táto stránka sa nenašla')}
         </h1>
         <p style={{ fontSize: 16, color: 'var(--hr-clear-text)', lineHeight: 1.6, margin: '0 0 28px' }}>
-          Odkaz je možno starý alebo neúplný. Skúste hľadať konkrétne hradisko,
-          alebo sa vráťte na úvod.
+          {t('Odkaz je možno starý alebo neúplný. Skúste hľadať konkrétne hradisko, alebo sa vráťte na úvod.')}
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/" onClick={(e) => { e.preventDefault(); go('/'); }}
+          <a href={odkaz('/')} onClick={(e) => { e.preventDefault(); go(odkaz('/')); }}
              style={{ ...btn, background: 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent-deep))', color: 'var(--hr-on-photo)', border: '1px solid var(--hr-accent-deep)' }}>
-            <Home style={{ width: 17, height: 17 }} /> Na úvod
+            <Home style={{ width: 17, height: 17 }} /> {t('Na úvod')}
           </a>
-          <a href="/hladat" onClick={(e) => { e.preventDefault(); go('/hladat'); }}
+          <a href={odkaz('/hladat')} onClick={(e) => { e.preventDefault(); go(odkaz('/hladat')); }}
              style={{ ...btn, background: 'transparent', color: 'var(--hr-accent)', border: '1px solid var(--hr-chip-border)' }}>
-            <Search style={{ width: 17, height: 17 }} /> Vyhľadávanie
+            <Search style={{ width: 17, height: 17 }} /> {t('Vyhľadávanie')}
           </a>
-          <a href="/hradiska" onClick={(e) => { e.preventDefault(); go('/hradiska'); }}
+          <a href={odkaz('/hradiska')} onClick={(e) => { e.preventDefault(); go(odkaz('/hradiska')); }}
              style={{ ...btn, background: 'transparent', color: 'var(--hr-accent)', border: '1px solid var(--hr-chip-border)' }}>
-            <Compass style={{ width: 17, height: 17 }} /> Hradiská
+            <Compass style={{ width: 17, height: 17 }} /> {t('Hradiská')}
           </a>
         </div>
       </div>

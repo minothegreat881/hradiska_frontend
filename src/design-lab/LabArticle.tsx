@@ -56,7 +56,7 @@ function skDate(iso?: string | null): string {
  */
 function CakanieNaClanok() {
   return (
-    <Nacitavanie celaVyska velkost="velke" text="Načítavam článok…" />
+    <Nacitavanie celaVyska velkost="velke" text={t('Načítavam článok…')} />
   );
 }
 

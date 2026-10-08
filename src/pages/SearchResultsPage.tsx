@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { t, poAnglicky } from '../lib/jazyk';
 import { Search, MapPin } from 'lucide-react';
 import {
   searchArticles, makeSnippet, highlightTerm, coverToUrl, type SearchHit,
@@ -94,20 +95,25 @@ export function SearchResultsPage({ query = '' }: SearchResultsPageProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
           <Search style={{ width: 22, height: 22, color: T.amber }} />
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600, color: T.textMain, margin: 0 }}>
-            Výsledky vyhľadávania
+            {t('Výsledky vyhľadávania')}
           </h1>
         </div>
         <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, color: T.textSub, margin: '0 0 28px' }}>
           {q ? (
-            <>Pre „<strong style={{ color: T.amber }}>{q}</strong>" — {loading ? 'hľadám…' : `${hits.length} ${hits.length === 1 ? 'výsledok' : hits.length < 5 ? 'výsledky' : 'výsledkov'}`}</>
+            <>{t('Pre')} „<strong style={{ color: T.amber }}>{q}</strong>" — {loading
+              ? t('hľadám…')
+              /* Slovenčina má tri tvary, angličtina dva. */
+              : `${hits.length} ${poAnglicky()
+                ? t(hits.length === 1 ? 'výsledok' : 'výsledkov')
+                : (hits.length === 1 ? 'výsledok' : hits.length < 5 ? 'výsledky' : 'výsledkov')}`}</>
           ) : (
-            'Zadajte hľadaný výraz v poli vyhľadávania.'
+            t('Zadajte hľadaný výraz v poli vyhľadávania.')
           )}
         </p>
 
         {!loading && q && hits.length === 0 && (
           <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, color: T.textSub, fontStyle: 'italic' }}>
-            Nič sme nenašli. Skúste iné alebo všeobecnejšie slovo.
+            {t('Nič sme nenašli. Skúste iné alebo všeobecnejšie slovo.')}
           </p>
         )}
 

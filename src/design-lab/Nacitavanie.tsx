@@ -61,7 +61,7 @@ export function Nacitavanie({ text, velkost = 'stredne', celaVyska = false, tmav
       </svg>
       {/* Keď je text vidieť, nesmie sa zopakovať aj pre čítačku — prečítala
           by ho dvakrát. */}
-      {text ? <p className="lnac-text">{text}</p> : <span className="sr-only">Načítavam…</span>}
+      {text ? <p className="lnac-text">{text}</p> : <span className="sr-only">{t('Načítavam…')}</span>}
     </div>
   );
 }
