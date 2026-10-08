@@ -1056,13 +1056,15 @@ export function MapaHradisk({ zvyraznene }: {
     if (!el || !touch || full) return;
 
     const open = () => {
-      /* Mapa je na šírku — na výšku sa z nej vidí pás. Po prechode do
-         celoobrazovkového režimu si preto vypýtame otočenie displeja.
-         Prehliadač to nemusí povoliť (iPhone to nevie vôbec); vtedy sa nič
-         nestane a mapa ostane na výšku. */
-      el.requestFullscreen?.()
-        .then(() => (screen.orientation as { lock?: (o: string) => Promise<void> })?.lock?.('landscape'))
-        .catch(() => {});
+      /* O celoobrazovkový režim prehliadača sa ZÁMERNE nežiada. Android pri
+         ňom povinne vypíše cez spodok mapy hlášku „Ak chcete ukončiť režim
+         celej obrazovky, potiahnite zhora…", ktorá sa nedá vypnúť a prekrýva
+         práve juh Slovenska. Mapa si celú obrazovku berie sama cez
+         `is-full` (position: fixed), takže je to na pohľad to isté.
+
+         Odišlo s tým vypýtané otočenie displeja na šírku — zámok orientácie
+         prehliadače dovolia len v celoobrazovkovom režime. Telefón si
+         návštevník otočí sám. */
       setFull(true);
     };
 

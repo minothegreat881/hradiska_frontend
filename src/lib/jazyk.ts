@@ -80,6 +80,9 @@ export function odkazDoDruhehoJazyka(cesta: string): string {
    Kľúč je slovenský originál, aby sa v komponente dalo napísať
    `t('Mohlo by vás zaujímať')` a slovenská vetva ostala čitateľná. */
 const EN: Record<string, string> = {
+  'Tabule, ktoré združenie vyrobilo a osadilo priamo pri hradiskách — čo je na nich napísané, ako vznikali a kde ich v teréne nájdete.':
+    'Panels the association has made and installed at the hillforts themselves — what they say, how they came about and where to find them.',
+
   'Zrušiť blokovanie': 'Unblock',
   'Neprišiel e-mail? Poslať znova': 'No e-mail? Send it again',
   'Satelitné snímky: Esri, Maxar, Earthstar Geographics · Názvy miest: © prispievatelia OpenStreetMap · Hranica: geoBoundaries': 'Satellite imagery: Esri, Maxar, Earthstar Geographics · Place names: © OpenStreetMap contributors · Border: geoBoundaries',
@@ -696,4 +699,60 @@ export function datum(iso: string | null | undefined): string {
   return aktualny === 'en'
     ? d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
     : d.toLocaleDateString('sk-SK', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/* ── Datovanie lokalít ─────────────────────────────────────────────────────
+   Hodnoty z `lokality.json`: buď storočie („9.–10. stor.", „2. st. pred n. l."),
+   alebo pomenované obdobie („doba halštatská"). Prekladá sa jazyk, ČÍSLA
+   ostávajú tak, ako ich určil autor. Čo sa netrafí do vzoru ani do slovníka,
+   vráti sa nezmenené — radšej slovenský tvar než vymyslený anglický. */
+const OBDOBIA: Record<string, string> = {
+  'pravek': 'prehistory',
+  'doba bronzová': 'the Bronze Age',
+  'doba halštatská': 'the Hallstatt period',
+  'halštat': 'Hallstatt period',
+  'doba laténska': 'the La Tène period',
+  'neskorý latén': 'late La Tène period',
+  'koniec laténu': 'end of the La Tène period',
+  'doba rímska': 'the Roman period',
+  'laténska–rímska': 'La Tène–Roman',
+  'bronzová–laténska': 'Bronze Age–La Tène',
+  'd. bronzová/latén': 'Bronze Age / La Tène',
+  'púchovská kultúra': 'Púchov culture',
+  'stredný eneolit': 'Middle Eneolithic',
+  'vrcholný stredovek': 'High Middle Ages',
+  'po Veľkej Morave': 'after Great Moravia',
+  'prelom letopočtov': 'turn of the era',
+  'prelom letopočtu': 'turn of the era',
+};
+
+/** 1 → 1st, 2 → 2nd, 3 → 3rd, 11 → 11th … */
+function radova(n: number): string {
+  const des = n % 100;
+  if (des >= 11 && des <= 13) return `${n}th`;
+  return `${n}${['th', 'st', 'nd', 'rd'][n % 10] || 'th'}`;
+}
+
+export function datovanie(text: string | null | undefined): string {
+  if (!text) return '';
+  if (aktualny === 'sk') return text;
+
+  const holy = text.trim();
+  const zoSlovnika = OBDOBIA[holy.toLowerCase()] ?? OBDOBIA[holy];
+  if (zoSlovnika) return zoSlovnika;
+
+  /* „9. stor.", „9.–10. stor.", „1. stor. n. l.", „2. st. pred n. l.",
+     „6. stor. pred Kr." — pomlčka môže byť spojovník aj dlhá a skratka
+     storočia sa v údajoch píše aj „st.", aj „stor.". */
+  const m = holy.match(/^(\d+)\.(?:\s*[–-]\s*(\d+)\.)?\s*st(?:or)?\.?\s*(pred n\. l\.|pred Kr\.|n\. l\.|po Kr\.)?$/i);
+  if (m) {
+    const [, od, do_, era] = m;
+    const pred = era ? /pred/.test(era) : false;
+    const koniec = pred ? ' BC' : (era ? ' AD' : '');
+    return do_
+      ? `${radova(+od)}–${radova(+do_)} centuries${koniec}`
+      : `${radova(+od)} century${koniec}`;
+  }
+
+  return text;
 }

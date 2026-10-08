@@ -54,7 +54,27 @@ const GALLERY_FALLBACK: { src: string; place?: string }[] = [
   { src: '/articles/bojna/brana.webp' },
   { src: '/articles/bojna/bojna-09-reconstruction.webp' },
 ];
+/* Koľko dlaždíc má mozaika. Na počítači sú tri stĺpce a veľká dlaždica zaberá
+   štyri polia, takže šesť dlaždíc vyplní presne 3×3. Na mobile sú stĺpce dva
+   a veľká zaberie celú šírku — pri šiestich tak posledná ostala sama v rade
+   a pod ňou diera. Sedem ich zarovná do troch dvojíc. */
 const GALLERY_TILES = 6;
+const GALLERY_TILES_MOBIL = 7;
+const UZKA_OBRAZOVKA = '(max-width: 860px)';
+
+/** To isté rozhranie, pri ktorom mozaika v CSS prechádza na dva stĺpce. */
+function useUzkaObrazovka(): boolean {
+  const [uzke, setUzke] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(UZKA_OBRAZOVKA).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(UZKA_OBRAZOVKA);
+    const zmena = (e: MediaQueryListEvent) => setUzke(e.matches);
+    setUzke(mq.matches);
+    mq.addEventListener('change', zmena);
+    return () => mq.removeEventListener('change', zmena);
+  }, []);
+  return uzke;
+}
 const FOUNDED_YEAR = 2010;
 
 function pickGallery(pool: KronikaPhoto[], count: number): KronikaPhoto[] {
@@ -118,6 +138,9 @@ export default function LabAktuality() {
   const trackRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
 
+  const uzkaObrazovka = useUzkaObrazovka();
+  const pocetDlazdic = uzkaObrazovka ? GALLERY_TILES_MOBIL : GALLERY_TILES;
+
   useEffect(() => {
     let cancelled = false;
     getKronikaIntro().then(i => { if (!cancelled) setIntro(i); }).catch(() => {});
@@ -148,7 +171,21 @@ export default function LabAktuality() {
     const load = async () => {
       const cur = await getDomovskaGaleria();
       if (cancelled) return;
-      if (cur.length) { setCurated(cur); return; }
+      if (cur.length) {
+        setCurated(cur);
+        /* Kurátorovaný výber má šesť fotiek. Na úzkej obrazovke mozaika
+           potrebuje sedem, inak posledná dlaždica ostane sama v rade —
+           tá jedna sa dotiahne z kroniky. `minGallery` musí ísť na jednotku,
+           inak sa preskočia všetky zápisy, ktoré nemajú aspoň šesť fotiek,
+           a z dotazu sa vráti prázdno; osem zápisov preto, že v tých
+           najnovších býva aj pár grafík namiesto fotografií. */
+        if (!uzkaObrazovka || cur.length >= GALLERY_TILES_MOBIL) return;
+        try {
+          const doplnok = await getKronikaPhotos({ posts: 8, minGallery: 1 });
+          if (!cancelled) setPhotos(doplnok);
+        } catch { /* mozaika ostane o dlaždicu kratšia */ }
+        return;
+      }
       try {
         const pool = await getKronikaPhotos();
         if (!cancelled) setPhotos(pool);
@@ -166,8 +203,11 @@ export default function LabAktuality() {
        `galleryRef.current` je prázdny. Efekt s prázdnym poľom závislostí sa
        spustil práve vtedy, nenašiel čo pozorovať a už sa nikdy nezopakoval.
        Kurátorský výber sa preto nenačítal NIKDY a domovská stránka roky
-       ukazovala statickú zálohu s Bojnou. */
-  }, [state]);
+       ukazovala statickú zálohu s Bojnou.
+
+       `uzkaObrazovka` je tu kvôli doplnkovej dlaždici: pri zúžení okna
+       treba dotiahnuť tú siedmu fotku, inak by mozaika ostala kratšia. */
+  }, [state, uzkaObrazovka]);
 
   useEffect(() => {
     let cancelled = false;
@@ -248,16 +288,37 @@ export default function LabAktuality() {
 
   const galleryTiles = useMemo(() => {
     if (curated.length) {
-      return curated.slice(0, GALLERY_TILES).map(img => ({
+      const vybrane = curated.slice(0, pocetDlazdic).map(img => ({
         src: getStrapiImageUrl(img, 'medium'),
         full: getStrapiImageUrl(img),
         alt: img.alternativeText || '',
         place: img.caption || '',
-        fileId: img.id,
+        fileId: img.id as number | undefined,
       }));
+      /* Doplnenie do celého radu. Fotky, ktoré už vo výbere sú, sa
+         preskočia — tá istá snímka dvakrát vedľa seba je horšia než diera. */
+      const chyba = pocetDlazdic - vybrane.length;
+      if (chyba <= 0 || !photos.length) return vybrane;
+      const uzTam = new Set(vybrane.map(g => g.fileId));
+      /* Do vybranej galérie patrí fotografia, nie grafika. Logá, plagáty
+         a kresby sú štvorcové alebo na výšku, takže sa berie len snímka
+         na šírku; keď sa žiadna nenájde, radšej kratšia mozaika než
+         nalepené logo združenia. Rozmery sú z `small` varianty (okolo
+         500 px), na pomer strán to stačí — na absolútnu šírku nie. */
+      const doplnok = photos
+        .filter(f => !uzTam.has(f.fileId) && f.width > f.height * 1.15)
+        .slice(0, chyba)
+        .map(f => ({
+          src: f.thumb,
+          full: f.url,
+          alt: f.alt || f.postTitle,
+          place: f.caption || f.postTitle,
+          fileId: f.fileId,
+        }));
+      return [...vybrane, ...doplnok];
     }
     if (photos.length) {
-      return pickGallery(photos, GALLERY_TILES).map(p => ({
+      return pickGallery(photos, pocetDlazdic).map(p => ({
         src: p.thumb,
         full: p.url,
         alt: p.alt || p.postTitle,
@@ -266,7 +327,7 @@ export default function LabAktuality() {
       }));
     }
     return GALLERY_FALLBACK.map(g => ({ src: g.src, full: g.src, alt: '', place: g.place ?? '', fileId: undefined }));
-  }, [curated, photos]);
+  }, [curated, photos, pocetDlazdic]);
 
   if (state === 'error' || state === 'empty') return null;
 

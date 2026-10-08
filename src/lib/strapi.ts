@@ -570,6 +570,14 @@ export async function getKronikaPhotos(options?: { posts?: number; minGallery?: 
   for (const post of response.data) {
     const gallery = post.gallery || [];
     if (gallery.length < minGallery) continue;        // oznam, nie reportáž
+    /* Anglické popisy fotiek — v knižnici médií je popis spoločný pre oba
+       jazyky, anglické znenie nesie `mediaTexts` článku. Mapa tu chýbala,
+       hoci sa z nej o dva riadky nižšie čítalo: funkcia padala na
+       `popisy is not defined` a volajúci to stíšil `catch`-om. */
+    const popisy = new Map<number, { caption?: string; alt?: string }>();
+    for (const m of (post as { mediaTexts?: Array<{ mediaId?: number; caption?: string; alt?: string }> }).mediaTexts || []) {
+      if (typeof m.mediaId === 'number') popisy.set(m.mediaId, m);
+    }
     for (const img of gallery) {
       /* Do mriežky stačí `small` (500 px) — dlaždica má okolo 300 px.
          `medium` znamenalo na fotoarchíve 4,7 MB namiesto 1,5 MB. */

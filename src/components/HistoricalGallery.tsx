@@ -1,6 +1,6 @@
 'use client';
 
-import { t } from '../lib/jazyk';
+import { t, odkaz } from '../lib/jazyk';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X, Maximize2, Share2 } from 'lucide-react';
@@ -166,18 +166,27 @@ export function Lightbox({
           className="pl-header"
           style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '13px 14px', borderBottom: '1px solid var(--pl-border-soft)' }}
         >
-          <picture>
-            <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
-            <img className="pl-avatar-h" src="/logo_slovanske_hradiska_256.jpg" alt="" aria-hidden="true" />
-          </picture>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, color: 'var(--pl-title)' }}>
-              Hradiská.sk
-            </div>
-            <div style={{ fontFamily: 'var(--font-serif)', fontSize: 13.5, color: 'var(--pl-muted-2)' }}>
-              {t('Fotogaléria')} · {index + 1} / {images.length}
-            </div>
-          </div>
+          {/* Značka vedie domov — zavrie prehliadač a pustí odkaz ďalej,
+              o samotný presun sa postará smerovanie webu. */}
+          <a
+            href={odkaz('/')}
+            onClick={onClose}
+            aria-label={t('Domov')}
+            style={{ display: 'flex', alignItems: 'center', gap: 11, flex: 1, minWidth: 0, textDecoration: 'none', color: 'inherit' }}
+          >
+            <picture>
+              <source srcSet="/logo_slovanske_hradiska_256.webp" type="image/webp" />
+              <img className="pl-avatar-h" src="/logo_slovanske_hradiska_256.jpg" alt="" aria-hidden="true" />
+            </picture>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, color: 'var(--pl-title)' }}>
+                Hradiská.sk
+              </span>
+              <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 13.5, color: 'var(--pl-muted-2)' }}>
+                {t('Fotogaléria')} · {index + 1} / {images.length}
+              </span>
+            </span>
+          </a>
           <button
             ref={closeRef}
             onClick={onClose}

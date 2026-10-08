@@ -2859,6 +2859,12 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   .lnav-burger-i[data-open]::before { top: 0; transform: rotate(45deg); }
   .lnav-burger-i[data-open]::after { top: 0; transform: rotate(-45deg); }
 
+  /* Otvorená ponuka: hlavička je pripnutá na vrch výrezu. Lepivosť
+     (`sticky`) sa pri zamknutom posúvaní tela stráca a hlavička aj s ponukou
+     skočila na začiatok dokumentu — kto bol v polovici stránky, uvidel po
+     klepnutí prázdno. Posúvanie je zamknuté, takže diera v rade nevadí. */
+  .lnav.is-ponuka { position: fixed; top: 0; left: 0; right: 0; }
+
   .lnav-mobile {
     display: block;
     max-height: calc(100dvh - 60px); overflow-y: auto;
@@ -3127,12 +3133,28 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .lgal-skupina { margin-bottom: 52px; }
 .lgal-skupina-h {
   /* Lepí sa POD to, čo je nad ňou. Odstup meria kód (`--lgal-lep`), lebo
-     v laboratóriu je nad stránkou lišta šiat a v produkcii len navigácia. */
+     v laboratóriu je nad stránkou lišta šiat a v produkcii len navigácia.
+     Pozadie je PLNÉ, nie dohasínajúce: priehľadným spodkom presvitala
+     fotografia, ktorá práve podliezala hlavičku, a linka pod nadpisom
+     potom vyzerala ako prerezaný obraz. */
   position: sticky; top: var(--lgal-lep, 68px); z-index: 3;
   display: flex; align-items: baseline; gap: 14px;
   padding: 12px 0 10px; margin-bottom: 16px;
-  background: linear-gradient(var(--l-paper) 76%, transparent);
+  background: var(--l-paper);
   border-bottom: 1px solid var(--l-line);
+}
+/* Na mobile sa nelepí vôbec. Názov výpravy má na úzkej obrazovke aj štyri
+   riadky, takže lepivá hlavička zjedla tretinu okna a stála nad fotkami
+   celý čas, čo pôsobilo ako chyba vykreslenia. */
+@media (max-width: 760px) {
+  .lgal-skupina-h {
+    position: static;
+    flex-wrap: wrap; align-items: baseline; gap: 2px 10px;
+  }
+  /* Názov má vlastný riadok, počet a odkaz na článok druhý — inak sa
+     „ČÍTAŤ ČLÁNOK" tlačí k pravému okraju vedľa štvorriadkového nadpisu. */
+  .lgal-skupina-h h2 { width: 100%; }
+  .lgal-skupina-o { margin-left: 0; }
 }
 .lgal-skupina-h h2 {
   font-family: 'Fraunces', Georgia, serif; font-weight: 600;

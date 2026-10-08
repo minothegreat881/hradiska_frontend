@@ -202,7 +202,7 @@ export function LabNav() {
   return (
     <nav
       ref={rootRef}
-      className="lnav"
+      className={menuOpen ? 'lnav is-ponuka' : 'lnav'}
       data-expanded={hovered || secondaryOpen ? 'true' : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

@@ -24,7 +24,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { odkaz, t, kategoria } from '../lib/jazyk';
+import { odkaz, t, kategoria, datovanie } from '../lib/jazyk';
 import { X } from 'lucide-react';
 import { Nacitavanie } from './Nacitavanie';
 import lokalityData from '../data/lokality.json';
@@ -77,7 +77,7 @@ const podlaAbecedy = (a: string, b: string) => a.localeCompare(b, 'sk');
 
 /** Meta riadok položky: okres a datovanie. Keď okres chýba, nastúpi miesto. */
 const meta = (l: Lokalita) =>
-  [l.okres || l.miesto, l.datovanie_text].filter(Boolean).join(' · ');
+  [l.okres || l.miesto, datovanie(l.datovanie_text)].filter(Boolean).join(' · ');
 
 /**
  * Rozdelí lokality do skupín. Prázdne skupiny sa nevracajú — číselník má

@@ -136,7 +136,21 @@ export const hradiskaCategories: HradiskaCategory[] = [
     description:
       'Archeologické výskumy, štúdie a state odborníkov — nálezové správy, rozbory lokalít a príspevky, ktoré idú hlbšie než populárny výklad.',
     icon: 'file-text',
-    image: '/uploads/Obr01_Salkovsky2_3956177981.jpg',
+    /* Mapa kmeňov severozápadných Slovanov tu bola predtým — v širokej
+       hlavičke sa z nej orezali dve nemecké slová. Nádoby púchovskej kultúry
+       sú z článku v tej istej kategórii a znesú akýkoľvek výrez. */
+    image: '/uploads/Keramika_puchovskej_k_l_345fceb688.JPG',
+  },
+  {
+    slug: 'informacne-tabule',
+    label: 'Informačné tabule',
+    description:
+      'Tabule, ktoré združenie vyrobilo a osadilo priamo pri hradiskách — čo je na nich napísané, ako vznikali a kde ich v teréne nájdete.',
+    icon: 'scroll',
+    /* Z vlastnej brigády: tabuľa sa nesie bukovým lesom hore na hradisko.
+       Bez tejto položky nemala kategória titulný obraz vôbec a hlavička
+       ostávala čierna. */
+    image: '/uploads/IMG_0832_88619f3e7d.jpg',
   },
   {
     slug: 'aktuality',
