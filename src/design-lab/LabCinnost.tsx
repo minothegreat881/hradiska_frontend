@@ -34,10 +34,17 @@ export interface LabCinnostProps {
   onVyber?: (kluc: KlucCinnosti | null) => void;
   /** Nadpis sekcie; v článku je tichší než na stránke kroniky. */
   tichy?: boolean;
+  /**
+   * Dlaždice, ktoré sa na danom mieste nemajú ukázať. Na domovskej sú to
+   * tabule a 3D rekonštrukcie: hneď nad blokom majú v „Ďalšom obsahu" celý
+   * rad článkov, takže by na jednej obrazovke stáli dvakrát.
+   */
+  vynechaj?: KlucCinnosti[];
 }
 
-export function LabCinnost({ pocty, poctyKategorii, vybrana = null, onVyber, tichy = false }: LabCinnostProps) {
+export function LabCinnost({ pocty, poctyKategorii, vybrana = null, onVyber, tichy = false, vynechaj }: LabCinnostProps) {
   const zaklad = zakladStrapi();
+  const dlazdice = vynechaj?.length ? CINNOSTI.filter((c) => !vynechaj.includes(c.kluc)) : CINNOSTI;
 
   return (
     <section className={tichy ? 'lcin lcin--ticha' : 'lcin'} aria-label={t('Činnosť združenia')}>
@@ -47,7 +54,7 @@ export function LabCinnost({ pocty, poctyKategorii, vybrana = null, onVyber, tic
       </div>
 
       <div className="lcin-rad">
-        {CINNOSTI.map((c) => {
+        {dlazdice.map((c) => {
           const pocet = c.kategoria ? poctyKategorii?.[c.kategoria] : pocty?.[c.kluc];
           const obrazok = c.vlastny ? c.obrazok : `${zaklad}${variant(c.obrazok, 'small')}`;
           const obsah = (

@@ -16,6 +16,7 @@ import { HeroSearch } from '../components/HeroSearch';
 import { InkEffect } from '../components/InkEffect';
 import LabAktuality from './LabAktuality';
 import { MapaAzKedTreba } from './MapaAzKedTreba';
+import { LabCinnost } from './LabCinnost';
 import LabKategorieRychle from './LabKategorieRychle';
 import LabDalsiObsah from './LabDalsiObsah';
 import { useEffect, useState } from 'react';
@@ -116,6 +117,15 @@ export function LabHome() {
       {/* Kategórie, ktoré nemajú dlaždicu nad mapou — každá s radom štyroch
           najnovších článkov. */}
       <LabDalsiObsah />
+
+      {/* Činnosť združenia. Tabule a 3D rekonštrukcie sa tu VYNECHÁVAJÚ
+          zámerne: majú vlastný rad článkov v „Ďalšom obsahu" o kus vyššie,
+          takže by na jednej obrazovke stáli dvakrát — raz ako dlaždica,
+          raz ako nadpis radu. Zvyšných päť činností sú práve zápisy kroniky,
+          takže blok stojí tesne pred ňou a je do nej dverami. */}
+      <section className="lhome-cinnost">
+        <LabCinnost vynechaj={['tabule', 'rekonstrukcie']} />
+      </section>
 
       <LabAktuality />
     </div>

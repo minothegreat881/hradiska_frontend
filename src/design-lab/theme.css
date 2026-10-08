@@ -1560,6 +1560,11 @@ body[data-lab-theme='pecat'],
 /* Mapa na domovskej — z-index drží roletku hľadania nad ňou. */
 .lhome-mapa { z-index: 5; }
 
+/* Blok činnosti na domovskej drží šírku aj okraje sekcie „Ďalší obsah",
+   aby medzi nimi nebol zlom. */
+.lhome-cinnost { max-width: 1320px; margin: 0 auto; padding: 0 28px 24px; }
+@media (max-width: 720px) { .lhome-cinnost { padding: 0 16px 18px; } }
+
 @keyframes lkat-nabeh {
   from { opacity: 0; transform: translateY(22px); }
   to { opacity: 1; transform: none; }
