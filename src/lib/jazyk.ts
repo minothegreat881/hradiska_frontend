@@ -36,6 +36,11 @@ export function rozdelAdresu(path: string): { jazyk: Jazyk; cesta: string } {
 
 /** Adresa v aktuálnom jazyku: `/blog/x` → `/en/blog/x` pre angličtinu. */
 export function odkaz(cesta: string, j: Jazyk = aktualny): string {
+  /* Poistka proti dvojitej predpone. Adresa sa miestami skladá v dátach a
+     potom ešte raz pri vykreslení; `/en/en/blog/…` nezodpovedá žiadnej ceste
+     a skončí na 404 — a hľadá sa to ťažko, lebo časť odkazov funguje. */
+  const { jazyk: uz, cesta: holá } = rozdelAdresu(cesta);
+  if (uz === 'en') cesta = holá;
   if (j === 'sk') return cesta;
   return cesta === '/' ? '/en' : `/en${cesta}`;
 }

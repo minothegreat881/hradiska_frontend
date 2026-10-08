@@ -381,7 +381,9 @@ function MobilKategoria({ slug, zoskupenie, onZoskupenie, onOdkaz }: {
   const jeLokalita = new Set(lokality.map(l => l.slug));
   const ostatne = clanky
     .filter(c => !jeLokalita.has(c.slug))
-    .map(c => ({ slug: odkaz(`/blog/${c.slug}`), nazov: c.title, meta: '' }));
+    /* Bez jazykovej predpony: tú pridáva až `Skupiny` pri vykreslení.
+       Keď bola aj tu, vznikalo `/en/en/blog/…` a odkaz končil na 404. */
+    .map(c => ({ slug: `/blog/${c.slug}`, nazov: c.title, meta: '' }));
 
   return (
     <div className="lprh-m">
