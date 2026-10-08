@@ -757,8 +757,18 @@ export function MapaHradisk({ zvyraznene }: {
     const map = mapRef.current;
     if (!map) return;
     map.stop();
-    const cam = map.cameraForBounds(new maplibregl.LngLatBounds(SK[0], SK[1]), { padding: 0 });
-    if (!cam) { map.fitBounds(SK, { padding: 0, duration }); return; }
+    /* Okraj, nie doraz. Body sú kruhy so 44 px a zhluky ešte väčšie, takže
+       pri nulovom okraji plátno orezalo tie pri hranici — na telefóne bolo
+       z Bratislavy aj zo Zemplína vidieť polkruh.
+
+       Na celej obrazovke sa okraj nezväčšuje. Skúšal som tam nechať miesto
+       na lištu vpravo a na krížik hore — krajina sa tým zmenšila na tretinu
+       výšky a uprostred papiera vyzerala ako nálepka. Lišta je priesvitná
+       a mapa sa posúva prstom, takže je lepšie dať krajine celú šírku. */
+    const uzke = window.matchMedia('(max-width: 900px)').matches;
+    const okraj = uzke ? 26 : 18;
+    const cam = map.cameraForBounds(new maplibregl.LngLatBounds(SK[0], SK[1]), { padding: okraj });
+    if (!cam) { map.fitBounds(SK, { padding: okraj, duration }); return; }
     /* Vždy sa VMESTIŤ, nikdy nevypĺňať. Vypĺňanie plátna síce odstránilo
        pásy, ale na telefóne pri tom orezalo východ aj západ a ostala len
        stredná časť krajiny. Pásy sa preto riešia inak: plátno je na telefóne
@@ -771,7 +781,13 @@ export function MapaHradisk({ zvyraznene }: {
        sú tam papier s mriežkou, teda časť návrhu.) */
     if (fullRef.current) {
       const b = map.getCanvas().getBoundingClientRect();
-      if (b.width && b.height) zoom += Math.abs(Math.log2((b.width / b.height) / COUNTRY_ASPECT));
+      const pomer = b.width && b.height ? b.width / b.height : 0;
+      /* Vypĺňať sa oplatí len na ležato. Odkedy mapa nepýta celoobrazovkový
+         režim prehliadača (a s ním aj otočenie displeja), ostáva telefón na
+         výšku: pomer okolo 0,46 proti 2,01 krajiny znamená priblíženie
+         o dve úrovne a z celého Slovenska ostane stred. Na výšku sa preto
+         krajina VMESTÍ a hore aj dole ostane papier s mriežkou. */
+      if (pomer >= 1.4) zoom += Math.abs(Math.log2(pomer / COUNTRY_ASPECT));
     }
     map.easeTo({ center: cam.center, zoom: Math.min(MAX_Z, zoom), duration });
   }, []);

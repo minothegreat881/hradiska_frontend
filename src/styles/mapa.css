@@ -416,24 +416,38 @@
    tlačidlo — mapa musí dostať výšku, nie zoznam kategórií. */
 @media (max-width: 900px) {
   .lmap { flex-direction: column; align-items: stretch; }
-  .lmap-side { width: auto; padding: 30px 20px 22px; border-right: 0; border-bottom: 1px solid var(--l-on-dark-line); gap: 20px; }
-  .lmap-head { gap: 12px; }
-  .lmap-lead { max-width: none; font-size: 14.5px; }
-  .lmap-legend { margin-top: 18px; }
+  .lmap-side { width: auto; padding: 18px 16px 12px; border-right: 0; border-bottom: 1px solid var(--l-on-dark-line); gap: 12px; }
+  .lmap-head { gap: 6px; }
+  /* Nadpis je na telefóne menovka mapy, nie plagát: 38 px na dvoch riadkoch
+     zabralo tretinu tmavého pásu. */
+  .lmap .lmap-title { font-size: 30px; }
+  .lmap-sub { font-size: 17px; margin-top: -4px; }
+  .lmap-eyebrow { font-size: 10px; letter-spacing: .24em; }
+  .lmap-eyebrow span { width: 24px; }
+  /* Odstavec s návodom hovorí o kolieske myši a o prejdení kurzorom — na
+     telefóne ani jedno neplatí, mapa sa tam ťuknutím otvára na celú
+     obrazovku (a hovorí to nápis priamo na nej). Zabral 112 zo 550 px
+     tmavého panela, v ktorom mapa nebola. */
+  .lmap-lead { display: none; }
+  .lmap-legend { margin-top: 6px; }
   .lmap-legend-h { cursor: pointer; min-height: 44px; align-items: center; }
   .lmap-legend-h span { display: block; font-size: 16px; color: var(--l-second); }
   .lmap-legend-body { display: none; padding-top: 12px; }
   .lmap-legend.is-open .lmap-legend-body { display: flex; }
-  /* Nižšie plátno = menej prázdna nad krajinou a pod ňou. Krajina je široká
-     2 : 1, plátno na výšku by z nej urobilo prúžok uprostred prázdna; pri
-     pomere 1,4 ostane po stranách len úzky pás papiera s mriežkou. */
-  .lmap-canvas { aspect-ratio: 1.4; height: auto; min-height: 260px; max-height: 60vh; }
+  /* Krajina je široká 2 : 1, plátno na výšku by z nej urobilo prúžok
+     uprostred prázdna. Pomer 1,25 je kompromis: mapa dostane na telefóne
+     okolo 310 px namiesto 260 a nad krajinou aj pod ňou ostane len pás
+     papiera s mriežkou. Spodná hranica je tu preto, že pri 260 px bola
+     mapa nižšia než text nad ňou. */
+  .lmap-canvas { aspect-ratio: 1.25; height: auto; min-height: 320px; max-height: 58vh; }
   .lmap-watermark { top: 8px; right: -24px; }
   .lmap-zoom { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); }
   /* Palcove ciele + `manipulation`, aby prehliadac na tuknutie necakal, ci
      nepride dvojtuk (tych 300 ms bolo cítiť ako „tlacidlo nereaguje"). */
   .lmap-zoom-box button { width: 46px; height: 46px; font-size: 19px; touch-action: manipulation; }
-  .lmap-attrib { margin-top: 14px; padding-top: 10px; font-size: 10px; }
+  /* Licenčný riadok je povinnosť, nie obsah — na telefóne drobný a tichý,
+     inak z neho je tretina tmavého pásu nad mapou. */
+  .lmap-attrib { margin-top: 8px; padding-top: 8px; font-size: 9px; line-height: 1.45; color: var(--l-on-dark-3); }
   /* Karta by na úzkom okne vytŕčala mimo plátno. */
   .lmap-card { width: min(260px, 76vw); }
 }

@@ -763,6 +763,13 @@ body[data-lab-theme='pecat'],
       from { opacity: 0; transform: translateY(22px); }
       to   { opacity: 1; transform: none; }
     }
+    /* VÝNIMKA: sekcia s mapou. `fill-mode: both` necháva na prvku maticu
+       transformácie aj po dobehnutí animácie a transformovaný predok je
+       schránkou pre `position: fixed` — mapa otvorená na celú obrazovku sa
+       potom nerozložila cez výrez, ale cez svoju sekciu: začínala o kus
+       nižšie a nad ňou presvitala stránka. */
+    .lab .parchment > section.lhome-mapa,
+    .lab .parchment > section.lart-mapa { animation: none; }
   }
 }
 
