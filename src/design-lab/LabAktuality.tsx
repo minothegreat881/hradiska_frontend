@@ -19,6 +19,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { odkaz, t, poAnglicky, datum } from '../lib/jazyk';
 import {
   getBlogPosts, getDomovskaGaleria, getKronikaAll, getKronikaIntro, getKronikaPhotos,
   getStrapiImageUrl, KRONIKA_INTRO_SLUG, KronikaItem, KronikaPhoto, StrapiImage,
@@ -66,6 +67,10 @@ function pickGallery(pool: KronikaPhoto[], count: number): KronikaPhoto[] {
 }
 
 function formatSkDate(iso: string): string {
+  /* V angličtine dátum skladá `datum()` z prekladovej vrstvy — mesiace
+     vypísané po slovensky boli na anglickej stránke posledná vec, ktorá
+     prezrádzala, že je to preklad. */
+  if (poAnglicky()) return datum(iso);
   const d = new Date(iso);
   const months = ['januára','februára','marca','apríla','mája','júna','júla','augusta','septembra','októbra','novembra','decembra'];
   return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
@@ -83,7 +88,7 @@ function StepButton({ dir, disabled, onClick }: { dir: 'prev' | 'next'; disabled
       className="lakv-step"
       onClick={onClick}
       disabled={disabled}
-      aria-label={dir === 'prev' ? 'Novšie zápisy' : 'Staršie zápisy'}
+      aria-label={dir === 'prev' ? t('Novšie zápisy') : t('Staršie zápisy')}
     >
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         {dir === 'prev' ? <path d="M19 12H5M11 18l-6-6 6-6" /> : <path d="M5 12h14M13 6l6 6-6 6" />}
@@ -281,13 +286,13 @@ export default function LabAktuality() {
           <div>
             <div className="lakv-kronika">
               <span className="lakv-dot" />
-              <span>KRONIKA · {FOUNDED_YEAR} — {new Date().getFullYear()}</span>
+              <span>{t('KRONIKA')} · {FOUNDED_YEAR} — {new Date().getFullYear()}</span>
             </div>
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(28px, 3.6vw, 40px)', fontWeight: 600, letterSpacing: '.06em', color: 'var(--hr-ink)', margin: 0 }}>
-              Zo života združenia
+              {t('Zo života združenia')}
             </h2>
           </div>
-          <a href="/aktuality" className="lakv-more">CELÁ KRONIKA →</a>
+          <a href="/aktuality" className="lakv-more">{t('CELÁ KRONIKA')} →</a>
         </div>
 
         {/* horný rad: kresba + pripnutý zápis */}
@@ -307,9 +312,9 @@ export default function LabAktuality() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <a href={intro ? `/blog/${intro.slug}` : '/aktuality'} className="lakv-tile lakv-pinned">
+            <a href={intro ? odkaz(`/blog/${intro.slug}`) : odkaz('/aktuality')} className="lakv-tile lakv-pinned">
               <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 36, fontWeight: 700, color: 'var(--hr-ink)', lineHeight: 1.04, marginBottom: 12, letterSpacing: '-.02em' }}>
-                {intro?.title ?? 'Prečo to vlastne robím'}
+                {intro?.title ?? t('Prečo to vlastne robím')}
               </span>
               {intro?.excerpt && (
                 <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 17.5, lineHeight: 1.55, color: 'var(--hr-body)', marginBottom: 10 }}>
@@ -318,23 +323,23 @@ export default function LabAktuality() {
               )}
               {intro && (
                 <span style={{ display: 'block', fontFamily: 'var(--font-serif)', fontSize: 14.5, color: 'var(--hr-muted)', marginBottom: 18 }}>
-                  {intro.author} · {formatSkDate(intro.datum)} · {intro.readingTime} min čítania
+                  {intro.author} · {formatSkDate(intro.datum)} · {intro.readingTime} {t('min čítania')}
                 </span>
               )}
               <span style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.08em', color: 'var(--hr-surface)', background: GOLD_GRAD, borderRadius: 999, padding: '11px 20px' }}>
-                ČÍTAŤ CELÉ <span style={{ fontSize: 14 }}>→</span>
+                {t('ČÍTAŤ CELÉ')} <span style={{ fontSize: 14 }}>→</span>
               </span>
             </a>
 
             <div className="lakv-stats">
               {[
-                { n: items.length ? String(items.length) : '—', l: 'zápisov v kronike' },
-                { n: String(yearsActive), l: 'rokov činnosti' },
+                { n: items.length ? String(items.length) : '—', l: t('zápisov v kronike') },
+                { n: String(yearsActive), l: t('rokov činnosti') },
                 /* Bolo `52+ hradísk na mape` — počet bodov na mape zapísaný
                    natvrdo v `data/hradiska.ts`, k tomu „+", ktoré z presného
                    čísla robilo odhad. Teraz skutočný počet publikovaných
                    článkov zo Strapi. */
-                { n: postCount ? String(postCount) : '—', l: 'článkov na webe' },
+                { n: postCount ? String(postCount) : '—', l: t('článkov na webe') },
               ].map((s, i) => (
                 <span key={s.l} className={i === 1 ? 'lakv-stat lakv-stat-mid' : 'lakv-stat'}>
                   <span className="lakv-stat-n">{s.n}</span>
@@ -347,8 +352,8 @@ export default function LabAktuality() {
 
         {/* ── Pás zápisov: nadpis + šípky ─────────────────────────────── */}
         <div className="lakv-striphead">
-          <span className="lakv-label">ZÁPISY Z AKTIVÍT</span>
-          <span className="lakv-hint">listujte šípkami alebo potiahnite os</span>
+          <span className="lakv-label">{t('ZÁPISY Z AKTIVÍT')}</span>
+          <span className="lakv-hint">{t('listujte šípkami alebo potiahnite os')}</span>
           <div className="lakv-steps">
             <StepButton dir="prev" disabled={edges.start} onClick={() => step(-1)} />
             <StepButton dir="next" disabled={edges.end} onClick={() => step(1)} />
@@ -363,7 +368,7 @@ export default function LabAktuality() {
           data-at-end={edges.end ? 'true' : 'false'}
         >
           {stripItems.map(item => (
-            <a key={item.documentId} href={`/blog/${item.slug}`} className="lakv-tile lakv-card">
+            <a key={item.documentId} href={odkaz(`/blog/${item.slug}`)} className="lakv-tile lakv-card">
               {item.coverUrl ? (
                 <img src={item.coverUrl} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -429,8 +434,8 @@ export default function LabAktuality() {
 
         {/* vybraná fotogaléria */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span className="lakv-label">VYBRANÁ FOTOGALÉRIA</span>
-          <a href="/galeria" className="lakv-more">CELÁ GALÉRIA →</a>
+          <span className="lakv-label">{t('VYBRANÁ FOTOGALÉRIA')}</span>
+          <a href="/galeria" className="lakv-more">{t('CELÁ GALÉRIA')} →</a>
         </div>
         <div ref={galleryRef} className="lakv-gal">
           {galleryTiles.map((g, i) => (

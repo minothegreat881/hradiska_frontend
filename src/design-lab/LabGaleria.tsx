@@ -20,6 +20,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { odkaz, t, poAnglicky } from '../lib/jazyk';
 import { Lightbox, type GalleryImage } from '../components/HistoricalGallery';
 import { getGalleryPhotos, type KronikaPhoto } from '../lib/strapi';
 
@@ -47,7 +48,7 @@ export function LabGaleria() {
       setPage(dalsia);
       setError('');
     } catch {
-      setError('Fotografie sa nepodarilo načítať. Skúste to prosím o chvíľu znova.');
+      setError(t('Fotografie sa nepodarilo načítať. Skúste to prosím o chvíľu znova.'));
     } finally {
       setBusy(false);
     }
@@ -125,31 +126,35 @@ export function LabGaleria() {
     <div className="lgal" ref={koren}>
       <div className="container lgal-in">
 
-        <nav aria-label="Omrvinky" className="lgal-omrvinky">
+        <nav aria-label={t('Omrvinky')} className="lgal-omrvinky">
           <ol>
-            <li><a href="/">Domov</a></li>
+            <li><a href={odkaz('/')}>{t('Domov')}</a></li>
             <li aria-hidden="true">·</li>
-            <li>Fotoarchív</li>
+            <li>{t('Fotoarchív')}</li>
           </ol>
         </nav>
 
         <header className="lgal-hlava">
-          <span className="lgal-eyebrow"><span aria-hidden="true" /> Zbierka · 03</span>
-          <h1 className="lgal-titul">Fotoarchív</h1>
+          <span className="lgal-eyebrow"><span aria-hidden="true" /> {t('Zbierka')} · 03</span>
+          <h1 className="lgal-titul">{t('Fotoarchív')}</h1>
           <p className="lgal-lead">
-            Snímky z hradísk, výprav a nálezov — tak, ako prišli k jednotlivým článkom.
+            {t('Snímky z hradísk, výprav a nálezov — tak, ako prišli k jednotlivým článkom.')}
           </p>
           {photos.length > 0 && (
             <p className="lgal-suhrn">
-              <b>{photos.length}</b> fotografií · <b>{skupiny.length}</b> {skupiny.length === 1 ? 'článok' : skupiny.length < 5 ? 'články' : 'článkov'}
+              {/* Angličtina počíta v jednom tvare, slovenčina v troch. */}
+              <b>{photos.length}</b> {t('fotografií')} · <b>{skupiny.length}</b>{' '}
+              {poAnglicky()
+                ? t(skupiny.length === 1 ? 'článok' : 'článkov')
+                : (skupiny.length === 1 ? 'článok' : skupiny.length < 5 ? 'články' : 'článkov')}
             </p>
           )}
         </header>
 
         {ponukaFiltrov.length > 1 && (
-          <div className="lgal-filter" role="group" aria-label="Zúžiť podľa článku">
+          <div className="lgal-filter" role="group" aria-label={t('Zúžiť podľa článku')}>
             <button type="button" className={filter ? undefined : 'is-on'} onClick={() => prepniFilter(null)}>
-              Všetko
+              {t('Všetko')}
             </button>
             {ponukaFiltrov.map(s => (
               <button
@@ -171,7 +176,7 @@ export function LabGaleria() {
             <div className="lgal-skupina-h">
               <h2>{s.nazov}</h2>
               <span className="lgal-skupina-n">{String(s.fotky.length).padStart(2, '0')}</span>
-              {s.slug && <a className="lgal-skupina-o" href={`/blog/${s.slug}`}>Čítať článok <span aria-hidden="true">→</span></a>}
+              {s.slug && <a className="lgal-skupina-o" href={odkaz(`/blog/${s.slug}`)}>{t('Čítať článok')} <span aria-hidden="true">→</span></a>}
             </div>
 
             <div className="lgal-hark">
@@ -213,14 +218,14 @@ export function LabGaleria() {
         )}
 
         {!busy && photos.length === 0 && !error && (
-          <p className="lgal-prazdno">Zatiaľ tu nie je ani jedna fotografia.</p>
+          <p className="lgal-prazdno">{t('Zatiaľ tu nie je ani jedna fotografia.')}</p>
         )}
 
         <div ref={koniec} />
 
         {hasMore && !busy && (
           <div className="lgal-viac">
-            <button type="button" onClick={() => void nacitaj(page + 1)}>Načítať ďalšie</button>
+            <button type="button" onClick={() => void nacitaj(page + 1)}>{t('Načítať ďalšie')}</button>
           </div>
         )}
         {!hasMore && photos.length > 0 && (

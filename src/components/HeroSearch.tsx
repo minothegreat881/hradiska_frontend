@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { searchArticles, makeSnippet, coverToUrl, getSearchIndex, type SearchHit } from '../lib/searchIndex';
+import { t, odkaz } from '../lib/jazyk';
 
 const goTo = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
 
@@ -277,7 +278,7 @@ export function HeroSearch() {
       pre: h.pre,
       mid: h.mid,
       post: h.post,
-      sub: hit.categoryName || 'Článok',
+      sub: hit.categoryName || t('Článok'),
       snip,
       thumbnail: coverToUrl(hit.cover),
       typeLabel: hit.hasLocation ? 'lokalita' : undefined,
@@ -405,7 +406,7 @@ export function HeroSearch() {
             type="text"
             id="site-search"
             name="search"
-            placeholder={uzko ? 'Hľadaj hradiská…' : 'Hľadaj hradiská, články, kľúčové slová…'}
+            placeholder={uzko ? t('Hľadaj hradiská…') : t('Hľadaj hradiská, články, kľúčové slová…')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => {
@@ -432,7 +433,7 @@ export function HeroSearch() {
             className="flex-1 min-w-0 bg-transparent outline-none border-0 hero-search-input"
             style={{ fontFamily: 'var(--font-serif)', fontSize: 20, color: T.textMain, padding: 0, background: 'transparent' }}
             role="combobox"
-            aria-label="Vyhľadávanie lokalít a článkov"
+            aria-label={t('Vyhľadávanie lokalít a článkov')}
             aria-autocomplete="list"
             aria-controls="search-dropdown-results"
             aria-expanded={showPanel}
@@ -471,7 +472,7 @@ export function HeroSearch() {
             <motion.button
               type="button"
               onClick={clearSearch}
-              aria-label="Vymazať vyhľadávanie"
+              aria-label={t('Vymazať vyhľadávanie')}
               style={{
                 flexShrink: 0,
                 border: `1px solid ${T.chipBorder}`,
@@ -514,7 +515,7 @@ export function HeroSearch() {
             onClick={() => (trimmed ? openResultsPage() : inputRef.current?.focus())}
             className="hero-search-odoslat"
           >
-            Hľadať
+            {t('Hľadať')}
           </button>
         </div>
       </div>
@@ -574,7 +575,7 @@ export function HeroSearch() {
                   )}
                   {articleResults.length > 0 && (
                     <div>
-                      <GroupHeader label="Články" count={articleResults.length} withTopBorder={locationResults.length > 0} />
+                      <GroupHeader label={t('Články')} count={articleResults.length} withTopBorder={locationResults.length > 0} />
                       {articleResults.map((r) => (
                         <ResultRow
                           key={r.id}
@@ -598,8 +599,8 @@ export function HeroSearch() {
                   }}
                 >
                   {searching
-                    ? 'Hľadám…'
-                    : <>Pre „<strong style={{ color: T.amber }}>{query}</strong>" sme nič nenašli.</>}
+                    ? t('Hľadám…')
+                    : <>{t('Nenašli sme nič pre')} „<strong style={{ color: T.amber }}>{query}</strong>".</>}
                 </div>
               )}
             </div>

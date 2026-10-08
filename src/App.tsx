@@ -198,7 +198,12 @@ function App() {
       if (link.href.startsWith(window.location.origin) && !link.href.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
         e.preventDefault();
         setRestoreScroll(false); // forward navigation — go to top, don't restore
-        window.history.pushState({}, '', link.href);
+        /* Prepnutie jazyka je tá istá stránka inými slovami, nie ďalší krok
+           cesty. Keby zakladalo záznam v histórii, tlačidlo Späť by najprv
+           vrátilo jazyk a až druhým stlačením stránku — čo vyzerá, akoby
+           Späť nefungovalo. */
+        if (link.dataset.jazyk) window.history.replaceState({}, '', link.href);
+        else window.history.pushState({}, '', link.href);
         handleNavigation();
         /* Skok, nie plynulý posun. Z konca dlhého článku („Mohlo by vás
            zaujímať" je úplne dole) sa plynulým posunom prechádzalo cez

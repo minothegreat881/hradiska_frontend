@@ -18,8 +18,22 @@ import LabAktuality from './LabAktuality';
 import { MapaAzKedTreba } from './MapaAzKedTreba';
 import LabKategorieRychle from './LabKategorieRychle';
 import LabDalsiObsah from './LabDalsiObsah';
+import { t, odkaz, poAnglicky } from '../lib/jazyk';
+
+/* Tri ukážkové hradiská pod hľadaním. Článok má v každom jazyku vlastný slug,
+   takže odkaz sa nedá zložiť z jednej cesty — inak anglická stránka posiela
+   čitateľa na „Article not found". */
+const SLUGY = {
+  sk: { bojna: 'bojna-vyznamne-velkomoravske-centrum', devin: 'devin', molpir: 'molpir' },
+  en: {
+    bojna: 'bojna-great-moravian-centre-valy-hillfort',
+    devin: 'devin-great-moravian-dowina-hillfort',
+    molpir: 'molpir-hallstatt-hillfort-smolenice',
+  },
+};
 
 export function LabHome() {
+  const populrneSlugy = poAnglicky() ? SLUGY.en : SLUGY.sk;
   return (
     <div className="min-h-screen parchment relative">
       <InkEffect />
@@ -46,11 +60,11 @@ export function LabHome() {
 
         <p className="lhero-nadciara">
           <span aria-hidden="true" />
-          Encyklopédia hradísk Slovenska
+          {t('Encyklopédia hradísk Slovenska')}
           <span aria-hidden="true" />
         </p>
 
-        <h1 className="lhero-titul">Slovanské hradiská</h1>
+        <h1 className="lhero-titul">{t('Slovanské hradiská')}</h1>
 
         {/* Rozcestník kategórií hneď pod titulkom — deväť kresieb, po ktorých
             sa dá vojsť do webu skôr, než návštevník začne čítať. */}
@@ -58,7 +72,7 @@ export function LabHome() {
 
         {/* Hľadanie potrebuje vetu, inak je to pole bez zadania. „Vo svojom
             okolí" je zároveň jediná výzva, ktorá vedie k mape hneď pod ňou. */}
-        <h2 className="lhero-vyzva">Nájdi hradisko vo svojom okolí</h2>
+        <h2 className="lhero-vyzva">{t('Nájdi hradisko vo svojom okolí')}</h2>
 
         <div className="lhero-hladanie">
           <HeroSearch />
@@ -68,12 +82,12 @@ export function LabHome() {
             nemeriame, takže je to vybraný zoznam — keď pribudne analytika, dá
             sa nahradiť skutočným poradím. */}
         <nav className="lhero-rychle" aria-label="Populárne hradiská">
-          <span className="lhero-rychle-popis">Populárne:</span>
-          <a href="/blog/bojna-vyznamne-velkomoravske-centrum">Bojná</a>
+          <span className="lhero-rychle-popis">{t('Populárne:')}</span>
+          <a href={odkaz(`/blog/${populrneSlugy.bojna}`)}>Bojná</a>
           <span aria-hidden="true">·</span>
-          <a href="/blog/devin">Devín</a>
+          <a href={odkaz(`/blog/${populrneSlugy.devin}`)}>Devín</a>
           <span aria-hidden="true">·</span>
-          <a href="/blog/molpir">Molpír</a>
+          <a href={odkaz(`/blog/${populrneSlugy.molpir}`)}>Molpír</a>
         </nav>
       </section>
 

@@ -100,6 +100,7 @@ function PrepinacJazyka() {
     <a
       className="lnav-jazyk"
       href={ciel}
+      data-jazyk="1"
       hrefLang={doAnglictiny ? 'en' : 'sk'}
       lang={doAnglictiny ? 'en' : 'sk'}
       title={popis}
@@ -380,7 +381,7 @@ function MobilKategoria({ slug, zoskupenie, onZoskupenie, onOdkaz }: {
   const jeLokalita = new Set(lokality.map(l => l.slug));
   const ostatne = clanky
     .filter(c => !jeLokalita.has(c.slug))
-    .map(c => ({ slug: `/blog/${c.slug}`, nazov: c.title, meta: '' }));
+    .map(c => ({ slug: odkaz(`/blog/${c.slug}`), nazov: c.title, meta: '' }));
 
   return (
     <div className="lprh-m">

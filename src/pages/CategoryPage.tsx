@@ -6,6 +6,7 @@ import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
 import { Crown, Scroll } from 'lucide-react';
 import { Nacitavanie } from '../design-lab/Nacitavanie';
+import { t, kategoria, odkaz } from '../lib/jazyk';
 import LabKategorieLista from '../design-lab/LabKategorieLista';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { STRAPI_URL } from '../lib/api-adresa';
@@ -32,7 +33,9 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   const isLoading = categoryLoading || articlesLoading;
 
   // Use Strapi category name if available, fallback to local
-  const categoryName = strapiCategory?.name || localCategory?.label || categorySlug;
+  /* Kategórie v Strapi lokalizované nie sú — anglický názov drží prekladová
+     vrstva (`jazyk.ts`), rovnako ako v hlavičke a v omrvinkách. */
+  const categoryName = kategoria(strapiCategory?.name || localCategory?.label || categorySlug);
   // Kurátorský popis má prednosť — je písaný podľa toho, čo v kategórii reálne je.
   const categoryDescription = localCategory?.description || strapiCategory?.description || '';
   // Obrázok je z článku v tej istej kategórii, servírovaný zo Strapi médií.
@@ -42,7 +45,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   // Loading state
   if (isLoading) {
     return (
-      <Nacitavanie celaVyska velkost="velke" text="Načítavam články…" />
+      <Nacitavanie celaVyska velkost="velke" text={t('Načítavam články…')} />
     );
   }
 
@@ -50,7 +53,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   if (!strapiCategory && !localCategory) {
     return (
       <div className="container py-24 text-center">
-        <h1 className="text-stone-900 dark:text-stone-50 mb-4">Kategória nebola nájdená</h1>
+        <h1 className="text-stone-900 dark:text-stone-50 mb-4">{t('Kategória nebola nájdená')}</h1>
         <a href="/" className="text-amber-700 dark:text-amber-400 hover:underline">
           Návrat na domovskú stránku
         </a>
@@ -87,12 +90,12 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
               <ol style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '0.03em', color: 'var(--hr-clear-text)' }}>
                 <li>
                   <a
-                    href="/"
+                    href={odkaz('/')}
                     style={{ color: 'var(--hr-accent)', textDecoration: 'none', transition: 'color 150ms ease' }}
                     onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--hr-accent-soft)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--hr-accent)'; }}
                   >
-                    Domov
+                    {t('Domov')}
                   </a>
                 </li>
                 <li aria-hidden="true" style={{ color: 'var(--hr-line-quiet)' }}>›</li>

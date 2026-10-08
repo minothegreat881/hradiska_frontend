@@ -32,6 +32,7 @@ import {
   type PolozkaRozcestnika as Polozka,
 } from '../data/rozcestnik';
 import { getCategoryPostCounts } from '../lib/strapi';
+import { t, odkaz, poAnglicky } from '../lib/jazyk';
 
 function Dlazdica({ d, pocet, poradie }: { d: Polozka; pocet?: number; poradie: number }) {
   const k = hradiskaCategories.find((c) => c.slug === d.slug);
@@ -41,8 +42,8 @@ function Dlazdica({ d, pocet, poradie }: { d: Polozka; pocet?: number; poradie: 
   return (
     <a
       className="lkat-dlazdica"
-      href={`/category/${d.slug}`}
-      title={k.label}
+      href={odkaz(`/category/${d.slug}`)}
+      title={t(k.label)}
       style={{ ['--lkat-poradie' as string]: String(poradie) }}
     >
       <span className="lkat-ram">
@@ -57,10 +58,12 @@ function Dlazdica({ d, pocet, poradie }: { d: Polozka; pocet?: number; poradie: 
         />
       </span>
       <span className="lkat-text">
-        <span className="lkat-nazov">{d.label}</span>
+        <span className="lkat-nazov">{t(d.label)}</span>
         {typeof pocet === 'number' && pocet > 0 && (
           <span className="lkat-pocet">
-            <b>{pocet}</b> {tvarPoctu(pocet, d.tvary)}
+            {/* Slovenčina počíta v troch tvaroch, angličtina v jednom —
+                 v nej stačí množné číslo z tretieho tvaru. */}
+            <b>{pocet}</b> {poAnglicky() ? t(d.tvary[2]) : tvarPoctu(pocet, d.tvary)}
           </span>
         )}
       </span>
@@ -80,7 +83,7 @@ export function LabKategorieRychle() {
   }, []);
 
   return (
-    <nav className="lkat" aria-label="Kategórie hradísk">
+    <nav className="lkat" aria-label={t('Kategórie hradísk')}>
       <div className="lkat-rad lkat-rad--typy">
         {TYPY.map((d, i) => (
           <Dlazdica key={d.slug} d={d} pocet={pocty[d.slug]} poradie={i} />
@@ -89,7 +92,7 @@ export function LabKategorieRychle() {
 
       <div className="lkat-predel">
         <span aria-hidden="true" />
-        Pramene a tradícia
+        {t('Pramene a tradícia')}
         <span aria-hidden="true" />
       </div>
 

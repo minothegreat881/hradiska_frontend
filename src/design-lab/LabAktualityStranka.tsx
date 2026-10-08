@@ -19,6 +19,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { odkaz, t } from '../lib/jazyk';
 import { ArticleCard } from '../components/ArticleCard';
 import { Nacitavanie } from './Nacitavanie';
 import { getKronika, type KronikaItem } from '../lib/strapi';
@@ -85,7 +86,7 @@ export function LabAktualityStranka() {
 
         <nav aria-label="Omrvinky" className="lgal-omrvinky">
           <ol>
-            <li><a href="/">Domov</a></li>
+            <li><a href={odkaz('/')}>{t('Domov')}</a></li>
             <li aria-hidden="true">·</li>
             <li>Kronika združenia</li>
           </ol>
@@ -94,7 +95,7 @@ export function LabAktualityStranka() {
         {/* Hlavička v reči kategórií: značka, názov, podtitul, počet. */}
         <header className="lakt-hlava">
           <span className="lakt-znacka">Kronika</span>
-          <h1 className="lakt-titul">Zo života združenia</h1>
+          <h1 className="lakt-titul">{t('Zo života združenia')}</h1>
           <p className="lakt-lead">
             Výpravy, obnovy tabúľ, prednášky a nálezy.
           </p>

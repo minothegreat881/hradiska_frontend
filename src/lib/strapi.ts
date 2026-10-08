@@ -3,6 +3,7 @@
  */
 
 import { STRAPI_URL } from './api-adresa';
+import { jazyk } from './jazyk';
 
 // Types matching Strapi response structure
 export interface StrapiImageFormat {
@@ -133,8 +134,26 @@ export interface StrapiResponse<T> {
 /** Oneskorenia medzi pokusmi (ms). Pozri `fetchStrapi`. */
 const RETRY_DELAYS = [700, 2000, 4000];
 
+/**
+ * Doplní jazyk do dotazu na články.
+ *
+ * Lokalizovaný je jediný typ obsahu — `blog-post`. Bez `locale` vracia Strapi
+ * slovenskú verziu, takže anglická stránka ukazovala slovenské články
+ * a odkazy na ne končili na „Article not found": odkaz sa skladá z anglickej
+ * predpony a slovenského slugu, ktorý v angličtine neexistuje.
+ *
+ * Kto si jazyk určuje sám (náhľad konceptu, prepínač jazykov), ho má v adrese
+ * už teraz — vtedy sa nič nedopĺňa.
+ */
+function sJazykom(endpoint: string): string {
+  if (!endpoint.startsWith('/blog-posts')) return endpoint;
+  if (/[?&]locale=/.test(endpoint)) return endpoint;
+  if (jazyk() === 'sk') return endpoint;
+  return endpoint + (endpoint.includes('?') ? '&' : '?') + 'locale=en';
+}
+
 async function fetchStrapi<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const url = `${STRAPI_URL}/api${endpoint}`;
+  const url = `${STRAPI_URL}/api${sJazykom(endpoint)}`;
 
   // Opakovať sa smie iba čítanie. Zápis by sa opakovaním mohol vykonať dvakrát
   // (dva komentáre, dve registrácie), takže ten ide na jeden pokus.

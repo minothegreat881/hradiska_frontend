@@ -22,6 +22,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { t, odkaz } from '../lib/jazyk';
 import { useMember } from '../auth/MemberAuth';
 import { deleteMyAccount } from '../lib/memberApi';
 import {
@@ -140,7 +141,7 @@ export function ProfilePage() {
 
         <nav aria-label="Omrvinky" className="lgal-omrvinky">
           <ol>
-            <li><a href="/">Domov</a></li>
+            <li><a href={odkaz('/')}>{t('Domov')}</a></li>
             <li aria-hidden="true">·</li>
             <li>Môj profil</li>
           </ol>

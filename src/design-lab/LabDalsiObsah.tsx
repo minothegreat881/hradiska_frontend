@@ -23,11 +23,12 @@
  */
 
 import { useEffect, useState } from 'react';
+import { odkaz, t } from '../lib/jazyk';
 import { getBlogPosts, getStrapiImageUrl } from '../lib/strapi';
 
 /** Poradie podľa handoffu. */
 const KATEGORIE: { slug: string; label: string }[] = [
-  { slug: 'informacne-tabule', label: 'Informačné tabule' },
+  { slug: 'informacne-tabule', label: 'Informačné tabule' },   // názov ide cez `kategoria()` nižšie
   { slug: 'odborne-texty', label: 'Odborné texty' },
   { slug: '3d-modely', label: '3D modely' },
 ];
@@ -47,7 +48,7 @@ interface Skupina {
 
 function Karta({ c }: { c: Clanok }) {
   return (
-    <a className="dob-clanok" href={`/blog/${c.slug}`}>
+    <a className="dob-clanok" href={odkaz(`/blog/${c.slug}`)}>
       <span className="dob-ram">
         {c.obrazok && (
           <img className="dob-obraz" src={c.obrazok} alt="" loading="lazy" decoding="async" />
@@ -105,7 +106,7 @@ export function LabDalsiObsah() {
     <section className="dob" aria-labelledby="dob-nadpis">
       <div className="dob-predel" id="dob-nadpis">
         <span aria-hidden="true" />
-        Ďalší obsah
+        {t('Ďalší obsah')}
         <span aria-hidden="true" />
       </div>
 
@@ -114,11 +115,11 @@ export function LabDalsiObsah() {
           <div className="dob-kategoria" key={s.slug} style={{ ['--dob-poradie' as string]: String(i) }}>
             <div className="dob-hlavicka">
               <h2 className="dob-titul">
-                {s.label}
+                {t(s.label)}
                 <span className="dob-pocet">{s.pocet}</span>
               </h2>
               <a className="dob-vsetky" href={`/category/${s.slug}`}>
-                Zobraziť všetky <span aria-hidden="true">→</span>
+                {t('Zobraziť všetky')} <span aria-hidden="true">→</span>
               </a>
             </div>
 

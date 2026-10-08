@@ -24,6 +24,7 @@
  */
 
 import { useState } from 'react';
+import { t } from '../lib/jazyk';
 
 const CONTACT_EMAIL = 'info@hradiska.sk';
 
@@ -53,10 +54,10 @@ export function LabJoinUs() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const next: FieldErrors = {};
-    if (!form.name.trim()) next.name = 'Meno je povinné';
-    if (!form.email.trim()) next.email = 'E-mail je povinný';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) next.email = 'Zadajte platnú adresu';
-    if (!form.message.trim()) next.message = 'Správa nesmie byť prázdna';
+    if (!form.name.trim()) next.name = t('Meno je povinné');
+    if (!form.email.trim()) next.email = t('E-mail je povinný');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) next.email = t('Zadajte platnú adresu');
+    if (!form.message.trim()) next.message = t('Správa nesmie byť prázdna');
     setErrors(next);
     if (Object.keys(next).length) return;
     setBusy(true);
@@ -85,24 +86,21 @@ export function LabJoinUs() {
               <img src="/znak_minca.png" alt="" aria-hidden="true" width={160} height={178} loading="lazy" decoding="async" />
             </picture>
 
-            <span className="ljoin-eyebrow">Buďme hrdí na naše dejiny</span>
-            <h2 className="ljoin-title">Staňte sa našimi spolupracovníkmi</h2>
+            <span className="ljoin-eyebrow">{t('Buďme hrdí na naše dejiny')}</span>
+            <h2 className="ljoin-title">{t('Staňte sa našimi spolupracovníkmi')}</h2>
 
             {/* Najsilnejšia veta sekcie. Na konci ju nemal kto dočítať. */}
             <blockquote className="ljoin-quote">
-              Možno sami neviete, aké poklady vlastníte.
+              {t('Možno sami neviete, aké poklady vlastníte.')}
             </blockquote>
 
             <p className="ljoin-lead">
-              Aj vy sa môžete podieľať na zveľaďovaní našej stránky. Ak máte doma
-              zaujímavé fotografie z hradísk alebo obrázky a fotky nálezov, stačí sa
-              s nami o ne podeliť — každý záber pomáha dopĺňať náš spoločný obraz
-              o dávnej minulosti.
+              {t('Aj vy sa môžete podieľať na zveľaďovaní našej stránky. Ak máte doma zaujímavé fotografie z hradísk alebo obrázky a fotky nálezov, stačí sa s nami o ne podeliť — každý záber pomáha dopĺňať náš spoločný obraz o dávnej minulosti.')}
             </p>
 
             <a className="ljoin-mail" href={`mailto:${CONTACT_EMAIL}`}>
               <span className="ljoin-mail-txt">
-                <span className="ljoin-mail-lbl">Pošlite fotky na</span>
+                <span className="ljoin-mail-lbl">{t('Pošlite fotky na')}</span>
                 <strong>{CONTACT_EMAIL}</strong>
               </span>
               <span className="ljoin-mail-go" aria-hidden="true">
@@ -122,40 +120,40 @@ export function LabJoinUs() {
               {sent ? (
                 <div className="ljoin-done" role="status" aria-live="polite">
                   <div className="ljoin-done-mark" aria-hidden="true">✓</div>
-                  <h3>Ďakujeme!</h3>
-                  <p>Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími informáciami o spolupráci.</p>
+                  <h3>{t('Ďakujeme!')}</h3>
+                  <p>{t('Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími informáciami o spolupráci.')}</p>
                   <button type="button" className="ljoin-ghost" onClick={() => { setSent(false); setForm({ name: '', email: '', message: '' }); }}>
-                    Poslať ďalšiu správu
+                    {t('Poslať ďalšiu správu')}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={submit} noValidate>
-                  <h3 className="ljoin-card-t">Alebo nám napíšte rovno tu</h3>
-                  <p className="ljoin-card-s">Ozveme sa vám späť na uvedený e-mail.</p>
+                  <h3 className="ljoin-card-t">{t('Alebo nám napíšte rovno tu')}</h3>
+                  <p className="ljoin-card-s">{t('Ozveme sa vám späť na uvedený e-mail.')}</p>
 
-                  <label htmlFor="lj-name">Vaše meno</label>
-                  <input id="lj-name" className="ljoin-fld" autoComplete="name" placeholder="Jana Nováková"
+                  <label htmlFor="lj-name">{t('Vaše meno')}</label>
+                  <input id="lj-name" className="ljoin-fld" autoComplete="name" placeholder={t('Jana Nováková')}
                     value={form.name} aria-invalid={!!errors.name}
                     onChange={e => { setForm({ ...form, name: e.target.value }); clear('name'); }} />
                   {errors.name && <span className="ljoin-err">{errors.name}</span>}
 
                   <label htmlFor="lj-mail">E-mail</label>
-                  <input id="lj-mail" className="ljoin-fld" type="email" autoComplete="email" placeholder="meno@domena.sk"
+                  <input id="lj-mail" className="ljoin-fld" type="email" autoComplete="email" placeholder={t('meno@domena.sk')}
                     value={form.email} aria-invalid={!!errors.email}
                     onChange={e => { setForm({ ...form, email: e.target.value }); clear('email'); }} />
                   {errors.email && <span className="ljoin-err">{errors.email}</span>}
 
-                  <label htmlFor="lj-msg">Vaša správa</label>
-                  <textarea id="lj-msg" className="ljoin-fld" rows={5} placeholder="Popíšte, čím by ste chceli prispieť…"
+                  <label htmlFor="lj-msg">{t('Vaša správa')}</label>
+                  <textarea id="lj-msg" className="ljoin-fld" rows={5} placeholder={t('Popíšte, čím by ste chceli prispieť…')}
                     value={form.message} aria-invalid={!!errors.message}
                     onChange={e => { setForm({ ...form, message: e.target.value }); clear('message'); }} />
                   {errors.message && <span className="ljoin-err">{errors.message}</span>}
 
                   <button type="submit" className="ljoin-send" disabled={busy} aria-busy={busy}>
-                    {busy ? 'Odosielam…' : 'Odoslať správu'}
+                    {busy ? t('Odosielam…') : t('Odoslať správu')}
                   </button>
                   <p className="ljoin-note">
-                    Vaše údaje použijeme len na odpoveď na túto správu. Neposkytujeme ich tretím stranám.
+                    {t('Vaše údaje použijeme len na odpoveď na túto správu. Neposkytujeme ich tretím stranám.')}
                   </p>
                 </form>
               )}
@@ -168,15 +166,15 @@ export function LabJoinUs() {
             odsek navyše; v trojici sa dajú porovnať na jeden pohľad. */}
         <div className="ljoin-asks">
           <div className="ljoin-askhead">
-            <span>Čo pomôže najviac</span>
+            <span>{t('Čo pomôže najviac')}</span>
             <span className="ljoin-askrule" aria-hidden="true" />
           </div>
           <div className="ljoin-ask-grid">
             {ASKS.map((a, i) => (
               <article className="ljoin-ask" key={a.t}>
                 <span className="ljoin-num" aria-hidden="true">{i + 1}</span>
-                <h3 className="ljoin-ask-t">{a.t}</h3>
-                <p className="ljoin-ask-d">{a.d}</p>
+                <h3 className="ljoin-ask-t">{t(a.t)}</h3>
+                <p className="ljoin-ask-d">{t(a.d)}</p>
               </article>
             ))}
           </div>
