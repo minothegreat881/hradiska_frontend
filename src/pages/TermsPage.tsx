@@ -1,6 +1,6 @@
 'use client';
 
-import { poAnglicky, odkaz } from '../lib/jazyk';
+import { t, poNemecky, poAnglicky, odkaz } from '../lib/jazyk';
 
 const H2: React.CSSProperties = { fontSize: 18, fontWeight: 600, color: 'var(--hr-ink)', marginBottom: 8 };
 const UL: React.CSSProperties = { paddingLeft: 20, marginTop: 8 };
@@ -170,6 +170,90 @@ function TeloEN() {
   );
 }
 
+function TeloDE() {
+  return (
+    <>
+          <section>
+            <h2 style={H2}>1. Einleitung</h2>
+            <p>
+              Diese Bedingungen regeln die Nutzung der Website <strong>Hradiska.sk</strong>, die der
+              Verein Hradiska.sk betreibt. Mit der Nutzung der Website stimmen Sie ihnen zu. Wenn Sie
+              damit nicht einverstanden sind, nutzen Sie die Website bitte nicht.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>2. Inhalt und Urheberrecht</h2>
+            <p>
+              Die Texte, Fotografien, Zeichnungen, 3D-Rekonstruktionen und weiteren Inhalte der
+              Website sind urheberrechtlich geschützt und gehören dem Verein, seinen Mitgliedern oder
+              den Urheberinnen und Urhebern, die sie zur Verfügung gestellt haben. Sie dürfen die
+              Inhalte lesen und als Link zu persönlichen, nicht gewerblichen Zwecken teilen.
+              <strong> Die Übernahme, Vervielfältigung oder Weiterverbreitung</strong> von Texten und
+              Bildern (vor allem auf anderen Websites oder in Publikationen) ist nur mit vorheriger
+              Zustimmung des Betreibers und unter Angabe der Quelle möglich.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>3. Benutzerkonten</h2>
+            <ul style={UL}>
+              <li>Machen Sie bei der Registrierung wahrheitsgemäße Angaben; ein Konto ist für eine Person bestimmt.</li>
+              <li>Für Ihre Anmeldedaten und für die Aktivität in Ihrem Konto sind Sie verantwortlich; bewahren Sie Ihr Passwort sicher auf.</li>
+              <li>Sie können Ihr Konto jederzeit löschen; der Betreiber kann ein Konto löschen, das gegen diese Bedingungen verstößt.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 style={H2}>4. Kommentare und Beiträge der Nutzer</h2>
+            <p>Für die Inhalte, die Sie hinzufügen (Kommentare), sind Sie verantwortlich. Sie verpflichten sich, keine Inhalte zu veröffentlichen, die:</p>
+            <ul style={UL}>
+              <li>rechtswidrig, beleidigend, hetzerisch, vulgär oder bedrohend gegenüber anderen sind;</li>
+              <li>Rechte Dritter verletzen (Urheberrecht, Privatsphäre);</li>
+              <li>Spam, Werbung oder irreführend sind.</li>
+            </ul>
+            <p style={{ marginTop: 8 }}>
+              Mit dem Hinzufügen eines Kommentars räumen Sie dem Betreiber das einfache Recht ein,
+              diesen Inhalt auf der Website anzuzeigen. Der Betreiber darf Kommentare{' '}
+              <strong>moderieren, ausblenden oder entfernen</strong>, vor allem bei einem Verstoß
+              gegen diese Bedingungen, und zwar ohne vorherige Ankündigung.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>5. Unzulässiges Verhalten</h2>
+            <p>Sie dürfen die Website nicht missbrauchen — vor allem nicht, indem Sie ihren Betrieb stören, sich unbefugt Zugang verschaffen, Inhalte automatisiert in großem Umfang herunterladen (Scraping) oder Sicherheitsmaßnahmen umgehen.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>6. Haftungsausschluss</h2>
+            <p>
+              Wir stellen die Inhalte nach bestem Wissen und mit fachlicher Sorgfalt bereit, jedoch{' '}
+              <strong>„wie sie sind“</strong> — ohne Gewähr für Vollständigkeit oder Fehlerfreiheit.
+              Deutungen und Datierungen entwickeln sich in der Archäologie mit der Zeit weiter. Für
+              Schäden aus der Nutzung der Website haftet der Betreiber nicht, ebenso wenig für die
+              Inhalte fremder Seiten, auf die die Website verlinkt.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>7. Änderungen der Bedingungen</h2>
+            <p>Wir können diese Bedingungen von Zeit zu Zeit aktualisieren. Änderungen werden mit ihrer Veröffentlichung auf dieser Seite wirksam; auf wichtige Änderungen versuchen wir hinzuweisen.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>8. Kontakt</h2>
+            <p>
+              Fragen zu diesen Bedingungen richten Sie bitte an{' '}
+              <a href="mailto:info@hradiska.sk" style={LINK}>info@hradiska.sk</a>. Die Verarbeitung
+              personenbezogener Daten regelt eine eigene{' '}
+              <a href={odkaz('/ochrana-osobnych-udajov')} style={LINK}>Datenschutzerklärung</a>.
+            </p>
+          </section>
+    </>
+  );
+}
+
 export function TermsPage() {
   return (
     <div className="min-h-screen parchment relative">
@@ -212,7 +296,7 @@ export function TermsPage() {
             lineHeight: 1.7,
           }}
         >
-          {poAnglicky() ? <TeloEN /> : <TeloSK />}
+          {poAnglicky() ? <TeloEN /> : poNemecky() ? <TeloDE /> : <TeloSK />}
         </div>
       </div>
     </div>

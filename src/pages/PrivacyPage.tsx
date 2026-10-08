@@ -1,6 +1,6 @@
 'use client';
 
-import { poAnglicky } from '../lib/jazyk';
+import { t, poNemecky, poAnglicky } from '../lib/jazyk';
 
 import { openCookieSettings } from '../lib/consent';
 
@@ -211,6 +211,108 @@ function TeloEN() {
   );
 }
 
+function TeloDE() {
+  return (
+    <>
+          <section>
+            <h2 style={H2}>1. Verantwortlicher</h2>
+            <p>
+              Verantwortlicher ist der Verein <strong>Hradiska.sk</strong>, der personenbezogene
+              Daten gemäß der <strong>DSGVO (EU) 2016/679</strong> und dem slowakischen Gesetz
+              Nr. 18/2018 Slg. über den Schutz personenbezogener Daten verarbeitet. Kontakt:{' '}
+              <a href="mailto:info@hradiska.sk" style={LINK}>info@hradiska.sk</a>.
+            </p>
+            <p style={{ marginTop: 8, fontSize: 13, fontStyle: 'italic', color: 'var(--hr-clear-text)' }}>
+              (Die Identifikations- und Registerangaben des Vereins — Identifikationsnummer, Sitz
+              und Registernummer — werden ergänzt.)
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>2. Welche Daten wir verarbeiten</h2>
+            <p><strong>a) Benutzerkonto</strong> (bei der Registrierung): E-Mail-Adresse, Name oder Spitzname und Passwort (nur in verschlüsselter Form gespeichert). Das Konto dient der Anmeldung und dem Kommentieren.</p>
+            <p style={{ marginTop: 8 }}><strong>b) Kommentare</strong>: Name oder Spitzname, Inhalt des Kommentars und Datum. Kommentieren dürfen nur angemeldete Mitglieder; die E-Mail-Adresse stammt aus dem Konto und wird nicht öffentlich angezeigt.</p>
+            <p style={{ marginTop: 8 }}><strong>c) Kontaktformular</strong> („Machen Sie mit“): Name, E-Mail-Adresse und Inhalt der Nachricht.</p>
+            <p style={{ marginTop: 8 }}><strong>d) Technische Daten</strong>: IP-Adresse und Serverprotokolle (Logs), die beim Besuch automatisch entstehen und dem Betrieb und der Sicherheit der Website dienen.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>3. Cookies und lokaler Speicher</h2>
+            <p>
+              Für die Anmeldung und für das Merken Ihrer Entscheidung über Cookies verwenden wir{' '}
+              <strong>notwendigen</strong> lokalen Speicher im Browser (zum Beispiel ein
+              Anmelde-Token) — ohne ihn funktioniert die Website nicht.
+              <strong> Analyse-Cookies</strong> (anonyme Zugriffszahlen) setzen wir{' '}
+              <strong>nur mit Ihrer Einwilligung</strong> ein; davor wird kein Analyseskript und
+              kein Cookie von Dritten geladen.
+            </p>
+            <p style={{ marginTop: 10 }}>
+              Ihre Entscheidung können Sie jederzeit ändern:{' '}
+              <button type="button" onClick={openCookieSettings} style={{ ...LINK, background: 'none', border: 'none', cursor: 'pointer', padding: 0, font: 'inherit' }}>
+                die Cookie-Einstellungen öffnen („Bräuche des Burgwalls“)
+              </button>.
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>4. Rechtsgrundlagen und Zweck</h2>
+            <ul style={UL}>
+              <li><strong>Erbringung des Dienstes</strong> (Art. 6 Abs. 1 lit. b) — Führung des Kontos und Anzeige der Kommentare.</li>
+              <li><strong>Einwilligung</strong> (Art. 6 Abs. 1 lit. a) — Analyse-Cookies; Bearbeitung einer Nachricht aus dem Kontaktformular.</li>
+              <li><strong>Berechtigtes Interesse</strong> (Art. 6 Abs. 1 lit. f) — Sicherheit, Betrieb und Schutz der Website vor Missbrauch.</li>
+            </ul>
+            <p style={{ marginTop: 8 }}>Wir nutzen die Daten weder für Profiling noch für automatisierte Entscheidungen und geben sie nicht zu Werbezwecken weiter.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>5. Empfänger und Auftragsverarbeiter</h2>
+            <p>Die Daten verarbeiten wir selbst; technische Unterstützung kommt von:</p>
+            <ul style={UL}>
+              <li>dem <strong>Hosting</strong>-Anbieter, auf dem die Website und die Datenbank laufen;</li>
+              <li>einem <strong>E-Mail-Dienst</strong> (SMTP) für die Bestätigung der Registrierung und das Zurücksetzen von Passwörtern;</li>
+              <li><strong>Google Fonts</strong> beim Laden der historischen Schriften (dabei wird die IP-Adresse verarbeitet) — das entfällt, sobald die Schriften lokal ausgeliefert werden.</li>
+            </ul>
+            <p style={{ marginTop: 8 }}>An Dritte zu deren eigenen Zwecken geben wir die Daten nicht weiter.</p>
+          </section>
+
+          <section>
+            <h2 style={H2}>6. Speicherdauer</h2>
+            <ul style={UL}>
+              <li><strong>Konto und Kommentare</strong> — solange das Konto besteht; nach seiner Löschung entfernen wir sie (Kommentare können anonymisiert werden).</li>
+              <li><strong>Nachricht aus dem Kontaktformular</strong> — höchstens 3 Jahre ab dem letzten Kontakt.</li>
+              <li><strong>Serverprotokolle</strong> — kurzzeitig, im für Sicherheit und Betrieb nötigen Umfang.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 style={H2}>7. Ihre Rechte</h2>
+            <p>Sie haben das Recht auf:</p>
+            <ul style={UL}>
+              <li>Auskunft über Ihre personenbezogenen Daten,</li>
+              <li>Berichtigung unrichtiger Daten,</li>
+              <li>Löschung der Daten („Recht auf Vergessenwerden“),</li>
+              <li>Einschränkung der Verarbeitung,</li>
+              <li>Datenübertragbarkeit,</li>
+              <li>Widerspruch gegen die Verarbeitung und jederzeitigen Widerruf Ihrer Einwilligung.</li>
+            </ul>
+            <p style={{ marginTop: 8 }}>
+              Ihnen steht außerdem das Recht auf Beschwerde bei der Aufsichtsbehörde zu — beim{' '}
+              <strong>Amt für den Schutz personenbezogener Daten der Slowakischen Republik</strong>{' '}
+              (<a href="https://dataprotection.gov.sk" target="_blank" rel="noopener noreferrer" style={LINK}>dataprotection.gov.sk</a>).
+            </p>
+          </section>
+
+          <section>
+            <h2 style={H2}>8. Kontakt</h2>
+            <p>
+              Bei Fragen zur Verarbeitung der Daten und zur Ausübung Ihrer Rechte wenden Sie sich bitte an{' '}
+              <a href="mailto:info@hradiska.sk" style={LINK}>info@hradiska.sk</a>.
+            </p>
+          </section>
+    </>
+  );
+}
+
 export function PrivacyPage() {
   return (
     <div className="min-h-screen parchment relative">
@@ -253,7 +355,7 @@ export function PrivacyPage() {
             lineHeight: 1.7,
           }}
         >
-          {poAnglicky() ? <TeloEN /> : <TeloSK />}
+          {poAnglicky() ? <TeloEN /> : poNemecky() ? <TeloDE /> : <TeloSK />}
         </div>
       </div>
     </div>
