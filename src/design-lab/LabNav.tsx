@@ -99,7 +99,7 @@ const shortLabel = (i: NavigationItem) => {
  * nesie skratku jazyka, do KTORÉHO prepne (na slovenskej stránke „EN").
  *
  * Článok má v každom jazyku vlastnú adresu, preto ju stránka článku ohlási
- * cez `nastavDruhyOdkaz`; inde stačí jazyková predpona.
+ * cez `nastavInojazycneOdkazy`; inde stačí jazyková predpona.
  */
 /* Skratka a popis podľa toho, KAM klepnutie vedie. Jedno tlačidlo, ktoré
    cyklí sk → en → de → sk: tri samostatné by sa do mobilnej lišty vedľa

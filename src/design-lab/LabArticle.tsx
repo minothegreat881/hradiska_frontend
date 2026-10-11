@@ -31,7 +31,7 @@ import { getStrapiImageUrl, convertStrapiPostToArticle, anglickeSlugy } from '..
 import { getRelated, type RelatedCard } from '../lib/related';
 import { DynamicZoneRenderer } from '../components/DynamicZoneRenderer';
 import { ArticleSidebar, KeyFactsCard, TimelineCard } from '../components/ArticleSidebar';
-import { poSlovensky, t, datum as datumJazyka, odkaz, poAnglicky, kategoria, jazyk, nastavDruhyOdkaz, druhyJazyk } from '../lib/jazyk';
+import { poSlovensky, t, datum as datumJazyka, odkaz, poAnglicky, kategoria, jazyk, nastavInojazycneOdkazy, JAZYKY, VEREJNE_JAZYKY, type Jazyk } from '../lib/jazyk';
 import { HistoricalGallery } from '../components/HistoricalGallery';
 import { CommentSection } from '../components/CommentSection';
 import { SocialShare } from '../components/SocialShare';
@@ -90,18 +90,27 @@ export function LabArticle({ slug }: { slug: string }) {
   useEffect(() => { setOstraTu(false); }, [slug]);
 
   /* Článok má v každom jazyku vlastný slug, takže prepínač v hlavičke sa cieľ
-     nemá ako dopočítať — ohlási mu ho stránka. Keď druhá verzia neexistuje,
-     ohlási sa `null` a prepínač prepne aspoň na domovskú stránku v druhom
-     jazyku, nie na 404. */
+     nemá ako dopočítať — ohlási mu ho stránka.
+
+     Ohlasuje sa CELÁ mapa jazyk → adresa, nie jedna „druhá" adresa. Pri dvoch
+     jazykoch stačila jedna, pri troch by sa z nej stala lotéria: `find` by
+     vrátil raz anglickú, raz nemeckú verziu podľa toho, v akom poradí ich
+     vráti API, a prepínač by potom viedol na jazyk, na ktorý neprepína. */
   useEffect(() => {
-    const druhy = (post?.localizations || []).find((x: { locale?: string }) => x.locale !== (post?.locale || 'sk'));
-    /* Keď druhá verzia článku neexistuje (nový slovenský článok pred
-       prekladom), prepínač vedie na domovskú stránku v druhom jazyku —
-       lepšie než odkaz na „Článok sa nenašiel". */
-    nastavDruhyOdkaz(druhy
-      ? (druhy.locale === 'en' ? `/en/blog/${druhy.slug}` : `/blog/${druhy.slug}`)
-      : odkaz('/', druhyJazyk()));
-    return () => nastavDruhyOdkaz(null);
+    if (!post) { nastavInojazycneOdkazy(null); return; }
+    const mapa: Partial<Record<Jazyk, string>> = {};
+    const zapis = (kod: string | undefined, slug: string | undefined) => {
+      if (!kod || !slug || !(JAZYKY as string[]).includes(kod)) return;
+      mapa[kod as Jazyk] = odkaz(`/blog/${slug}`, kod as Jazyk);
+    };
+    zapis(post.locale || 'sk', post.slug);
+    for (const v of (post.localizations || []) as { locale?: string; slug?: string }[]) zapis(v.locale, v.slug);
+    /* Keď verzia v niektorom jazyku ešte nie je (nový slovenský článok pred
+       prekladom), vedie prepínač na domovskú stránku v tom jazyku — lepšie
+       než odkaz na „Článok sa nenašiel". */
+    for (const j of VEREJNE_JAZYKY) if (!mapa[j]) mapa[j] = odkaz('/', j);
+    nastavInojazycneOdkazy(mapa);
+    return () => nastavInojazycneOdkazy(null);
   }, [post]);
 
   const cover = post?.coverImage ? getStrapiImageUrl(post.coverImage) : null;
@@ -140,19 +149,23 @@ export function LabArticle({ slug }: { slug: string }) {
     return () => { alive = false; };
   }, [slug]);
 
-  /* Záchrana pre anglickú adresu so slovenským slugom.
-     Mapa aj staršie odkazy vedú na `/en/blog/<slovenský slug>`, čo v angličtine
-     neexistuje. Namiesto „Article not found" sa dohľadá slovenský článok,
-     z neho anglická verzia a stránka sa naň presmeruje. */
+  /* Záchrana pre cudzojazyčnú adresu so slovenským slugom.
+     Prepínač aj staršie odkazy vedú na `/en/blog/<slovenský slug>` (a odkedy
+     je verejná nemčina, aj na `/de/...`), čo v tom jazyku neexistuje.
+     Namiesto „Article not found" sa dohľadá slovenský článok, z neho verzia
+     v aktuálnom jazyku a stránka sa naň presmeruje.
+
+     Predponu skladá `odkaz`, nie natvrdo napísané `/en`: s natvrdo napísanou
+     sa nemecká adresa presmerovala na `/en/blog/<nemecký slug>`, čo je
+     dvojica, ktorá neexistuje ani v jednom jazyku. */
   useEffect(() => {
-    /* Záchrana pre adresu so slovenským slugom v cudzom jazyku. */
     if (loading || post || poSlovensky() || !slug) return;
     let zrusene = false;
     anglickeSlugy([slug], jazyk())
       .then((m) => {
-        const en = m[slug];
-        if (zrusene || !en) return;
-        window.history.replaceState({}, '', `/en/blog/${en}`);
+        const inojazycny = m[slug];
+        if (zrusene || !inojazycny) return;
+        window.history.replaceState({}, '', odkaz(`/blog/${inojazycny}`));
         window.dispatchEvent(new PopStateEvent('popstate'));
       })
       .catch(() => { /* ostane hlásenie, že článok nie je */ });

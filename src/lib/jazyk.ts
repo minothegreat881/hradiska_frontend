@@ -22,12 +22,10 @@ export type Jazyk = 'sk' | 'en' | 'de';
 export const JAZYKY: Jazyk[] = ['sk', 'en', 'de'];
 
 /**
- * Jazyky, ktoré PONÚKA prepínač v hlavičke. Nemčina sa rozrába — adresy
- * `/de/...` fungujú a dajú sa otvoriť priamo, ale kým nie sú preložené
- * články, prepínač by návštevníka poslal na prázdny web. Keď bude obsah
- * hotový, pridá sa sem `'de'` a nič iné sa meniť nemusí.
+ * Jazyky, ktoré PONÚKA prepínač v hlavičke. Odkedy sú preložené všetky
+ * články, sú to všetky tri — prepínač nimi cyklí sk → en → de → sk.
  */
-export const VEREJNE_JAZYKY: Jazyk[] = ['sk', 'en'];
+export const VEREJNE_JAZYKY: Jazyk[] = ['sk', 'en', 'de'];
 const PREDPONY: Record<Exclude<Jazyk, 'sk'>, string> = { en: '/en', de: '/de' };
 
 /** Kód pre `toLocaleDateString` a formátovanie čísel. */
@@ -93,11 +91,6 @@ export function nastavInojazycneOdkazy(mapa: Partial<Record<Jazyk, string>> | nu
   if (rovnake) return;
   inojazycne = nove;
   poslucháči.forEach((f) => f());
-}
-
-/** Spätná kompatibilita: ohlásenie JEDNEJ adresy v druhom jazyku. */
-export function nastavDruhyOdkaz(url: string | null): void {
-  nastavInojazycneOdkazy(url ? { [rozdelAdresu(url).jazyk]: url } : null);
 }
 
 export const dajInojazycnyOdkaz = (j: Jazyk): string | null => inojazycne[j] ?? null;
