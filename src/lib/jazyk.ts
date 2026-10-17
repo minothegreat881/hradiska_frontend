@@ -789,6 +789,17 @@ export function t(kluc: string): string {
   return SLOVNIKY[aktualny]?.[kluc] ?? kluc;
 }
 
+/**
+ * Preklad zo slovníka pre KONKRÉTNY jazyk (nie jazyk stránky), alebo null,
+ * keď v slovníku nie je. Potrebuje ho vzhľad webu (`lib/vzhlad/texty.ts`)
+ * a prevod dnešného stavu, ktorý musí rozoznať „preklad je" od „preklad nie je"
+ * — `t()` vracia v oboch prípadoch reťazec.
+ */
+export function prekladZoSlovnika(kluc: string, j: Jazyk): string | null {
+  if (j === 'sk') return kluc;
+  return SLOVNIKY[j]?.[kluc] ?? null;
+}
+
 /** Názov kategórie v jazyku stránky. Keď preklad nie je, vráti pôvodný. */
 export const kategoria = (meno: string | undefined | null): string => (meno ? t(meno) : '');
 

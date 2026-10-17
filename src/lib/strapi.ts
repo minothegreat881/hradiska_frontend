@@ -4,6 +4,7 @@
 
 import { STRAPI_URL } from './api-adresa';
 import { jazyk, type Jazyk } from './jazyk';
+import { KRONIKA_INTRO_SLUG } from '../data/domovska';
 
 // Types matching Strapi response structure
 export interface StrapiImageFormat {
@@ -284,6 +285,10 @@ export async function getBlogPosts(options?: {
   featured?: boolean;
   page?: number;
   pageSize?: number;
+  /** Radenie (Strapi `sort`). Predvolene `publishedAt:desc` — tak to bolo vždy. */
+  sort?: string;
+  /** Len tieto články (documentId) — „vybrané ručne" v riadkoch vzhľadu. */
+  documentIds?: string[];
 }): Promise<{ posts: StrapiBlogPost[]; pagination: any }> {
   // Build query string manually to avoid encoding issues
   // PERF: `populate=*` ťahalo pre KAŽDÝ článok v zozname aj gallery, blocks, quotes,
@@ -295,7 +300,7 @@ export async function getBlogPosts(options?: {
     'populate[0]=coverImage',
     'populate[1]=category',
     'populate[2]=tags',
-    'sort=publishedAt:desc',
+    `sort=${options?.sort || 'publishedAt:desc'}`,
   ];
 
   // Pagination
@@ -311,6 +316,9 @@ export async function getBlogPosts(options?: {
   }
   if (options?.featured !== undefined) {
     queryParts.push(`filters[featured][$eq]=${options.featured}`);
+  }
+  if (options?.documentIds?.length) {
+    options.documentIds.forEach((d, i) => queryParts.push(`filters[documentId][$in][${i}]=${encodeURIComponent(d)}`));
   }
 
   const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
@@ -423,8 +431,9 @@ export interface KronikaItem {
   coverUrl: string | null;
 }
 
-/** Slug článku, ktorý je na nástenke pripnutý ako statický úvod. */
-export const KRONIKA_INTRO_SLUG = 'preco-to-vlastne-robim';
+/** Slug článku, ktorý je na nástenke pripnutý ako statický úvod (konštanta je
+    v `data/domovska.ts`, odkiaľ ju berie aj základný vzhľad). */
+export { KRONIKA_INTRO_SLUG };
 
 function toKronikaItem(p: StrapiBlogPost): KronikaItem {
   return {
@@ -465,10 +474,11 @@ export async function getKronika(options?: {
 }
 
 /** Úvodný (pripnutý) príspevok. Ťahá sa zvlášť — pri radení podľa dátumu by
- *  inak nemusel padnúť na prvú stránku. */
-export async function getKronikaIntro(): Promise<KronikaItem | null> {
+ *  inak nemusel padnúť na prvú stránku. `slug` je v jazyku stránky (vzhľad ho
+ *  pozná z `documentId`); bez neho ide slovenský slug ako doteraz. */
+export async function getKronikaIntro(slug: string = KRONIKA_INTRO_SLUG): Promise<KronikaItem | null> {
   const response = await fetchStrapi<StrapiResponse<StrapiBlogPost[]>>(
-    `/blog-posts?filters[slug][$eq]=${KRONIKA_INTRO_SLUG}&populate[0]=coverImage`
+    `/blog-posts?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[0]=coverImage`
   );
   return response.data[0] ? toKronikaItem(response.data[0]) : null;
 }
