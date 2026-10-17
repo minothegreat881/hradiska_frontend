@@ -96,7 +96,9 @@ function ciel(x: unknown): Ciel | null {
   switch (x.druh) {
     case 'kategoria': { const k = odkaz(x.kategoria); return k ? { druh: 'kategoria', kategoria: k } : null; }
     case 'clanok': { const c = odkazClanku(x.clanok); return c ? { druh: 'clanok', clanok: c } : null; }
-    case 'cesta': return jeStr(x.cesta) && VZOR_CESTY.test(x.cesta) ? { druh: 'cesta', cesta: x.cesta } : null;
+    /* `//…` by prehliadač bral ako adresu iného webu — odmieta sa aj vtedy,
+       keď by ho vzor v typy.ts pustil. */
+    case 'cesta': return jeStr(x.cesta) && VZOR_CESTY.test(x.cesta) && !x.cesta.startsWith('//') ? { druh: 'cesta', cesta: x.cesta } : null;
     case 'url': return jeStr(x.url) && /^(https:\/\/|mailto:)[^\s"'<>]+$/.test(x.url) ? { druh: 'url', url: x.url } : null;
     default: return null;
   }
