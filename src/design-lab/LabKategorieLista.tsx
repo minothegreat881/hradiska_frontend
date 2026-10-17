@@ -12,45 +12,70 @@
  * Kategória práve otvoreného článku dostane dvojitý prstenec, plné farby
  * a `aria-current="page"`.
  *
- * Zoznam je spoločný s domovskou (`data/rozcestnik.ts`) — poradie ani názvy
- * sa nemôžu rozísť.
+ * Skupiny sú spoločné s domovskou — berú sa z vzhľadu webu
+ * (`domov.dlazdice`), takže poradie ani názvy sa nemôžu rozísť. Medzi
+ * skupinami stojí tichý oddeľovač.
  */
 
 import { t, odkaz } from '../lib/jazyk';
-import { useEffect, useRef } from 'react';
-import { hradiskaCategories, variant } from '../data/categories';
-import { ROZCESTNIK_TYPY, ROZCESTNIK_PRAMENE, zakladStrapi } from '../data/rozcestnik';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { useVzhlad } from '../lib/vzhlad/VzhladContext';
+import { skupinyDlazdic, obrazokKategorie, zalohaObrazkaKategorie, titulokKategorie, type DlazdicaNaWebe } from '../lib/vzhlad/citaj';
+import { textVzhladu } from '../lib/vzhlad/texty';
+import { adresaObrazka, srcSetObrazka, poziciaObrazka, jeSuborMedii, priChybeVymen } from '../lib/vzhlad/obrazky';
+import type { Rozriesene, Vzhlad } from '../lib/vzhlad/typy';
 
-function Mini({ slug, label, aktivna }: { slug: string; label: string; aktivna: boolean }) {
-  const k = hradiskaCategories.find((c) => c.slug === slug);
-  if (!k) return null;
-  const base = zakladStrapi();
+const VELKOSTI: ['thumbnail' | 'small', number][] = [['thumbnail', 245], ['small', 500]];
+
+function Mini({ d, aktivna, vzhlad, rozriesene, znacka }: {
+  d: DlazdicaNaWebe; aktivna: boolean; vzhlad: Vzhlad; rozriesene: Rozriesene; znacka?: string;
+}) {
+  const o = obrazokKategorie(vzhlad, rozriesene, d.slug);
+  const src = adresaObrazka(o, 'thumbnail', rozriesene);
+  const srcSet = srcSetObrazka(o, VELKOSTI, rozriesene);
+  const pozicia = poziciaObrazka(o);
+  const zaloha = jeSuborMedii(o) ? zalohaObrazkaKategorie(d.slug) : null;
+  const popisok = d.vk ? textVzhladu(d.vk.popisokDlazdice) : titulokKategorie(undefined, rozriesene, d.slug);
 
   return (
     <a
       className={aktivna ? 'cat-mini is-active' : 'cat-mini'}
-      href={odkaz(`/category/${slug}`)}
-      title={t(k.label)}
+      href={odkaz(`/category/${d.slug}`)}
+      title={titulokKategorie(d.vk, rozriesene, d.slug)}
       aria-current={aktivna ? 'page' : undefined}
-      data-slug={slug}
+      data-slug={d.slug}
+      data-vw={znacka}
     >
       <span className="cat-mini-ram">
-        <img
-          className="cat-mini-obraz"
-          src={`${base}${variant(k.image, 'thumbnail')}`}
-          srcSet={`${base}${variant(k.image, 'thumbnail')} 245w, ${base}${variant(k.image, 'small')} 500w`}
-          sizes="(max-width: 600px) 96px, (max-width: 1060px) 126px, 156px"
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
+        {src && (
+          <img
+            className="cat-mini-obraz"
+            src={src}
+            srcSet={srcSet ?? undefined}
+            sizes="(max-width: 600px) 96px, (max-width: 1060px) 126px, 156px"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={pozicia ? { objectPosition: pozicia } : undefined}
+            onError={priChybeVymen(zaloha ? {
+              src: adresaObrazka(zaloha, 'thumbnail'),
+              srcSet: srcSetObrazka(zaloha, VELKOSTI),
+            } : null)}
+          />
+        )}
       </span>
-      <span className="cat-mini-nazov">{t(label)}</span>
+      <span className="cat-mini-nazov">{popisok}</span>
     </a>
   );
 }
 
-export function LabKategorieLista({ aktivna }: { aktivna?: string }) {
+export function LabKategorieLista({ aktivna, bezZnaciek = false }: {
+  aktivna?: string;
+  /** Vysúvacia lišta je kópia — v režime úprav nesie značky len lišta v stránke. */
+  bezZnaciek?: boolean;
+}) {
+  const { vzhlad, rozriesene, upravy } = useVzhlad();
+  const skupiny = useMemo(() => skupinyDlazdic(vzhlad, rozriesene), [vzhlad, rozriesene]);
   const pas = useRef<HTMLDivElement>(null);
   const zaciatok = useRef<{ x: number; y: number; posun: number } | null>(null);
 
@@ -84,19 +109,25 @@ export function LabKategorieLista({ aktivna }: { aktivna?: string }) {
     if (!cil) return;
     if (el.scrollWidth <= el.clientWidth) return;
     el.scrollLeft = Math.max(0, cil.offsetLeft - (el.clientWidth - cil.offsetWidth) / 2);
-  }, [aktivna]);
+  }, [aktivna, skupiny]);
 
   return (
     <nav className="cat-rail" aria-label={t('Kategórie hradísk')}>
       <div className="cat-rail-pas" ref={pas} onPointerDown={stlacenie} onClickCapture={klik}>
-        {ROZCESTNIK_TYPY.map((p) => (
-          <Mini key={p.slug} slug={p.slug} label={p.label} aktivna={p.slug === aktivna} />
-        ))}
-
-        <span className="cat-rail-predel" aria-hidden="true" />
-
-        {ROZCESTNIK_PRAMENE.map((p) => (
-          <Mini key={p.slug} slug={p.slug} label={p.label} aktivna={p.slug === aktivna} />
+        {skupiny.map((s, i) => (
+          <Fragment key={s.id}>
+            {i > 0 && <span className="cat-rail-predel" aria-hidden="true" />}
+            {s.polozky.map((d) => (
+              <Mini
+                key={d.id}
+                d={d}
+                aktivna={d.slug === aktivna}
+                vzhlad={vzhlad}
+                rozriesene={rozriesene}
+                znacka={upravy && !bezZnaciek ? `lista:${d.slug}` : undefined}
+              />
+            ))}
+          </Fragment>
         ))}
       </div>
     </nav>

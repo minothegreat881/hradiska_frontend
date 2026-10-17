@@ -22,6 +22,8 @@ export function useBlogPosts(options?: {
   featured?: boolean;
   page?: number;
   pageSize?: number;
+  /** Radenie (Strapi `sort`); bez neho `publishedAt:desc` ako vždy. */
+  sort?: string;
 }) {
   const [posts, setPosts] = useState<ReturnType<typeof convertStrapiPostToArticle>[]>([]);
   const [pagination, setPagination] = useState<any>(null);
@@ -58,7 +60,7 @@ export function useBlogPosts(options?: {
     return () => {
       cancelled = true;
     };
-  }, [options?.categorySlug, options?.tagSlug, options?.featured, options?.page, options?.pageSize]);
+  }, [options?.categorySlug, options?.tagSlug, options?.featured, options?.page, options?.pageSize, options?.sort]);
 
   return { posts, pagination, loading, error };
 }

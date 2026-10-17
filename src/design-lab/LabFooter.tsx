@@ -21,58 +21,48 @@ import { t, odkaz, poAnglicky } from '../lib/jazyk';
  *   dole tichý služobný riadok oddelený vláskom. Jediná farebná vec je meď —
  *   krátky vrub v hornej hrane a to, čoho sa dotkneš. Namiesto ozdoby je
  *   v pozadí vrstevnicová kresba: tak vyzerá hradisko na mape.
+ *
+ * Stĺpce odkazov a siete sú vo vzhľade webu (`pata`); bez neho platí
+ * základný vzhľad = `data/pata.ts`. Popis združenia, služobný riadok a ikony
+ * sietí ostávajú v kóde.
  */
 
+import { Fragment } from 'react';
 import { openCookieSettings } from '../lib/consent';
+import { useVzhlad } from '../lib/vzhlad/VzhladContext';
+import { adresaCiela } from '../lib/vzhlad/citaj';
+import { textVzhladu } from '../lib/vzhlad/texty';
+import { vw } from '../lib/vzhlad/upravy';
+import type { DruhSiete } from '../lib/vzhlad/typy';
 
-/* Odkazy sú zámerne zopakované (nie importované z produkčnej pätičky) — lab
-   má ostať samostatný, aby sa v ňom dalo skúšať aj poradie a názvy. */
-const KATEGORIE = [
-  { href: '/category/kniezacie-sidla', label: 'Kniežacie sídla' },
-  { href: '/category/mocenske-centra', label: 'Mocenské centrá' },
-  { href: '/category/svatyne-a-sakralne-objekty', label: 'Svätyne' },
-  { href: '/category/vseobecne-o-hradiskach', label: 'Všeobecne o hradiskách' },
-];
-
-const CLANKY = [
-  { href: '/category/povesti', label: 'Povesti' },
-  { href: '/category/listiny-a-pisomne-zdroje', label: 'Listiny a pramene' },
-  { href: '/category/odborne-texty', label: 'Odborné texty' },
-  { href: '/category/3d-modely', label: '3D modely' },
-  { href: '/category/aktuality', label: 'Aktuality' },
-];
-
-const SOCIALS = [
-  {
+/** Ikony a mená sietí podľa druhu. Adresy sú vo vzhľade. */
+const SIETE: Record<DruhSiete, { label: string; path: string }> = {
+  facebook: {
     label: 'Facebook',
-    href: 'https://www.facebook.com/groups/118846781525141',
     path: 'M13.5 9H15V6.5h-1.9C10.9 6.5 10 7.9 10 9.6V11H8v2.5h2V21h2.7v-7.5h2l.3-2.5h-2.3V9.9c0-.6.2-.9.8-.9Z',
   },
-  {
+  instagram: {
     label: 'Instagram',
-    href: 'https://www.instagram.com/slovanske_hradiska/',
     path: 'M12 7.8A4.2 4.2 0 1 0 12 16.2 4.2 4.2 0 0 0 12 7.8Zm0 6.9a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4Zm5.4-7.1a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM20 8.3c0-1.4-.4-2.6-1.4-3.6S16.4 3.4 15 3.3C13.7 3.2 10.3 3.2 9 3.3c-1.4 0-2.6.4-3.6 1.4S4 6.9 3.9 8.3c-.1 1.4-.1 4.8 0 6.1 0 1.4.4 2.6 1.4 3.6s2.2 1.4 3.6 1.4c1.4.1 4.8.1 6.1 0 1.4 0 2.6-.4 3.6-1.4s1.4-2.2 1.4-3.6c.1-1.3.1-4.7 0-6.1Zm-1.8 7.6a2.7 2.7 0 0 1-1.5 1.5c-1.1.4-3.6.3-4.7.3s-3.7.1-4.7-.3a2.7 2.7 0 0 1-1.5-1.5c-.4-1.1-.3-3.6-.3-4.7s-.1-3.7.3-4.7A2.7 2.7 0 0 1 7.3 5c1.1-.4 3.6-.3 4.7-.3s3.7-.1 4.7.3a2.7 2.7 0 0 1 1.5 1.5c.4 1.1.3 3.6.3 4.7s.1 3.6-.3 4.7Z',
   },
-  {
+  youtube: {
     label: 'YouTube',
-    href: 'https://www.youtube.com/@ozhradiska3940',
     path: 'M21.6 8.2a2.5 2.5 0 0 0-1.8-1.8C18.2 6 12 6 12 6s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 8.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 3.8 2.5 2.5 0 0 0 1.8 1.8C5.8 18 12 18 12 18s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-3.8ZM10 15V9l5.2 3L10 15Z',
   },
-  {
+  email: {
     label: 'E-mail',
-    href: 'mailto:info@hradiska.sk',
     path: 'M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm8 7.2L4.8 7h14.4L12 12.2Zm0 1.9L5 8.6V17h14V8.6l-7 5.5Z',
   },
-];
+};
 
-function Col({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+function Col({ id, title, links, upravy }: { id: string; title: string; links: { href: string; label: string }[]; upravy: boolean }) {
   return (
-    <div className="lfoot-col">
-      <h3 className="lfoot-h">{t(title)}</h3>
+    <div className="lfoot-col" data-vw={vw(upravy, `pata:stlpec:${id}`)}>
+      <h3 className="lfoot-h">{title}</h3>
       <nav>
-        {links.map((l) => (
-          <a key={l.href + l.label} href={odkaz(l.href)}>
-            {t(l.label)}
+        {links.map((l, i) => (
+          <a key={l.href + l.label} href={l.href} data-vw={vw(upravy, `pata:odkaz:${id}:${i}`)}>
+            {l.label}
           </a>
         ))}
       </nav>
@@ -81,6 +71,15 @@ function Col({ title, links }: { title: string; links: { href: string; label: st
 }
 
 export function LabFooter() {
+  const { vzhlad, rozriesene, upravy } = useVzhlad();
+  /* Odkaz, ktorého cieľ už neexistuje (zmazaná kategória), sa vynechá. */
+  const stlpce = vzhlad.pata.stlpce.map((s) => ({
+    id: s.id,
+    title: textVzhladu(s.nadpis),
+    links: s.odkazy
+      .map((o) => ({ href: adresaCiela(o.ciel, rozriesene), label: textVzhladu(o.text) }))
+      .filter((l): l is { href: string; label: string } => !!l.href),
+  }));
   const scrollTop = () => {
     const reduce =
       typeof window !== 'undefined' &&
@@ -140,27 +139,35 @@ export function LabFooter() {
                 registra v roletke kategórií (`.lprh-znak`). */}
             <div className="lfoot-spodok">
             <div className="lfoot-soc">
-              {SOCIALS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  aria-label={s.label}
-                  {...(s.href.startsWith('http')
-                    ? { target: '_blank', rel: 'noopener noreferrer' }
-                    : {})}
-                >
-                  <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d={s.path} />
-                  </svg>
-                </a>
-              ))}
+              {vzhlad.pata.siete.map((s, i) => {
+                const ikona = SIETE[s.druh];
+                if (!ikona) return null;
+                return (
+                  <a
+                    key={`${i}:${s.druh}`}
+                    href={s.url}
+                    aria-label={ikona.label}
+                    {...(s.url.startsWith('http')
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                    data-vw={vw(upravy, `pata:siet:${s.druh}`)}
+                  >
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d={ikona.path} />
+                    </svg>
+                  </a>
+                );
+              })}
             </div>
             </div>
           </div>
 
           <div className="lfoot-cols">
-            <Col title={t('Kategórie')} links={KATEGORIE} />
-            <Col title={t('Články')} links={CLANKY} />
+            {stlpce.map((s) => (
+              <Fragment key={s.id}>
+                <Col id={s.id} title={s.title} links={s.links} upravy={upravy} />
+              </Fragment>
+            ))}
           </div>
         </div>
 

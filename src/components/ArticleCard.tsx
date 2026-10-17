@@ -24,6 +24,8 @@ interface ArticleCardProps {
    * obyčajný.
    */
   znak?: boolean;
+  /** Značka pre editor vzhľadu (`data-vw`); mimo režimu úprav sa nevykreslí. */
+  dataVw?: string;
 }
 
 // Fallback labely, ak Strapi nedodá display name kategórie (article.categoryName).
@@ -80,7 +82,7 @@ function prettifySlug(slug: string): string {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 }
 
-export function ArticleCard({ article, stitok = true, znak = false }: ArticleCardProps) {
+export function ArticleCard({ article, stitok = true, znak = false, dataVw }: ArticleCardProps) {
   /* Uložená fotka môže byť mŕtva adresa (v zozname aktualít ich pár je).
      Vtedy ostával v karte rozbitý obrázok — po zlyhaní nasadne kresba. */
   const [fotkaZlyhala, setFotkaZlyhala] = useState(false);
@@ -108,6 +110,7 @@ export function ArticleCard({ article, stitok = true, znak = false }: ArticleCar
       href={odkaz(`/blog/${article.slug}`)}
       className={znak ? 'acard acard--znak' : 'acard'}
       aria-label={stitok && categoryLabel ? `${article.title} — ${categoryLabel}` : article.title}
+      data-vw={dataVw}
     >
       {/* Obraz v zaoblenom ráme. Text naň nelezie, takže nepotrebuje závoj
           a fotka ostáva celá — to bol dôvod prestavby. */}

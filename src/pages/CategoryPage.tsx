@@ -1,48 +1,86 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArticleCard } from '../components/ArticleCard';
 import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
 import { Crown, Scroll } from 'lucide-react';
 import { Nacitavanie } from '../design-lab/Nacitavanie';
-import { t, kategoria, odkaz } from '../lib/jazyk';
+import { t, odkaz } from '../lib/jazyk';
 import LabKategorieLista from '../design-lab/LabKategorieLista';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { STRAPI_URL } from '../lib/api-adresa';
+import { useVzhlad } from '../lib/vzhlad/VzhladContext';
+import { vzhladKategorie, nazovKategorie, obrazokKategorie, zalohaObrazkaKategorie, clanokVJazyku } from '../lib/vzhlad/citaj';
+import { textVzhladu } from '../lib/vzhlad/texty';
+import { adresaObrazka, poziciaObrazka, jeSuborMedii } from '../lib/vzhlad/obrazky';
+import { vw } from '../lib/vzhlad/upravy';
+import type { ZoradenieClankov } from '../lib/vzhlad/typy';
 
 interface CategoryPageProps {
   categorySlug: string;
 }
 
+/** Zoradenie vzhľadu → `sort` pre Strapi. Predvolené je dnešné správanie. */
+const RADENIE: Record<ZoradenieClankov, string> = {
+  zverejnenie: 'publishedAt:desc',
+  'povodny-datum': 'originalPublishedDate:desc',
+  abecedne: 'title:asc',
+};
+
 export function CategoryPage({ categorySlug }: CategoryPageProps) {
-  // Kurátorské dáta ku kategórii (obrázok, popis). Predtým sa brali z `mock-data`,
-  // ktoré má neaktuálne slugy — pre `strazna-funkcia`, `3d-modely`, `odborne-texty`
-  // a ďalšie sa nenašla zhoda a hlavička padala na generickú Unsplash fotku.
-  const localCategory = hradiskaCategories.find(c => c.slug === categorySlug);
+  /* Kurátorské údaje ku kategórii (obrázok, popis, názov v jazykoch, radenie
+     a pripnuté články) sú vo vzhľade webu. Poradie zdrojov: vzhľad → kód
+     (základný vzhľad z `data/categories.ts`) → databáza — tak, aby sa bez
+     vzhľadu z API nezmenilo nič. Predtým sa brali z `mock-data`, ktoré má
+     neaktuálne slugy — pre `strazna-funkcia`, `3d-modely`, `odborne-texty`
+     a ďalšie sa nenašla zhoda a hlavička padala na generickú Unsplash fotku. */
+  const { vzhlad, rozriesene, upravy } = useVzhlad();
+  const vk = vzhladKategorie(vzhlad, rozriesene, categorySlug);
 
   // Fetch category from Strapi
   const { category: strapiCategory, loading: categoryLoading } = useCategory(categorySlug);
 
   // Fetch articles for this category from Strapi
+  const zoradenie = vk?.clanky.zoradenie ?? 'zverejnenie';
   const { posts: strapiArticles, loading: articlesLoading, error } = useBlogPosts({
     categorySlug: categorySlug,
     pageSize: 50,
+    sort: RADENIE[zoradenie],
   });
+
+  /* Obrázok z médií, ktorý sa nenačíta, vymení záložný obrázok kategórie.
+     Hlavička je CSS pozadie (nemá `onError`), preto sa súbor overí vopred. */
+  const obrazok = obrazokKategorie(vzhlad, rozriesene, categorySlug);
+  const adresa = adresaObrazka(obrazok, 'original', rozriesene);
+  const [zlyhal, setZlyhal] = useState<string | null>(null);
+  useEffect(() => {
+    if (!adresa || !jeSuborMedii(obrazok) || typeof Image === 'undefined') return;
+    let zrusene = false;
+    const skuska = new Image();
+    skuska.onerror = () => { if (!zrusene) setZlyhal(adresa); };
+    skuska.src = adresa;
+    return () => { zrusene = true; };
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [adresa]);
 
   const isLoading = categoryLoading || articlesLoading;
 
-  // Use Strapi category name if available, fallback to local
-  /* Kategórie v Strapi lokalizované nie sú — anglický názov drží prekladová
-     vrstva (`jazyk.ts`), rovnako ako v hlavičke a v omrvinkách. */
-  const categoryName = kategoria(strapiCategory?.name || localCategory?.label || categorySlug);
+  /* Kategórie v Strapi lokalizované nie sú — názov v jazyku stránky nesie
+     vzhľad (`nazov`), inak databáza cez prekladovú vrstvu (`jazyk.ts`),
+     rovnako ako v hlavičke a v omrvinkách; až potom názov z kódu. */
+  const categoryName = nazovKategorie(vzhlad, rozriesene, categorySlug, strapiCategory?.name);
   // Kurátorský popis má prednosť — je písaný podľa toho, čo v kategórii reálne je.
-  /* Popis kategórie je kurátorský text z `data/categories.ts`; anglické
-     znenie drží prekladová vrstva pod slovenským kľúčom. */
-  const categoryDescription = t(localCategory?.description || strapiCategory?.description || '');
-  // Obrázok je z článku v tej istej kategórii, servírovaný zo Strapi médií.
-  const categoryImage = localCategory ? `${STRAPI_URL}${localCategory.image}` : null;
-  const categoryIcon = localCategory?.icon || '📜';
+  /* Popis kategórie je kurátorský text vzhľadu; anglické znenie je v ňom
+     výslovne alebo ho drží prekladová vrstva pod slovenským kľúčom. */
+  const categoryDescription = vk?.popis?.sk ? textVzhladu(vk.popis) : t(strapiCategory?.description || '');
+  // Obrázok je z článku v tej istej kategórii (alebo kresba), servírovaný zo Strapi médií.
+  const categoryImage = zlyhal && zlyhal === adresa
+    ? adresaObrazka(zalohaObrazkaKategorie(categorySlug), 'original')
+    : adresa;
+  const vyrez = poziciaObrazka(obrazok) ?? 'center 42%';
+  /* Ikona prázdnej kategórie nie je súčasť vzhľadu — ostáva z kódu. */
+  const categoryIcon = hradiskaCategories.find(c => c.slug === categorySlug)?.icon || '📜';
 
   // Loading state
   if (isLoading) {
@@ -52,7 +90,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   }
 
   // If no category found in Strapi and no local category
-  if (!strapiCategory && !localCategory) {
+  if (!strapiCategory && !vk) {
     return (
       <div className="container py-24 text-center">
         <h1 className="text-stone-900 dark:text-stone-50 mb-4">{t('Kategória nebola nájdená')}</h1>
@@ -64,7 +102,16 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   }
 
   // Use Strapi articles, or empty array if error/none
-  const categoryArticles = strapiArticles || [];
+  /* Pripnuté články idú na začiatok v zadanom poradí; zvyšok podľa radenia.
+     Pripnutý článok, ktorý v jazyku stránky nie je, sa preskočí. */
+  const pripnute = (vk?.clanky.pripnute ?? []).filter((c) => !!clanokVJazyku(c, rozriesene));
+  const vsetky = strapiArticles || [];
+  const napred = pripnute
+    .map((c) => vsetky.find((a) => (c.dokument ? a.id === c.dokument : a.slug === c.slug)))
+    .filter((a): a is (typeof vsetky)[number] => !!a);
+  const categoryArticles = napred.length
+    ? [...napred, ...vsetky.filter((a) => !napred.includes(a))]
+    : vsetky;
 
   /* Skúška zatiaľ len pre jednu kategóriu: karty aj titulná fotografia
      dostanú prekrížené kopije a výraznejšie priblíženie pod kurzorom.
@@ -73,7 +120,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   const skusobnyZnak = categorySlug === 'strazna-funkcia';
 
   return (
-    <div className="min-h-screen parchment">
+    <div className="min-h-screen parchment" data-vw-upravy={upravy ? '1' : undefined}>
       {/* Tá istá lišta kategórií ako na začiatku článku. Na stránke kategórie
           je to jediná cesta k súrodencom bez vracania sa na domovskú —
           otvorená kategória je v nej zvýraznená. */}
@@ -83,7 +130,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
       <section className="relative overflow-hidden">
         <div className="container relative" style={{ paddingTop: 22, paddingBottom: 40 }}>
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={upravy ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
@@ -114,12 +161,13 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   position: 'absolute',
                   inset: 0,
                   background: categoryImage
-                    ? `url("${categoryImage}") center 42% / cover no-repeat`
+                    ? `url("${categoryImage}") ${vyrez} / cover no-repeat`
                     : 'var(--ch-fallback)',
                   backgroundColor: 'var(--ch-fallback)',
                 }}
                 role="img"
                 aria-label={categoryName}
+                data-vw={vw(upravy, 'kategoria:obrazok')}
               />
               {/* Zlatý rám. Scrim ani vignette tu už nie sú — kryli kresbu
                   kvôli textu, ktorý na fotke nestojí. */}
@@ -141,9 +189,9 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                 celá. */}
             <div className="cat-uvod">
               <span className="cat-uvod-linka" aria-hidden="true" />
-              <h1 className="cat-uvod-titul">{categoryName}</h1>
+              <h1 className="cat-uvod-titul" data-vw={vw(upravy, 'kategoria:nazov')}>{categoryName}</h1>
               {categoryDescription && (
-                <p className="cat-uvod-popis">{categoryDescription}</p>
+                <p className="cat-uvod-popis" data-vw={vw(upravy, 'kategoria:popis')}>{categoryDescription}</p>
               )}
             </div>
           </motion.div>
@@ -156,7 +204,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
           <div className="flex items-center justify-center gap-4">
             <motion.div
               className="h-px flex-1 bg-gradient-to-r from-transparent to-amber-700/40"
-              initial={{ scaleX: 0 }}
+              initial={upravy ? false : { scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
@@ -164,7 +212,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
             <Scroll className="w-6 h-6 text-amber-700/60 dark:text-amber-500/60" />
             <motion.div
               className="h-px flex-1 bg-gradient-to-l from-transparent to-amber-700/40"
-              initial={{ scaleX: 0 }}
+              initial={upravy ? false : { scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
@@ -249,8 +297,8 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   oneskorenie — 20. dlaždica čakala 2 s, 40. štyri sekundy. Pri kategórii so 45
                   článkami to pôsobilo, že sa stránka donekonečna načítava. Zoznam sa má dať
                   prezerať naraz, nie sa odhaľovať. */}
-              {categoryArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} stitok={false} znak={skusobnyZnak} />
+              {categoryArticles.map((article, i) => (
+                <ArticleCard key={article.id} article={article} stitok={false} znak={skusobnyZnak} dataVw={vw(upravy, `kategoria:clanok:${i}`)} />
               ))}
             </div>
           </div>
@@ -317,7 +365,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
       <div className="relative py-12">
         <div className="container">
           <motion.div
-            initial={{ scaleX: 0 }}
+            initial={upravy ? false : { scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1 }}

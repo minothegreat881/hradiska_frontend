@@ -21,31 +21,25 @@
  *   Citát nestojí na konci, kde ho nikto nedočítal — je hneď pod nadpisom
  *   a je jediné farebné miesto sekcie. Jediný rám ostáva okolo formulára;
  *   e-mail je vlásková linka so šípkou, nie ďalšia karta.
+ *
+ * Texty, e-mail a prosby sú vo vzhľade webu (`domov.pridajteSa`); bez neho
+ * platí základný vzhľad = text z `data/domovska.ts`. Sekcia sa dá skryť,
+ * nie presunúť — je vždy posledná. Formulár ostáva v kóde (nič neodosiela).
  */
 
 import { useState } from 'react';
 import { t } from '../lib/jazyk';
-
-const CONTACT_EMAIL = 'info@hradiska.sk';
+import { useVzhlad } from '../lib/vzhlad/VzhladContext';
+import { textVzhladu } from '../lib/vzhlad/texty';
+import { vw, vwSkryte } from '../lib/vzhlad/upravy';
 
 type FieldErrors = Partial<Record<'name' | 'email' | 'message', string>>;
 
-const ASKS = [
-  {
-    t: 'Valy a opevnenia',
-    d: 'Zábery na valy, pozostatky opevnení, budov a podobne — najmä pri hradiskách, na ktorých som ešte nebol a ku ktorým preto nemám žiadne fotky.',
-  },
-  {
-    t: 'Nálezy v zahraničí',
-    d: 'Slovanské nálezy v Maďarsku a Rakúsku — múzeá vo Visegráde, Novohrade, Ostrihome či Zalavári. Šperky, zbrane, črepy a podobne.',
-  },
-  {
-    t: 'Máte doma nález?',
-    d: 'Platí to aj pre náhodných nálezcov, ktorí majú v pivnici či na povale zaujímavé nálezy, na ktoré len sadá prach a s ktorými sa boja oficiálne pochváliť. Urobiť fotku, napísať, kde sa nález našiel, a poslať to na mail sa predsa dá.',
-  },
-];
-
 export function LabJoinUs() {
+  const { vzhlad, upravy } = useVzhlad();
+  const p = vzhlad.domov.pridajteSa;
+  const CONTACT_EMAIL = p.email;
+  const ASKS = p.prosby;
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [sent, setSent] = useState(false);
@@ -70,8 +64,10 @@ export function LabJoinUs() {
 
   const clear = (k: keyof FieldErrors) => { if (errors[k]) setErrors({ ...errors, [k]: undefined }); };
 
+  if (!p.viditelna && !upravy) return null;
+
   return (
-    <section className="ljoin">
+    <section className="ljoin" data-vw={vw(upravy, 'pridajte-sa')} data-vw-skryte={vwSkryte(upravy, !p.viditelna)}>
       <div className="ljoin-wrap">
         {/* ── Prvý pohyb: dôvod × formulár ────────────────────────────── */}
         <div className="ljoin-top">
@@ -86,19 +82,19 @@ export function LabJoinUs() {
               <img src="/znak_minca.png" alt="" aria-hidden="true" width={160} height={178} loading="lazy" decoding="async" />
             </picture>
 
-            <span className="ljoin-eyebrow">{t('Buďme hrdí na naše dejiny')}</span>
-            <h2 className="ljoin-title">{t('Staňte sa našimi spolupracovníkmi')}</h2>
+            <span className="ljoin-eyebrow" data-vw={vw(upravy, 'pridajte-sa:nadtitulok')}>{textVzhladu(p.nadtitulok)}</span>
+            <h2 className="ljoin-title" data-vw={vw(upravy, 'pridajte-sa:nadpis')}>{textVzhladu(p.nadpis)}</h2>
 
             {/* Najsilnejšia veta sekcie. Na konci ju nemal kto dočítať. */}
-            <blockquote className="ljoin-quote">
-              {t('Možno sami neviete, aké poklady vlastníte.')}
+            <blockquote className="ljoin-quote" data-vw={vw(upravy, 'pridajte-sa:citat')}>
+              {textVzhladu(p.citat)}
             </blockquote>
 
-            <p className="ljoin-lead">
-              {t('Aj vy sa môžete podieľať na zveľaďovaní našej stránky. Ak máte doma zaujímavé fotografie z hradísk alebo obrázky a fotky nálezov, stačí sa s nami o ne podeliť — každý záber pomáha dopĺňať náš spoločný obraz o dávnej minulosti.')}
+            <p className="ljoin-lead" data-vw={vw(upravy, 'pridajte-sa:uvod')}>
+              {textVzhladu(p.uvod)}
             </p>
 
-            <a className="ljoin-mail" href={`mailto:${CONTACT_EMAIL}`}>
+            <a className="ljoin-mail" href={`mailto:${CONTACT_EMAIL}`} data-vw={vw(upravy, 'pridajte-sa:email')}>
               <span className="ljoin-mail-txt">
                 <span className="ljoin-mail-lbl">{t('Pošlite fotky na')}</span>
                 <strong>{CONTACT_EMAIL}</strong>
@@ -171,10 +167,10 @@ export function LabJoinUs() {
           </div>
           <div className="ljoin-ask-grid">
             {ASKS.map((a, i) => (
-              <article className="ljoin-ask" key={a.t}>
+              <article className="ljoin-ask" key={`${i}:${a.nadpis.sk}`} data-vw={vw(upravy, `pridajte-sa:prosba:${i}`)}>
                 <span className="ljoin-num" aria-hidden="true">{i + 1}</span>
-                <h3 className="ljoin-ask-t">{t(a.t)}</h3>
-                <p className="ljoin-ask-d">{t(a.d)}</p>
+                <h3 className="ljoin-ask-t">{textVzhladu(a.nadpis)}</h3>
+                <p className="ljoin-ask-d">{textVzhladu(a.text)}</p>
               </article>
             ))}
           </div>

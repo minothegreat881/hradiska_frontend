@@ -41,6 +41,23 @@ import { initConsent } from './lib/consent';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
 import { zapojSchranku } from './nativne/schranka';
+/* Vzhľad webu (dlaždice, sekcie domovskej, menu, päta…) — vložený do HTML
+   pri builde, inak základný z kódu; hneď potom sa stiahne zverejnený. */
+import { VzhladProvider } from './lib/vzhlad/VzhladContext';
+import { ADMIN_TOKEN_KEY } from './lib/preview';
+
+/* „Upraviť túto stránku" — sťahuje sa len vtedy, keď je v prehliadači
+   prihlásenie do administrácie. Návštevník z neho nedostane nič. */
+const UpravitStranku = lazyStale(() => import('./lib/vzhlad/UpravitStranku').then(m => ({ default: m.UpravitStranku })));
+
+/** Je v prehliadači uložené prihlásenie do administrácie? (Platnosť overí až administrácia.) */
+function maPrihlasenieAdmina(): boolean {
+  try {
+    return !!window.localStorage.getItem(ADMIN_TOKEN_KEY);
+  } catch {
+    return false;
+  }
+}
 
 // Admin je lazy — návštevník webu ho nikdy nestiahne, nezväčšuje hlavný bundle.
 const AdminApp = lazyStale(() => import('./admin/AdminApp'));
@@ -156,6 +173,7 @@ function App() {
   const [accountMode, setAccountMode] = useState<AccountMode>(uvod.accountMode ?? 'login');
   const [params, setParams] = useState<Record<string, string>>(uvod.params);
   const [pathname, setPathname] = useState(window.location.pathname);
+  const [redaktor] = useState(maPrihlasenieAdmina);
   // true on initial load and browser back/forward (restore old scroll position),
   // false right after a link click (that already scrolls to top itself).
   const [restoreScroll, setRestoreScroll] = useState(true);
@@ -323,6 +341,7 @@ function App() {
        celý šat zapuzdrený — premenovať ju by znamenalo prepísať vyše dvoch
        tisíc riadkov CSS bez toho, aby sa čokoľvek zmenilo na obrazovke.
        Starý zlatohnedý šat je v značke `stary-sat-2026-08-18`. */
+    <VzhladProvider>
     <div className="min-h-screen lab" data-theme="pecat">
       <LabNav />
 
@@ -359,7 +378,14 @@ function App() {
 
       {/* PWA — ponuka „Nainštalovať appku" (až po zapojení a cookie lište) */}
       <InstallPrompt />
+
+      {redaktor && (
+        <Suspense fallback={null}>
+          <UpravitStranku route={route} slug={params.slug} />
+        </Suspense>
+      )}
     </div>
+    </VzhladProvider>
   );
 }
 

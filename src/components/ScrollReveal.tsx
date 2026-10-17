@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'motion/react';
 import { useRef, ReactNode } from 'react';
+import { useEditMode } from './EditModeContext';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -18,6 +19,9 @@ export function ScrollReveal({
 }: ScrollRevealProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  /* Na plátne editora (vzhľad webu) sa nezjavuje — v iframe by sa pozorovanie
+     nespustilo a obsah by ostal priehľadný. Na webe je to vždy `false`. */
+  const naPlatne = useEditMode();
 
   const variants = {
     up: { y: 50, opacity: 0 },
@@ -32,8 +36,8 @@ export function ScrollReveal({
   return (
     <motion.div
       ref={ref}
-      initial={initial}
-      animate={isInView ? { x: 0, y: 0, opacity: 1, scale: 1 } : initial}
+      initial={naPlatne ? false : initial}
+      animate={isInView || naPlatne ? { x: 0, y: 0, opacity: 1, scale: 1 } : initial}
       transition={{ 
         duration: 0.6, 
         delay, 

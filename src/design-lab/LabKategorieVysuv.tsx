@@ -20,6 +20,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import LabKategorieLista from './LabKategorieLista';
+import { useUpravy } from '../lib/vzhlad/VzhladContext';
 
 /** Odkiaľ vyššie má zmysel ponúkať rozcestník. */
 const PRAH = 420;
@@ -27,6 +28,10 @@ const PRAH = 420;
 const CHVENIE = 6;
 
 export function LabKategorieVysuv() {
+  /* Skupiny a dlaždice sú tie isté ako na domovskej — kreslí ich
+     `LabKategorieLista` z vzhľadu webu. Na plátne editora sa lišta nevysúva:
+     prekrývala by stránku, ktorú redaktor práve upravuje. */
+  const upravy = useUpravy();
   const [vidno, setVidno] = useState(false);
   /* Hlavička je `sticky`, nie `fixed`, takže jej výšku treba odmerať —
      lišta sa musí zavesiť presne pod ňu, nie ju prekryť. */
@@ -49,6 +54,7 @@ export function LabKategorieVysuv() {
   }, []);
 
   useEffect(() => {
+    if (upravy) return;
     posledny.current = window.scrollY;
 
     const vyhodnot = () => {
@@ -72,7 +78,7 @@ export function LabKategorieVysuv() {
 
     window.addEventListener('scroll', naPosun, { passive: true });
     return () => window.removeEventListener('scroll', naPosun);
-  }, []);
+  }, [upravy]);
 
   /* Kategória, v ktorej človek je — na stránke kategórie ju lišta zvýrazní.
      Čítame ju pri každom vysunutí, nie raz na začiatku: web prepína stránky
@@ -89,7 +95,7 @@ export function LabKategorieVysuv() {
       /* Skrytú lištu vyraďuje z klikania aj z tabulátora `visibility: hidden`
          v CSS — spoľahlivejšie než `inert`, ktorý React 18 ešte nepozná. */
     >
-      <LabKategorieLista aktivna={aktivna} />
+      <LabKategorieLista aktivna={aktivna} bezZnaciek />
     </div>
   );
 }

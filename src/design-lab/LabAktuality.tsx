@@ -19,23 +19,27 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { poSlovensky, odkaz, t, poAnglicky, datum } from '../lib/jazyk';
+import { poSlovensky, odkaz, t, datum, jazyk } from '../lib/jazyk';
 import {
   getBlogPosts, getDomovskaGaleria, getKronikaAll, getKronikaIntro, getKronikaPhotos,
-  getStrapiImageUrl, KRONIKA_INTRO_SLUG, KronikaItem, KronikaPhoto, StrapiImage,
+  getStrapiImageUrl, KronikaItem, KronikaPhoto, StrapiImage,
 } from '../lib/strapi';
-import { hradiskaCategories, variant } from '../data/categories';
-import { zakladStrapi } from '../data/rozcestnik';
+import { useVzhlad } from '../lib/vzhlad/VzhladContext';
+import { clanokVJazyku, sekcia as najdiSekciu } from '../lib/vzhlad/citaj';
+import { adresaObrazka, jeSuborMedii, priChybeVymen } from '../lib/vzhlad/obrazky';
+import { ZAKLADNY_VZHLAD } from '../lib/vzhlad/zakladny';
+import { vw, vwSkryte } from '../lib/vzhlad/upravy';
+import type { SekciaDomov } from '../lib/vzhlad/typy';
 
-/* Obraz v ľavom hornom bloku sekcie. Kresba strážnej a hospodárskej funkcie
-   z toho istého zoznamu, z ktorého žijú dlaždice na domovskej — keď sa tam
-   obrázok vymení, vymení sa aj tu. */
-const obrazokSekcie = (() => {
-  const k = hradiskaCategories.find((c) => c.slug === 'strazna-funkcia');
-  /* `medium` stačí: obraz má v sekcii okolo 400 px, `large` znamenal
-     116 kB navyše na každej domovskej stránke. */
-  return k ? `${zakladStrapi()}${variant(k.image, 'medium')}` : '/logo_hradiska_full.png';
-})();
+type SekciaKroniky = Extract<SekciaDomov, { typ: 'kronika' }>;
+
+/* Obraz v ľavom hornom bloku sekcie. Dnes kresba strážnej a hospodárskej
+   funkcie — v základnom vzhľade je to ten istý súbor, z ktorého žije jej
+   dlaždica na domovskej. Vzhľad ho môže vymeniť (`obrazok` sekcie kroniky).
+   `medium` stačí: obraz má v sekcii okolo 400 px, `large` znamenal 116 kB
+   navyše na každej domovskej stránke. */
+const ZALOHA_OBRAZKA = (ZAKLADNY_VZHLAD.domov.sekcie.find((s) => s.typ === 'kronika') as SekciaKroniky | undefined)?.obrazok ?? null;
+const BEZ_OBRAZKA = '/logo_hradiska_full.png';
 
 const GOLD_GRAD = 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent))';
 const GLASS: React.CSSProperties = {
@@ -119,7 +123,20 @@ function StepButton({ dir, disabled, onClick }: { dir: 'prev' | 'next'; disabled
   );
 }
 
-export default function LabAktuality() {
+export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKroniky } = {}) {
+  const { vzhlad, rozriesene, upravy } = useVzhlad();
+  const sekcia = zadana ?? najdiSekciu(vzhlad, 'kronika');
+  const j = jazyk();
+
+  /* Úvodný článok. Vzhľad z API ho pozná cez `documentId`, takže má slug
+     v jazyku stránky. Základný vzhľad pozná len slovenský slug a hľadá sa
+     ním ako doteraz (v angličtine a nemčine sa preto nenájde a na jeho mieste
+     ostane pozvánka do kroniky). `null` = sekcia je bez úvodného článku. */
+  const uvodny = sekcia?.uvodnyClanok ?? null;
+  const uvodVJazyku = clanokVJazyku(uvodny, rozriesene, j);
+  const slugUvodu = uvodVJazyku ? uvodVJazyku.slug : '';
+  const dokumentUvodu = uvodVJazyku?.dokument ?? null;
+
   const [items, setItems] = useState<KronikaItem[]>([]);
   const [intro, setIntro] = useState<KronikaItem | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'empty' | 'error'>('loading');
@@ -143,9 +160,18 @@ export default function LabAktuality() {
 
   useEffect(() => {
     let cancelled = false;
-    getKronikaIntro().then(i => { if (!cancelled) setIntro(i); }).catch(() => {});
+    setIntro(null);
+    if (!slugUvodu) return;
+    getKronikaIntro(slugUvodu).then(i => { if (!cancelled) setIntro(i); }).catch(() => {});
     return () => { cancelled = true; };
-  }, []);
+  }, [slugUvodu]);
+
+  /* Vybraná fotogaléria. Verejný web ju berie z databázy (`domovska-galeria`,
+     zverejnenie vzhľadu do nej zapisuje). Na plátne editora sa ukazuje výber
+     z konceptu — ten v databáze ešte nie je. */
+  const fotkyKonceptu = upravy ? vzhlad.domov.fotogaleria?.fotky ?? null : null;
+  const klucKonceptu = fotkyKonceptu ? fotkyKonceptu.join(',') : '';
+  const fotogaleriaVidno = sekcia ? sekcia.fotogaleriaViditelna : true;
 
   /**
    * Počet článkov. Doťahuje sa naživo, aby nezostaral — číslo v štatistike
@@ -169,7 +195,12 @@ export default function LabAktuality() {
     let cancelled = false;
 
     const load = async () => {
-      const cur = await getDomovskaGaleria();
+      const cur = klucKonceptu
+        ? klucKonceptu.split(',').map((id) => rozriesene.subory[id]).filter(Boolean).map((f): StrapiImage => ({
+            id: f.id, url: f.url, width: f.width ?? 0, height: f.height ?? 0,
+            alternativeText: f.alt ?? undefined, caption: undefined, formats: f.formats,
+          }))
+        : await getDomovskaGaleria();
       if (cancelled) return;
       if (cur.length) {
         setCurated(cur);
@@ -207,7 +238,7 @@ export default function LabAktuality() {
 
        `uzkaObrazovka` je tu kvôli doplnkovej dlaždici: pri zúžení okna
        treba dotiahnuť tú siedmu fotku, inak by mozaika ostala kratšia. */
-  }, [state, uzkaObrazovka]);
+  }, [state, uzkaObrazovka, klucKonceptu, fotogaleriaVidno]);
 
   useEffect(() => {
     let cancelled = false;
@@ -226,29 +257,41 @@ export default function LabAktuality() {
     return () => { cancelled = true; };
   }, []);
 
-  /* Prvé štyri zápisy sú pripnuté ručne. Pás je to prvé, čo z kroniky vidno,
-     a čisto podľa dátumu sa naň dostali zápisy bez použiteľnej fotografie —
-     karta potom ukazuje len vodoznak značky. Poradie je redakčné rozhodnutie,
-     nie chyba radenia.
+  /* Prvé zápisy sú pripnuté ručne (vzhľad, `pripnute`). Pás je to prvé, čo
+     z kroniky vidno, a čisto podľa dátumu sa naň dostali zápisy bez
+     použiteľnej fotografie — karta potom ukazuje len vodoznak značky. Poradie
+     je redakčné rozhodnutie, nie chyba radenia.
 
-     Zvyšok ide ďalej podľa dátumu, od najnovšieho. Slug, ktorý sa v kronike
-     nenájde, sa proste preskočí — zoznam tak prežije aj premenovanie. */
-  const PRIPNUTE = [
-    '2-pre-hradiska-v-roku-2025',
-    'danuvina-alacris-opat-na-vodach-dunaja',
-    'bronzovy-poklad-z-hradiska-na-strednom-povazi',
-    'vyprava-polske-hradiska-3-gdansk-a-owidz',
-  ];
+     Zvyšok ide ďalej podľa dátumu, od najnovšieho. Zápis, ktorý sa v kronike
+     nenájde (premenovaný, v jazyku stránky nie je), sa proste preskočí.
+     Vzhľad z API pripína podľa `documentId` — ten je rovnaký vo všetkých
+     jazykoch, takže pripnutie platí aj v angličtine a nemčine. Základný
+     vzhľad pripína podľa slovenského slugu ako doteraz. */
+  const pripnute = (sekcia?.pripnute ?? []).filter((c) => !!clanokVJazyku(c, rozriesene, j));
+  const klucPripnutych = JSON.stringify([pripnute, dokumentUvodu, uvodny?.slug ?? '']);
 
   const stripItems = useMemo(() => {
-    const bezUvodu = items.filter(it => it.slug !== KRONIKA_INTRO_SLUG);
-    const napred = PRIPNUTE
-      .map(slug => bezUvodu.find(it => it.slug === slug))
+    const bezUvodu = items.filter(it => (dokumentUvodu ? it.documentId !== dokumentUvodu : it.slug !== uvodny?.slug));
+    const napred = pripnute
+      .map(c => bezUvodu.find(it => (c.dokument ? it.documentId === c.dokument : it.slug === c.slug)))
       .filter((it): it is KronikaItem => !!it);
-    const uzTam = new Set(napred.map(it => it.slug));
-    return [...napred, ...bezUvodu.filter(it => !uzTam.has(it.slug))];
+    const uzTam = new Set(napred.map(it => it.documentId));
+    return [...napred, ...bezUvodu.filter(it => !uzTam.has(it.documentId))];
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [items]);
+  }, [items, klucPripnutych]);
+  /* Koľko kariet na začiatku pásu je pripnutých — len pre značky editora. */
+  const pocetPripnutych = useMemo(() => {
+    const bezUvodu = items.filter(it => (dokumentUvodu ? it.documentId !== dokumentUvodu : it.slug !== uvodny?.slug));
+    return pripnute.filter(c => bezUvodu.some(it => (c.dokument ? it.documentId === c.dokument : it.slug === c.slug))).length;
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [items, klucPripnutych]);
+
+  /* Obraz v ľavom bloku: z vzhľadu, keď jeho súbor chýba, zo základného. */
+  const vlastnyObrazok = sekcia?.obrazok ?? null;
+  const obrazokSekcie = (sekcia && sekcia.obrazok === null)
+    ? BEZ_OBRAZKA
+    : adresaObrazka(vlastnyObrazok, 'medium', rozriesene) ?? adresaObrazka(ZALOHA_OBRAZKA, 'medium') ?? BEZ_OBRAZKA;
+  const zalohaSekcie = jeSuborMedii(vlastnyObrazok) ? adresaObrazka(ZALOHA_OBRAZKA, 'medium') : null;
 
   /** Jediné miesto, kde sa číta stav pásu — volá sa pri posune aj po načítaní. */
   const readStrip = useCallback(() => {
@@ -329,6 +372,7 @@ export default function LabAktuality() {
     return GALLERY_FALLBACK.map(g => ({ src: g.src, full: g.src, alt: '', place: g.place ?? '', fileId: undefined }));
   }, [curated, photos, pocetDlazdic]);
 
+  if (!sekcia) return null;
   if (state === 'error' || state === 'empty') return null;
 
   /* Krajné roky osi sa čítajú z DÁTUMOV, nie z prvej a poslednej karty.
@@ -343,7 +387,7 @@ export default function LabAktuality() {
   const osFill = 6 + progress * 94;
 
   return (
-    <section className="lakv" style={{ padding: '64px 0 72px' }}>
+    <section className="lakv" style={{ padding: '64px 0 72px' }} data-vw={vw(upravy, `sekcia:${sekcia.id}`)} data-vw-skryte={vwSkryte(upravy, !sekcia.viditelna)}>
       <div className="container" style={{ maxWidth: 1104 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24, marginBottom: 26 }}>
           <div>
@@ -360,7 +404,7 @@ export default function LabAktuality() {
 
         {/* horný rad: kresba + pripnutý zápis */}
         <div className="lakv-top" style={{ marginBottom: 30 }}>
-          <div className="lakv-logo" style={{ position: 'relative', aspectRatio: '900 / 886', alignSelf: 'start', borderRadius: 30, overflow: 'hidden', border: '1px solid var(--hr-line-soft)', background: 'radial-gradient(ellipse at 50% 38%, var(--hr-wash-1) 0%, var(--hr-wash-2) 55%, var(--hr-wash-3) 100%)', boxShadow: '0 24px 56px -26px rgba(40,26,10,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="lakv-logo" style={{ position: 'relative', aspectRatio: '900 / 886', alignSelf: 'start', borderRadius: 30, overflow: 'hidden', border: '1px solid var(--hr-line-soft)', background: 'radial-gradient(ellipse at 50% 38%, var(--hr-wash-1) 0%, var(--hr-wash-2) 55%, var(--hr-wash-3) 100%)', boxShadow: '0 24px 56px -26px rgba(40,26,10,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} data-vw={vw(upravy, 'kronika:obrazok')}>
             {/* Kresba strážnej a hospodárskej funkcie namiesto loga. Berie sa
                 zo zoznamu kategórií, takže keď sa tam obrázok vymení, vymení
                 sa aj tu. */}
@@ -371,11 +415,17 @@ export default function LabAktuality() {
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               loading="lazy"
               decoding="async"
+              onError={priChybeVymen(zalohaSekcie ? { src: zalohaSekcie } : null)}
             />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <a href={intro ? odkaz(`/blog/${intro.slug}`) : odkaz('/aktuality')} className="lakv-tile lakv-pinned">
+            {/* Pozvánka do kroniky stojí na mieste úvodného článku, keď sa
+                nenašiel podľa slovenského slugu (základný vzhľad v cudzom
+                jazyku — tak to bolo vždy). Článok, ktorý vzhľad z API pozná,
+                ale v jazyku stránky nie je, sa vynechá celý. */}
+            {(uvodny && (uvodVJazyku || !uvodny.dokument)) && (
+            <a href={intro ? odkaz(`/blog/${intro.slug}`) : odkaz('/aktuality')} className="lakv-tile lakv-pinned" data-vw={vw(upravy, 'kronika:uvod')}>
               <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 36, fontWeight: 700, color: 'var(--hr-ink)', lineHeight: 1.04, marginBottom: 12, letterSpacing: '-.02em' }}>
                 {intro?.title ?? t('Prečo to vlastne robím')}
               </span>
@@ -393,6 +443,7 @@ export default function LabAktuality() {
                 {t('ČÍTAŤ CELÉ')} <span style={{ fontSize: 14 }}>→</span>
               </span>
             </a>
+            )}
 
             <div className="lakv-stats">
               {[
@@ -430,8 +481,8 @@ export default function LabAktuality() {
           data-at-start={edges.start ? 'true' : 'false'}
           data-at-end={edges.end ? 'true' : 'false'}
         >
-          {stripItems.map(item => (
-            <a key={item.documentId} href={odkaz(`/blog/${item.slug}`)} className="lakv-tile lakv-card">
+          {stripItems.map((item, poradie) => (
+            <a key={item.documentId} href={odkaz(`/blog/${item.slug}`)} className="lakv-tile lakv-card" data-vw={vw(upravy && poradie < pocetPripnutych, `kronika:pripnuty:${poradie}`)}>
               {item.coverUrl ? (
                 <img src={item.coverUrl} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -495,12 +546,15 @@ export default function LabAktuality() {
           <span className="lakv-year lakv-year-old">{yearOldest}</span>
         </div>
 
-        {/* vybraná fotogaléria */}
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
+        {/* vybraná fotogaléria — dá sa skryť (`fotogaleriaViditelna`) */}
+        {(fotogaleriaVidno || upravy) && (
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }} data-vw-skryte={vwSkryte(upravy, !fotogaleriaVidno)}>
           <span className="lakv-label">{t('VYBRANÁ FOTOGALÉRIA')}</span>
           <a href={odkaz('/galeria')} className="lakv-more">{t('CELÁ GALÉRIA')} →</a>
         </div>
-        <div ref={galleryRef} className="lakv-gal">
+        )}
+        {(fotogaleriaVidno || upravy) && (
+        <div ref={galleryRef} className="lakv-gal" data-vw={vw(upravy, 'kronika:fotogaleria')} data-vw-skryte={vwSkryte(upravy, !fotogaleriaVidno)}>
           {galleryTiles.map((g, i) => (
             <a
               key={g.src}
@@ -518,6 +572,7 @@ export default function LabAktuality() {
             </a>
           ))}
         </div>
+        )}
       </div>
     </section>
   );

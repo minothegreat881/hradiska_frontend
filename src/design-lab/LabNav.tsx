@@ -1,4 +1,4 @@
-import { poNemecky, poSlovensky, t, kategoria, odkaz, poAnglicky, rozdelAdresu, druhyJazyk, odkazDoJazyka, sledujDruhyOdkaz, dajDruhyOdkaz } from '../lib/jazyk';
+import { poSlovensky, t, kategoria, odkaz, rozdelAdresu, druhyJazyk, odkazDoJazyka, sledujDruhyOdkaz, dajDruhyOdkaz } from '../lib/jazyk';
 'use client';
 
 /**
@@ -30,65 +30,47 @@ import {
   MegaPonuka, Prepinac, Skupiny, zoskup, lokalityKategorie, useClankyKategorie,
   type Zoskupenie,
 } from './LabPrehlad';
+import { useVzhlad } from '../lib/vzhlad/VzhladContext';
+import { vzhladKategorie, hlavnyRiadokMenu, skryteVMenu, poradieMenu } from '../lib/vzhlad/citaj';
+import { textVzhladu, lenVyslovny } from '../lib/vzhlad/texty';
+import { vw, vwSkryte } from '../lib/vzhlad/upravy';
+import type { Rozriesene, Vzhlad } from '../lib/vzhlad/typy';
 
-/**
- * Delenie kategórií. Pôvodná lišta ho už používala, len ho nedávala najavo —
- * oba riadky vyzerali rovnako, takže 14 položiek pôsobilo ako stena. Tu každý
- * riadok dostal tichý názov, čím sa z hromady stane štruktúra:
- *   riadok 1 — TYPY HRADÍSK (podľa funkcie sídla)
- *   riadok 2 — ĎALŠÍ OBSAH (pramene, texty, modely, dianie)
+/*
+ * Delenie kategórií a krátke názvy sú vo vzhľade webu (`menu`, záznamy
+ * kategórií `popisokMenu`); bez neho platí základný vzhľad = `data/menu.ts`.
+ *   riadok 1 — TYPY HRADÍSK (podľa funkcie sídla), `menu.hlavnyRiadok`
+ *   riadok 2 — ĎALŠÍ OBSAH (pramene, texty, modely, dianie), všetko ostatné
+ * Kategórie v `menu.skryte` (dnes „Ostatné" s nulou článkov) v lište nie sú.
+ *
+ * PORADIE je ďalej z databázy (`blog-category.order`) — zverejnenie vzhľadu
+ * ho tam zapíše, takže ho vidia aj staré verzie webu a appka. Len na plátne
+ * editora sa kreslí navrhované poradie z konceptu (`menu.poradie`).
  */
-const PRIMARY_SLUGS = new Set([
-  'kniezacie-sidla', 'mocenske-centra', 'strazna-funkcia',
-  'refugia', 'staroveke-sidla', 'vseobecne-o-hradiskach',
-]);
-// „Ostatné" má 0 článkov — v lište nemá čo robiť (rovnako ako v pôvodnej).
-const EXCLUDE_SLUGS = new Set(['ostatne']);
 const catSlug = (i: NavigationItem) => (i.slug || '').replace('/category/', '').replace(/^\//, '');
 
 /**
- * Skrátené názvy PRE LIŠTU. Plné znenie ostáva všade inde — v roletke, na
+ * Skrátený názov PRE LIŠTU. Plné znenie ostáva všade inde — v roletke, na
  * stránke kategórie aj v pätičke; tu ide len o to, aby sa rad zmestil na jeden
- * riadok. „Strážna a hospodárska funkcia" a „Všeobecne o hradiskách" spolu
- * zaberali skoro 200 px, čo stačilo na to, aby posledná kategória vypadla
- * mimo obrazovku bez akéhokoľvek náznaku, že tam ešte niečo je.
+ * riadok. Krátky názov je výslovný pre každý jazyk (doslovný preklad slovenskej
+ * skratky — „Všeobecne" → „Allgemein" — by nedával zmysel); kde chýba, ostáva
+ * celý názov kategórie v jazyku stránky.
  *
  * Kľúč je slug, nie názov — keby sa kategória v Strapi premenovala, skratka
  * sa prestane používať a v lište sa objaví nové plné znenie. To je správne:
  * lepšie dlhý názov než nesprávny.
  */
-const SHORT: Record<string, string> = {
-  'strazna-funkcia': 'Strážna funkcia',
-  'vseobecne-o-hradiskach': 'Všeobecne',
-  'svatyne-a-sakralne-objekty': 'Svätyne',
-  'listiny-a-pisomne-zdroje': 'Listiny a pramene',
-  '3d-modely': '3D modely',
-  'informacne-tabule': 'Tabule',
+const shortLabel = (i: NavigationItem, v: Vzhlad, r: Rozriesene) => {
+  const vk = vzhladKategorie(v, r, catSlug(i));
+  const kratky = lenVyslovny(vk?.popisokMenu);
+  if (kratky) return kratky;
+  return plnyNazov(i, v, r);
 };
-/* Skrátené tvary pre lištu v cudzích jazykoch. Doslovný preklad slovenskej
-   skratky („Všeobecne" → „Allgemein") by nedával zmysel, preto má každý
-   jazyk vlastnú dvojicu. */
-const SHORT_EN: Record<string, string> = {
-  'strazna-funkcia': 'Guard function',
-  'listiny-a-pisomne-zdroje': 'Written sources',
-  'svatyne-a-sakralne-objekty': 'Sanctuaries',
-  'vseobecne-o-hradiskach': 'About hillforts',
-  'informacne-tabule': 'Panels',
-};
-const SHORT_DE: Record<string, string> = {
-  'strazna-funkcia': 'Wachfunktion',
-  'listiny-a-pisomne-zdroje': 'Urkunden',
-  'svatyne-a-sakralne-objekty': 'Heiligtümer',
-  'vseobecne-o-hradiskach': 'Allgemein',
-  'informacne-tabule': 'Tafeln',
-  'kniezacie-sidla': 'Fürstensitze',
-  'mocenske-centra': 'Machtzentren',
-  'staroveke-sidla': 'Vorzeit',
-};
-const shortLabel = (i: NavigationItem) => {
-  if (poSlovensky()) return SHORT[catSlug(i)] ?? i.label;
-  const skratky = poNemecky() ? SHORT_DE : SHORT_EN;
-  return skratky[catSlug(i)] ?? kategoria(i.label);
+/** Celý názov v jazyku stránky: vzhľad (`nazov`) → databáza cez slovník. */
+const plnyNazov = (i: NavigationItem, v: Vzhlad, r: Rozriesene) => {
+  const vk = vzhladKategorie(v, r, catSlug(i));
+  if (vk?.nazov?.sk) return textVzhladu(vk.nazov);
+  return poSlovensky() ? i.label : kategoria(i.label);
 };
 
 /**
@@ -142,6 +124,7 @@ function PrepinacJazyka() {
 
 export function LabNav() {
   const { items, loading, nacitajClanky } = useNavigationData();
+  const { vzhlad, rozriesene, upravy } = useVzhlad();
   /**
    * Otvorená roletka. Drží sa aj vodorovná poloha tlačidla, lebo panel sa
    * NEVYKRESĽUJE vnútri radu, ale až na úrovni celej lišty.
@@ -212,13 +195,23 @@ export function LabNav() {
     return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onEsc); };
   }, [menuOpen]);
 
-  const cats = items.filter(i => i.slug !== '/' && !EXCLUDE_SLUGS.has(catSlug(i)));
+  const hlavne = hlavnyRiadokMenu(vzhlad, rozriesene);
+  const skryte = skryteVMenu(vzhlad, rozriesene);
+  /* Na plátne editora ostanú aj skryté kategórie — označené, aby sa dali
+     vrátiť. Poradie z konceptu len tam; web drží poradie z databázy. */
+  let cats = items.filter(i => i.slug !== '/' && (upravy || !skryte.has(catSlug(i))));
+  const navrhovane = upravy ? poradieMenu(vzhlad, rozriesene) : [];
+  if (navrhovane.length) {
+    const miesto = (i: NavigationItem) => { const k = navrhovane.indexOf(catSlug(i)); return k < 0 ? navrhovane.length : k; };
+    cats = [...cats].sort((a, b) => miesto(a) - miesto(b));
+  }
   const openCat = open ? cats.find(c => c.label === open.label) ?? null : null;
 
   const rows = [
-    { label: t('Typy hradísk'), items: cats.filter(c => PRIMARY_SLUGS.has(catSlug(c))) },
-    { label: t('Ďalší obsah'), items: cats.filter(c => !PRIMARY_SLUGS.has(catSlug(c))) },
+    { label: t('Typy hradísk'), items: cats.filter(c => hlavne.has(catSlug(c))), znacka: 'menu:hlavny' },
+    { label: t('Ďalší obsah'), items: cats.filter(c => !hlavne.has(catSlug(c))), znacka: 'menu:dalsi' },
   ];
+  const jeSkryta = (c: NavigationItem) => vwSkryte(upravy, skryte.has(catSlug(c)));
   const secondaryOpen = open !== null && rows[1].items.some(c => c.label === open.label);
 
   return (
@@ -248,7 +241,7 @@ export function LabNav() {
             zalamovať. */}
         <div className="lnav-cats" ref={catsRef} data-overflow={overflow ? 'true' : undefined} data-scrolled={scrolled ? 'true' : undefined}>
           {rows.slice(0, 1).map(row => (
-            <div className="lnav-cats-row" key={row.label} data-secondary={row.label === t('Ďalší obsah') ? 'true' : undefined}>
+            <div className="lnav-cats-row" key={row.label} data-secondary={row.label === t('Ďalší obsah') ? 'true' : undefined} data-vw={vw(upravy, row.znacka)}>
               {/* Názov nesie len druhý rad — ten sa vysúva a treba povedať, čo
                   pribudlo. Prvý rad je hlavná navigácia a popisovať ju je šum;
                   navyše tým získa 122 px, vďaka čomu sa zmestí na jeden riadok. */}
@@ -257,6 +250,10 @@ export function LabNav() {
                 <CatButton
                   key={cat.label}
                   cat={cat}
+                  kratky={shortLabel(cat, vzhlad, rozriesene)}
+                  plny={plnyNazov(cat, vzhlad, rozriesene)}
+                  znacka={vw(upravy, `menu:${catSlug(cat)}`)}
+                  skryta={jeSkryta(cat)}
                   open={open?.label === cat.label}
                   onToggle={(left) => {
                     // Zoznam článkov sa ťahá až tu — pri štarte stránky má
@@ -292,12 +289,12 @@ export function LabNav() {
       {menuOpen && (
         <div className="lnav-mobile" role="dialog" aria-label={t('Ponuka')}>
           {rows.map(row => (
-            <div className="lnav-m-group" key={row.label}>
+            <div className="lnav-m-group" key={row.label} data-vw={vw(upravy, row.znacka)}>
               <span className="lnav-m-label">{row.label}</span>
               {row.items.map(cat => {
                 const isOpen = openMobileCat === cat.label;
                 return (
-                  <div className="lnav-m-cat" key={cat.label}>
+                  <div className="lnav-m-cat" key={cat.label} data-vw={vw(upravy, `menu:${catSlug(cat)}`)} data-vw-skryte={jeSkryta(cat)}>
                     <button
                       type="button"
                       className="lnav-m-btn"
@@ -308,7 +305,7 @@ export function LabNav() {
                         setOpenMobileCat(prev => (prev === cat.label ? null : cat.label));
                       }}
                     >
-                      <span>{kategoria(cat.label)}</span>
+                      <span>{plnyNazov(cat, vzhlad, rozriesene)}</span>
                       {typeof cat.count === 'number' && cat.count > 0 && <span className="lnav-m-count">{cat.count}</span>}
                       <span className="lnav-m-chev" aria-hidden="true">{isOpen ? '–' : '+'}</span>
                     </button>
@@ -356,18 +353,19 @@ export function LabNav() {
   );
 }
 
-function CatButton({ cat, open, onToggle }: {
-  cat: NavigationItem; open: boolean; onToggle: (left: number) => void;
+function CatButton({ cat, kratky, plny, znacka, skryta, open, onToggle }: {
+  cat: NavigationItem; kratky: string; plny: string; znacka?: string; skryta?: '1';
+  open: boolean; onToggle: (left: number) => void;
 }) {
   return (
-    <div className="lnav-cat">
+    <div className="lnav-cat" data-vw={znacka} data-vw-skryte={skryta}>
       <button
         type="button"
         className="lnav-cat-btn"
         data-open={open ? 'true' : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
-        title={kategoria(cat.label)}
+        title={plny}
         onClick={(e) => {
           // Poloha tlačidla voči lište — panel sa vykresľuje mimo radu, takže
           // si ju musí niesť so sebou.
@@ -377,7 +375,7 @@ function CatButton({ cat, open, onToggle }: {
           onToggle(n ? b.left - n.left : b.left);
         }}
       >
-        {shortLabel(cat)}
+        {kratky}
         {typeof cat.count === 'number' && cat.count > 0 && <span className="lnav-count">{cat.count}</span>}
       </button>
     </div>

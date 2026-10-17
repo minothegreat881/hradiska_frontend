@@ -4575,3 +4575,50 @@ html .ck-settings-btn {
 
 /* Prepínač jazyka sa presťahoval do hlavičky (`.lnav-jazyk`) — v titulke
    článku bol jediným miestom na webe, kde sa jazyk dal prepnúť. */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   VZHĽAD WEBU — tlačidlo „Upraviť túto stránku" a režim úprav (plátno editora)
+   Triedy majú predponu `vw-` a atribúty `data-vw*` sa na verejnom webe
+   nevykresľujú vôbec (viď `lib/vzhlad/`), takže tieto pravidlá na stránke
+   návštevníka nič nezasiahnu. Bez Tailwind tried — Tailwind sa nebuilduje.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Odkaz do editora — len prihlásenému redaktorovi. Vľavo dole, aby sa
+   nebil s tlačidlom pripomienok vpravo (z-index tesne pod ním). */
+.vw-upravit {
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 10004;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 13px; border-radius: 999px;
+  border: 1px solid var(--hr-line, #e8dcc0); background: #fffdf7;
+  color: #8a5316; font: 600 13px Inter, system-ui, sans-serif; text-decoration: none;
+  box-shadow: 0 10px 26px rgba(40, 24, 8, .22);
+}
+.vw-upravit:hover { border-color: #b8792d; background: #fff; }
+.vw-upravit:focus-visible { outline: 2px solid #b8792d; outline-offset: 2px; }
+@media (max-width: 640px) { .vw-upravit span { display: none; } .vw-upravit { padding: 11px; } }
+
+/* Režim úprav: žiadne animácie pri vstupe ani pri posune — na plátne v iframe
+   by sa časť z nich nespustila a obsah by ostal priehľadný. */
+[data-vw-upravy],
+[data-vw-upravy] * {
+  animation: none !important;
+}
+
+/* Prvok, ktorý je na webe skrytý: na plátne ostáva, vyšrafovaný. */
+[data-vw-skryte="1"] {
+  opacity: .5;
+  background-image: repeating-linear-gradient(135deg, rgba(138, 83, 22, .14) 0 8px, transparent 8px 16px) !important;
+  outline: 1px dashed rgba(138, 83, 22, .55);
+  outline-offset: -1px;
+}
+
+/* Zástupca mapy na plátne — výška ako načítaná mapa (namerané 10/2026:
+   862 px pri šírke 1440, 650 px pri 390), bez knižnice MapLibre. */
+.vw-mapa-zastup {
+  display: flex; align-items: center; justify-content: center;
+  height: 862px;
+  border: 1px dashed var(--hr-line, #ded5c2); box-sizing: border-box;
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, .025) 0 12px, transparent 12px 24px), #f3ede1;
+  color: #6d6f74; font: 600 13px Inter, system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase;
+}
+@media (max-width: 900px) { .vw-mapa-zastup { height: 650px; } }
