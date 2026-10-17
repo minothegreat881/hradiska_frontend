@@ -12,8 +12,8 @@
  *
  * ČO SA VYNECHÁVA A PREČO:
  *   • zdrojové výškové dáta — vstup pre `scripts/merge_srtm.py`, nie obsah;
- *   • predvykreslené HTML článkov a kategórií — to je pre vyhľadávače,
- *     appka si stránky skladá sama z `index.html`;
+ *   • predvykreslené HTML článkov a kategórií (aj `en/blog`, `de/blog`) —
+ *     to je pre vyhľadávače, appka si stránky skladá sama z `index.html`;
  *   • `sitemap.xml`, `robots.txt` — to isté;
  *   • `sw.js` — service worker vnútri schránky nemá čo zrýchľovať (súbory
  *     sú v zariadení) a vie narobiť zmätok so starou verziou v pamäti.
@@ -38,6 +38,17 @@ const VYNECHAT_PRIECINKY = new Set([
   'category',
 ]);
 
+/* Predvykreslené články sú aj pod jazykovými predponami (`en/blog`, `de/blog`).
+   Odkedy prerender do každej HTML vkladá aj vzhľad webu (~60 kB), by tých
+   728 súborov zväčšilo balík appky o vyše 40 MB — a appka ich nečíta, stránky
+   si skladá z koreňovej `index.html`. */
+const JAZYKOVE_PREDPONY = new Set(['en', 'de']);
+const jeVynechany = (zdroj, meno) => {
+  if (!VYNECHAT_PRIECINKY.has(meno)) return false;
+  const rodic = path.dirname(zdroj);
+  return rodic === ZDROJ || (path.dirname(rodic) === ZDROJ && JAZYKOVE_PREDPONY.has(path.basename(rodic)));
+};
+
 /** Súbory podľa prípony — zdrojové dáta reliéfu. */
 const VYNECHAT_PRIPONY = new Set(['.tif', '.tfw', '.hdr', '.hgt', '.zip']);
 
@@ -55,7 +66,7 @@ function kopiruj(zo, do_) {
     const ciel = path.join(do_, polozka.name);
 
     if (polozka.isDirectory()) {
-      if (VYNECHAT_PRIECINKY.has(polozka.name) && path.dirname(zdroj) === ZDROJ) {
+      if (jeVynechany(zdroj, polozka.name)) {
         bajtovVynechanych += velkostPriecinka(zdroj);
         vynechanych++;
         continue;

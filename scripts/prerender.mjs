@@ -11,6 +11,14 @@
  * Statické hostingy servujú tieto súbory na príslušných URL; SPA fallback ostáva
  * pre klientsku navigáciu.
  *
+ * VZHĽAD WEBU: do každej vygenerovanej HTML (aj do koreňovej `index.html`,
+ * ktorá je zálohou všetkých ostatných ciest) sa vloží zverejnený vzhľad ako
+ * `<script type="application/json" id="vzhlad-webu">` — celá odpoveď
+ * `GET /api/vzhlad-webu`. Prvé kreslenie ho tak má hneď, bez čakania na API
+ * a bez blikania (`src/lib/vzhlad/nacitaj.ts`). Keď vzhľad zverejnený nie je
+ * (`data: null`) alebo sa stiahnuť nedá, nevloží sa nič a build pokračuje —
+ * web vtedy kreslí základný vzhľad z kódu.
+ *
  * ENV: SITE_URL (default https://hradiska.sk), VITE_STRAPI_URL (build-fetch),
  *      MEDIA_URL (základ pre OG obrázky, default SITE_URL).
  */
@@ -44,7 +52,41 @@ if (!shell.includes(START) || !shell.includes(END)) {
   process.exit(0);
 }
 const before = shell.slice(0, shell.indexOf(START) + START.length);
-const after = shell.slice(shell.indexOf(END));
+let after = shell.slice(shell.indexOf(END));
+
+/* ── Vzhľad webu ──────────────────────────────────────────────────────────
+   Stiahne sa raz a vloží do hlavičky každej stránky (pred `</head>`, mimo
+   značiek seo:start/end). `<` sa píše ako `\u003c`, aby text v JSON nemohol
+   ukončiť značku `<script>`. Chyba ani výpadok build nezastavia. */
+async function stiahniVzhlad() {
+  try {
+    const res = await fetch(`${STRAPI}/api/vzhlad-webu`, {
+      headers: { 'ngrok-skip-browser-warning': 'true' },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const o = await res.json();
+    if (!o || typeof o !== 'object' || !o.data || typeof o.data !== 'object') {
+      console.log('[prerender] vzhľad webu nie je zverejnený (data: null) — nevkladám, web kreslí základný.');
+      return null;
+    }
+    return o;
+  } catch (e) {
+    console.warn(`[prerender] vzhľad webu sa nestiahol (${e.message}) — nevkladám, web kreslí základný.`);
+    return null;
+  }
+}
+const vzhlad = await stiahniVzhlad();
+if (vzhlad) {
+  const znacka = `<script type="application/json" id="vzhlad-webu">${JSON.stringify(vzhlad).replace(/</g, '\\u003c')}</script>`;
+  const i = after.indexOf('</head>');
+  if (i === -1) {
+    console.warn('[prerender] v dist/index.html nie je </head> — vzhľad nevkladám.');
+  } else {
+    after = after.slice(0, i) + znacka + '\n  ' + after.slice(i);
+    console.log(`[prerender] vzhľad webu v${vzhlad.verzia ?? '?'} vložený do HTML (${(znacka.length / 1024).toFixed(1)} kB).`);
+  }
+}
 
 const escAttr = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const escText = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
