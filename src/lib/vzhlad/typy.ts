@@ -247,6 +247,7 @@ export interface Menu {
 }
 
 export type DruhSiete = 'facebook' | 'instagram' | 'youtube' | 'email';
+export const DRUHY_SIETI = ['facebook', 'instagram', 'youtube', 'email'] as const;
 
 export interface Pata {
   stlpce: { id: string; nadpis: Text; odkazy: { text: Text; ciel: Ciel }[] }[];
@@ -355,7 +356,7 @@ export const LIMITY = {
 
 /** Povolené id položiek. */
 export const VZOR_ID = /^[a-z0-9-]{1,40}$/;
-/** Povolené cesty webu v odkazoch. */
-export const VZOR_CESTY = /^\/[a-z0-9\-/]*(\?[a-z0-9=&\-]*)?$/;
+/** Povolené cesty webu v odkazoch. Nie `//…` — prehliadač by to bral ako adresu iného webu. */
+export const VZOR_CESTY = /^\/(?!\/)[a-z0-9\-/]*(\?[a-z0-9=&\-]*)?$/;
 /** Povolené cesty obrázkov (súbory Strapi alebo súbory webu v koreni). */
 export const VZOR_CESTY_OBRAZKA = /^(\/uploads\/[A-Za-z0-9_.\-]+|\/[A-Za-z0-9_.\-]+\.(webp|png|jpg|jpeg|svg))$/;
