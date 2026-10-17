@@ -20,7 +20,8 @@
  *   • EN a DE domovská, kronika: úvodný článok a pripnuté zápisy sa začnú
  *     zobrazovať správne (dnes sa hľadajú podľa slovenského slugu a v cudzom
  *     jazyku sa nenájdu) — porovnanie DOM aj pixelov vynechá úvodnú dlaždicu,
- *     pás zápisov a časovú os a test zvlášť overí, že nový stav je správny,
+ *     pás zápisov a časovú os (na snímke skryté, dlaždica s pevnou výškou)
+ *     a test zvlášť overí, že nový stav je správny,
  *   • adresa obrázka z `formats` namiesto skladanej cesty (ten istý súbor) —
  *     pri dnešných súboroch sú obe adresy zhodné, pravidlo sa neuplatní.
  *
@@ -64,8 +65,12 @@ const pohlady = vsetky.flatMap((s) => SIRKY.map((sirka) => ({ s, sirka, kluc: `$
 const AKCEPTOVANE_KRONIKA = ['.lakv-pinned', '.lakv-strip', '.lakv-os'];
 /* Úvodná dlaždica má s nájdeným článkom iný obsah (perex, autor) a tým aj
    výšku — bez pevnej výšky by sa celý zvyšok stránky posunul o zlomok pixela
-   a líšil by sa celý. Pevná výška len na snímke, v oboch weboch rovnako. */
-const CSS_KRONIKA = '.lakv-pinned { height: 460px !important; min-height: 460px !important; max-height: 460px !important; overflow: hidden !important; box-sizing: border-box !important; }';
+   a líšil by sa celý. Pevná výška len na snímke, v oboch weboch rovnako.
+   Oblasti s akceptovaným rozdielom sa skryjú (`visibility`), nie zakryjú
+   maskou: maska sa kreslí na celé pixely a obsah na hranách (prvý riadok osi)
+   by pod ňou presvital. */
+const CSS_KRONIKA = '.lakv-pinned { height: 460px !important; min-height: 460px !important; max-height: 460px !important; overflow: hidden !important; box-sizing: border-box !important; }'
+  + AKCEPTOVANE_KRONIKA.map((s) => `${s}, ${s} *`).join(', ') + ' { visibility: hidden !important; }';
 const jeKronikaVCudzomJazyku = (s, rezim) => rezim !== '1' && s.druh === 'domov' && s.jazyk !== 'sk';
 
 /** Konzola bez sieťových hlásení prehliadača (tie sú zvlášť a rovnaké pre oba weby). */
@@ -128,7 +133,7 @@ async function zachyt(prehliadac, port, p, rezim) {
   const cudziDomov = p.s.druh === 'domov' && p.s.jazyk !== 'sk';
   const png = rezim === 'dnes' || !jeKronikaVCudzomJazyku(p.s, rezim) ? await snimka(page) : null;
   const pngAkcept = (rezim === 'dnes' && cudziDomov) || jeKronikaVCudzomJazyku(p.s, rezim)
-    ? await snimka(page, { css: CSS_KRONIKA, maska: AKCEPTOVANE_KRONIKA }) : null;
+    ? await snimka(page, { css: CSS_KRONIKA }) : null;
   await ctx.close();
   return { dom: celyDom.html, vw: celyDom.vw, domAkcept: domAkcept?.html ?? null, png, pngAkcept, kronika, kronikaStav, ...z };
 }

@@ -173,6 +173,11 @@ async function cakajNaObrazky(page) {
       ...[...pozadia].map((u) => { const im = new Image(); im.src = u; return im.decode().catch(() => {}); }),
     ]);
     await document.fonts.ready;
+    /* Obrázok, ktorý sa nenačítal (v lokálnej kópii médií chýba pár súborov,
+       napr. titulná fotka článku Devín), kreslí Chromium raz s ikonou
+       a popisom, raz bez — podľa toho, kedy chyba prišla. Na snímke sa preto
+       skryje; DOM sa porovnáva skôr a nezmenený. */
+    document.querySelectorAll('img').forEach((i) => { if (i.complete && !i.naturalWidth) i.style.visibility = 'hidden'; });
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   });
 }
