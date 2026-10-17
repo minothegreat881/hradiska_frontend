@@ -50,3 +50,6 @@ dist-app/
 
 # Balíky webu pre aplikáciu (zip, desiatky MB) — vydaný popis je v app-balik.json.
 app-balik/
+
+# Výstupy testov a prevodu vzhľadu webu (snímky, DOM, vzhlad-v1*.json)
+scripts/vzhlad/vystup/
