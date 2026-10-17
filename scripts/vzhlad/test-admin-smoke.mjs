@@ -17,7 +17,7 @@ import { resolve } from 'node:path';
 import { spustiServer } from './server.mjs';
 import { KOREN, BACKEND, SIRKY, spustiPrehliadac, novyKontext, ustal, zapis } from './spolocne.mjs';
 
-const PORT = 4302;
+const PORT = Number(process.env.VZHLAD_PORT || 4304);
 const server = await spustiServer({ dist: resolve(KOREN, 'dist'), port: PORT });
 const prehliadac = await spustiPrehliadac();
 const zapisy = [];
@@ -57,7 +57,6 @@ try {
   await page.goto(`http://127.0.0.1:${PORT}/admin`, { waitUntil: 'load', timeout: 60000 });
   await page.waitForSelector('button[title="Upraviť"]', { timeout: 60000 });
   const riadkov = await page.locator('button[title="Upraviť"]').count();
-  const nazov = (await page.locator('button[title="Upraviť"]').first().locator('xpath=ancestor::tr[1]').innerText().catch(() => '')).split('\n')[0];
   await page.locator('button[title="Upraviť"]').first().click();
   /* Editor článku: plátno s nadpisom článku. */
   await page.waitForFunction(() => /Uložiť|Zverejniť|Publikovať/.test(document.body.innerText) && document.querySelectorAll('iframe, [contenteditable="true"], textarea, input').length > 0, null, { timeout: 60000 });
@@ -65,7 +64,10 @@ try {
   const editor = await page.evaluate(() => ({
     tlacidla: [...document.querySelectorAll('button')].map((b) => b.innerText.trim()).filter((t) => /Uložiť|Zverejniť|Publikovať/.test(t)).slice(0, 4),
     upravitelne: document.querySelectorAll('[contenteditable="true"], iframe').length,
+    /* Nadpis otvoreného článku — prvé neprázdne textové pole editora. */
+    nazov: [...document.querySelectorAll('input, textarea')].map((x) => x.value).find((v) => v && v.trim()) ?? '',
   }));
+  const nazov = editor.nazov;
   zapis('admin-smoke.png', await page.screenshot());
   detail = { riadkovVZozname: riadkov, otvorenyClanok: nazov, editor };
   ok = riadkov > 0 && editor.tlacidla.length > 0 && !zapisy.length && !chyby.length;

@@ -15,7 +15,7 @@ import { join, resolve } from 'node:path';
 import { spustiServer } from './server.mjs';
 import { KOREN, VYSTUP, SIRKY, spustiPrehliadac, novyKontext, ustal, nacitajObrazky, dom, prvyRozdiel, zapis } from './spolocne.mjs';
 
-const PORT = 4302;
+const PORT = Number(process.env.VZHLAD_PORT || 4303);
 const V1 = JSON.parse(readFileSync(join(VYSTUP, 'vzhlad-v1-odpoved.json'), 'utf8'));
 const kopia = () => structuredClone(V1);
 const server = await spustiServer({ dist: resolve(KOREN, 'dist'), port: PORT });
@@ -97,7 +97,7 @@ try {
       return src && src.endsWith('/strapi/uploads/small_kategoria_refugium_023d7282bb.jpg') ? [] : [`obrázok dlaždice ${src}`];
     });
     await pripad('chýbajúca fotka (nie je v subory) → hlavička kategórie so základným obrázkom', '/category/refugia', o, async (page) => {
-      const bg = await page.$eval('.ch-foto', (e) => e.style.background);
+      const bg = await page.$eval('.ch-foto', (e) => e.style.backgroundImage);
       return bg.includes('/strapi/uploads/kategoria_refugium_023d7282bb.jpg') ? [] : [`hlavička: ${bg.slice(0, 120)}`];
     });
   }
@@ -114,7 +114,7 @@ try {
       return z;
     });
     await pripad('chýbajúca fotka (404) → hlavička kategórie so základným obrázkom', '/category/refugia', o, async (page) => {
-      const bg = await page.$eval('.ch-foto', (e) => e.style.background);
+      const bg = await page.$eval('.ch-foto', (e) => e.style.backgroundImage);
       return bg.includes('/strapi/uploads/kategoria_refugium_023d7282bb.jpg') ? [] : [`hlavička: ${bg.slice(0, 120)}`];
     });
   }
