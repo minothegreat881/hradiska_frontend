@@ -122,9 +122,17 @@ function PrepinacJazyka() {
   );
 }
 
-export function LabNav() {
+export function LabNav({ rozbalene = false }: {
+  /**
+   * Len pre plátno editora vzhľadu (stránka „Hlavička a päta"): ukáže aj
+   * druhý riadok kategórií — na počítači rozvinutý pod prvým, na mobile
+   * otvorenú ponuku. Platí len v režime úprav; verejný web ho nepoužíva.
+   */
+  rozbalene?: boolean;
+} = {}) {
   const { items, loading, nacitajClanky } = useNavigationData();
-  const { vzhlad, rozriesene, upravy } = useVzhlad();
+  const { vzhlad, rozriesene, upravy, nahlad } = useVzhlad();
+  const rozvinute = upravy && rozbalene;
   /**
    * Otvorená roletka. Drží sa aj vodorovná poloha tlačidla, lebo panel sa
    * NEVYKRESĽUJE vnútri radu, ale až na úrovni celej lišty.
@@ -200,7 +208,7 @@ export function LabNav() {
   /* Na plátne editora ostanú aj skryté kategórie — označené, aby sa dali
      vrátiť. Poradie z konceptu len tam; web drží poradie z databázy. */
   let cats = items.filter(i => i.slug !== '/' && (upravy || !skryte.has(catSlug(i))));
-  const navrhovane = upravy ? poradieMenu(vzhlad, rozriesene) : [];
+  const navrhovane = upravy || nahlad ? poradieMenu(vzhlad, rozriesene) : [];
   if (navrhovane.length) {
     const miesto = (i: NavigationItem) => { const k = navrhovane.indexOf(catSlug(i)); return k < 0 ? navrhovane.length : k; };
     cats = [...cats].sort((a, b) => miesto(a) - miesto(b));
@@ -218,7 +226,7 @@ export function LabNav() {
     <nav
       ref={rootRef}
       className={menuOpen ? 'lnav is-ponuka' : 'lnav'}
-      data-expanded={hovered || secondaryOpen ? 'true' : undefined}
+      data-expanded={hovered || secondaryOpen || rozvinute ? 'true' : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -240,7 +248,7 @@ export function LabNav() {
             poriadny register. Hlavička tým získala riadok a prestala sa
             zalamovať. */}
         <div className="lnav-cats" ref={catsRef} data-overflow={overflow ? 'true' : undefined} data-scrolled={scrolled ? 'true' : undefined}>
-          {rows.slice(0, 1).map(row => (
+          {(rozvinute ? rows : rows.slice(0, 1)).map(row => (
             <div className="lnav-cats-row" key={row.label} data-secondary={row.label === t('Ďalší obsah') ? 'true' : undefined} data-vw={vw(upravy, row.znacka)}>
               {/* Názov nesie len druhý rad — ten sa vysúva a treba povedať, čo
                   pribudlo. Prvý rad je hlavná navigácia a popisovať ju je šum;
@@ -286,7 +294,7 @@ export function LabNav() {
       </div>
 
       {/* ── Mobilná ponuka ──────────────────────────────────────────────── */}
-      {menuOpen && (
+      {(menuOpen || rozvinute) && (
         <div className="lnav-mobile" role="dialog" aria-label={t('Ponuka')}>
           {rows.map(row => (
             <div className="lnav-m-group" key={row.label} data-vw={vw(upravy, row.znacka)}>

@@ -124,7 +124,7 @@ function StepButton({ dir, disabled, onClick }: { dir: 'prev' | 'next'; disabled
 }
 
 export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKroniky } = {}) {
-  const { vzhlad, rozriesene, upravy } = useVzhlad();
+  const { vzhlad, rozriesene, upravy, nahlad } = useVzhlad();
   const sekcia = zadana ?? najdiSekciu(vzhlad, 'kronika');
   const j = jazyk();
 
@@ -169,7 +169,7 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
   /* Vybraná fotogaléria. Verejný web ju berie z databázy (`domovska-galeria`,
      zverejnenie vzhľadu do nej zapisuje). Na plátne editora sa ukazuje výber
      z konceptu — ten v databáze ešte nie je. */
-  const fotkyKonceptu = upravy ? vzhlad.domov.fotogaleria?.fotky ?? null : null;
+  const fotkyKonceptu = upravy || nahlad ? vzhlad.domov.fotogaleria?.fotky ?? null : null;
   const klucKonceptu = fotkyKonceptu ? fotkyKonceptu.join(',') : '';
   const fotogaleriaVidno = sekcia ? sekcia.fotogaleriaViditelna : true;
 
@@ -425,7 +425,7 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
                 jazyku — tak to bolo vždy). Článok, ktorý vzhľad z API pozná,
                 ale v jazyku stránky nie je, sa vynechá celý. */}
             {(uvodny && (uvodVJazyku || !uvodny.dokument)) && (
-            <a href={intro ? odkaz(`/blog/${intro.slug}`) : odkaz('/aktuality')} className="lakv-tile lakv-pinned" data-vw={vw(upravy, 'kronika:uvod')}>
+            <a href={intro ? odkaz(`/blog/${intro.slug}`) : odkaz('/aktuality')} className="lakv-tile lakv-pinned" data-vw={vw(upravy, 'kronika:uvod')} data-vw-dokument={upravy ? intro?.documentId : undefined}>
               <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: 36, fontWeight: 700, color: 'var(--hr-ink)', lineHeight: 1.04, marginBottom: 12, letterSpacing: '-.02em' }}>
                 {intro?.title ?? t('Prečo to vlastne robím')}
               </span>
@@ -482,7 +482,9 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
           data-at-end={edges.end ? 'true' : 'false'}
         >
           {stripItems.map((item, poradie) => (
-            <a key={item.documentId} href={odkaz(`/blog/${item.slug}`)} className="lakv-tile lakv-card" data-vw={vw(upravy && poradie < pocetPripnutych, `kronika:pripnuty:${poradie}`)}>
+            /* Editor vzhľadu: pripnuté karty `kronika:pripnuty:<i>`, ostatné
+               `kronika:zapis:<i>` (dajú sa pripnúť), obe s documentId. */
+            <a key={item.documentId} href={odkaz(`/blog/${item.slug}`)} className="lakv-tile lakv-card" data-vw={vw(upravy, poradie < pocetPripnutych ? `kronika:pripnuty:${poradie}` : `kronika:zapis:${poradie - pocetPripnutych}`)} data-vw-dokument={upravy ? item.documentId : undefined}>
               {item.coverUrl ? (
                 <img src={item.coverUrl} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -565,6 +567,9 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
                  „odkaz" — štyri razy za sebou. Vtedy nastúpi popis miesta,
                  a keď nie je ani ten, aspoň názov cieľa. */
               aria-label={g.alt ? undefined : (g.place ? `Fotogaléria — ${g.place}` : 'Fotogaléria')}
+              /* Fotky výberu z konceptu — editor ich vie presúvať (`kronika:fotka:<i>`). */
+              data-vw={vw(upravy && !!klucKonceptu && i < curated.length && g.fileId !== undefined, `kronika:fotka:${i}`)}
+              data-vw-subor={upravy && klucKonceptu && i < curated.length && g.fileId !== undefined ? String(g.fileId) : undefined}
               style={{ position: 'relative', display: 'block', borderRadius: i === 0 ? 26 : 20, overflow: 'hidden', gridColumn: i === 0 ? 'span 2' : undefined, gridRow: i === 0 ? 'span 2' : undefined }}
             >
               <img src={g.src} alt={g.alt} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
