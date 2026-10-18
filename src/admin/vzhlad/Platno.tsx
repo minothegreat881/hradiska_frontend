@@ -97,6 +97,8 @@ export interface PlatnoProps {
   pisatTeraz: number;
   /** Dokument plátna (klávesy, odrolovanie na prvok, testy). */
   onDokument?: (d: Document | null) => void;
+  /** Písanie priamo v stránke začalo / skončilo (telefón). */
+  onPise?: (pise: boolean) => void;
 }
 
 export function Platno(p: PlatnoProps) {
@@ -167,6 +169,7 @@ export function Platno(p: PlatnoProps) {
           onAkcia={p.onAkcia}
           upozornenia={p.upozornenia}
           pisatTeraz={p.pisatTeraz}
+          onPise={p.onPise}
         />
       )}
     </CanvasFrame>

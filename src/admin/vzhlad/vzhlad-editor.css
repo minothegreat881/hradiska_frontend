@@ -248,3 +248,133 @@
 .admin .vw-druh-ulozenia.je-hned { background: var(--ad-pub-bg); color: var(--ad-pub-fg); }
 .admin .vw-druh-ulozenia.je-vzhlad { background: var(--ad-draft-bg); color: var(--ad-draft-fg); }
 .admin .ad-cat-row:has(> [data-vw-vzhlad-kategorie]) { grid-template-columns: 24px minmax(0, 1fr) 44px auto 16px; gap: 8px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TELEFÓN A TABLET
+   Rozvrh administrácie je pod `.adm-koren` (koreň administrácie — v okne
+   plátna nie je), ovládanie vo vrstve plátna pod `@media (pointer: coarse)`
+   (okno plátna sa pýta zariadenia, nie svojej šírky). Počítač s myšou
+   nedostane z tohto nič.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Vrstva nad plátnom: ovládanie prstom ── */
+.vw-pise-tlacidla {
+  position: absolute; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; width: max-content;
+  transform-origin: left top; transform: scale(var(--vw-m, 1));
+}
+.vw-pise-tlacidla button {
+  display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 10px; cursor: pointer;
+  border: 1px solid #d8c9ab; background: #fffdf7; color: #2f2418; font: 600 14px Inter, system-ui, sans-serif;
+  box-shadow: 0 4px 12px rgba(60, 40, 15, .18);
+}
+.vw-pise-tlacidla button.vw-pise-hotovo { background: #8a5316; border-color: #8a5316; color: #fff; }
+.vw-pise-tlacidla svg { width: 16px; height: 16px; }
+.vw-pocitadlo-dotyk { padding: 4px 9px; border-radius: 6px; background: #2f2418; color: #f7efdc; font: 600 12px/1.6 Inter, system-ui, sans-serif; white-space: nowrap; }
+.vw-pocitadlo-dotyk.je-plne { background: #b3261e; }
+
+@media (pointer: coarse) {
+  /* Vrstva má nulovú šírku — bez `max-content` by sa lišta zalomila po jednom tlačidle. */
+  .vw-lista.je-dotyk { flex-wrap: wrap; white-space: normal; width: max-content; gap: 2px; padding: 3px; border-radius: 12px; }
+  .vw-lista.je-dotyk button { min-width: 44px; height: 44px; padding: 0; border-radius: 9px; }
+  .vw-lista.je-dotyk svg { width: 20px; height: 20px; }
+  .vw-lista.je-dotyk .vw-lista-sep { height: 28px; margin: 0 1px; }
+  .vw-lista.je-tahanie { visibility: hidden; }
+  .vw-plus { height: 44px; padding: 0 14px; opacity: .92; font-size: 13px; }
+  .vw-plus svg { width: 16px; height: 16px; }
+}
+
+/* ── Administrácia: tablet a telefón ── */
+@media (max-width: 1023px) {
+  /* Hlavička editora sa prilepí pod hlavičku administrácie — Uložiť, Zverejniť a ⋯ sú vždy po ruke. */
+  .adm-koren .vw-m-hlava { position: sticky; top: 57px; z-index: 30; background: var(--ad-app); margin-left: -16px; margin-right: -16px; padding: 6px 16px; }
+  .adm-koren .vw-m-panel { display: none; }
+  .adm-koren .vw-uzke .vw-telo { display: block; padding-bottom: 104px; }
+
+  /* Spodný list (pravý panel). */
+  .adm-koren .vw-list {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 95;
+    display: flex; flex-direction: column; height: 88px;
+    padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box;
+    background: var(--ad-surface); border-top: 1px solid var(--ad-border); border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 30px rgba(40, 28, 10, .2); transition: height .2s ease;
+  }
+  .adm-koren .vw-list.je-polovica { height: 50vh; height: 50dvh; }
+  .adm-koren .vw-list.je-cele { height: calc(100vh - 128px); height: calc(100dvh - 128px); }
+  .adm-koren .vw-list.je-tahany { transition: none; }
+  .adm-koren .vw-list-uchyt {
+    flex: 0 0 auto; width: 100%; height: 44px; display: flex; align-items: center; justify-content: center; gap: 10px;
+    border: 0; background: none; color: var(--ad-muted); cursor: grab; touch-action: none; padding: 0;
+  }
+  .adm-koren .vw-list-uchyt:active { cursor: grabbing; }
+  .adm-koren .vw-list-pruh { width: 46px; height: 5px; border-radius: 3px; background: var(--ad-field-border); }
+  .adm-koren .vw-list-sipka { width: 18px; height: 18px; }
+  .adm-koren .vw-list-telo { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .adm-koren .vw-list.je-zbalene .vw-list-telo { overflow: hidden; }
+  .admin.adm-koren .vw-list .vw-panel {
+    position: static; width: auto; max-height: none; overflow: visible; flex-shrink: 1;
+    border: 0; border-radius: 0; background: none; box-shadow: none;
+  }
+  .adm-koren .vw-list .vw-panel-hlava { padding: 0 16px 10px; }
+  .adm-koren .vw-list.je-zbalene .vw-panel-hlava { border-bottom: 0; }
+  .adm-koren .vw-list.je-zbalene .vw-panel-hlava p { display: none; }
+  .adm-koren .vw-list .vw-panel-hlava h2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Ciele dotyku v paneli a dialógoch. */
+  .admin.adm-koren .vw-ikona { width: 44px; height: 44px; }
+  .admin.adm-koren .vw-ikona svg { width: 18px; height: 18px; }
+  .admin.adm-koren .vw-zalozky button { min-height: 44px; min-width: 44px; }
+  .admin.adm-koren .vw-pridat { min-height: 44px; }
+  .admin.adm-koren .vw-prepinac { min-height: 44px; }
+  .admin.adm-koren .vw-menu button { min-height: 48px; }
+  .admin.adm-koren .vw-hladanie-vysledky button { min-height: 48px; }
+  .admin.adm-koren .vw-stranky select { min-height: 44px; }
+  .admin.adm-koren .ad-grip { width: 32px; height: 44px; }
+
+  /* Klasická úprava: hlavička sa zalomí. */
+  .adm-koren .vw-formular > .ad-editor-head { flex-wrap: wrap; height: auto; padding-bottom: 10px; row-gap: 8px; }
+  .adm-koren .vw-formular > .ad-editor-head > .ad-head-title { flex: 1 1 100%; min-width: 0; }
+  .adm-koren .vw-formular > .ad-editor-head > div[style*="flex: 1"] { display: none; }
+}
+
+@media (pointer: coarse) {
+  /* Výrez obrázka sa ťahá prstom — obrázok v náhľade stránku neposúva. */
+  .adm-koren .vw-vyrez img { touch-action: none; }
+}
+
+@media (max-width: 767px) {
+  .adm-koren .vw-m-hlava { margin-left: -12px; margin-right: -12px; padding: 6px 12px; gap: 6px; }
+  .adm-koren .vw-m-hlava .vw-m-spat { display: none; }
+  .adm-koren .vw-m-hlava > .ad-head-title { flex: 1 1 0; min-width: 0; }
+  .adm-koren .vw-m-hlava .ad-title { max-width: none; }
+  .adm-koren .vw-m-hlava .vw-stav { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .adm-koren .vw-m-hlava .vw-stav .vw-stav-bodka { display: inline-block; margin-right: 4px; }
+  .adm-koren .vw-m-hlava > div[style*="flex: 1"] { display: none; }
+  .admin.adm-koren .vw-m-hlava > .abtn:not(.abtn-icon) { padding: 0 12px; }
+
+  /* Nástroje: stránka na celú šírku, pod ňou história zmien, jazyk a zariadenie. */
+  .adm-koren [data-vw-editor] .vw-nastroje { gap: 8px; }
+  .adm-koren .vw-nastroje > .vw-stranky { flex: 1 1 100%; display: flex; }
+  .adm-koren .vw-nastroje > .vw-stranky > button { flex: 1 1 auto; padding: 0 8px; }
+  .adm-koren .vw-nastroje > .vw-stranky select { max-width: 120px; }
+  .adm-koren .vw-nastroje > div[style*="flex: 1"] { display: none; }
+  .adm-koren .vw-m-zoom { display: none !important; }
+
+  /* Plátno po okraje obrazovky: náhľad Mobil je v skutočnej veľkosti. */
+  .adm-koren .vw-uzke .vw-platno-stlpec { margin: 0 -12px; }
+  .adm-koren .vw-uzke .vw-platno-stlpec > div > div { border-radius: 0 !important; box-shadow: none !important; }
+
+  .adm-koren .vw-riadok-poli { grid-template-columns: 1fr; }
+  .adm-koren .vw-formular > .ad-editor-head > .abtn { flex: 1 1 auto; justify-content: center; }
+  .adm-koren .vw-formular-prvok-hlava { flex-wrap: wrap; }
+  /* História a zoznamy v dialógoch: text na celý riadok, tlačidlá pod ním. */
+  .adm-koren .vw-dialog .vw-zoznam-riadok { flex-wrap: wrap; }
+  .adm-koren .vw-dialog .vw-zoznam-riadok .vw-text { flex: 1 1 calc(100% - 40px); white-space: normal; }
+  .adm-koren .vw-dialog .vw-zoznam-riadok > .abtn { flex: 1 1 auto; justify-content: center; }
+  .adm-koren .vw-citanie > .abtn { flex: 1 1 auto; justify-content: center; }
+}
+@media (max-width: 767px) {
+  /* Riadky zoznamov (dlaždice, sekcie, odkazy…): názov v prvom riadku vedľa úchytu
+     a obrázka, tlačidlá pod ním vpravo — inak by na názov neostalo miesto. */
+  .adm-koren .vw-zoznam-riadok { flex-wrap: wrap; justify-content: flex-end; row-gap: 2px; }
+  .adm-koren .vw-zoznam-riadok > .vw-text { flex: 1 1 calc(100% - 104px); white-space: normal; }
+}

@@ -20,12 +20,19 @@
  * nedotknuté. Enter potvrdí, Esc vráti — vtedy sa pôvodné uzly vrátia na
  * miesto a zmenu zapíše editor do vzhľadu. Po potvrdení teda plátno kreslí
  * zas len web, žiadne písmo ani okraje úprav.
+ *
+ * Dotyk (telefón, tablet — `pointer: coarse`): klepnutie vyberá, potiahnutie
+ * prstom po stránke ju posúva (ťahá sa len za úchyt v lište, ten má
+ * `touch-action: none`), pri ťahaní pri okraji obrazovky sa stránka posúva
+ * sama. Lišta má tlačidlá 44 px a zalomí sa do šírky plátna. Pri písaní sú
+ * pod textom tlačidlá Hotovo a Zrušiť (klávesnica telefónu Esc nemá) a Enter
+ * klávesnice telefónu potvrdí aj vtedy, keď príde len ako `insertParagraph`.
  */
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   GripVertical, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Eye, EyeOff, Trash2, Image as ImageIcon,
-  Type, Pin, CornerLeftUp, FileEdit, ExternalLink, Plus,
+  Type, Pin, CornerLeftUp, FileEdit, ExternalLink, Plus, Check, X,
 } from 'lucide-react';
 import type { Jazyk, Vzhlad } from '../../lib/vzhlad/typy';
 import { opisPrvku, presunPrvku, obalZoznamu, type KontextPrvku, type OpisPrvku, type TextPrvku, type Smer } from './prvky';
@@ -103,9 +110,11 @@ export interface VrstvaProps {
   upozornenia: Map<string, UpozornenieNaPlatne[]>;
   /** Požiadavka zvonka: začni písať do vybraného prvku (Enter, tlačidlo v paneli). */
   pisatTeraz: number;
+  /** Začalo / skončilo sa písanie priamo v stránke (telefón zbalí spodný list). */
+  onPise?: (pise: boolean) => void;
 }
 
-export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, onAkcia, upozornenia, pisatTeraz }: VrstvaProps) {
+export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, onAkcia, upozornenia, pisatTeraz, onPise }: VrstvaProps) {
   const [nad, setNad] = useState<string | null>(null);
   const [, setTik] = useState(0);
   const [tahanie, setTahanie] = useState<Tahanie | null>(null);
@@ -113,6 +122,8 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
   const [dlzkaPisania, setDlzkaPisania] = useState(0);
   const tahRef = useRef<Tahanie | null>(null);
   tahRef.current = tahanie;
+  /** Posledné miesto prsta pri ťahaní (súradnice okna plátna) — pre posúvanie pri okraji. */
+  const prstRef = useRef<{ x: number; y: number } | null>(null);
   const pisRef = useRef<Pisanie | null>(null);
   pisRef.current = pisanie;
 
@@ -136,7 +147,14 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
     mo.observe(doc.body, { childList: true, subtree: true, characterData: true });
     doc.addEventListener('load', tik, true);
     const t = okno.setInterval(tik, 1000);
-    return () => { ro.disconnect(); mo.disconnect(); doc.removeEventListener('load', tik, true); okno.clearInterval(t); if (caka) okno.cancelAnimationFrame(caka); };
+    /* Dotyk: lišta sa kladie podľa toho, čo je na obrazovke vidieť (prilepené hlavičky
+       administrácie zakrývajú vrch plátna) — pri posúvaní administrácie preto tiež. */
+    const posun = jeDotyk(doc);
+    if (posun) window.addEventListener('scroll', tik, { passive: true });
+    return () => {
+      ro.disconnect(); mo.disconnect(); doc.removeEventListener('load', tik, true); okno.clearInterval(t); if (caka) okno.cancelAnimationFrame(caka);
+      if (posun) window.removeEventListener('scroll', tik);
+    };
   }, [doc]);
 
   /* ── Písanie priamo v stránke ── */
@@ -184,7 +202,8 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
     span.addEventListener('input', () => setDlzkaPisania((span.textContent ?? '').length));
     span.addEventListener('beforeinput', (e: InputEvent) => {
       if (e.inputType.startsWith('delete') || e.inputType === 'historyUndo' || e.inputType === 'historyRedo') return;
-      if (e.inputType === 'insertParagraph' || e.inputType === 'insertLineBreak') { e.preventDefault(); return; }
+      /* Enter klávesnice telefónu často príde len ako `insertParagraph` (bez `keydown`) — aj ten potvrdí. */
+      if (e.inputType === 'insertParagraph' || e.inputType === 'insertLineBreak') { e.preventDefault(); ukonciPisanie(true); return; }
       const sel2 = doc.defaultView?.getSelection();
       const oznacene = sel2 && sel2.rangeCount ? sel2.toString().length : 0;
       const pribudne = (e.data ?? e.dataTransfer?.getData('text/plain') ?? '').length;
@@ -211,6 +230,10 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
   /* Výber iného prvku alebo zmena jazyka ukončí písanie (potvrdí ho). */
   useEffect(() => { if (pisRef.current && pisRef.current.nazov !== vyber) ukonciPisanie(true); }, [vyber, ukonciPisanie]);
   useEffect(() => () => { if (pisRef.current) ukonciPisanie(false); }, [ukonciPisanie]);
+  const pise = !!pisanie;
+  const onPiseRef = useRef(onPise);
+  onPiseRef.current = onPise;
+  useEffect(() => { onPiseRef.current?.(pise); }, [pise]);
 
   /* ── Ťahanie ── */
   const pripravCiele = useCallback((o: OpisPrvku): Tahanie['zoznamy'] => {
@@ -314,10 +337,13 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
         const n: Tahanie = { ...t, x, y, ciel: najdiCiel(t, x, y) };
         tahRef.current = n;
         setTahanie(n);
+        prstRef.current = { x: e.clientX, y: e.clientY };
         return;
       }
       if (!cakajuce || stav.current.lenNaCitanie) return;
       if (Math.hypot(e.clientX - cakajuce.x, e.clientY - cakajuce.y) < 6) return;
+      /* Prst po stránke ju posúva, neťahá prvok (na to je úchyt v lište). */
+      if (e.pointerType !== 'mouse') { cakajuce = null; return; }
       const o = opis(cakajuce.el);
       if (!o?.zoznam) { cakajuce = null; return; }
       stav.current.onVyber(o.nazov);
@@ -342,6 +368,11 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
         stav.current.onVyber(n);
         cakajuce = null;
       }
+    };
+    /* Prehliadač prevzal dotyk (posúvanie stránky) — nič sa nevyberá ani nepresúva. */
+    const zrusene = () => {
+      cakajuce = null;
+      if (tahRef.current) { tahRef.current = null; setTahanie(null); }
     };
     const klik = (e: MouseEvent) => {
       if (vVrstve(e.target) || vPisani(e.target)) return;
@@ -369,6 +400,7 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
     doc.addEventListener('pointerdown', dole, true);
     doc.addEventListener('pointermove', tah, true);
     doc.addEventListener('pointerup', hore, true);
+    doc.addEventListener('pointercancel', zrusene, true);
     doc.addEventListener('click', klik, true);
     doc.addEventListener('auxclick', klik, true);
     doc.addEventListener('dblclick', dvojklik, true);
@@ -384,6 +416,7 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
       doc.removeEventListener('pointerdown', dole, true);
       doc.removeEventListener('pointermove', tah, true);
       doc.removeEventListener('pointerup', hore, true);
+      doc.removeEventListener('pointercancel', zrusene, true);
       doc.removeEventListener('click', klik, true);
       doc.removeEventListener('auxclick', klik, true);
       doc.removeEventListener('dblclick', dvojklik, true);
@@ -401,7 +434,43 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
     const n: Tahanie = { opis: o, x: e.clientX + okno.scrollX, y: e.clientY + okno.scrollY, ciel: null, zoznamy: pripravCiele(o) };
     tahRef.current = n;
     setTahanie(n);
+    prstRef.current = { x: e.clientX, y: e.clientY };
   };
+
+  /* Ťahanie prstom pri hornom alebo dolnom okraji obrazovky posúva stránku
+     (plátno je vysoké ako celý web, posúva sa administrácia, nie okno plátna).
+     Prst stojí, stránka ide — poloha v plátne sa preto prepočíta z miesta
+     prsta na obrazovke. */
+  const tahaSa = !!tahanie;
+  useEffect(() => {
+    if (!tahaSa || !jeDotyk(doc)) return;
+    const okno = doc.defaultView!;
+    const ram = okno.frameElement as HTMLElement | null;
+    if (!ram) return;
+    const id = window.setInterval(() => {
+      const t = tahRef.current;
+      const prst = prstRef.current;
+      if (!t || !prst) return;
+      const r = ram.getBoundingClientRect();
+      const mierka = r.width / (ram.offsetWidth || r.width || 1);
+      const naObrazovke = r.top + prst.y * mierka;
+      const okraj = 96;
+      const dy = naObrazovke < okraj ? -14 : naObrazovke > window.innerHeight - okraj - 60 ? 14 : 0;
+      if (!dy) return;
+      const pred = window.scrollY;
+      window.scrollBy(0, dy);
+      const posun = window.scrollY - pred;
+      if (!posun) return;
+      /* Ten istý bod obrazovky je teraz o `posun` px ďalej v plátne. */
+      prst.y += posun / mierka;
+      const x = prst.x + okno.scrollX, y = prst.y + okno.scrollY;
+      const n: Tahanie = { ...t, x, y, ciel: najdiCiel(t, x, y) };
+      tahRef.current = n;
+      setTahanie(n);
+    }, 30);
+    return () => window.clearInterval(id);
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [tahaSa, doc]);
 
   /* ── Kreslenie ── */
   const elVyber = vyber ? najdiPrvok(doc, vyber) : null;
@@ -417,6 +486,30 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
   const ram = doc.defaultView?.frameElement as HTMLElement | null;
   const mierkaOkna = ram ? ram.getBoundingClientRect().width / (ram.offsetWidth || 1) : 1;
   const m = mierkaOkna > 0.05 && mierkaOkna < 1 ? 1 / mierkaOkna : 1;
+
+  /* Dotyk: lišta má tlačidlá 44 px a zalomí sa do šírky plátna — jej skutočný
+     rozmer (s mierkou) sa meria, aby sa dala umiestniť celá do plátna. */
+  const dotyk = jeDotyk(doc);
+  const listaRef = useRef<HTMLDivElement>(null);
+  const [rozmerListy, setRozmerListy] = useState<{ w: number; h: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = listaRef.current;
+    if (!dotyk || !el) { if (rozmerListy) setRozmerListy(null); return; }
+    const r = el.getBoundingClientRect();
+    const w = Math.round(r.width), h = Math.round(r.height);
+    if (!rozmerListy || rozmerListy.w !== w || rozmerListy.h !== h) setRozmerListy({ w, h });
+  });
+
+  /** Koľko z vrchu plátna (v px okna plátna) práve zakrývajú prilepené hlavičky administrácie. */
+  const zakryteHore = () => {
+    if (!ram) return 0;
+    const hlavicky = [...window.document.querySelectorAll('.adm-m-hlavicka, .vw-m-hlava')]
+      .filter((el) => getComputedStyle(el).position === 'sticky')
+      .map((el) => el.getBoundingClientRect().bottom);
+    const spodok = hlavicky.length ? Math.max(...hlavicky) : 0;
+    const r = ram.getBoundingClientRect();
+    return Math.max(0, (spodok - r.top) / (mierkaOkna || 1));
+  };
 
   /* Prvok s rodičom so značkou — „vybrať nadradený". */
   const rodic = elVyber?.parentElement?.closest('[data-vw]')?.getAttribute('data-vw') ?? null;
@@ -510,11 +603,18 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
       if (['popularne', 'kronika'].includes(casti[0]) || (casti[0] === 'pridajte-sa' && casti[1] === 'prosba')) onVyber([...casti.slice(0, -1), String(z.index + d)].join(':'));
       else if (casti[0] === 'pata' && casti[1] === 'odkaz') onVyber(`pata:odkaz:${casti[2]}:${z.index + d}`);
     };
-    const hore = rVyber.y > 44 * m;
-    const styl: React.CSSProperties = { left: Math.max(0, Math.min(rVyber.x, sirka - 440 * m)), top: hore ? rVyber.y - 8 : rVyber.y + rVyber.h + 8 };
-    if (tahanie) return null;
+    /* Dotyk: nad prvok len vtedy, keď sa tam lišta celá zmestí pod prilepené hlavičky
+       administrácie — inak by ju zakryli a nedala by sa trafiť; potom pod prvok. */
+    const hore = dotyk ? rVyber.y - (rozmerListy?.h ?? 100 * m) - 12 >= zakryteHore() : rVyber.y > 44 * m;
+    const styl: React.CSSProperties = dotyk
+      ? { left: Math.max(0, Math.min(rVyber.x, sirka - (rozmerListy?.w ?? sirka))), top: hore ? rVyber.y - 8 : rVyber.y + rVyber.h + 8, maxWidth: Math.max(160, (sirka - 4) / m) }
+      : { left: Math.max(0, Math.min(rVyber.x, sirka - 440 * m)), top: hore ? rVyber.y - 8 : rVyber.y + rVyber.h + 8 };
+    /* Pri ťahaní lišta zmizne. Na dotyk ostane v DOM (len neviditeľná): úchyt drží
+       prst (implicitné zachytenie ukazovateľa) — keby sa odstránil, ďalšie `pointermove`
+       a `pointerup` by k dokumentu plátna už nedošli. */
+    if (tahanie && !dotyk) return null;
     return (
-      <div className={`vw-lista pointer-events-none${hore ? ' je-hore' : ''}`} style={styl} data-vw-lista={o.nazov}>
+      <div ref={listaRef} className={`vw-lista pointer-events-none${hore ? ' je-hore' : ''}${dotyk ? ' je-dotyk' : ''}${tahanie ? ' je-tahanie' : ''}`} style={styl} data-vw-lista={o.nazov}>
         {z && (
           <>
             <button type="button" className="vw-uchyt" title="Potiahnutím presuniete" aria-label="Presunúť ťahaním" onPointerDown={zacniTahanieZUchytu(o)}><GripVertical /></button>
@@ -583,15 +683,34 @@ export function Vrstva({ doc, kontext, vyber, onVyber, lenNaCitanie, onZmena, on
       )}
       {lista}
       {plusy}
-      {pisanie && rVyber && (
+      {pisanie && rVyber && !dotyk && (
         <span className={`vw-pocitadlo pointer-events-none${dlzkaPisania >= pisanie.text.limit ? ' je-plne' : ''}`} style={{ left: rVyber.x, top: rVyber.y + rVyber.h + 8 }}>
           {pisanie.jazyk.toUpperCase()} · {dlzkaPisania} / {pisanie.text.limit} · Enter potvrdí, Esc vráti
         </span>
+      )}
+      {/* Dotyk: klávesnica telefónu nemá Esc a Enter býva skrytý — Hotovo a Zrušiť
+          pod textom. `mousedown` bez predvolenej akcie: klepnutie nezoberie textu
+          zameranie (inak by ho `blur` potvrdil skôr, než by Zrušiť zabralo). */}
+      {pisanie && rVyber && dotyk && (
+        <div className="vw-pise-tlacidla pointer-events-none" style={{ left: Math.max(0, Math.min(rVyber.x, sirka - 300 * m)), top: rVyber.y + rVyber.h + 8 }} data-vw-pise-tlacidla>
+          <span className={`vw-pocitadlo-dotyk pointer-events-none${dlzkaPisania >= pisanie.text.limit ? ' je-plne' : ''}`}>{pisanie.jazyk.toUpperCase()} · {dlzkaPisania} / {pisanie.text.limit}</span>
+          <button type="button" className="vw-pise-hotovo" data-vw-pise-hotovo onMouseDown={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()} onClick={() => ukonciPisanie(true)}>
+            <Check /> Hotovo
+          </button>
+          <button type="button" data-vw-pise-zrusit onMouseDown={(e) => e.preventDefault()} onPointerDown={(e) => e.stopPropagation()} onClick={() => ukonciPisanie(false)}>
+            <X /> Zrušiť
+          </button>
+        </div>
       )}
       {ciara && <div className={`vw-ciara ${ciara.w > ciara.h ? 'vw-ciara-vodorovne' : 'vw-ciara-zvisle'} pointer-events-none`} style={{ left: ciara.x, top: ciara.y, width: ciara.w, height: ciara.h }} />}
       {tahanie && <span className="vw-tahany-duch pointer-events-none" style={{ left: tahanie.x, top: tahanie.y }}>{tahanie.opis.stitok}</span>}
     </div>
   );
+}
+
+/** Ovláda sa plátno prstom (telefón, tablet)? Pýta sa okna plátna — `window.matchMedia` je počas editora presmerované. */
+function jeDotyk(doc: Document): boolean {
+  try { return !!doc.defaultView?.matchMedia('(pointer: coarse)').matches; } catch { return false; }
 }
 
 /** Pre klávesy: presun vybraného prvku o jedno miesto (Alt+šípky). */

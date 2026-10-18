@@ -9,6 +9,10 @@
  * Klávesy (v administrácii aj v okne plátna): šípky menia výber, Alt+šípky
  * presúvajú, Delete odstráni (s potvrdením), Enter upraví text, Esc zruší
  * výber, Ctrl+Z / Ctrl+Y, Ctrl+S uloží koncept.
+ *
+ * Telefón a tablet (≤ 1023 px, `lib/mobil.ts`): pravý panel je spodný list
+ * (`SpodnyList`), na telefóne je predvolený náhľad Mobil a plátno siaha po
+ * okraje obrazovky. Rozvrh lišty rieši `vzhlad-editor.css`.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -31,6 +35,8 @@ import { zmenyVzhladu } from '../../lib/vzhlad/zmeny';
 import { indexZaznamu, vycistiNeplatne } from './stav/operacie';
 import { zaznamNovejKategorie } from '../../lib/vzhlad/prevod';
 import { prekladZoSlovnika } from '../../lib/jazyk';
+import { jeTelefon, useSirkaAdministracie } from '../lib/mobil';
+import { SpodnyList, type StavListu } from './SpodnyList';
 
 export function VizualnyEditor({ stranka, naStranku, spat, otvorFormular, odrolovat }: {
   stranka: Stranka;
@@ -44,10 +50,23 @@ export function VizualnyEditor({ stranka, naStranku, spat, otvorFormular, odrolo
   const ui = useEditorUI();
   const a = useAkciePrvkov();
   const [jazyk, setJazyk] = useState<Jazyk>('sk');
-  const [zariadenie, setZariadenie] = useState<Zariadenie>('pocitac');
+  /* Na telefóne sa plátno predvolene kreslí ako mobil — tak, ako stránku uvidí návštevník s telefónom. */
+  const [zariadenie, setZariadenie] = useState<Zariadenie>(() => (jeTelefon() ? 'mobil' : 'pocitac'));
+  const { uzke, telefon } = useSirkaAdministracie();
+  const [list, setList] = useState<StavListu>('zbalene');
+  /* Pri písaní priamo v stránke list ustúpi, aby bolo vidieť text aj klávesnicu. */
+  const onPise = useCallback((pise: boolean) => { if (pise) setList('zbalene'); }, []);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState<CanvasZoom>('fit');
   const [panel, setPanel] = useState(true);
   const [menu, setMenu] = useState(false);
+  /* Dotyk nemá „odchod myši" — ponuka ⋯ sa na úzkej obrazovke zavrie aj klepnutím mimo nej. */
+  useEffect(() => {
+    if (!menu || !uzke) return;
+    const mimo = (e: PointerEvent) => { if (!menuRef.current?.contains(e.target as Node)) setMenu(false); };
+    document.addEventListener('pointerdown', mimo, true);
+    return () => document.removeEventListener('pointerdown', mimo, true);
+  }, [menu, uzke]);
   const [pisatTeraz, setPisatTeraz] = useState(0);
   const [doc, setDoc] = useState<Document | null>(null);
   const docRef = useRef<Document | null>(null);
@@ -205,20 +224,20 @@ export function VizualnyEditor({ stranka, naStranku, spat, otvorFormular, odrolo
   const kategoriaVyber = stranka.druh === 'kategoria' ? stranka.slug : '';
 
   return (
-    <div data-vw-editor>
+    <div data-vw-editor className={uzke ? `vw-uzke vw-list-${list}` : undefined}>
       {/* Dva riadky: hore stav a vydanie, dole stránka a zobrazenie plátna. */}
-      <div className="ad-editor-head vw-hlava">
-        <button className="abtn abtn-icon" onClick={spat} title="Späť" aria-label="Späť"><ArrowLeft className="w-4 h-4" /></button>
+      <div className="ad-editor-head vw-hlava vw-m-hlava">
+        <button className="abtn abtn-icon vw-m-spat" onClick={spat} title="Späť" aria-label="Späť"><ArrowLeft className="w-4 h-4" /></button>
         <div className="ad-head-title">
-          <div className="ad-head-line"><span className="ad-title">Vzhľad webu · {nazovStranky(stranka, k.kategorieDb)}</span></div>
+          <div className="ad-head-line"><span className="ad-title"><span className="adm-m-skry">Vzhľad webu · </span>{nazovStranky(stranka, k.kategorieDb)}</span></div>
           <div className={`vw-stav ${stav.c}`} data-vw-stav>
             {k.pracuje ? <><Loader2 className="w-3 h-3 animate-spin" /> {k.pracuje}</> : <><span className="vw-stav-bodka" /> {stav.t}</>}
           </div>
         </div>
         <div style={{ flex: 1 }} />
-        <button className="abtn" onClick={() => void k.ulozit()} disabled={!!k.pracuje || lenNaCitanie || !k.neulozene} data-vw-ulozit title="Uloží koncept (Ctrl+S) — web sa nezmení">Uložiť koncept</button>
+        <button className="abtn" onClick={() => void k.ulozit()} disabled={!!k.pracuje || lenNaCitanie || !k.neulozene} data-vw-ulozit title="Uloží koncept (Ctrl+S) — web sa nezmení">{telefon ? 'Uložiť' : 'Uložiť koncept'}</button>
         <button className="abtn abtn-primary" onClick={() => void k.pripravZverejnenie()} disabled={!!k.pracuje || lenNaCitanie} data-vw-zverejnit>Zverejniť</button>
-        <div className="vw-menu-wrap">
+        <div className="vw-menu-wrap" ref={menuRef}>
           <button className="abtn abtn-icon" onClick={() => setMenu((x) => !x)} aria-label="Ďalšie" title="Ďalšie" data-vw-menu><MoreHorizontal className="w-4 h-4" /></button>
           {menu && (
             <div className="vw-menu" onMouseLeave={() => setMenu(false)}>
@@ -259,10 +278,10 @@ export function VizualnyEditor({ stranka, naStranku, spat, otvorFormular, odrolo
         <div className="ad-seg" role="group" aria-label="Zariadenie a zväčšenie">
           <button className={zariadenie === 'pocitac' ? 'is-on' : ''} onClick={() => setZariadenie('pocitac')} aria-label="Počítač" title="Počítač (1440 px)" data-vw-zariadenie="pocitac"><Monitor className="w-4 h-4" /></button>
           <button className={zariadenie === 'mobil' ? 'is-on' : ''} onClick={() => setZariadenie('mobil')} aria-label="Mobil" title="Mobil (390 px)" data-vw-zariadenie="mobil"><Smartphone className="w-4 h-4" /></button>
-          <button className={zoom === 'fit' ? 'is-on' : ''} onClick={() => setZoom('fit')} title="Prispôsobiť šírke" data-vw-zoom="fit">Prispôsobiť</button>
-          <button className={zoom === 'full' ? 'is-on' : ''} onClick={() => setZoom('full')} title="Skutočná veľkosť" data-vw-zoom="full">100 %</button>
+          <button className={`vw-m-zoom${zoom === 'fit' ? ' is-on' : ''}`} onClick={() => setZoom('fit')} title="Prispôsobiť šírke" data-vw-zoom="fit">Prispôsobiť</button>
+          <button className={`vw-m-zoom${zoom === 'full' ? ' is-on' : ''}`} onClick={() => setZoom('full')} title="Skutočná veľkosť" data-vw-zoom="full">100 %</button>
         </div>
-        <button className="abtn abtn-icon" onClick={() => setPanel((x) => !x)} aria-label={panel ? 'Skryť panel' : 'Zobraziť panel'} title={panel ? 'Skryť pravý panel' : 'Zobraziť pravý panel'}>
+        <button className="abtn abtn-icon vw-m-panel" onClick={() => setPanel((x) => !x)} aria-label={panel ? 'Skryť panel' : 'Zobraziť panel'} title={panel ? 'Skryť pravý panel' : 'Zobraziť pravý panel'}>
           {panel ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
         </button>
       </div>
@@ -301,9 +320,15 @@ export function VizualnyEditor({ stranka, naStranku, spat, otvorFormular, odrolo
             upozornenia={naPlatne}
             pisatTeraz={pisatTeraz}
             onDokument={setDoc}
+            onPise={uzke ? onPise : undefined}
           />
         </div>
-        {panel && (
+        {uzke ? (
+          <SpodnyList stav={list} onStav={setList}>
+            <PravyPanel stranka={stranka} opis={lenNaCitanie ? null : opisVyberu} jazyk={jazyk} onJazyk={setJazyk}
+                        onZrusVyber={() => k.nastavVyber(null)} upozornenia={vPaneli} lenNaCitanie={lenNaCitanie} />
+          </SpodnyList>
+        ) : panel && (
           <PravyPanel stranka={stranka} opis={lenNaCitanie ? null : opisVyberu} jazyk={jazyk} onJazyk={setJazyk}
                       onZrusVyber={() => k.nastavVyber(null)} upozornenia={vPaneli} lenNaCitanie={lenNaCitanie} />
         )}
