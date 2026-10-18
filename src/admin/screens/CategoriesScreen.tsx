@@ -9,17 +9,27 @@
  * Zoznam vľavo, formulár vpravo. Poradie sa mení ťahaním za úchyt a ukladá sa
  * hneď (pole `order` v schéme). Kategóriu s článkami sa vymazať nedá — články
  * by ostali bez zaradenia.
+ *
+ * Dva druhy údajov, viditeľne oddelené:
+ *   • ukladá sa hneď — názov, adresa (slug), popis a poradie v databáze
+ *     (čítajú ich aj staré verzie webu a appka),
+ *   • zverejní sa so vzhľadom — obrázok, popisky dlaždice a menu, popis na
+ *     webe, anglický a nemecký názov; upravujú sa v editore vzhľadu
+ *     („Vzhľad na webe") a na web idú až zverejnením vzhľadu.
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { GripVertical, Plus, ChevronRight, Loader2, Trash2 } from 'lucide-react';
+import { GripVertical, Plus, ChevronRight, Loader2, Trash2, LayoutTemplate, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import {
   listCategories, createCategory, updateCategory, deleteCategory, saveCategoryOrder, toSlug,
   type Category,
 } from '../api/taxonomy';
 
-export function CategoriesScreen() {
+export function CategoriesScreen({ onVzhlad }: {
+  /** Otvorí stránku kategórie v editore vzhľadu webu. */
+  onVzhlad?: (slug: string) => void;
+} = {}) {
   const { token } = useAuth();
   const [cats, setCats] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,6 +66,19 @@ export function CategoriesScreen() {
 
   const save = async () => {
     if (!token || !draft.name?.trim()) return;
+    /* Zmena adresy rozbije odkazy, ktoré na ňu ukazujú — pýta sa výslovne. */
+    const stary = cats.find((c) => c.documentId === selected);
+    if (stary && draft.slug !== undefined && draft.slug !== stary.slug) {
+      const ist = window.confirm([
+        `Adresa kategórie sa zmení z /category/${stary.slug} na /category/${draft.slug}.`,
+        '',
+        'Na starú adresu ukazujú odkazy z iných webov a vyhľadávačov, presmerovania zo starého webu (Blogger), sitemap,',
+        'odkazy v článkoch a staré verzie mobilnej aplikácie — tie skončia na „Kategória nebola nájdená".',
+        '',
+        'Naozaj zmeniť adresu?',
+      ].join(String.fromCharCode(10)));
+      if (!ist) return;
+    }
     setBusy(true); setMsg(null);
     try {
       if (selected === 'nova') await createCategory(token, { ...draft, slug: draft.slug || toSlug(draft.name) });
@@ -169,6 +192,14 @@ export function CategoriesScreen() {
                 <div className="ad-cat-slug">/{c.slug}</div>
               </div>
               <div className="ad-cat-count">{c.posts ?? '—'}</div>
+              {onVzhlad && (
+                <button type="button" className="abtn" style={{ padding: '3px 8px', fontSize: 12 }}
+                        title="Obrázok, popisky, popis a preklady názvu — v editore vzhľadu webu"
+                        data-vw-vzhlad-kategorie={c.slug}
+                        onClick={(e) => { e.stopPropagation(); onVzhlad(c.slug); }}>
+                  <LayoutTemplate className="w-3.5 h-3.5" /> Vzhľad na webe
+                </button>
+              )}
               <ChevronRight className="w-4 h-4" style={{ color: 'var(--ad-muted)' }} />
             </div>
           ))}
@@ -179,6 +210,8 @@ export function CategoriesScreen() {
             <div className="ad-empty-row">Vyberte kategóriu vľavo, alebo pridajte novú.</div>
           ) : (
             <>
+              <div className="vw-hned">
+              <span className="vw-druh-ulozenia je-hned">Ukladá sa hneď</span>
               <div className="ad-field">
                 <label htmlFor="cat-name">Názov</label>
                 <input
@@ -209,6 +242,36 @@ export function CategoriesScreen() {
                   onChange={(e) => { setDraft((d) => ({ ...d, description: e.target.value })); setDirty(true); }}
                 />
               </div>
+
+              {current && draft.slug !== undefined && draft.slug !== current.slug && (
+                <div className="ad-note" role="alert" style={{ display: 'flex', gap: 8, color: 'var(--ad-danger)' }} data-vw-varovanie-slug>
+                  <AlertTriangle className="w-4 h-4" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span>
+                    Meníte adresu kategórie. Na <b>/category/{current.slug}</b> ukazujú odkazy z iných webov, presmerovania zo
+                    starého webu (Blogger), sitemap, odkazy v článkoch aj staré verzie appky — po zmene skončia na „Kategória
+                    nebola nájdená". Editor vzhľadu slug nemení nikdy.
+                  </span>
+                </div>
+              )}
+              <div className="ad-note" style={{ fontSize: 12.5 }}>
+                Názov, adresa, popis a poradie sa zapíšu do databázy hneď po uložení — vidia ich aj staré verzie webu a appka.
+                Nový web ukazuje názov a popis zo vzhľadu webu, ak ich vzhľad má; editor vzhľadu zmenu názvu prevezme sám
+                a na web ju dostane zverejnenie vzhľadu.
+              </div>
+              </div>
+
+              {current && onVzhlad && (
+                <div className="vw-so-vzhladom">
+                  <span className="vw-druh-ulozenia je-vzhlad">Zverejní sa so vzhľadom webu</span>
+                  <div className="ad-note" style={{ fontSize: 12.5 }}>
+                    Obrázok kategórie (dlaždica, lišta, hlavička), popisok dlaždice a krátky názov v menu, popis na stránke kategórie,
+                    anglický a nemecký názov, zoradenie a pripnuté články. Menia sa v koncepte vzhľadu a na web idú až zverejnením.
+                  </div>
+                  <button type="button" className="abtn" onClick={() => onVzhlad(current.slug)} data-vw-otvorit-vzhlad>
+                    <LayoutTemplate className="w-4 h-4" /> Upraviť vzhľad kategórie
+                  </button>
+                </div>
+              )}
 
               {current && (
                 <div className="ad-note">
