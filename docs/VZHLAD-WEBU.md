@@ -241,6 +241,7 @@ Pri neuložených zmenách (vzhľad aj článok) sa odchod z obrazovky, zmena `#
 | `Vrstva.tsx` | vrstva nad plátnom: rámik pri prejdení, výber, lišta nástrojov, ťahanie, „+“, písanie priamo v texte |
 | `prvky.ts` | register prvkov: čo je prvok s daným `data-vw`, čo sa s ním dá robiť (presun, skrytie, text, obrázok, odstránenie, pripnutie) |
 | `PravyPanel.tsx`, `oblasti.tsx`, `polia.tsx` | pravý panel: nastavenia vybraného prvku a celých oblastí (úvod, dlaždice, sekcie, „Ďalší obsah“, činnosť, kronika, „Pridajte sa“, kategória, menu, päta) |
+| `SpodnyList.tsx` | pravý panel na telefóne a tablete: spodný list (zbalený, polovica, celý), úchyt klepnutím aj ťahaním |
 | `ui.tsx` | dialógy v dokumente administrácie: potvrdenie, výber článku, kategórie, cieľa odkazu, fotky; obrázok (médiá, nahratie, výrez, kde je použitý, „Vrátiť pôvodný“) |
 | `akcie.tsx` | spoločné úkony lišty, klávesnice a panela |
 | `dialogy.tsx` | konflikt verzií, chyby kontroly, zverejnenie so zoznamom zmien, konflikt s DB, história, obnova zálohy, zahodenie |
@@ -309,6 +310,30 @@ Editor vzhľadu slug nemení nikdy.
 (`GET /api/vzhlad-webu/pouzitie-suboru/:id`): koncept, zverejnený vzhľad, posledné verzie histórie, zoznam chránených
 súborov starých verzií webu a appky. Taký súbor sa zmazať nedá a obrazovka vypíše miesta. Backend zmazanie aj tak odmietne (409) — obrazovka len vysvetlí vopred, prečo.
 
+## Administrácia na telefóne a tablete
+
+Celá administrácia sa dá používať na telefóne (390 × 844, dotyk) aj na tablete. Počítač (≥ 1024 px, myš) sa nemení:
+všetko je v `src/admin/admin-mobil.css` (rám, obrazovky, editor článku) a v časti „TELEFÓN A TABLET“ súboru
+`src/admin/vzhlad/vzhlad-editor.css`, pod koreňom `.adm-koren` a v media dotazoch. JS rozhoduje podľa šírky okna
+administrácie (`src/admin/lib/mobil.ts`, nie `matchMedia` — to plátno počas editora presmeruje na svoje okno).
+
+| šírka | čo sa zmení |
+|---|---|
+| ≤ 1023 px | ponuka v zásuvke za tlačidlom ☰ (clona, Esc, krížik, zavrie sa po výbere), ciele dotyku 44 px, polia s písmom 16 px (iOS pri menšom zväčšuje), editor článku v jednom stĺpci s údajmi pod plátnom (tlačidlo „Údaje článku“), pravý panel editora vzhľadu ako spodný list, hlavička editora vzhľadu prilepená pod hlavičkou administrácie |
+| ≤ 767 px | hlavičky s ikonami, dialógy na celú obrazovku (tlačidlá prilepené dole), tabuľky Články a Používatelia ako karty, jeden stĺpec formulárov, editor vzhľadu aj článku predvolene s náhľadom **Mobil** a plátnom po okraje obrazovky (mierka 1) |
+| dotyk (`pointer: coarse`) | vo vrstve plátna: lišta prvku s tlačidlami 44 px zalomená do šírky plátna, „+“ 44 px, pri písaní tlačidlá Hotovo / Zrušiť; v editore článku pruhy na vkladanie neprekrývajú text a „+“ je pri vybranom bloku |
+
+**Spodný list** (`vzhlad/SpodnyList.tsx`): zbalený (úchyt a nadpis vybraného prvku), polovica a celá obrazovka. Klepnutie
+na úchyt prepne na ďalšiu polohu, potiahnutie ho posunie a pustenie prichytí k najbližšej. `touch-action: none` má len úchyt.
+Pri písaní priamo v stránke sa list zbalí.
+
+**Plátno prstom** (`Vrstva.tsx`): klepnutie vyberá; potiahnutie prstom po stránke ju posúva a nič neťahá (prehliadač
+pri posúvaní pošle `pointercancel`, ten ťahanie aj čakajúci výber zruší). Ťahá sa za úchyt v lište (`touch-action: none`);
+lišta počas ťahania ostane v DOM neviditeľná — úchyt drží prst (implicitné zachytenie ukazovateľa) a keby zmizol, ďalšie
+udalosti by k dokumentu plátna nedošli. Pri ťahaní pri hornom alebo dolnom okraji obrazovky sa administrácia posúva
+sama. Spoľahlivá cesta sú tlačidlá ← → / ↑ ↓ v lište. Enter klávesnice telefónu potvrdí text aj vtedy, keď príde len
+ako `beforeinput` `insertParagraph`.
+
 ## Testy (`scripts/vzhlad/`, výstupy v `scripts/vzhlad/vystup/`, nekomitujú sa)
 
 Prostredie: dnešný web = build z `main` vo worktree `../hradiska-web-zaklad`, nový web = build z vetvy, oba s
@@ -326,6 +351,8 @@ Po builde vrátiť `git checkout public/sitemap.xml`.
 | `prevod.mjs` | prevod F3 |
 | `test-editor.mjs` | editor vzhľadu proti lokálnemu backendu (plán, časť 10.3): založenie z dnešného webu, 30 rôznych úprav myšou a klávesnicou (presun, skrytie, text v troch jazykoch, obrázok z médií a nahratý, výrez, „Vrátiť pôvodný“, riadok, pripnutie, kategória, menu, päta), Ctrl+Z / Ctrl+Y, uloženie, záloha a obnova po zatvorení karty, konflikt dvoch redaktorov (409), chyba kontroly, zverejnenie so zoznamom zmien a overenie verejného webu, náhľad, história a obnovenie verzie, klasická úprava, Kategórie a Médiá; snímky do `vystup/snimky-editor/` (1440 a 390). Na konci vráti DB do stavu pred testom a porovná všetky tabuľky. |
 | `test-editor-clankov.mjs` | editor článkov po presune `CanvasFrame`: 20 článkov, klik do každého textového bloku, uloženie konceptu, obsah v DB sa nesmie zmeniť. Mení v DB časy a id komponentov — po teste vrátiť DB zo zálohy. |
+| `test-mobil.mjs` | administrácia na telefóne (390 × 844, isMobile, hasTouch) proti lokálnemu backendu: každá obrazovka bez posunu do strán a bez chýb v konzole, ponuka v zásuvke, editor vzhľadu (náhľad Mobil, spodný list klepnutím aj ťahaním, výber klepnutím, popisok SK v stránke, posun tlačidlom, ťahanie prstom za úchyt, posúvanie stránky prstom, uloženie, zverejnenie, verejná stránka, história → obnovenie → zverejnenie → web ako pred testom), klasická úprava (zmena, zverejnenie, návrat), editor článku (odsek, titulná fotka, uloženie — v DB sa zmení len to). Odloží si dotknuté tabuľky a na konci ich vráti; porovná obsah všetkých tabuliek. |
+| `snimky-mobil.mjs --faza pred\|po` | snímky každej obrazovky pri 390 a 768 do `vystup/snimky-mobil/<faza>/` a meranie (pretečenie, ciele dotyku pod 44 px, polia pod 16 px); koncept vzhľadu založený kvôli plátnu na konci zmaže |
 
 Akceptované rozdiely v teste zhody (režim 2 a 2v), nič iné:
 1. **EN a DE domovská, kronika:** úvodný článok a pripnuté zápisy sa začnú zobrazovať správne (predtým sa hľadali podľa
@@ -377,3 +404,24 @@ tých pohľadov aj dva celé behy potom dali zhodu.
 
 `test-editor-clankov.mjs` našiel pri prvých behoch chybu editora článkov, ktorá s presunom `CanvasFrame` nesúvisí:
 klik do bloku, ktorý je len nadpis, pridal prázdny odsek (pozri `docs/EDITOR.md`) — opravené.
+
+### Administrácia na telefóne (18. 10. 2026, FE vetva `mobil-admin`, lokálny backend s kópiou ostrej DB)
+
+Prostredie ako pri editore: backend na `:1337` s `ENV_PATH=.env.lokalne-vzhlad`, vývojový server na `:5190`,
+pred testami záloha `hradiska-strapi/.tmp/data.db.pred-mobilom`. Test zhody proti `../hradiska-web-zaklad/dist`
+s `VZHLAD_BACKEND=http://localhost:1337` (oba weby aj zoznam stránok z toho istého backendu), `--sucasne 2`.
+
+| test | výsledok (každý dvakrát) |
+|---|---|
+| `test-mobil.mjs` | 100 z 100 a 100 z 100; po návrate obsah všetkých tabuliek aj `sqlite_sequence` ako pred testom |
+| `test-editor.mjs` | 100 z 100 a 100 z 100; tabuľky s iným obsahom: žiadne |
+| `test-editor-clankov.mjs` | obsah rovnaký 20 z 20 a 20 z 20 (po každom behu DB zo zálohy) |
+| `test-zhoda.mjs --rezim 1` | rovnaké 102 z 102 a 102 z 102 (aj tretí beh na poslednom builde) |
+| `npm run build` | v poriadku (štyrikrát), `public/sitemap.xml` vrátený; štýly telefónu sú len v balíku `AdminApp-*.css` |
+| `snimky-mobil.mjs --faza po` | 24 obrazoviek pri 390 aj 768: vodorovné pretečenie 0 px všade, polia pod 16 px 0; ciele pod 44 px len pole hľadania v Štítkoch a Pripomienkach (42 px vnútri rámika 44 px) |
+| `test-admin-pocitac.mjs` (worktree `main` na `:5191` proti vetve) | 1440 a 1024: rovnaké 45 z 50 v prvom behu; z piatich rozdielov (jednotky až stovky pixelov, odtiene na hranách) boli pri opakovaní 4 rovnaké a Médiá sa v snímke okna líšia aj pôvodný kód sám so sebou (celá stránka rovnaká) — šum merania, nie zmena |
+
+Pred úpravou (`snimky-mobil.mjs --faza pred`): pri 390 px každá obrazovka pretekala o 200 – 537 px (bočná ponuka 232 px
+a hlavička sa nezmenšili), plátno editora vzhľadu sa vôbec nedalo nájsť (stĺpec plátna mal nulovú šírku), pri 768 px
+plátno vzhľadu široké ~120 px a hlavička klasickej úpravy pretekala o 159 px; skoro všetky ciele dotyku pod 44 px,
+polia s písmom 14 px.

@@ -14,6 +14,9 @@ Tento report je podklad k prerobeniu adminu na vizuálny editor, kde správca vi
 >   „Ukladá sa hneď“ (názov, adresa, popis, poradie) a „Zverejní sa so vzhľadom webu“ a varovanie pri zmene adresy.
 > - **Médiá** pred zmazaním ukážu, kde vo vzhľade webu je súbor použitý; taký súbor sa zmazať nedá.
 > - Okno plátna (`CanvasFrame`) je presunuté do `src/admin/editor/platno/` a používa ho aj editor vzhľadu.
+> - **Telefón a tablet** (vetva `mobil-admin`): ponuka v zásuvke, dialógy na celú obrazovku, tabuľky ako karty,
+>   editor vzhľadu so spodným listom a ovládaním prstom, editor článku v jednom stĺpci. Počítač sa nemení.
+>   Opis v `docs/VZHLAD-WEBU.md` („Administrácia na telefóne a tablete“), test `scripts/vzhlad/test-mobil.mjs`.
 >
 > Kapitoly nižšie opisujú stav z 22. 9. 2026 a ďalej sa neaktualizujú.
 

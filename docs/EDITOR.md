@@ -68,6 +68,15 @@ zmeny správania, aby ho mohol použiť editor vzhľadu webu (`docs/VZHLAD-WEBU.
 | Vidieť mobil | prepínač Počítač / Mobil |
 | Písať v skutočnej veľkosti | prepínač Prispôsobiť / 100 % |
 
+## Na telefóne a tablete
+
+Editor je na telefóne použiteľný, nie prepísaný (pozri `docs/VZHLAD-WEBU.md`, „Administrácia na telefóne a tablete“):
+hlavička sa zalomí, plátno je na celú šírku s predvoleným náhľadom **Mobil**, údaje článku (titulná fotka, kategória,
+SEO…) sú pod plátnom — tlačidlo **Údaje článku** na ne skočí. Klepnutie do odseku zapne písanie; na dotyk pruhy na
+vkladanie neprekrývajú okraj textu, „+“ je pri vybranom bloku a lišta bloku má tlačidlá 44 px. Knižnica médií je na
+celú obrazovku. Ukladanie sa nemení — to isté pole blokov, bajt po bajte ten istý výstup (`test-mobil.mjs` to overí na
+telefóne, `test-editor-clankov.mjs` na počítači).
+
 ## Pravidlá, ktoré sa nesmú porušiť
 
 **Ukladanie prepisuje celé pole blokov.** `PUT` s poľom `blocks` nahradí všetky
