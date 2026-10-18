@@ -1,0 +1,179 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   ADMINISTRÁCIA NA TELEFÓNE A TABLETE
+
+   Všetko je pod `.adm-koren` (koreň administrácie v dokumente stránky) a —
+   okrem skrytia prvkov, ktoré na počítači nie sú — v media dotazoch:
+     • ≤ 1023 px (tablet aj telefón): ponuka v zásuvke, ciele dotyku 44 px,
+       polia s písmom 16 px (iOS pri menšom písme pri zameraní zväčšuje),
+       editor článku v jednom stĺpci, panel editora vzhľadu ako spodný list,
+     • ≤ 767 px (telefón): jeden stĺpec, dialógy na celú obrazovku, tabuľky
+       ako karty, hlavičky s ikonami namiesto textu.
+
+   Prečo `.adm-koren` a nie `.admin`: štýly stránky sa kopírujú aj do okna
+   plátna (iframe, `CanvasFrame`) a pobočný stĺpec článku je tam tiež
+   v `.admin`. Media dotaz v okne plátna sa pýta šírky PLÁTNA — v náhľade
+   Mobil (390 px) by pravidlá pod `.admin` zmenili plátno aj na počítači.
+   `.adm-koren` v okne plátna nie je.
+
+   Žiadne triedy Tailwindu (Tailwind sa nebuilduje), predpona `adm-m-`.
+   Súbor sa načíta len s administráciou — verejný web ho nedostane.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Prvky, ktoré existujú len na telefóne a tablete. */
+.adm-koren .adm-m-iba { display: none; }
+
+/* ── Rám: zásuvka s ponukou, hlavička, obsah ─────────────────────────────── */
+@media (max-width: 1023px) {
+  .adm-koren .adm-m-iba { display: inline-flex; }
+
+  .adm-koren > .adm-m-bocny {
+    position: fixed !important; left: 0; top: 0; bottom: 0; z-index: 160;
+    width: min(300px, 86vw) !important; height: 100vh !important; height: 100dvh !important;
+    transform: translateX(-102%); visibility: hidden;
+    transition: transform .22s ease, visibility 0s linear .22s;
+  }
+  .adm-koren.je-ponuka > .adm-m-bocny {
+    transform: none; visibility: visible; transition: transform .22s ease;
+    box-shadow: 0 0 44px rgba(10, 6, 2, .45);
+  }
+  .adm-koren .adm-m-clona { position: fixed; inset: 0; z-index: 155; background: rgba(20, 14, 6, .5); }
+  .adm-koren .adm-m-zavriet {
+    margin-left: auto; width: 44px; height: 44px; flex-shrink: 0; align-items: center; justify-content: center;
+    border: 0; border-radius: 10px; background: none; color: var(--ad-side-text); cursor: pointer;
+  }
+  .adm-koren .ad-nav { min-height: 44px; }
+  /* Kým je zásuvka otvorená, stránka pod ňou sa neposúva. */
+  html:has(.adm-koren.je-ponuka) { overflow: hidden; }
+
+  .adm-koren .adm-m-hlavicka { padding: 6px 16px !important; gap: 8px !important; min-height: 56px; }
+  .adm-koren .adm-m-cesta { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px !important; }
+  .adm-koren .adm-m-obsah { padding: 16px !important; }
+  .adm-koren .ad-upoz { margin: 12px 16px -4px; flex-wrap: wrap; }
+
+  /* Ciele dotyku aspoň 44 px. */
+  .admin.adm-koren .abtn { min-height: 44px; }
+  .admin.adm-koren .abtn-icon { width: 44px; height: 44px; min-width: 44px; }
+  .admin.adm-koren .ad-seg button { min-height: 44px; min-width: 44px; justify-content: center; }
+  .admin.adm-koren .apanel-head { min-height: 52px; }
+  .admin.adm-koren input[type="checkbox"], .admin.adm-koren input[type="radio"] { width: 20px; height: 20px; flex-shrink: 0; }
+  /* Polia: písmo 16 px — iOS pri menšom pri zameraní priblíži celú stránku. */
+  .admin.adm-koren :is(input, select, textarea, .afld) { font-size: 16px; }
+  .admin.adm-koren :is(input, select).afld { min-height: 44px; }
+}
+
+@media (max-width: 767px) {
+  .adm-koren .adm-m-skry { display: none; }
+  .admin.adm-koren .adm-m-ikona { width: 44px; height: 44px; padding: 0 !important; justify-content: center; }
+  .adm-koren .adm-m-hlavicka { padding: 6px 12px !important; }
+  .adm-koren .adm-m-obsah { padding: 12px !important; }
+  .adm-koren .ad-upoz { margin: 10px 12px -2px; }
+}
+
+/* ── Dialógy: na telefóne na celú obrazovku ──────────────────────────────── */
+@media (max-width: 767px) {
+  .adm-koren :is(.ad-modal-wrap, .adm-m-zaves) {
+    padding: 0 !important; align-items: stretch !important; justify-content: stretch !important;
+  }
+  .adm-koren :is(.ad-modal-wrap, .adm-m-zaves) > :is(.acard, .ad-modal, .adm-m-okno) {
+    width: 100% !important; max-width: none !important;
+    height: 100% !important; max-height: none !important; min-height: 100%;
+    border-radius: 0 !important; border: 0 !important; box-sizing: border-box;
+    overflow-y: auto; overscroll-behavior: contain;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  /* Knižnica médií si posúva len mriežku — rám ostáva bez okrajov. */
+  .adm-koren .adm-m-zaves > .adm-m-okno.adm-m-okno-ram { padding: 0 !important; overflow: hidden; }
+  /* Tlačidlá dialógu ostanú po ruke aj pri dlhom obsahu. */
+  .adm-koren .ad-modal > div:last-child,
+  .adm-koren .vw-dialog .vw-dialog-tlacidla,
+  .adm-koren .adm-m-okno > div:last-child:has(> .abtn) {
+    position: sticky; bottom: calc(-16px - env(safe-area-inset-bottom, 0px)); z-index: 2;
+    margin: 16px -16px calc(-16px - env(safe-area-inset-bottom, 0px)); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--ad-card); border-top: 1px solid var(--ad-line);
+    flex-wrap: wrap;
+  }
+  .adm-koren .ad-modal > div:last-child > .abtn,
+  .adm-koren .vw-dialog .vw-dialog-tlacidla > .abtn,
+  .adm-koren .adm-m-okno > div:last-child:has(> .abtn) > .abtn { flex: 1 1 auto; justify-content: center; }
+}
+
+/* ── Tabuľky ako karty (telefón) ─────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .admin.adm-koren table.adm-m-karty { min-width: 0 !important; display: block; }
+  .adm-koren table.adm-m-karty thead { display: none; }
+  .adm-koren table.adm-m-karty tbody { display: block; }
+  .adm-koren table.adm-m-karty tr {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+    padding: 12px 14px; border-bottom: 1px solid var(--ad-line);
+  }
+  .adm-koren table.adm-m-karty tbody tr:last-child { border-bottom: 0; }
+  .admin.adm-koren table.adm-m-karty td { display: block; padding: 0; border: 0; font-size: 14px; }
+  .adm-koren table.adm-m-karty td[colspan] { flex: 1 1 100%; padding: 28px 0; }
+  .adm-koren table.adm-m-karty td.adm-m-nazov { flex: 1 1 calc(100% - 70px); min-width: 0; overflow-wrap: anywhere; }
+  .adm-koren table.adm-m-karty td.adm-m-obr { flex: 0 0 auto; }
+  .adm-koren table.adm-m-karty td.adm-m-meta { font-size: 13px; }
+  .adm-koren table.adm-m-karty td.adm-m-meta[data-stlpec]::before { content: attr(data-stlpec) ': '; color: var(--ad-muted); }
+  .adm-koren table.adm-m-karty td.adm-m-meta + td.adm-m-meta::before { content: '· '; color: var(--ad-muted); }
+  .adm-koren table.adm-m-karty td.adm-m-akcie { flex: 1 1 100%; }
+  .adm-koren table.adm-m-karty td.adm-m-akcie > div { flex-wrap: wrap; }
+  .adm-koren table.adm-m-karty-uctov td.adm-m-nazov { flex-basis: 100%; }
+  /* Články: obrázok vľavo; vpravo názov, pod ním štítky a potom autor a dátum. */
+  .adm-koren table.adm-m-karty-clanky tr { display: grid; grid-template-columns: 44px auto auto 1fr; justify-items: start; }
+  .adm-koren table.adm-m-karty-clanky td.adm-m-obr { grid-column: 1; grid-row: 1 / span 3; align-self: start; }
+  .adm-koren table.adm-m-karty-clanky td.adm-m-nazov { grid-column: 2 / -1; grid-row: 1; }
+  .adm-koren table.adm-m-karty-clanky td.adm-m-cip { grid-row: 2; }
+  .adm-koren table.adm-m-karty-clanky td.adm-m-meta { grid-row: 3; }
+  .adm-koren table.adm-m-karty-clanky td.adm-m-akcie { grid-column: 1 / -1; grid-row: 4; justify-self: stretch; }
+  .adm-koren table.adm-m-karty-clanky td[colspan] { grid-column: 1 / -1; justify-self: stretch; }
+
+  .adm-koren .adm-m-strankovanie { flex-wrap: wrap; justify-content: center; }
+  .adm-koren .adm-m-strankovanie > span:first-child { flex: 1 1 100%; text-align: center; }
+  .adm-koren .adm-m-strankovanie > div[style*="flex: 1"] { display: none; }
+}
+
+/* ── Knižnica médií (výber súboru) ───────────────────────────────────────── */
+@media (max-width: 767px) {
+  .adm-koren .adm-m-vyber-hlava { flex-wrap: wrap; padding: 10px 12px !important; }
+  .adm-koren .adm-m-vyber-hlava > h2 { flex: 1 1 auto; }
+  .adm-koren .adm-m-vyber-hlava > div[style*="flex: 1"]:not(.adm-m-vyber-hladanie) { display: none; }
+  .adm-koren .adm-m-vyber-hladanie { order: 5; flex: 1 1 100% !important; max-width: none !important; }
+  .adm-koren .adm-m-vyber-hladanie > svg { top: 14px !important; }
+}
+
+/* ── Obrazovky: drobnosti po jednej ──────────────────────────────────────── */
+/* Obal zaškrtávacieho poľa v zozname štítkov: na počítači neexistuje. */
+.adm-koren .adm-m-zaskrtnutie { display: contents; }
+
+@media (max-width: 1023px) {
+  .admin.adm-koren .ad-page { padding: 8px 0; gap: 18px; }
+  .adm-koren .ad-page-head { flex-wrap: wrap; align-items: flex-start; }
+  .admin.adm-koren .adm-m-odkaz { min-height: 44px; padding: 0 12px !important; }
+  .admin.adm-koren .adm-m-profil { min-height: 44px; }
+  .admin.adm-koren .adm-m-odhlasit { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .admin.adm-koren label:has(> input[type="checkbox"]) { min-height: 44px; }
+  .admin.adm-koren .ad-search { height: 44px; }
+  .admin.adm-koren .ad-search button { width: 36px; height: 36px; align-items: center; justify-content: center; }
+  .admin.adm-koren .ad-nahl-clanok { min-height: 44px; }
+  /* Kategórie: úchyt na ťahanie poradia. */
+  .admin.adm-koren .ad-row-grip { width: 44px; height: 44px; }
+  .admin.adm-koren .ad-cat-row { grid-template-columns: 44px minmax(0, 1fr) 60px 16px; }
+  .admin.adm-koren .ad-cat-row:has(> [data-vw-vzhlad-kategorie]) { grid-template-columns: 44px minmax(0, 1fr) 40px auto 16px; }
+  .admin.adm-koren [data-vw-vzhlad-kategorie] { min-height: 44px; }
+  /* Štítky: zaškrtnutie s cieľom 44 px. */
+  .adm-koren .adm-m-zaskrtnutie { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; cursor: pointer; }
+  .admin.adm-koren .ad-tag-row { grid-template-columns: 44px minmax(0, 1.4fr) minmax(0, 1fr) 180px 44px; }
+}
+@media (max-width: 900px) {
+  .admin.adm-koren .ad-tag-row { grid-template-columns: 44px minmax(0, 1fr) 120px 44px; }
+}
+@media (max-width: 767px) {
+  .admin.adm-koren .ad-page { padding: 4px 0; }
+  .admin.adm-koren [data-vw-vzhlad-kategorie] { width: 44px; padding: 0 !important; justify-content: center; }
+  .admin.adm-koren .ad-cat-row:has(> [data-vw-vzhlad-kategorie]) { grid-template-columns: 44px minmax(0, 1fr) 32px 44px 14px; gap: 6px; padding: 4px 10px; }
+  .admin.adm-koren .ad-tag-row { grid-template-columns: 44px minmax(0, 1fr) 40px 44px; padding: 4px 10px; gap: 8px; }
+  .admin.adm-koren .ad-tag-row .ad-bar { display: none; }
+  .admin.adm-koren .ad-bulkbar { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); transform: none; flex-wrap: wrap; }
+  /* Filtre ako prepínač (Nahlásenia, Štítky): radšej posúvať vo vlastnom páse než stláčať text. */
+  .admin.adm-koren .ad-page .ad-seg { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+  .admin.adm-koren .ad-page .ad-seg > button { flex: 0 0 auto; white-space: nowrap; }
+}

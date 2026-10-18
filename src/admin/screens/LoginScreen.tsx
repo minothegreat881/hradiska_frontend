@@ -60,7 +60,7 @@ export function LoginScreen() {
 
   return (
     <div
-      className="admin"
+      className="admin adm-koren"
       style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 20,
@@ -130,6 +130,7 @@ export function LoginScreen() {
         {!forgotOpen ? (
           <button
             type="button"
+            className="adm-m-odkaz"
             onClick={() => { setForgotOpen(true); setForgotEmail(email.trim()); }}
             style={{
               display: 'block', margin: '14px auto 0', background: 'none', border: 'none',

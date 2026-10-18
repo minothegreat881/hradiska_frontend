@@ -153,12 +153,16 @@ export function TagsScreen() {
         {!loading && shown.length === 0 && <div className="ad-empty-row">Nič sa nenašlo.</div>}
         {!loading && shown.map((t) => (
           <div key={t.documentId} className={`ad-list-row ad-tag-row${selected.has(t.documentId) ? ' is-selected' : ''}`}>
-            <input
-              type="checkbox"
-              checked={selected.has(t.documentId)}
-              onChange={() => toggle(t.documentId)}
-              aria-label={`Vybrať ${t.name}`}
-            />
+            {/* Obal je na počítači `display: contents` (nič nemení); na telefóne
+                je to cieľ dotyku 44 × 44 px okolo malého zaškrtávacieho poľa. */}
+            <label className="adm-m-zaskrtnutie">
+              <input
+                type="checkbox"
+                checked={selected.has(t.documentId)}
+                onChange={() => toggle(t.documentId)}
+                aria-label={`Vybrať ${t.name}`}
+              />
+            </label>
             {editing === t.documentId ? (
               <input
                 className="afld" autoFocus value={editValue}

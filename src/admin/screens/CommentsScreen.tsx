@@ -335,9 +335,9 @@ export function CommentsScreen() {
       )}
 
       {confirmDel && (
-        <div onClick={() => setConfirmDel(null)}
+        <div className="adm-m-zaves" onClick={() => setConfirmDel(null)}
              style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(30,22,12,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(440px,92vw)', padding: 24 }}>
+          <div className="acard adm-m-okno" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={{ width: 'min(440px,92vw)', padding: 24 }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 10px' }}>Zmazať komentár?</h2>
             <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 20px' }}>
               Komentár od <strong style={{ color: 'var(--ad-text)' }}>{confirmDel.authorName}</strong> sa

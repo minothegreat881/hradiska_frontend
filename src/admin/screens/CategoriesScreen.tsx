@@ -21,6 +21,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { GripVertical, Plus, ChevronRight, Loader2, Trash2, LayoutTemplate, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../AuthContext';
+import { jeUzke } from '../lib/mobil';
 import {
   listCategories, createCategory, updateCategory, deleteCategory, saveCategoryOrder, toSlug,
   type Category,
@@ -48,12 +49,19 @@ export function CategoriesScreen({ onVzhlad }: {
   };
   useEffect(() => { load(); }, [token]);
 
+  /* Na telefóne a tablete je detail pod zoznamom — po výbere sa k nemu odroluje. */
+  const ukazDetail = () => {
+    if (!jeUzke()) return;
+    window.requestAnimationFrame(() => document.querySelector('[data-adm-m-detail-kategorie]')?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+  };
+
   const pick = (c: Category) => {
     setSelected(c.documentId);
     setDraft({ ...c });
     setDirty(false);
     setSlugTouched(true);
     setMsg(null);
+    ukazDetail();
   };
 
   const addNew = () => {
@@ -62,6 +70,7 @@ export function CategoriesScreen({ onVzhlad }: {
     setDirty(true);
     setSlugTouched(false);
     setMsg(null);
+    ukazDetail();
   };
 
   const save = async () => {
@@ -197,7 +206,7 @@ export function CategoriesScreen({ onVzhlad }: {
                         title="Obrázok, popisky, popis a preklady názvu — v editore vzhľadu webu"
                         data-vw-vzhlad-kategorie={c.slug}
                         onClick={(e) => { e.stopPropagation(); onVzhlad(c.slug); }}>
-                  <LayoutTemplate className="w-3.5 h-3.5" /> Vzhľad na webe
+                  <LayoutTemplate className="w-3.5 h-3.5" /> <span className="adm-m-skry">Vzhľad na webe</span>
                 </button>
               )}
               <ChevronRight className="w-4 h-4" style={{ color: 'var(--ad-muted)' }} />
@@ -205,7 +214,7 @@ export function CategoriesScreen({ onVzhlad }: {
           ))}
         </div>
 
-        <div className="acard ad-form">
+        <div className="acard ad-form" data-adm-m-detail-kategorie>
           {!selected ? (
             <div className="ad-empty-row">Vyberte kategóriu vľavo, alebo pridajte novú.</div>
           ) : (

@@ -77,7 +77,7 @@ export function UsersScreen() {
 
       <div className="acard" style={{ overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-          <table className="atable" style={{ minWidth: 720 }}>
+          <table className="atable adm-m-karty adm-m-karty-uctov" style={{ minWidth: 720 }}>
             <thead>
               <tr>
                 <th>Meno</th>
@@ -96,24 +96,24 @@ export function UsersScreen() {
               )}
               {!loading && rows.map(u => (
                 <tr key={u.id}>
-                  <td><strong>{u.displayName || u.username}</strong></td>
-                  <td style={{ color: 'var(--ad-secondary)' }}>{u.email}</td>
-                  <td>
+                  <td className="adm-m-nazov"><strong>{u.displayName || u.username}</strong></td>
+                  <td className="adm-m-nazov" style={{ color: 'var(--ad-secondary)' }}>{u.email}</td>
+                  <td className="adm-m-cip">
                     {u.isStaff
                       ? <span className="achip achip-pub" title="Plné práva v administrácii"><ShieldCheck className="w-3 h-3" /> Superadmin</span>
                       : <span className="achip achip-cat">{u.roleName === 'Member' ? 'Člen' : (u.roleName || '—')}</span>}
                   </td>
-                  <td>
+                  <td className="adm-m-cip">
                     {u.blocked
                       ? <span className="achip achip-draft"><Ban className="w-3 h-3" /> Zablokovaný</span>
                       : !u.confirmed
                         ? <span className="achip achip-draft">Neoverený</span>
                         : <span className="achip achip-pub"><ShieldCheck className="w-3 h-3" /> Aktívny</span>}
                   </td>
-                  <td style={{ color: 'var(--ad-secondary)', whiteSpace: 'nowrap' }}>
+                  <td className="adm-m-meta" data-stlpec="Registrácia" style={{ color: 'var(--ad-secondary)', whiteSpace: 'nowrap' }}>
                     {new Date(u.createdAt).toLocaleDateString('sk-SK')}
                   </td>
-                  <td>
+                  <td className="adm-m-akcie">
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
                       {/* Superadminov sa z tejto obrazovky blokovať ani mazať nedá —
                           ani seba, ani toho druhého. Zámerne: je to jediná cesta,
@@ -151,9 +151,9 @@ export function UsersScreen() {
       </div>
 
       {blockTarget && (
-        <div onClick={() => setBlockTarget(null)}
+        <div className="adm-m-zaves" onClick={() => setBlockTarget(null)}
              style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(30,22,12,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(460px,92vw)', padding: 24 }}>
+          <div className="acard adm-m-okno" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={{ width: 'min(460px,92vw)', padding: 24 }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 10px' }}>Zablokovať účet?</h2>
             <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 16px' }}>
               Účet <strong style={{ color: 'var(--ad-text)' }}>{blockTarget.displayName || blockTarget.username}</strong> sa
@@ -175,9 +175,9 @@ export function UsersScreen() {
       )}
 
       {deleteTarget && (
-        <div onClick={() => !deleteBusy && setDeleteTarget(null)}
+        <div className="adm-m-zaves" onClick={() => !deleteBusy && setDeleteTarget(null)}
              style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(30,22,12,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(460px,92vw)', padding: 24 }}>
+          <div className="acard adm-m-okno" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={{ width: 'min(460px,92vw)', padding: 24 }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 10px' }}>Vymazať účet natrvalo?</h2>
             <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 16px' }}>
               Účet <strong style={{ color: 'var(--ad-text)' }}>{deleteTarget.displayName || deleteTarget.username}</strong>

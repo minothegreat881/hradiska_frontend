@@ -165,7 +165,7 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
 
       <div className="acard" style={{ overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-          <table className="atable">
+          <table className="atable adm-m-karty adm-m-karty-clanky">
             <thead>
               <tr>
                 <th style={{ width: 60 }}></th>
@@ -186,30 +186,30 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
 
               {!loading && rows.map(a => (
                 <tr key={a.documentId}>
-                  <td>
+                  <td className="adm-m-obr">
                     <div style={{ width: 44, height: 32, borderRadius: 6, background: 'var(--hr-wash-2)', border: '1px solid var(--ad-line)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {a.coverThumbUrl
                         ? <img src={a.coverThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
                         : <ImageOff className="w-3.5 h-3.5" style={{ color: 'var(--ad-muted)' }} />}
                     </div>
                   </td>
-                  <td>
+                  <td className="adm-m-nazov">
                     <div style={{ fontWeight: 600 }}>{a.title}</div>
                     <div style={{ fontSize: 12, color: 'var(--ad-muted)' }}>/{a.slug}</div>
                   </td>
-                  <td>{a.categoryName ? <span className="achip achip-cat">{a.categoryName}</span>
+                  <td className="adm-m-cip">{a.categoryName ? <span className="achip achip-cat">{a.categoryName}</span>
                                       : <span style={{ fontSize: 12, color: 'var(--ad-muted)' }}>—</span>}</td>
-                  <td style={{ color: 'var(--ad-secondary)' }}>{a.authorName || '—'}</td>
-                  <td style={{ color: 'var(--ad-secondary)', whiteSpace: 'nowrap' }}>
+                  <td className="adm-m-meta" style={{ color: 'var(--ad-secondary)' }}>{a.authorName || '—'}</td>
+                  <td className="adm-m-meta" style={{ color: 'var(--ad-secondary)', whiteSpace: 'nowrap' }}>
                     {a.originalPublishedDate ? new Date(a.originalPublishedDate).toLocaleDateString('sk-SK') : '—'}
                   </td>
-                  <td>
+                  <td className="adm-m-cip">
                     <span className={`achip ${a.published ? 'achip-pub' : 'achip-draft'}`}>
                       <span style={{ width: 6, height: 6, borderRadius: 999, background: 'currentColor' }} />
                       {a.published ? 'Publikovaný' : 'Koncept'}
                     </span>
                   </td>
-                  <td>
+                  <td className="adm-m-akcie">
                     <div style={{ display: 'flex', gap: 5, justifyContent: 'flex-end' }}>
                       <button className="abtn abtn-icon" title="Upraviť" onClick={() => onEdit(a.documentId)}>
                         <Pencil className="w-3.5 h-3.5" />
@@ -232,7 +232,7 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
           </table>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px', borderTop: '1px solid var(--ad-line)', background: 'var(--ad-surface)' }}>
+        <div className="adm-m-strankovanie" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '12px 16px', borderTop: '1px solid var(--ad-line)', background: 'var(--ad-surface)' }}>
           <span style={{ fontSize: 13, color: 'var(--ad-secondary)' }}>
             strana {page} z {pageCount} · {total} článkov
           </span>
@@ -248,9 +248,9 @@ export function ArticlesScreen({ onEdit }: { onEdit: (id: string | null) => void
       </div>
 
       {confirmDelete && (
-        <div onClick={() => setConfirmDelete(null)}
+        <div className="adm-m-zaves" onClick={() => setConfirmDelete(null)}
              style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(30,22,12,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(440px, 92vw)', padding: 24 }}>
+          <div className="acard adm-m-okno" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={{ width: 'min(440px, 92vw)', padding: 24 }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 10px' }}>Zmazať článok?</h2>
             <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 20px' }}>
               Článok <strong style={{ color: 'var(--ad-text)' }}>{confirmDelete.title}</strong> sa zmaže natrvalo

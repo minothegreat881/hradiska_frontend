@@ -3,9 +3,11 @@
 import { useEffect, useState, useRef } from 'react';
 import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
-  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus, Flag, LayoutTemplate,
+  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus, Flag, LayoutTemplate, Menu, X,
 } from 'lucide-react';
 import '../styles/admin-redesign.css';
+/* Telefón a tablet — len pod `.adm-koren` a v media dotazoch, počítač sa nemení. */
+import './admin-mobil.css';
 import { AuthProvider, useAuth } from './AuthContext';
 import { LoginScreen } from './screens/LoginScreen';
 import { ArticlesScreen } from './screens/ArticlesScreen';
@@ -218,6 +220,18 @@ function AdminShell() {
   /* Keď sa na nahlásenia pozrie, upozornenie zmizne — splnilo úlohu. */
   useEffect(() => { if (route === 'nahlasenia') setNoveNahlasenia(0); }, [route]);
 
+  /* Ponuka v zásuvke (telefón, tablet — `admin-mobil.css`). Na počítači sa
+     nič nekreslí inak: tlačidlo aj clona sú tam skryté. Zavrie sa po výbere
+     obrazovky, pri zmene adresy, klávesou Esc a klepnutím vedľa. */
+  const [ponuka, setPonuka] = useState(false);
+  useEffect(() => { setPonuka(false); }, [poloha]);
+  useEffect(() => {
+    if (!ponuka) return;
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setPonuka(false); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, [ponuka]);
+
   // ⌘K / Ctrl+K na rýchle hľadanie
   const [searchOpen, setSearchOpen] = useState(false);
   useEffect(() => {
@@ -235,7 +249,7 @@ function AdminShell() {
   // Kým sa overuje uložený token, needáme bliknúť prihlasovaciu obrazovku.
   if (!ready) {
     return (
-      <div className="admin" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ad-secondary)', fontSize: 14 }}>
+      <div className="admin adm-koren" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ad-secondary)', fontSize: 14 }}>
         Overujem prihlásenie…
       </div>
     );
@@ -247,12 +261,17 @@ function AdminShell() {
   /* Odchod cez ľavú ponuku. Stráž (`smiemOdist`) sa pýta pri každej zmene
      adresy, teda aj pri Späť v prehliadači — predtým obrazovka len zmizla
      a vyzeralo to, že sa práca stratila. */
-  const prejdiNa = (id: AdminRoute) => setRoute(id);
+  const prejdiNa = (id: AdminRoute) => { setPonuka(false); setRoute(id); };
 
   return (
-    <div className="admin" style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className={`admin adm-koren${ponuka ? ' je-ponuka' : ''}`} style={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Clona pod zásuvkou s ponukou (len telefón a tablet). */}
+      {ponuka && <div className="adm-m-clona" data-adm-m-clona onClick={() => setPonuka(false)} aria-hidden="true" />}
       {/* ───────── Sidebar ───────── */}
       <aside
+        id="adm-bocny"
+        className="adm-m-bocny"
+        aria-label="Ponuka administrácie"
         style={{
           width: 232, flexShrink: 0, position: 'sticky', top: 0, height: '100vh',
           display: 'flex', flexDirection: 'column',
@@ -282,6 +301,9 @@ function AdminShell() {
               ADMINISTRÁCIA
             </div>
           </div>
+          <button type="button" className="adm-m-iba adm-m-zavriet" onClick={() => setPonuka(false)} aria-label="Zavrieť ponuku" data-adm-m-zavriet>
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         <nav style={{ flex: 1, overflowY: 'auto' }}>
@@ -296,7 +318,7 @@ function AdminShell() {
                     key={it.id}
                     className="ad-nav"
                     aria-current={active ? 'page' : undefined}
-                    onClick={() => (it.id === 'editor' ? openEditor(editingId) : prejdiNa(it.id))}
+                    onClick={() => { setPonuka(false); if (it.id === 'editor') openEditor(editingId); else prejdiNa(it.id); }}
                   >
                     <Icon className="w-4 h-4" style={{ flexShrink: 0 }} />
                     {it.label}
@@ -322,6 +344,7 @@ function AdminShell() {
           </div>
           {/* Klik na meno otvorí vlastný profil (zmena e-mailu a hesla). */}
           <button
+            className="adm-m-profil"
             onClick={() => prejdiNa('profile')}
             title="Môj profil — e-mail a heslo"
             style={{
@@ -333,6 +356,7 @@ function AdminShell() {
             <div style={{ fontSize: 11, color: 'var(--ad-side-label)' }}>Superadmin · upraviť</div>
           </button>
           <button
+            className="adm-m-odhlasit"
             onClick={signOut}
             title="Odhlásiť"
             aria-label="Odhlásiť"
@@ -346,6 +370,7 @@ function AdminShell() {
       {/* ───────── Obsah ───────── */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <header
+          className="adm-m-hlavicka"
           style={{
             position: 'sticky', top: 0, zIndex: 20,
             display: 'flex', alignItems: 'center', gap: 14,
@@ -353,20 +378,26 @@ function AdminShell() {
             backdropFilter: 'blur(8px)', borderBottom: '1px solid var(--ad-border)',
           }}
         >
-          <span style={{ fontSize: 13, color: 'var(--ad-secondary)' }}>
-            Admin <span style={{ color: 'var(--ad-muted)' }}>/</span>{' '}
+          <button
+            type="button" className="abtn abtn-icon adm-m-iba" onClick={() => setPonuka((x) => !x)}
+            aria-label="Ponuka" aria-expanded={ponuka} aria-controls="adm-bocny" data-adm-m-ponuka
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <span className="adm-m-cesta" style={{ fontSize: 13, color: 'var(--ad-secondary)' }}>
+            <span className="adm-m-skry">Admin <span style={{ color: 'var(--ad-muted)' }}>/</span>{' '}</span>
             <span style={{ color: 'var(--ad-text)' }}>{ROUTE_LABELS[route]}</span>
           </span>
           <div style={{ flex: 1 }} />
-          <button className="abtn" onClick={() => setSearchOpen(true)} style={{ color: 'var(--ad-secondary)' }}>
+          <button className="abtn adm-m-ikona" onClick={() => setSearchOpen(true)} style={{ color: 'var(--ad-secondary)' }} aria-label="Hľadať">
             <Search className="w-4 h-4" />
-            Hľadať
-            <kbd style={{ marginLeft: 6, fontSize: 11, color: 'var(--ad-muted)', border: '1px solid var(--ad-field-border)', borderRadius: 5, padding: '1px 5px' }}>
+            <span className="adm-m-skry">Hľadať</span>
+            <kbd className="adm-m-skry" style={{ marginLeft: 6, fontSize: 11, color: 'var(--ad-muted)', border: '1px solid var(--ad-field-border)', borderRadius: 5, padding: '1px 5px' }}>
               ⌘K
             </kbd>
           </button>
-          <a className="abtn" href="/" target="_blank" rel="noreferrer">
-            Zobraziť web <ExternalLink className="w-3.5 h-3.5" />
+          <a className="abtn adm-m-ikona" href="/" target="_blank" rel="noreferrer" aria-label="Zobraziť web">
+            <span className="adm-m-skry">Zobraziť web</span> <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </header>
 
@@ -384,7 +415,7 @@ function AdminShell() {
           </div>
         )}
 
-        <main style={{ flex: 1, padding: 24, minWidth: 0 }}>
+        <main className="adm-m-obsah" style={{ flex: 1, padding: 24, minWidth: 0 }}>
           {/* Budíček pošty. Ukáže sa len vtedy, keď odosielanie nefunguje —
               inak by z neho po týždni bola tapeta, ktorú nikto nečíta. */}
           {token && <StavPosty token={token} />}
@@ -415,13 +446,14 @@ function AdminShell() {
       {/* Rýchle hľadanie */}
       {searchOpen && (
         <div
+          className="adm-m-zaves"
           onClick={() => setSearchOpen(false)}
           style={{
             position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(30,22,12,.45)',
             display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '14vh',
           }}
         >
-          <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(560px, 92vw)', padding: 14 }}>
+          <div className="acard adm-m-okno" role="dialog" aria-modal="true" aria-label="Rýchle hľadanie" onClick={e => e.stopPropagation()} style={{ width: 'min(560px, 92vw)', padding: 14 }}>
             <input className="afld" autoFocus placeholder="Hľadať v článkoch…" />
             <div style={{ fontSize: 12, color: 'var(--ad-muted)', marginTop: 10 }}>
               Napíšte názov článku. Zavrieť klávesou Esc.

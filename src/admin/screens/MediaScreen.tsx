@@ -145,9 +145,9 @@ export function MediaScreen() {
       )}
 
       {confirm && (
-        <div onClick={() => setConfirm(null)}
+        <div className="adm-m-zaves" onClick={() => setConfirm(null)}
              style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(30,22,12,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(440px,92vw)', padding: 24 }}>
+          <div className="acard adm-m-okno" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={{ width: 'min(440px,92vw)', padding: 24 }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 10px' }}>Zmazať obrázok?</h2>
             <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 12px' }}>
               Súbor <strong style={{ color: 'var(--ad-text)' }}>{confirm.name}</strong> sa zmaže natrvalo.

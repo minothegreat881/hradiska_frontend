@@ -74,18 +74,20 @@ export function MediaPicker({
 
   return (
     <div
+      className="adm-m-zaves"
       onClick={onClose}
       style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(30,22,12,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
     >
       <div
-        className="acard admin"
+        className="acard admin adm-m-okno adm-m-okno-ram"
+        role="dialog" aria-modal="true" aria-label="Knižnica médií"
         onClick={e => e.stopPropagation()}
         style={{ width: 'min(980px, 96vw)', height: 'min(680px, 90vh)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
       >
         {/* Hlavička */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, borderBottom: '1px solid var(--ad-line)' }}>
+        <div className="adm-m-vyber-hlava" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, borderBottom: '1px solid var(--ad-line)' }}>
           <h2 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>Knižnica médií</h2>
-          <div style={{ position: 'relative', flex: 1, maxWidth: 320 }}>
+          <div className="adm-m-vyber-hladanie" style={{ position: 'relative', flex: 1, maxWidth: 320 }}>
             <Search className="w-4 h-4" style={{ position: 'absolute', left: 10, top: 10, color: 'var(--ad-muted)' }} />
             <input className="afld" value={q} onChange={e => setQ(e.target.value)}
                    placeholder="Hľadať podľa názvu…" style={{ paddingLeft: 32, padding: '8px 12px 8px 32px' }} />
