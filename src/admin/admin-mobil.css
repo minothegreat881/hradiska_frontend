@@ -152,6 +152,7 @@
   .admin.adm-koren .adm-m-odhlasit { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; }
   .admin.adm-koren label:has(> input[type="checkbox"]) { min-height: 44px; }
   .admin.adm-koren .ad-search { height: 44px; }
+  .admin.adm-koren .ad-search input { align-self: stretch; }
   .admin.adm-koren .ad-search button { width: 36px; height: 36px; align-items: center; justify-content: center; }
   .admin.adm-koren .ad-nahl-clanok { min-height: 44px; }
   /* Kategórie: úchyt na ťahanie poradia. */
@@ -197,7 +198,7 @@
   .admin.adm-koren .ad-cover-links button { min-height: 44px; padding: 0 4px; }
   .admin.adm-koren .ad-add { height: 44px; }
   .admin.adm-koren .ad-gal-nastroje { opacity: 1; padding: 2px; }
-  .admin.adm-koren .ad-gal-nastroje button { min-width: 40px; height: 40px; font-size: 18px; }
+  .admin.adm-koren .ad-gal-nastroje button { min-width: 44px; height: 44px; font-size: 18px; }
 }
 @media (max-width: 767px) {
   /* Plátno na celú šírku obrazovky — náhľad Mobil je tak v skutočnej veľkosti. */
