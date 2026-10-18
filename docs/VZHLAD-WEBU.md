@@ -1,7 +1,9 @@
 # Vzhľad webu — vrstva, z ktorej web kreslí „prezentáciu“
 
-Stav: fázy F2 (web číta vzhľad) a F3 (prevod dnešného stavu) z plánu úpravy webu z pohľadu webu.
-Editor (F4) a klasická úprava (F5) ešte nie sú; backend (`GET /api/vzhlad-webu`) stavia samostatná vetva v `hradiska-strapi`.
+Stav: fázy F2 (web číta vzhľad), F3 (prevod dnešného stavu), F4 (vizuálny editor) a F5 (klasická úprava,
+Kategórie, Médiá) z plánu úpravy webu z pohľadu webu. Backend (`/api/vzhlad-webu`, koncept, zverejnenie, história)
+je vo vetve `vzhlad-webu` repozitára `hradiska-strapi`, jeho API opisuje `docs/VZHLAD-WEBU-API.md` tam.
+Editor je opísaný nižšie v časti [Editor vzhľadu (F4)](#editor-vzhľadu-f4).
 
 ## Čo je vzhľad
 
@@ -29,6 +31,10 @@ Texty majú jazyky výslovne `{ sk, en, de, enZo, deZo }`, kategórie a články
 | `src/lib/vzhlad/VzhladContext.tsx` | `VzhladProvider`, `useVzhlad()`, `useUpravy()` |
 | `src/lib/vzhlad/upravy.ts` | značky režimu úprav (`data-vw`, `data-vw-skryte`) |
 | `src/lib/vzhlad/UpravitStranku.tsx` | tlačidlo „Upraviť túto stránku“ |
+| `src/lib/vzhlad/nahlad.ts` | náhľad uloženého konceptu na webe (`?nahlad=vzhlad`), sťahuje sa odložene |
+| `src/lib/vzhlad/prevod.ts` | prevod základného vzhľadu na vzhľad v1 — spoločný pre `scripts/vzhlad/prevod.mjs` a tlačidlo „Založiť z dnešného webu“ |
+| `src/lib/vzhlad/zmeny.ts` | `zmenyVzhladu(a, b)` — zoznam zmien ľudskou rečou (dialóg zverejnenia, história) |
+| `src/lib/vzhlad/kontrola.ts`, `zlucenie.ts` | doslovné kópie z backendu (`src/api/vzhlad-webu/`): kontrola tvaru a odkazov, trojcestné zlúčenie zápisov do DB — menia sa len spolu |
 | `src/data/domovska.ts`, `menu.ts`, `pata.ts` | konštanty presťahované z komponentov — zdroj základného vzhľadu |
 
 Konštanty ostávajú v kóde (`data/rozcestnik.ts`, `data/categories.ts`, `data/cinnost.ts` a tri nové súbory vyššie),
@@ -144,7 +150,9 @@ Na skúšku bez editora je vo vývojovom serveri (`npm run dev`) prepínač `?vz
 | `kronika:uvod` | `a.lakv-pinned` |
 | `kronika:obrazok` | `div.lakv-logo` |
 | `kronika:pripnuty:<index>` | prvé karty pásu `a.lakv-card`, ktoré sú pripnuté |
+| `kronika:zapis:<index>` | ostatné karty pásu (najnovšie zápisy; editor z nich ponúka „Pripnúť“) |
 | `kronika:fotogaleria` | `div.lakv-gal` |
+| `kronika:fotka:<index>` | dlaždica fotogalérie (fotka z konceptu `domov.fotogaleria`) |
 | `pridajte-sa` | `section.ljoin` |
 | `pridajte-sa:nadtitulok`, `…:nadpis`, `…:citat`, `…:uvod`, `…:email` | nadtitulok, nadpis, citát, úvod, odkaz s e-mailom |
 | `pridajte-sa:prosba:<index>` | `article.ljoin-ask` |
@@ -157,15 +165,19 @@ Na skúšku bez editora je vo vývojovom serveri (`npm run dev`) prepínač `?vz
 | `kategoria:obrazok`, `kategoria:nazov`, `kategoria:popis` | `.ch-foto`, `h1.cat-uvod-titul`, `p.cat-uvod-popis` |
 | `kategoria:clanok:<index>` | `a.acard` v zozname článkov kategórie |
 
-Ďalšie atribúty len v režime úprav: `data-vw-skryte="1"` (prvok je na webe skrytý), `data-vw-upravy="1"` (koreň stránky).
+Ďalšie atribúty len v režime úprav: `data-vw-skryte="1"` (prvok je na webe skrytý), `data-vw-upravy="1"` (koreň stránky),
+`data-vw-dokument="<documentId>"` (karta článku: úvodný článok a karty kroniky, riadky „Ďalší obsah“, `a.acard` kategórie —
+editor podľa neho otvorí článok alebo ho pripne), `data-vw-subor="<id>"` (dlaždica fotogalérie).
+
+`LabNav` má prop `rozbalene` (len v režime úprav): editor na stránke Menu kreslí oba rady kategórií naraz
+a mobilnú ponuku otvorenú, aby sa dali vybrať všetky položky.
 
 ## Tlačidlo „Upraviť túto stránku“
 
 Na verejnom webe, len keď je v `localStorage` kľúč `hradiska.admin.jwt` (ten istý ako náhľad konceptu článku).
 Je to odkaz, prihlásenie overí až administrácia: domovská → `/admin#/vzhlad/domov`, kategória →
 `/admin#/vzhlad/kategoria/<slug>`, inde → `/admin#/vzhlad/menu`. Trieda `vw-upravit` (vľavo dole), komponent sa
-sťahuje odložene — návštevník bez prihlásenia nedostane do stránky nič. Smerovanie `#/vzhlad/…` v administrácii
-dorobí editor (F4).
+sťahuje odložene — návštevník bez prihlásenia nedostane do stránky nič.
 
 ## Vloženie do HTML pri builde
 
@@ -199,6 +211,104 @@ Zdroj: verejné API referenčného Strapi, knižnica médií (nemá verejné API
 Výstup `scripts/vzhlad/vystup/vzhlad-v1.json`, s `--odpoved` aj `vzhlad-v1-odpoved.json` (celé `OdpovedVzhladu`
 s `subory`, `kategorie`, `clanky`). Do backendu prevod nič nezapisuje — uloženie ako koncept je krok D4 nasadenia.
 
+Samotný prevod je v `src/lib/vzhlad/prevod.ts` (`prevedVzhlad`), skript mu len podá údaje z API a DB. Tú istú funkciu
+volá editor pod tlačidlom „Založiť z dnešného webu“ (údaje berie z API administrácie), takže koncept založený
+v editore a výstup skriptu sú rovnaké. Po presune dáva skript bajt po bajte ten istý výstup ako predtým.
+
+## Editor vzhľadu (F4)
+
+Administrácia → **Vzhľad webu**. Smerovanie je v adrese za `#` (záložky a „späť“ prehliadača fungujú):
+
+| adresa | čo otvorí |
+|---|---|
+| `#/vzhlad/domov` | plátno domovskej |
+| `#/vzhlad/kategoria/<slug>` | plátno stránky kategórie |
+| `#/vzhlad/menu` | hlavička a päta (na plátne domovská s rozbaleným menu) |
+| `#/vzhlad/formular` | klasická úprava (F5) |
+| `#/<obrazovka>`, `#/editor/<documentId>` | ostatné obrazovky administrácie, editor článku |
+
+Pri neuložených zmenách (vzhľad aj článok) sa odchod z obrazovky, zmena `#` aj zatvorenie karty pýtajú.
+
+### Súbory (`src/admin/vzhlad/`)
+
+| súbor | čo robí |
+|---|---|
+| `VzhladModul.tsx` | vstup: spoločný stav, dialógy, prázdny stav s tlačidlom „Založiť z dnešného webu“ |
+| `stav/KonceptKontext.tsx` | `useKoncept()` — načítanie, prevzatie zmien z DB, `zmen(popis, fn)`, história krokov (100, Ctrl+Z / Ctrl+Y), uloženie, zverejnenie, konflikty, história verzií, záloha v prehliadači |
+| `stav/operacie.ts`, `stav/rebase.ts`, `stav/preklady.ts` | čisté operácie nad vzhľadom, prevzatie zmien z DB (trojcestne, `zlucenie.ts`), stav prekladov |
+| `VizualnyEditor.tsx` | horná lišta, klávesy, upozornenia, čítanie starej verzie |
+| `Platno.tsx` | plátno: skutočné komponenty webu v `CanvasFrame` (`src/admin/editor/platno/`) pod `VzhladProvider` s konceptom a `upravy: true` |
+| `Vrstva.tsx` | vrstva nad plátnom: rámik pri prejdení, výber, lišta nástrojov, ťahanie, „+“, písanie priamo v texte |
+| `prvky.ts` | register prvkov: čo je prvok s daným `data-vw`, čo sa s ním dá robiť (presun, skrytie, text, obrázok, odstránenie, pripnutie) |
+| `PravyPanel.tsx`, `oblasti.tsx`, `polia.tsx` | pravý panel: nastavenia vybraného prvku a celých oblastí (úvod, dlaždice, sekcie, „Ďalší obsah“, činnosť, kronika, „Pridajte sa“, kategória, menu, päta) |
+| `ui.tsx` | dialógy v dokumente administrácie: potvrdenie, výber článku, kategórie, cieľa odkazu, fotky; obrázok (médiá, nahratie, výrez, kde je použitý, „Vrátiť pôvodný“) |
+| `akcie.tsx` | spoločné úkony lišty, klávesnice a panela |
+| `dialogy.tsx` | konflikt verzií, chyby kontroly, zverejnenie so zoznamom zmien, konflikt s DB, história, obnova zálohy, zahodenie |
+| `FormularScreen.tsx` | klasická úprava (F5) |
+| `cesty.ts` | adresa webu → stránka plátna („Upraviť túto stránku“, odkazy) |
+| `vzhlad-editor.css` | štýly editora — všetko pod `.admin` s predponou `vw-`, žiadne nové triedy Tailwindu |
+
+API administrácie je v `src/admin/api/vzhlad.ts` (koncept, zverejnenie, história, obnovenie, použitie súboru, vyhľadanie
+článkov a súborov pre editor).
+
+### Ako sa pracuje
+
+- **Plátno** kreslí tie isté komponenty ako web, v okne širokom 1440 (počítač) alebo 390 px (mobil), zmenšené mierkou.
+  Klik, ťahanie a odoslanie formulára webu sú na plátne zablokované; odkazy nikam nevedú. Jazyk plátna (SK/EN/DE)
+  sa prepína bez zmeny jazyka administrácie (`nastavJazykPlatna` v `lib/jazyk.ts`), `matchMedia` odpovedá podľa okna plátna.
+- **Výber:** klik, šípky (ďalší/predchádzajúci prvok), Esc. **Presun:** ťahanie za prvok alebo Alt+šípky; čiara ukáže,
+  kam prvok padne. **Skrytie** (oko) — prvok ostane na plátne vyšrafovaný. **Odstránenie** (Delete) sa potvrdzuje.
+- **Text:** dvojklik alebo Enter → píše sa priamo v stránke, v jazyku plátna (obyčajný text, Enter potvrdí, Esc vráti).
+  Platia dĺžky z `LIMITY`. Preklad si pamätá slovenské znenie, ku ktorému vznikol (`enZo`/`deZo`); keď sa slovenčina
+  zmení, preklad ostane a editor ho označí ako zastaraný (žltá). Prázdny preklad = web ukáže slovenčinu (tiež žltá,
+  pokiaľ text nepozná slovník webu). **Premenovanie kategórie** po slovensky otvorí dialóg na nový anglický a nemecký
+  názov — inak by cudzojazyčný web ukazoval starý.
+- **Obrázok:** dialóg s knižnicou médií, nahratím súboru, výrezom (ťahanie bodu), zoznamom, kde všade je súbor použitý,
+  a „Vrátiť pôvodný“ (obrázok zo základného vzhľadu).
+- **„+“** pridá prvok za vybraný (dlaždica, riadok, odkaz, prosba, …), kde to tvar dovoľuje.
+- **Pravý panel** ukazuje polia vybraného prvku a celú oblasť, do ktorej patrí; „Otvoriť na plátne“ odroluje k prvku.
+- **Upozornenia** (lišta nad plátnom a panel): chyby kontroly (rovnaké pravidlá ako backend, `kontrola.ts`),
+  chýbajúce preklady, odkazy na zmazané kategórie a články, kategórie bez záznamu vo vzhľade („bez vzhľadu“ —
+  doplní ich tlačidlo „Pridať“).
+
+### Ukladanie a zverejnenie
+
+- **Uložiť koncept** (Ctrl+S) — `PUT /koncept` s `zaklad` (verzia konceptu, z ktorej práca vychádza), `data` a `zakladDb`.
+  Keď medzitým koncept uložil niekto iný (409 `koncept-zmeneny`), dialóg ponúkne „Načítať jeho verziu“ alebo
+  „Prepísať mojou“ (s potvrdením).
+- **Zverejniť** — dialóg so zoznamom zmien ľudskou rečou (`zmenyVzhladu` medzi zverejnenou verziou a konceptom)
+  a poznámkou do histórie. Keď sa medzitým v DB zmenilo to isté, čo mení koncept (409 `konflikt-db`, napr. názov
+  kategórie v Strapi paneli), dialóg ukáže konflikty a dovolí prevziať hodnotu z DB alebo ponechať svoju.
+- **Pri načítaní** editor prevezme zmeny z DB, ktoré koncept nemení (kategórie pridané, premenované alebo zmazané
+  mimo editora), a označí ich ako neuložené.
+- **Záloha:** každých 5 s a pri odchode do `localStorage` `hradiska.vzhlad.koncept`; po havárii ju editor ponúkne obnoviť.
+- **História** (⋯ → História): zverejnené verzie s autorom, časom a poznámkou; verziu možno pozrieť na plátne len na
+  čítanie a obnoviť do konceptu (`POST /obnovit/:verzia`) — zverejní sa až tlačidlom Zverejniť.
+- **Náhľad** (⋯ → Náhľad v novom okne): `/?nahlad=vzhlad` alebo `/category/<slug>?nahlad=vzhlad` v novej karte. Web v náhľade
+  stiahne **uložený** koncept (`GET /koncept` s tokenom redaktora) a kreslí ho ako verejný web s pásom „Náhľad konceptu
+  vzhľadu“ dole; náhľad trvá pri preklikoch v tej istej karte (`sessionStorage`), „Ukončiť náhľad“ ho vypne.
+  Kód náhľadu sa sťahuje odložene a len pri `?nahlad=vzhlad` s prihlásením — návštevník ho nedostane.
+- **Zahodiť koncept** (⋯) vráti koncept na zverejnenú verziu.
+
+## Klasická úprava (F5)
+
+`#/vzhlad/formular` (alebo ⋯ → Klasická úprava): bez plátna, zbalené panely po oblastiach (úvod, dlaždice, hľadanie,
+sekcie, „Ďalší obsah“, činnosť, kronika, „Pridajte sa“, kategória s výberom, menu, päta), zoznamy s úchytmi, polia
+so záložkami SK · EN · DE a pri každom prvku „Otvoriť na plátne“. Sú to tie isté komponenty ako v pravom paneli
+a ten istý stav (`KonceptProvider`) — prepnutie plátno ↔ formulár neuložené zmeny nestratí, ukladanie, zverejnenie
+a história sú spoločné.
+
+**Kategórie** (obrazovka administrácie): každý riadok má tlačidlo „Vzhľad“ → plátno stránky kategórie. Detail
+rozlišuje, čo sa zapíše do DB hneď po uložení („Ukladá sa hneď“ — názov, adresa, popis, poradie; vidia to aj staré
+verzie webu a appka) a čo je vo vzhľade („Zverejní sa so vzhľadom webu“ — obrázok, popisok dlaždice, krátky názov
+v menu, popis na stránke, anglický a nemecký názov, zoradenie a pripnuté články; „Upraviť vzhľad kategórie“).
+Zmena adresy (slugu) ukáže varovanie, čo všetko na starú adresu vedie, a pred uložením sa ešte raz pýta.
+Editor vzhľadu slug nemení nikdy.
+
+**Médiá:** pri pokuse o zmazanie sa administrácia spýta backendu, kde je súbor použitý
+(`GET /api/vzhlad-webu/pouzitie-suboru/:id`): koncept, zverejnený vzhľad, posledné verzie histórie, zoznam chránených
+súborov starých verzií webu a appky. Taký súbor sa zmazať nedá a obrazovka vypíše miesta. Backend zmazanie aj tak odmietne (409) — obrazovka len vysvetlí vopred, prečo.
+
 ## Testy (`scripts/vzhlad/`, výstupy v `scripts/vzhlad/vystup/`, nekomitujú sa)
 
 Prostredie: dnešný web = build z `main` vo worktree `../hradiska-web-zaklad`, nový web = build z vetvy, oba s
@@ -214,6 +324,8 @@ Po builde vrátiť `git checkout public/sitemap.xml`.
 | `test-admin-smoke.mjs` | administrácia sa načíta a editor otvorí článok; referenčné Strapi smie dostať len GET, preto je relácia podstrčená (`users/me`), ostatné GET idú do Strapi bez tokenu a každý zápis sa zahodí |
 | `snimky-upravy.mjs` | snímky domovskej v režime úprav (1440, 390) a zoznam značiek `data-vw` |
 | `prevod.mjs` | prevod F3 |
+| `test-editor.mjs` | editor vzhľadu proti lokálnemu backendu (plán, časť 10.3): založenie z dnešného webu, 30 rôznych úprav myšou a klávesnicou (presun, skrytie, text v troch jazykoch, obrázok z médií a nahratý, výrez, „Vrátiť pôvodný“, riadok, pripnutie, kategória, menu, päta), Ctrl+Z / Ctrl+Y, uloženie, záloha a obnova po zatvorení karty, konflikt dvoch redaktorov (409), chyba kontroly, zverejnenie so zoznamom zmien a overenie verejného webu, náhľad, história a obnovenie verzie, klasická úprava, Kategórie a Médiá; snímky do `vystup/snimky-editor/` (1440 a 390). Na konci vráti DB do stavu pred testom a porovná všetky tabuľky. |
+| `test-editor-clankov.mjs` | editor článkov po presune `CanvasFrame`: 20 článkov, klik do každého textového bloku, uloženie konceptu, obsah v DB sa nesmie zmeniť. Mení v DB časy a id komponentov — po teste vrátiť DB zo zálohy. |
 
 Akceptované rozdiely v teste zhody (režim 2 a 2v), nič iné:
 1. **EN a DE domovská, kronika:** úvodný článok a pripnuté zápisy sa začnú zobrazovať správne (predtým sa hľadali podľa
@@ -242,3 +354,26 @@ vráti `{ data: null }`.
 Normalizácie merania (rovnako pre dnešný aj nový web): pôvod stránky v adresách (iné porty), obsah sekcie mapy,
 snímanie, kým dve snímky po sebe nie sú rovnaké, odložené obrázky stiahnuté pred zachytením DOM, nenačítané obrázky
 (v lokálnej kópii médií chýba pár súborov) na snímke skryté. `--samo` (dnešný web proti sebe) dáva zhodu.
+
+### Editor (18. 10. 2026, FE vetva `vzhlad-editor`, lokálny backend `vzhlad-webu` s kópiou ostrej DB)
+
+Prostredie: backend na `:1337` s `ENV_PATH=.env.lokalne-vzhlad` (bez mailov a pushov), vývojový server webu na `:5190`
+s `VITE_STRAPI_URL=http://localhost:1337`. Pred testami záloha `hradiska-strapi/.tmp/data.db.pred-editorom`.
+`test-editor.mjs` DB upratuje sám; po `test-editor-clankov.mjs` sa DB vracia zo zálohy (zastaviť backend, skopírovať
+zálohu, zmazať `-wal`/`-shm`, spustiť).
+
+| test | výsledok (každý dvakrát) |
+|---|---|
+| `test-editor.mjs` | 100 z 100 a 100 z 100; po upratovaní obsah všetkých tabuliek bajt po bajte ako pred testom |
+| `test-editor-clankov.mjs` | obsah rovnaký 20 z 20 a 20 z 20 (112 textových blokov, TipTap sa zapol v každom), bez chýb v konzole; editor článkov po svojom: `gallery_columns` 14, `cover_position` 10, čas `original_published_date` 9, prázdny popis videa 4 článkov |
+| `test-zhoda.mjs --rezim 1` (build vetvy proti `main`) | rovnaké 102 z 102 a 102 z 102; na verejnom webe ani jeden `data-vw` |
+| `test-vykon.mjs` | hlavný balík gzip 98,97 → 109,06 kB (+10,09 kB proti `main`, strop +15; proti základu vetvy `2fa00ca` +0,78 kB). LCP domovskej proti `main` kolíše: z troch behov (5, 9 a 9 meraní) raz OK, dvakrát „horší“ o 52 – 80 ms. Proti buildu základu `2fa00ca` (15 behov, poradie striedané, základ aj sám proti sebe): 1440 medián 584 → 584 ms (základ proti sebe 584 / 624), 390 492 → 492 ms — editor LCP nemení, rozdiely sú šum stroja |
+
+Stroj bol počas testov vyťažený inými behmi (ďalšie Strapi, Vite a testy). Celostránková snímka `/category/3d-modely`
+(21 862 px pri 390) vtedy trvala dlhšie než predvolených 30 s Playwrightu a test zhody spadol; zelené behy sú
+spustené s `node --import <modul>`, ktorý každému kontextu nastaví limit 120 s — porovnanie to nemení. V jednom
+behu pri záťaži vyšli dve karty s iným náhradným obrázkom (zlyhané načítanie fotky z `/strapi/uploads`); opakovanie
+tých pohľadov aj dva celé behy potom dali zhodu.
+
+`test-editor-clankov.mjs` našiel pri prvých behoch chybu editora článkov, ktorá s presunom `CanvasFrame` nesúvisí:
+klik do bloku, ktorý je len nadpis, pridal prázdny odsek (pozri `docs/EDITOR.md`) — opravené.

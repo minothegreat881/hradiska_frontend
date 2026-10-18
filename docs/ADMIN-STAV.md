@@ -2,6 +2,21 @@
 
 Tento report je podklad k prerobeniu adminu na vizuálny editor, kde správca vidí výsledok a obrázky posúva a zväčšuje priamo myšou. Všetko je overené z kódu a z lokálnej databázy (`hradiska-strapi/.tmp/data.db`). Na jednom mieste je výslovne uvedené, čo sa overiť nedalo.
 
+> **Doplnok 18. 10. 2026 (vetva `vzhlad-editor`).** Od tohto reportu pribudlo:
+>
+> - **Smerovanie cez `#`.** Každá obrazovka má adresu (`/admin#/articles`, `#/editor/<documentId>`, `#/categories`, …),
+>   záložky a tlačidlo „späť“ prehliadača fungujú. Pri neuložených zmenách (článok aj vzhľad) sa odchod pýta —
+>   pri prepnutí obrazovky, zmene adresy aj zatvorení karty.
+> - **Vzhľad webu** v bočnom menu: vizuálny editor domovskej, stránok kategórií, hlavičky a päty
+>   (`#/vzhlad/domov`, `#/vzhlad/kategoria/<slug>`, `#/vzhlad/menu`) a klasická úprava formulárom
+>   (`#/vzhlad/formular`). Opis je v `docs/VZHLAD-WEBU.md`, kód v `src/admin/vzhlad/`.
+> - **Kategórie** (obrazovka už nie je zástupný text) majú tlačidlo „Vzhľad“ pri každej kategórii, rozlíšenie
+>   „Ukladá sa hneď“ (názov, adresa, popis, poradie) a „Zverejní sa so vzhľadom webu“ a varovanie pri zmene adresy.
+> - **Médiá** pred zmazaním ukážu, kde vo vzhľade webu je súbor použitý; taký súbor sa zmazať nedá.
+> - Okno plátna (`CanvasFrame`) je presunuté do `src/admin/editor/platno/` a používa ho aj editor vzhľadu.
+>
+> Kapitoly nižšie opisujú stav z 22. 9. 2026 a ďalej sa neaktualizujú.
+
 ---
 
 ## 1. Dva admini, nie jeden

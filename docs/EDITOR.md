@@ -26,11 +26,16 @@ nezasahuje. Všetko ovládanie (rámiky, úchyty, lišty, tlačidlá „+") kres
 
 ```
 src/admin/editor/
-  EditorCanvas.tsx       plátno: iframe, portál, mierka, prepínače
+  EditorCanvas.tsx       plátno článku: mierka, prepínače, okno z platno/
+  platno/
+    CanvasFrame.tsx      okno plátna (iframe + portál + prenos štýlov) — spoločné
+                         s editorom vzhľadu webu (src/admin/vzhlad/Platno.tsx)
   BlockShell.tsx         obal bloku bez boxu; značky data-block-*
   BlockOverlay.tsx       vrstva ovládania: výber, úchyt, lišta, „+", ťahanie
   EditorUIContext.ts     spojenie plátna s obalom bloku
   useRowDrag.ts          preusporiadanie riadkov v pravom paneli
+  SideColumnEditor.tsx   pobočný stĺpec; exportuje `useReorder` (ťahanie položiek
+                         zoznamu), ktorý používajú aj zoznamy editora vzhľadu
   blocks/
     RichTextInline.tsx   TipTap priamo v stránke + plávajúci panel
     ImageControls.tsx    ťahanie obrázka na zónu, zväčšovanie za roh
@@ -42,6 +47,11 @@ src/admin/editor/
     useHistory.ts        vrátenie zmien (Ctrl+Z / Ctrl+Y, 100 krokov)
     autosave.ts          záloha rozpísaného článku do prehliadača
 ```
+
+`CanvasFrame` sa v októbri 2026 presunul z `EditorCanvas.tsx` do `platno/` bez
+zmeny správania, aby ho mohol použiť editor vzhľadu webu (`docs/VZHLAD-WEBU.md`).
+`EditorCanvas.tsx` ho importuje a ďalej exportuje typ `CanvasZoom`. Overuje to
+`scripts/vzhlad/test-editor-clankov.mjs` (nižšie).
 
 ## Čo editor vie
 
@@ -84,7 +94,23 @@ dokument. Robí sa to v Strapi paneli.
   `span` v renderi). Po kliknutí mimo vyzerá správne.
 - Prázdny popis vo vloženom videu sa pri uložení zmení z `""` na `null`. Robí to
   ukladacia vrstva odjakživa, na weboch sa neprejaví.
-- Round-trip test na 50 článkoch nebol dokončený (viď nižšie).
+- Round-trip test na 50 článkoch nebol dokončený (viď nižšie). Po presune
+  `CanvasFrame` ho čiastočne nahrádza `scripts/vzhlad/test-editor-clankov.mjs`
+  (20 článkov, klik do každého textového bloku, uloženie, porovnanie obsahu v DB).
+- Editor ukladá prázdny počet stĺpcov galérie (`gallery_columns` = null) ako 3
+  (`Number(d.galleryColumns) || 3`) a prázdny výrez titulnej fotky ako
+  `center center`. Web null kreslí rovnako, takže sa to neprejaví; test to
+  neráta ako zmenu obsahu.
+- **Pôvodný dátum stráca čas.** Pole „Pôvodný dátum“ je bez času
+  (`originalPublishedDate.slice(0, 10)`), takže každé uloženie migrovaného
+  článku zmení napr. `2017-08-08T18:59` na `2017-08-08T00:00`. Deň ostáva,
+  poradie článkov z toho istého dňa sa však môže zmeniť. Neopravené — je to
+  rozhodnutie o tvare poľa, nie chyba plátna.
+
+Opravené v októbri 2026: klik do textového bloku, ktorý je iba nadpis alebo
+končí zoznamom, pridal na koniec prázdny odsek (TipTap 3 má v StarterKite
+`TrailingNode`). Článok sa tým označil ako neuložený a po uložení mal prázdny
+odsek navyše. `RichTextInline` má teraz `trailingNode: false`.
 
 ## Testovanie
 
