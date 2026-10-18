@@ -71,7 +71,9 @@ export async function novyKontext(prehliadac, sirka, { route } = {}) {
     locale: 'sk-SK',
     timezoneId: 'Europe/Bratislava',
   });
-  await ctx.route((u) => !/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(u.href), (r) => r.abort());
+  /* Mimo lokálnych serverov nič (mapa, fonty tretích strán); `VZHLAD_POVOLENE_HOSTY` = nasadené weby pri porovnaní cez `--url-*`. */
+  const povolene = (process.env.VZHLAD_POVOLENE_HOSTY || '').split(',').filter(Boolean);
+  await ctx.route((u) => !/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(u.href) && !povolene.includes(u.host), (r) => r.abort());
   if (route) await route(ctx);
   return ctx;
 }

@@ -41,10 +41,14 @@ const REZIMY = arg('--rezim', '1,2,2v').split(',');
 const LEN = arg('--len', null);
 const SUCASNE = Number(arg('--sucasne', '3'));
 const DIST_DNES = resolve(KOREN, '..', 'hradiska-web-zaklad', 'dist');
+/* `--url-dnes` / `--url-novy`: namiesto lokálneho buildu porovnať nasadený web (napr. ostrý a náhľad na Verceli). */
+const URL_DNES = arg('--url-dnes', null)?.replace(/\/$/, '') ?? null;
+const URL_NOVY = arg('--url-novy', null)?.replace(/\/$/, '') ?? null;
+process.env.VZHLAD_POVOLENE_HOSTY = [URL_DNES, URL_NOVY].filter(Boolean).map((u) => new URL(u).host).join(',');
 const DIST_NOVY = resolve(KOREN, 'dist');
 const ODPOVED_SUBOR = join(VYSTUP, 'vzhlad-v1-odpoved.json');
 
-if (!existsSync(join(DIST_DNES, 'index.html'))) throw new Error(`Chýba build dnešného webu: ${DIST_DNES}`);
+if (!URL_DNES && !existsSync(join(DIST_DNES, 'index.html'))) throw new Error(`Chýba build dnešného webu: ${DIST_DNES}`);
 if ((REZIMY.includes('2') || REZIMY.includes('2v')) && !existsSync(ODPOVED_SUBOR)) throw new Error('Chýba vystup/vzhlad-v1-odpoved.json — najprv `node scripts/vzhlad/prevod.mjs --odpoved`.');
 const ODPOVED = existsSync(ODPOVED_SUBOR) ? readFileSync(ODPOVED_SUBOR, 'utf8') : null;
 const odp = ODPOVED ? JSON.parse(ODPOVED) : null;
@@ -53,9 +57,10 @@ const PORT_DNES = 4301;
 /* `--samo`: nový web nahradí dnešný — skúška, či je samotné meranie stále. */
 const PORT_NOVY = a.includes('--samo') ? 4301 : 4302;
 const servery = [
-  await spustiServer({ dist: DIST_DNES, port: PORT_DNES }),
-  await spustiServer({ dist: DIST_NOVY, port: 4302 }),
+  ...(URL_DNES ? [] : [await spustiServer({ dist: DIST_DNES, port: PORT_DNES })]),
+  ...(URL_NOVY ? [] : [await spustiServer({ dist: DIST_NOVY, port: 4302 })]),
 ];
+const adresa = (port) => (port === PORT_DNES && URL_DNES) ? URL_DNES : (port === PORT_NOVY && URL_NOVY) ? URL_NOVY : `http://127.0.0.1:${port}`;
 
 const zoznamy = await nacitajZoznamy();
 let vsetky = stranky(zoznamy);
@@ -107,7 +112,7 @@ async function zachyt(prehliadac, port, p, rezim) {
   });
   const page = await ctx.newPage();
   const z = sledujKonzolu(page);
-  await page.goto(`http://127.0.0.1:${port}${p.s.cesta}`, { waitUntil: 'load', timeout: 60000 });
+  await page.goto(`${adresa(port)}${p.s.cesta}`, { waitUntil: 'load', timeout: 60000 });
   await ustal(page);
   /* Odložené obrázky načítať pred zachytením DOM (mŕtva fotka → kresba). */
   await nacitajObrazky(page);
