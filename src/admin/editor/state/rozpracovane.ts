@@ -15,9 +15,20 @@
 
 let neulozene = false;
 let odlozOkamzite: (() => void) | null = null;
+/** Vlastná otázka pri odchode (editor vzhľadu webu); `null` = otázka editora článkov. */
+let sprava: string | null = null;
 
 export function nastavNeulozene(hodnota: boolean) {
   neulozene = hodnota;
+}
+
+/** Editor vzhľadu webu má inú otázku pri odchode než editor článkov. */
+export function nastavSpravuOdchodu(text: string | null) {
+  sprava = text;
+}
+
+export function spravaOdchodu(): string | null {
+  return sprava;
 }
 
 /** Editor sem dá funkciu, ktorá okamžite odloží rozpísanú prácu. */

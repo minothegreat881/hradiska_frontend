@@ -1,0 +1,250 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   EDITOR VZHĽADU WEBU — administrácia (`.admin .vw-…`) a vrstva nad plátnom
+   (`.vw-vrstva …`, žije v okne plátna; súbor sa tam prenesie ako všetky štýly
+   stránky — `CanvasFrame`).
+
+   Triedy majú predponu `vw-` (na webe sú obsadené len `vw-upravit`,
+   `vw-mapa-zastup`). Žiadne Tailwind triedy — Tailwind sa nebuilduje.
+   Súbor sa načíta len s administráciou, verejný web ho nikdy nedostane.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Vrstva nad plátnom ──────────────────────────────────────────────────── */
+.vw-vrstva {
+  position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 2147482000;
+  font: 500 12px/1.4 Inter, system-ui, sans-serif; color: #2f2418;
+}
+/* Všetko vo vrstve prepúšťa myš okrem tlačidiel (globals.css vynucuje
+   `pointer-events: auto` na každý div — ozdoby preto nesú `pointer-events-none`). */
+.vw-vrstva button, .vw-vrstva input, .vw-vrstva .vw-klik { pointer-events: auto !important; font: inherit; }
+.vw-ram { position: absolute; border-radius: 6px; box-sizing: border-box; }
+.vw-ram-nad { outline: 1.5px dashed rgba(138, 83, 22, .7); outline-offset: 2px; }
+.vw-ram-vybrany { outline: 2px solid #8a5316; outline-offset: 2px; box-shadow: 0 0 0 5px rgba(138, 83, 22, .12); }
+.vw-ram-pise { outline: 2px dashed #b8792d; outline-offset: 3px; background: rgba(255, 250, 235, .18); }
+.vw-ram-cielovy { outline: 2px dashed rgba(138, 83, 22, .55); outline-offset: 4px; background: rgba(255, 247, 229, .25); }
+.vw-ram-tahany { opacity: .45; outline: 2px dashed #8a5316; }
+.vw-stitok {
+  position: absolute; left: -2px; top: 0; white-space: nowrap;
+  transform-origin: left top; transform: scale(var(--vw-m, 1)) translateY(calc(-100% - 4px));
+  padding: 1px 8px; border-radius: 5px; background: rgba(138, 83, 22, .82); color: #fff;
+  font: 600 11px/1.6 Inter, system-ui, sans-serif; letter-spacing: .02em;
+}
+.vw-ram-vybrany > .vw-stitok { background: #8a5316; }
+.vw-stitok-dole { top: 100%; transform: scale(var(--vw-m, 1)) translateY(4px); }
+
+.vw-lista {
+  transform-origin: left top; transform: scale(var(--vw-m, 1));
+  position: absolute; display: flex; align-items: center; gap: 2px; padding: 3px;
+  background: #fffdf7; border: 1px solid #d8c9ab; border-radius: 9px;
+  box-shadow: 0 6px 18px rgba(60, 40, 15, .2); white-space: nowrap;
+}
+.vw-lista.je-hore { transform: scale(var(--vw-m, 1)) translateY(-100%); }
+.vw-lista button {
+  min-width: 28px; height: 27px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  border: 0; background: none; color: #5b4a2f; border-radius: 6px; cursor: pointer; font-size: 12px;
+}
+.vw-lista button:hover:not(:disabled) { background: #f1e6cf; color: #2f2418; }
+.vw-lista button:disabled { opacity: .35; cursor: default; }
+.vw-lista button.vw-nebezpecne:hover { background: #f6d9d5; color: #8f2a20; }
+.vw-lista button.is-on { background: #8a5316; color: #fff; }
+.vw-lista .vw-uchyt { cursor: grab; touch-action: none; }
+.vw-lista svg { width: 15px; height: 15px; }
+.vw-lista-sep { width: 1px; height: 18px; background: #e3d6bb; margin: 0 2px; }
+
+.vw-ciara { position: absolute; background: #8a5316; border-radius: 2px; box-shadow: 0 0 0 3px rgba(138, 83, 22, .2); }
+.vw-ciara-vodorovne { height: 3px; }
+.vw-ciara-zvisle { width: 3px; }
+.vw-tahany-duch {
+  position: absolute; padding: 4px 10px; border-radius: 8px; background: #2f2418; color: #f7efdc;
+  font: 600 12px Inter, system-ui, sans-serif; white-space: nowrap; transform-origin: left top; transform: translate(12px, 12px) scale(var(--vw-m, 1));
+}
+
+.vw-plus {
+  transform-origin: left top; transform: scale(var(--vw-m, 1));
+  position: absolute; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px;
+  border: 1px dashed #b8792d; border-radius: 999px; background: rgba(255, 253, 247, .94); color: #8a5316;
+  font: 600 12px Inter, system-ui, sans-serif; cursor: pointer; opacity: .7; white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(60, 40, 15, .12);
+}
+.vw-plus:hover { opacity: 1; background: #fff; }
+.vw-plus svg { width: 13px; height: 13px; }
+
+.vw-znacka {
+  transform-origin: left top; transform: scale(var(--vw-m, 1));
+  position: absolute; display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 999px;
+  font: 600 10.5px/1.6 Inter, system-ui, sans-serif; white-space: nowrap; box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
+}
+.vw-znacka-zlta { background: #f2c94c; color: #3a2a05; }
+.vw-znacka-cervena { background: #b3261e; color: #fff; }
+.vw-znacka-siva { background: #6f6658; color: #fff; }
+.vw-znacka-slovnik { background: #e9e2d2; color: #5b4a2f; }
+.vw-znacka-modra { background: #2f5d8a; color: #fff; }
+.vw-bodka { transform-origin: left top; transform: scale(var(--vw-m, 1)); position: absolute; width: 11px; height: 11px; border-radius: 999px; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); }
+.vw-bodka-zlta { background: #f2b705; }
+
+.vw-pocitadlo {
+  transform-origin: left top; transform: scale(var(--vw-m, 1));
+  position: absolute; padding: 2px 8px; border-radius: 6px; background: #2f2418; color: #f7efdc;
+  font: 600 11px/1.6 Inter, system-ui, sans-serif; white-space: nowrap;
+}
+.vw-pocitadlo.je-plne { background: #b3261e; }
+
+/* Písanie priamo v stránke: obyčajný text, bez písma a okrajov úprav —
+   po potvrdení ostane presne to, čo kreslí web. */
+.vw-pise { outline: none !important; caret-color: #b3261e; white-space: pre-wrap; cursor: text; }
+.vw-pise:empty::before { content: '…'; opacity: .45; }
+
+/* Plátno v režime len na čítanie (pozretie verzie z histórie). */
+.vw-citanie-pas {
+  position: absolute; left: 0; right: 0; top: 0; height: 0;
+}
+
+/* ── Administrácia ───────────────────────────────────────────────────────── */
+.admin .vw-hlava { margin-bottom: 10px; }
+.admin .vw-nastroje { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.admin .vw-hlava .ad-head-title { min-width: 180px; }
+.admin .vw-stav { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ad-secondary); }
+.admin .vw-stav .vw-stav-bodka { width: 8px; height: 8px; border-radius: 999px; background: var(--ad-pub-fg); }
+.admin .vw-stav.je-koncept .vw-stav-bodka { background: var(--ad-amber-bright); }
+.admin .vw-stav.je-neulozene .vw-stav-bodka { background: var(--ad-danger); }
+.admin .vw-stranky { display: inline-flex; gap: 0; }
+.admin .vw-stranky select { border: none; background: none; font: inherit; font-size: 13px; color: inherit; padding: 0 4px; cursor: pointer; max-width: 170px; }
+.admin .vw-jazyky button { position: relative; min-width: 38px; justify-content: center; }
+.admin .vw-jazyky .vw-jazyk-bodka {
+  position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 999px; background: #f2b705;
+  box-shadow: 0 0 0 1.5px #fff;
+}
+.admin .vw-menu-wrap { position: relative; }
+.admin .vw-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; min-width: 250px; padding: 5px;
+  background: var(--ad-card); border: 1px solid var(--ad-border); border-radius: 11px; box-shadow: 0 12px 30px rgba(40, 28, 10, .2);
+}
+.admin .vw-menu button {
+  display: flex; align-items: center; gap: 9px; width: 100%; padding: 8px 10px; border: 0; border-radius: 8px;
+  background: none; color: var(--ad-text); font: inherit; font-size: 13.5px; cursor: pointer; text-align: left;
+}
+.admin .vw-menu button:hover { background: var(--ad-tint); }
+.admin .vw-menu button.vw-nebezpecne { color: var(--ad-danger); }
+.admin .vw-menu small { display: block; color: var(--ad-muted); font-size: 11.5px; }
+
+.admin .vw-telo { display: flex; gap: 18px; align-items: flex-start; }
+.admin .vw-platno-stlpec { flex: 1; min-width: 0; }
+.admin .vw-panel {
+  width: 348px; flex-shrink: 0; position: sticky; top: 76px; max-height: calc(100vh - 96px); overflow-y: auto;
+  background: var(--ad-surface); padding: 0;
+}
+.admin .vw-panel-hlava { padding: 14px 16px 10px; border-bottom: 1px solid var(--ad-line); }
+.admin .vw-panel-hlava h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.admin .vw-panel-hlava p { margin: 4px 0 0; font-size: 12.5px; color: var(--ad-secondary); line-height: 1.45; }
+.admin .vw-panel-telo { padding: 12px 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.admin .vw-sekcia-panela h3 { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ad-panel-head); }
+
+.admin .vw-pole { display: block; }
+.admin .vw-pole > .vw-pole-nazov { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: var(--ad-panel-head); margin-bottom: 5px; }
+.admin .vw-pole-nazov .vw-pocet { margin-left: auto; font-weight: 400; font-size: 11.5px; color: var(--ad-muted); }
+.admin .vw-pole-nazov .vw-pocet.je-plne { color: var(--ad-danger); }
+.admin .vw-zalozky { display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--ad-seg-bg); margin-bottom: 6px; }
+.admin .vw-zalozky button {
+  position: relative; border: 0; background: none; border-radius: 6px; padding: 3px 10px; cursor: pointer;
+  font: inherit; font-size: 12px; font-weight: 600; color: var(--ad-secondary);
+}
+.admin .vw-zalozky button.is-on { background: #fff; color: var(--ad-amber-deep); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+.admin .vw-zalozky .vw-jazyk-bodka { position: absolute; top: 1px; right: 1px; width: 6px; height: 6px; border-radius: 999px; background: #f2b705; }
+.admin .vw-pomoc { font-size: 11.5px; color: var(--ad-muted); line-height: 1.45; margin-top: 4px; }
+.admin .vw-pomoc.je-vyhrada { color: #8a6100; }
+.admin .vw-pomoc.je-chyba { color: var(--ad-danger); }
+.admin .vw-pomoc b { color: var(--ad-panel-head); }
+.admin .vw-stitok-slovnik { display: inline-block; padding: 0 6px; border-radius: 999px; background: #e9e2d2; color: #5b4a2f; font-size: 10.5px; font-weight: 600; }
+.admin .vw-stitok-vyhrada { display: inline-block; padding: 0 6px; border-radius: 999px; background: #f2c94c; color: #3a2a05; font-size: 10.5px; font-weight: 600; }
+
+.admin .vw-prepinac { display: flex; align-items: center; gap: 9px; font-size: 13px; cursor: pointer; padding: 3px 0; }
+.admin .vw-prepinac input { width: 15px; height: 15px; accent-color: var(--ad-amber-deep); }
+.admin .vw-riadok-poli { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.admin .vw-zoznam { display: flex; flex-direction: column; gap: 4px; }
+.admin .vw-zoznam-riadok {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 9px;
+  background: var(--ad-card); border: 1px solid var(--ad-line); font-size: 13px;
+}
+.admin .vw-zoznam-riadok.is-over { border-color: var(--ad-amber-deep); box-shadow: 0 -2px 0 var(--ad-amber-deep); }
+.admin .vw-zoznam-riadok.is-dragging { opacity: .5; }
+.admin .vw-zoznam-riadok.je-skryte { opacity: .55; background-image: repeating-linear-gradient(135deg, rgba(138, 83, 22, .08) 0 6px, transparent 6px 12px); }
+.admin .vw-zoznam-riadok.je-neplatne { border-color: #e0a39b; background: #fbecea; }
+.admin .vw-zoznam-riadok .vw-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin .vw-zoznam-riadok .vw-text small { display: block; color: var(--ad-muted); font-size: 11.5px; }
+.admin .vw-ikona { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 0; border-radius: 7px; background: none; color: var(--ad-secondary); cursor: pointer; flex-shrink: 0; }
+.admin .vw-ikona:hover:not(:disabled) { background: var(--ad-tint); color: var(--ad-text); }
+.admin .vw-ikona:disabled { opacity: .35; cursor: default; }
+.admin .vw-ikona.vw-nebezpecne:hover { background: #f6d9d5; color: var(--ad-danger); }
+.admin .vw-ikona svg { width: 15px; height: 15px; }
+.admin .vw-pridat {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; cursor: pointer;
+  border: 1px dashed var(--ad-dashed); background: none; color: var(--ad-amber-deep); font: inherit; font-size: 12.5px; font-weight: 500;
+}
+.admin .vw-pridat:hover { border-color: var(--ad-amber-deep); background: var(--ad-active-bg); }
+.admin .vw-nahlad-obrazka { width: 100%; border-radius: 9px; overflow: hidden; border: 1px solid var(--ad-line); background: var(--hr-wash-2, #eee7d8); }
+.admin .vw-nahlad-obrazka img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.admin .vw-mini { width: 44px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--ad-tint); }
+
+.admin .vw-upozornenia { display: flex; flex-direction: column; gap: 6px; }
+.admin .vw-upozornenie { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 9px; font-size: 12.5px; line-height: 1.45; }
+.admin .vw-upozornenie.je-zlte { background: #fdf3d3; color: #5f4800; }
+.admin .vw-upozornenie.je-cervene { background: #fbecea; color: #8f2a20; }
+.admin .vw-upozornenie.je-sive { background: #efebe3; color: #4b4237; }
+.admin .vw-upozornenie.je-modre { background: #e6eef6; color: #23466b; }
+.admin .vw-upozornenie button { margin-left: auto; flex-shrink: 0; }
+
+.admin .vw-sprava { padding: 10px 14px; margin-bottom: 14px; font-size: 13.5px; display: flex; gap: 10px; align-items: center; }
+.admin .vw-sprava.je-ok { background: var(--ad-pub-bg); border-color: var(--ad-pub-br); color: var(--ad-pub-fg); }
+.admin .vw-sprava.je-chyba { background: var(--hr-error-bg); border-color: var(--hr-error-line); color: var(--ad-danger); }
+.admin .vw-sprava.je-info { background: #e6eef6; border-color: #c5d6e8; color: #23466b; }
+.admin .vw-sprava button { margin-left: auto; }
+
+.admin .vw-dialog { width: min(640px, 94vw); max-height: 88vh; overflow-y: auto; padding: 22px; }
+.admin .vw-dialog.je-siroky { width: min(920px, 96vw); }
+.admin .vw-dialog h2 { font-size: 18px; font-weight: 600; margin: 0 0 8px; }
+.admin .vw-dialog p { font-size: 13.5px; color: var(--ad-secondary); line-height: 1.55; margin: 0 0 12px; }
+.admin .vw-dialog ul.vw-zmeny { margin: 0 0 14px; padding: 0 0 0 18px; font-size: 13.5px; line-height: 1.6; max-height: 320px; overflow-y: auto; }
+.admin .vw-dialog .vw-dialog-tlacidla { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 16px; }
+.admin .vw-nahlady { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 10px 0 12px; }
+.admin .vw-nahlady figure { margin: 0; }
+.admin .vw-nahlady figcaption { font-size: 11.5px; color: var(--ad-secondary); margin-top: 4px; }
+.admin .vw-vyrez { position: relative; width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid var(--ad-line); background: #e9e2d2; }
+.admin .vw-vyrez img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
+.admin .vw-vyrez .ed-cover-hint {
+  position: absolute; left: 50%; top: 10px; transform: translateX(-50%); z-index: 2; pointer-events: none;
+  background: rgba(20, 14, 6, .82); color: #f4ead6; font: 500 12px/1.6 Inter, system-ui, sans-serif; padding: 3px 10px; border-radius: 8px; white-space: nowrap;
+}
+.admin .vw-hladanie-vysledky { display: flex; flex-direction: column; gap: 4px; max-height: 330px; overflow-y: auto; margin-top: 8px; }
+.admin .vw-hladanie-vysledky button {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 9px; border-radius: 8px; text-align: left;
+  border: 1px solid var(--ad-line); background: var(--ad-card); cursor: pointer; font: inherit; font-size: 13px; color: var(--ad-text);
+}
+.admin .vw-hladanie-vysledky button:hover { border-color: var(--ad-amber-mid); }
+.admin .vw-hladanie-vysledky button:disabled { opacity: .5; cursor: default; }
+.admin .vw-hladanie-vysledky small { color: var(--ad-muted); display: block; font-size: 11.5px; }
+
+.admin .vw-prazdny { padding: 40px 30px; text-align: center; max-width: 620px; margin: 40px auto; }
+.admin .vw-prazdny h2 { font-size: 20px; margin: 0 0 10px; }
+.admin .vw-prazdny p { font-size: 14px; color: var(--ad-secondary); line-height: 1.6; }
+
+.admin .vw-citanie {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; margin-bottom: 14px;
+  background: #2f2418; color: #f7efdc; border-radius: 12px; font-size: 13.5px;
+}
+.admin .vw-citanie .abtn { background: #fffdf7; }
+
+/* Klasická úprava */
+.admin .vw-formular { max-width: 980px; }
+.admin .vw-formular .apanel { margin-bottom: 10px; }
+.admin .vw-formular-prvok { border: 1px solid var(--ad-line); border-radius: 10px; padding: 10px 12px; background: var(--ad-card); margin-bottom: 8px; }
+.admin .vw-formular-prvok-hlava { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13.5px; font-weight: 600; }
+.admin .vw-formular-prvok-hlava .vw-otvorit { margin-left: auto; font-size: 12px; font-weight: 500; }
+.admin .vw-mriezka-poli { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+
+/* Kategórie: čo sa ukladá hneď a čo so vzhľadom */
+.admin .vw-hned { border-left: 3px solid var(--ad-pub-fg); padding-left: 10px; }
+.admin .vw-so-vzhladom { border-left: 3px solid var(--ad-amber-bright); padding-left: 10px; margin-top: 14px; }
+.admin .vw-druh-ulozenia { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 1px 8px; border-radius: 999px; margin-bottom: 8px; }
+.admin .vw-druh-ulozenia.je-hned { background: var(--ad-pub-bg); color: var(--ad-pub-fg); }
+.admin .vw-druh-ulozenia.je-vzhlad { background: var(--ad-draft-bg); color: var(--ad-draft-fg); }
+.admin .ad-cat-row:has(> [data-vw-vzhlad-kategorie]) { grid-template-columns: 24px minmax(0, 1fr) 44px auto 16px; gap: 8px; }
