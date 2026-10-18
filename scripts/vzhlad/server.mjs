@@ -13,6 +13,9 @@
  * Do backendu ide len to, čo príde od prehliadača; server nič nezapisuje.
  *
  *   node scripts/vzhlad/server.mjs --dist dist --port 4302 [--backend http://localhost:1338] [--vzhlad subor.json]
+ *
+ * Predvolený backend sa dá zmeniť premennou `VZHLAD_BACKEND` (tú istú číta `spolocne.mjs`) —
+ * napr. test zhody proti lokálnemu backendu na :1337.
  */
 import http from 'node:http';
 import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
@@ -27,7 +30,7 @@ const TYPY = {
   '.xml': 'application/xml', '.pbf': 'application/x-protobuf', '.geojson': 'application/geo+json', '.mp4': 'video/mp4',
 };
 
-export function spustiServer({ dist, port, backend = 'http://localhost:1338', vzhlad = null, ticho = true }) {
+export function spustiServer({ dist, port, backend = process.env.VZHLAD_BACKEND || 'http://localhost:1338', vzhlad = null, ticho = true }) {
   const koren = dist ? resolve(dist) : null;
   const ciel = new URL(backend);
 
