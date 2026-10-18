@@ -205,7 +205,7 @@ export async function snimka(page, { css = '', maska = [] } = {}) {
     await cakajNaObrazky(page);
     await spi(300);
     return page.screenshot({
-      fullPage: true, animations: 'disabled', caret: 'hide', scale: 'css',
+      fullPage: true, animations: 'disabled', caret: 'hide', scale: 'css', timeout: 120000,
       mask: maska.map((m) => page.locator(m)), maskColor: '#ff00ff',
     });
   };
