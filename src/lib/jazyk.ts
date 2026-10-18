@@ -39,12 +39,30 @@ export function nastavJazyk(j: Jazyk): void {
   if (typeof document !== 'undefined') document.documentElement.lang = j;
 }
 
-export const jazyk = (): Jazyk => aktualny;
-export const poAnglicky = (): boolean => aktualny === 'en';
-export const poNemecky = (): boolean => aktualny === 'de';
-export const poSlovensky = (): boolean => aktualny === 'sk';
+/**
+ * Jazyk PLÁTNA editora vzhľadu webu v administrácii. Administrácia beží na
+ * `/admin` (teda vždy slovensky), ale plátno má ukázať stránku v angličtine
+ * či nemčine — funkcie nižšie preto čítajú najprv tento jazyk. Nastavuje ho
+ * LEN editor vzhľadu (`admin/vzhlad/`) a po zatvorení ho vráti na `null`.
+ * Verejný web ho nevolá nikdy, takže na ňom ostáva `null` a všetko sa správa
+ * presne ako predtým (overuje to test zhody).
+ */
+let jazykPlatna: Jazyk | null = null;
+
+/** Len pre plátno editora vzhľadu webu. `null` = jazyk podľa adresy. */
+export function nastavJazykPlatna(j: Jazyk | null): void {
+  jazykPlatna = j;
+}
+
+/** Jazyk, v ktorom sa práve kreslí: plátno editora, inak jazyk z adresy. */
+const ucinny = (): Jazyk => jazykPlatna ?? aktualny;
+
+export const jazyk = (): Jazyk => ucinny();
+export const poAnglicky = (): boolean => ucinny() === 'en';
+export const poNemecky = (): boolean => ucinny() === 'de';
+export const poSlovensky = (): boolean => ucinny() === 'sk';
 /** Kód prostredia pre dátumy a čísla v jazyku stránky. */
-export const narodneProstredie = (j: Jazyk = aktualny): string => PROSTREDIE[j];
+export const narodneProstredie = (j: Jazyk = ucinny()): string => PROSTREDIE[j];
 
 /**
  * Z adresy vyberie jazyk a vráti cestu bez predpony.
@@ -60,7 +78,7 @@ export function rozdelAdresu(path: string): { jazyk: Jazyk; cesta: string } {
 }
 
 /** Adresa v aktuálnom jazyku: `/blog/x` → `/en/blog/x` pre angličtinu. */
-export function odkaz(cesta: string, j: Jazyk = aktualny): string {
+export function odkaz(cesta: string, j: Jazyk = ucinny()): string {
   /* Poistka proti dvojitej predpone. Adresa sa miestami skladá v dátach a
      potom ešte raz pri vykreslení; `/en/en/blog/…` nezodpovedá žiadnej ceste
      a skončí na 404 — a hľadá sa to ťažko, lebo časť odkazov funguje. */
@@ -103,7 +121,7 @@ export function sledujDruhyOdkaz(f: () => void): () => void {
 }
 
 /** Jazyk, na ktorý prepne jedno klepnutie — cyklí po VEREJNÝCH jazykoch. */
-export const druhyJazyk = (j: Jazyk = aktualny): Jazyk => {
+export const druhyJazyk = (j: Jazyk = ucinny()): Jazyk => {
   const i = VEREJNE_JAZYKY.indexOf(j);
   /* Z rozrobeného jazyka vedie prepínač späť na slovenčinu. */
   if (i < 0) return VEREJNE_JAZYKY[0];
@@ -785,8 +803,9 @@ const EN: Record<string, string> = {
 const SLOVNIKY: Partial<Record<Jazyk, Record<string, string>>> = { en: EN, de: DE };
 
 export function t(kluc: string): string {
-  if (aktualny === 'sk') return kluc;
-  return SLOVNIKY[aktualny]?.[kluc] ?? kluc;
+  const j = ucinny();
+  if (j === 'sk') return kluc;
+  return SLOVNIKY[j]?.[kluc] ?? kluc;
 }
 
 /**
@@ -845,7 +864,7 @@ function radova(n: number): string {
 
 export function datovanie(text: string | null | undefined): string {
   if (!text) return '';
-  if (aktualny === 'sk') return text;
+  if (ucinny() === 'sk') return text;
 
   const holy = text.trim();
   const zoSlovnika = OBDOBIA[holy.toLowerCase()] ?? OBDOBIA[holy];
