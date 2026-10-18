@@ -4,6 +4,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Search, Upload, Loader2, Trash2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { listFiles, uploadFiles, deleteFile, fileUrl, PAGE, type MediaFile } from '../api/media';
+import { pouzitieSuboru, type PouzitieSuboru } from '../api/vzhlad';
+
+/* Pred zmazaním: kde je súbor použitý vo vzhľade webu (koncept, zverejnené,
+   posledné verzie histórie) a či je na zozname chránených súborov starých
+   verzií webu a appky. Server použitý alebo chránený súbor odmietne zmazať
+   aj tak (409) — toto je len zrozumiteľné vysvetlenie vopred. */
+const ZDROJE: Record<string, string> = { koncept: 'koncept vzhľadu', zverejnene: 'zverejnený vzhľad webu', historia: 'história vzhľadu' };
+function miestaPouzitia(p: PouzitieSuboru): string[] {
+  const von = p.miesta.map((m) => `${ZDROJE[m.zdroj] ?? m.zdroj}${m.verzia ? ` (verzia ${m.verzia})` : ''}: ${m.cesta}`);
+  if (p.chraneny) von.push('staré verzie webu a mobilnej aplikácie (chránený súbor)');
+  return von;
+}
 
 export function MediaScreen() {
   const { token } = useAuth();
@@ -15,6 +27,7 @@ export function MediaScreen() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [confirm, setConfirm] = useState<MediaFile | null>(null);
+  const [pouzitie, setPouzitie] = useState<PouzitieSuboru | 'nacitava' | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -46,13 +59,23 @@ export function MediaScreen() {
     finally { setUploading(false); }
   };
 
+  const opytajSaNaZmazanie = (f: MediaFile) => {
+    setConfirm(f);
+    setPouzitie('nacitava');
+    if (!token) return;
+    pouzitieSuboru(token, f.id).then(setPouzitie).catch(() => setPouzitie(null));
+  };
+
   const doDelete = async () => {
     if (!token || !confirm) return;
     try {
       await deleteFile(token, confirm.id);
       setItems(prev => prev.filter(f => f.id !== confirm.id));
-    } catch (e: any) { setError(e?.message || 'Mazanie zlyhalo.'); }
-    finally { setConfirm(null); }
+    } catch (e: any) {
+      /* 409 = súbor je použitý vo vzhľade alebo chránený — server to vysvetlí sám. */
+      setError(e?.status === 409 ? `Obrázok sa nezmazal: ${e?.message || 'je použitý vo vzhľade webu alebo ho potrebujú staré verzie webu.'}` : (e?.message || 'Mazanie zlyhalo.'));
+    }
+    finally { setConfirm(null); setPouzitie(null); }
   };
 
   return (
@@ -97,7 +120,7 @@ export function MediaScreen() {
                 {f.width}×{f.height} · {Math.round(f.size)} KB
               </div>
             </div>
-            <button className="abtn abtn-icon abtn-danger" onClick={() => setConfirm(f)}
+            <button className="abtn abtn-icon abtn-danger" onClick={() => opytajSaNaZmazanie(f)}
                     title="Zmazať" style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(253,251,244,.92)' }}>
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -126,16 +149,30 @@ export function MediaScreen() {
              style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(30,22,12,.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(440px,92vw)', padding: 24 }}>
             <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 10px' }}>Zmazať obrázok?</h2>
-            <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 20px' }}>
+            <p style={{ fontSize: 14, color: 'var(--ad-secondary)', lineHeight: 1.6, margin: '0 0 12px' }}>
               Súbor <strong style={{ color: 'var(--ad-text)' }}>{confirm.name}</strong> sa zmaže natrvalo.
               Ak ho používa nejaký článok, obrázok tam prestane fungovať.
             </p>
+            {pouzitie === 'nacitava' && (
+              <p style={{ fontSize: 13, color: 'var(--ad-muted)', margin: '0 0 16px' }}>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ display: 'inline' }} /> Zisťujem, či ho nepoužíva vzhľad webu…
+              </p>
+            )}
+            {pouzitie && pouzitie !== 'nacitava' && !pouzitie.mozeSaZmazat && (
+              <div style={{ fontSize: 13.5, lineHeight: 1.55, margin: '0 0 16px', padding: '10px 12px', borderRadius: 9, background: 'var(--hr-error-bg)', color: 'var(--ad-danger)' }} data-vw-subor-pouzity>
+                <b>Tento obrázok sa zmazať nedá.</b> Používa ho:
+                <ul style={{ margin: '6px 0 0', paddingLeft: 18 }}>{miestaPouzitia(pouzitie).map((m) => <li key={m}>{m}</li>)}</ul>
+                Najprv ho vymeňte vo vzhľade webu (a zverejnite), chránené súbory starých verzií ostávajú natrvalo.
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button className="abtn" onClick={() => setConfirm(null)}>Zrušiť</button>
-              <button className="abtn" onClick={doDelete}
-                      style={{ background: 'var(--ad-danger)', color: '#fff', borderColor: 'var(--ad-danger)' }}>
-                Zmazať natrvalo
-              </button>
+              <button className="abtn" onClick={() => { setConfirm(null); setPouzitie(null); }}>{pouzitie && pouzitie !== 'nacitava' && !pouzitie.mozeSaZmazat ? 'Zavrieť' : 'Zrušiť'}</button>
+              {!(pouzitie && pouzitie !== 'nacitava' && !pouzitie.mozeSaZmazat) && (
+                <button className="abtn" onClick={doDelete} disabled={pouzitie === 'nacitava'}
+                        style={{ background: 'var(--ad-danger)', color: '#fff', borderColor: 'var(--ad-danger)' }}>
+                  Zmazať natrvalo
+                </button>
+              )}
             </div>
           </div>
         </div>

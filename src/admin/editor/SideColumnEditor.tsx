@@ -57,8 +57,12 @@ export function SideColumnEditor({
   );
 }
 
-/** Preusporiadanie ťahaním za úchyt (ukazovateľové udalosti, funguje aj v iframe). */
-function useReorder<T extends { uid: string }>(items: T[], onChange: (n: T[]) => void) {
+/**
+ * Preusporiadanie ťahaním za úchyt (ukazovateľové udalosti, funguje aj v iframe).
+ * Používa ho aj editor vzhľadu webu (zoznamy v pravom paneli a v klasickej úprave):
+ * zoznam nesie `data-reorder-list`, riadky `data-reorder-item`, úchyt `start(uid)`.
+ */
+export function useReorder<T extends { uid: string }>(items: T[], onChange: (n: T[]) => void) {
   const state = useRef<{ uid: string; over: number } | null>(null);
   const [dragUid, setDragUid] = useState<string | null>(null);
   const [over, setOver] = useState<number | null>(null);

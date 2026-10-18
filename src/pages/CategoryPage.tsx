@@ -298,7 +298,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                   článkami to pôsobilo, že sa stránka donekonečna načítava. Zoznam sa má dať
                   prezerať naraz, nie sa odhaľovať. */}
               {categoryArticles.map((article, i) => (
-                <ArticleCard key={article.id} article={article} stitok={false} znak={skusobnyZnak} dataVw={vw(upravy, `kategoria:clanok:${i}`)} />
+                <ArticleCard key={article.id} article={article} stitok={false} znak={skusobnyZnak} dataVw={vw(upravy, `kategoria:clanok:${i}`)} dataVwDokument={upravy ? String(article.id) : undefined} />
               ))}
             </div>
           </div>

@@ -91,6 +91,12 @@ export function RichTextInline({
         heading: false, // nahradené `LeveledHeading` nižšie
         paragraph: { HTMLAttributes: { class: P_CLASS } },
         bulletList: { HTMLAttributes: { class: UL_CLASS } },
+        // TipTap 3 v StarterKit dopĺňa za posledný nadpis či zoznam prázdny
+        // odsek. Už samotné kliknutie do bloku, ktorý je len nadpis (časté
+        // v migrovaných článkoch), tak zmenilo obsah: článok bol „neuložený"
+        // a uložil sa s prázdnym odsekom navyše. Nový odsek za nadpisom
+        // urobí Enter aj bez toho.
+        trailingNode: false,
       }),
       LeveledHeading.configure({ levels: [2, 3, 4] }),
       Link.configure({ openOnClick: false, autolink: false, HTMLAttributes: { class: A_CLASS } }),

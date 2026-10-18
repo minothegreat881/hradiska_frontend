@@ -72,8 +72,11 @@ const naClanok = (p: StrapiBlogPost): Clanok => ({
 });
 
 function Karta({ c, znacka }: { c: Clanok; znacka?: string }) {
+  /* `data-vw-dokument` (len v režime úprav, so značkou) — editor podľa neho
+     pozná článok aj vtedy, keď ho riadok doplnil sám („Upraviť článok",
+     iný obrázok na dlaždici). */
   return (
-    <a className="dob-clanok" href={odkaz(`/blog/${c.slug}`)} data-vw={znacka}>
+    <a className="dob-clanok" href={odkaz(`/blog/${c.slug}`)} data-vw={znacka} data-vw-dokument={znacka ? c.documentId : undefined}>
       <span className="dob-ram">
         {c.obrazok && (
           <img className="dob-obraz" src={c.obrazok} alt="" loading="lazy" decoding="async" />

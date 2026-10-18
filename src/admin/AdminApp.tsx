@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import {
   FileText, PenSquare, Image as ImageIcon, FolderTree, Tag, MessageSquare,
-  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus, Flag,
+  BarChart3, LogOut, Search, ExternalLink, Users, FileEdit, MessageSquarePlus, Flag, LayoutTemplate,
 } from 'lucide-react';
 import '../styles/admin-redesign.css';
 import { AuthProvider, useAuth } from './AuthContext';
@@ -12,7 +12,8 @@ import { ArticlesScreen } from './screens/ArticlesScreen';
 import { DraftsScreen } from './screens/DraftsScreen';
 import { NahlaseniaScreen } from './screens/NahlaseniaScreen';
 import { PripomienkyScreen } from './screens/PripomienkyScreen';
-import { maNeulozeneZmeny, odlozTeraz } from './editor/state/rozpracovane';
+import { maNeulozeneZmeny, odlozTeraz, spravaOdchodu } from './editor/state/rozpracovane';
+import { VzhladModul, type StrankaModulu } from './vzhlad/VzhladModul';
 import { EditorScreen } from './screens/EditorScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { MediaScreen } from './screens/MediaScreen';
@@ -25,7 +26,51 @@ import { fetchNavCounts } from './api/posts';
 import { StavPosty } from './components/StavPosty';
 
 export type AdminRoute =
-  | 'articles' | 'drafts' | 'editor' | 'media' | 'categories' | 'tags' | 'comments' | 'pripomienky' | 'nahlasenia' | 'users' | 'analytics' | 'profile';
+  | 'articles' | 'drafts' | 'editor' | 'vzhlad' | 'media' | 'categories' | 'tags' | 'comments' | 'pripomienky' | 'nahlasenia' | 'users' | 'analytics' | 'profile';
+
+/**
+ * Poloha v administrácii — v adrese za `#`, aby prežila obnovenie stránky
+ * a fungovalo Späť/Vpred v prehliadači:
+ *   #/articles, #/drafts, #/media, … (obrazovky),
+ *   #/editor/<documentId> (editor článku; #/editor = nový článok),
+ *   #/vzhlad/domov, #/vzhlad/kategoria/<slug>, #/vzhlad/menu, #/vzhlad/formular.
+ * Na `#/vzhlad/…` vedie aj tlačidlo „Upraviť túto stránku" na webe.
+ */
+export type Poloha =
+  | { route: Exclude<AdminRoute, 'editor' | 'vzhlad'> }
+  | { route: 'editor'; id: string | null }
+  | { route: 'vzhlad'; stranka: StrankaModulu };
+
+const OBRAZOVKY: AdminRoute[] = ['articles', 'drafts', 'editor', 'vzhlad', 'media', 'categories', 'tags', 'comments', 'pripomienky', 'nahlasenia', 'users', 'analytics', 'profile'];
+
+export function polohaZHashu(hash: string): Poloha {
+  const casti = hash.replace(/^#\/?/, '').split('/').map((c) => { try { return decodeURIComponent(c); } catch { return c; } });
+  const r = casti[0] as AdminRoute;
+  if (r === 'vzhlad') {
+    if (casti[1] === 'kategoria' && casti[2]) return { route: 'vzhlad', stranka: { druh: 'kategoria', slug: casti[2] } };
+    if (casti[1] === 'menu') return { route: 'vzhlad', stranka: { druh: 'menu' } };
+    if (casti[1] === 'formular') return { route: 'vzhlad', stranka: { druh: 'formular' } };
+    return { route: 'vzhlad', stranka: { druh: 'domov' } };
+  }
+  if (r === 'editor') return { route: 'editor', id: casti[1] || null };
+  if (OBRAZOVKY.includes(r)) return { route: r as Exclude<AdminRoute, 'editor' | 'vzhlad'> };
+  return { route: 'articles' };
+}
+
+export function hashZPolohy(p: Poloha): string {
+  if (p.route === 'editor') return p.id ? `#/editor/${encodeURIComponent(p.id)}` : '#/editor';
+  if (p.route === 'vzhlad') {
+    const st = p.stranka;
+    return st.druh === 'kategoria' ? `#/vzhlad/kategoria/${encodeURIComponent(st.slug)}` : `#/vzhlad/${st.druh}`;
+  }
+  return `#/${p.route}`;
+}
+
+/** Je to tá istá obrazovka (prechod medzi nimi nič neodmontuje)? */
+const tenIstyModul = (a: Poloha, b: Poloha) =>
+  a.route === b.route && (a.route !== 'editor' || (b.route === 'editor' && a.id === b.id));
+
+const adresaS = (hash: string) => `${window.location.pathname}${window.location.search}${hash}`;
 
 // Badge sa dopĺňa dynamicky z reálnych počtov (viď `badges` v AdminShell) — žiadne statické čísla.
 const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon: any }[] }[] = [
@@ -35,6 +80,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
       { id: 'articles', label: 'Články', icon: FileText },
       { id: 'drafts', label: 'Koncepty', icon: FileEdit },
       { id: 'editor', label: 'Editor', icon: PenSquare },
+      { id: 'vzhlad', label: 'Vzhľad webu', icon: LayoutTemplate },
       { id: 'media', label: 'Médiá', icon: ImageIcon },
     ],
   },
@@ -56,7 +102,7 @@ const NAV_GROUPS: { label: string; items: { id: AdminRoute; label: string; icon:
 ];
 
 const ROUTE_LABELS: Record<AdminRoute, string> = {
-  articles: 'Články', drafts: 'Koncepty', editor: 'Editor článku', media: 'Médiá',
+  articles: 'Články', drafts: 'Koncepty', editor: 'Editor článku', vzhlad: 'Vzhľad webu', media: 'Médiá',
   categories: 'Kategórie', tags: 'Štítky', comments: 'Komentáre', pripomienky: 'Pripomienky', nahlasenia: 'Nahlásenia',
   users: 'Používatelia', analytics: 'Analytika',
   profile: 'Môj profil',
@@ -72,8 +118,63 @@ export default function AdminApp() {
 
 function AdminShell() {
   const { user, ready, signOut, token } = useAuth();
-  const [route, setRoute] = useState<AdminRoute>('articles');
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [poloha, setPoloha] = useState<Poloha>(() => polohaZHashu(window.location.hash));
+  const route = poloha.route;
+  const [editingId, setEditingId] = useState<string | null>(() => (poloha.route === 'editor' ? poloha.id : null));
+  const polohaRef = useRef(poloha);
+  polohaRef.current = poloha;
+
+  /* Stráž odchodu: rozpísaná práca (článok, vzhľad webu) sa najprv odloží
+     do prehliadača a redaktor sa dozvie, kde ju nájde. */
+  const smiemOdist = (z: Poloha, na: Poloha): boolean => {
+    if (tenIstyModul(z, na) || !maNeulozeneZmeny()) return true;
+    odlozTeraz();
+    return window.confirm(
+      spravaOdchodu() ?? [
+        'V článku máte neuložené zmeny — na webe sa zatiaľ neprejavia.',
+        '',
+        'Odložil som ich do tohto prehliadača. Nájdete ich v časti „Koncepty" '
+          + 'a po otvorení článku sa vás editor spýta, či ich má vrátiť.',
+      ].join(String.fromCharCode(10)),
+    );
+  };
+
+  /* Späť/Vpred v prehliadači a ručne zmenená adresa. Keď redaktor odchod
+     odmietne, adresa sa vráti bez nového záznamu v histórii. */
+  useEffect(() => {
+    if (!window.location.hash) window.history.replaceState(null, '', adresaS(hashZPolohy(polohaRef.current)));
+    const naZmenu = () => {
+      const nova = polohaZHashu(window.location.hash);
+      const stara = polohaRef.current;
+      if (hashZPolohy(nova) === hashZPolohy(stara)) return;
+      if (!smiemOdist(stara, nova)) {
+        window.history.replaceState(null, '', adresaS(hashZPolohy(stara)));
+        return;
+      }
+      if (nova.route === 'editor') setEditingId(nova.id);
+      setPoloha(nova);
+    };
+    window.addEventListener('hashchange', naZmenu);
+    return () => window.removeEventListener('hashchange', naZmenu);
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, []);
+
+  /** Prechod na inú obrazovku: zápis do adresy → `hashchange` → stav (a stráž). */
+  const prejdi = (na: Poloha, nahradit = false) => {
+    const h = hashZPolohy(na);
+    if (h === window.location.hash) { setPoloha(na); return; }
+    if (nahradit) {
+      window.history.replaceState(null, '', adresaS(h));
+      setPoloha(na);
+      return;
+    }
+    window.location.hash = h;
+  };
+  const setRoute = (r: AdminRoute) => prejdi(
+    r === 'editor' ? { route: 'editor', id: editingId }
+      : r === 'vzhlad' ? { route: 'vzhlad', stranka: { druh: 'domov' } }
+      : { route: r },
+  );
 
   // Reálne počty pre badge (články/kategórie/štítky/komentáre) — nie statické čísla.
   const [badges, setBadges] = useState<Partial<Record<AdminRoute, number>>>({});
@@ -141,26 +242,12 @@ function AdminShell() {
   }
   if (!user) return <LoginScreen />;
 
-  const openEditor = (id: string | null) => { setEditingId(id); setRoute('editor'); };
+  const openEditor = (id: string | null) => prejdi({ route: 'editor', id });
 
-  /* Odchod z editora cez ľavú ponuku. Editor sa tým odmontuje, preto sa
-     rozpísaná práca najprv odloží a redaktor sa dozvie, kde ju nájde —
-     predtým obrazovka len zmizla a vyzeralo to, že sa práca stratila. */
-  const prejdiNa = (id: AdminRoute) => {
-    if (route === 'editor' && maNeulozeneZmeny()) {
-      odlozTeraz();
-      const ist = window.confirm(
-        [
-          'V článku máte neuložené zmeny — na webe sa zatiaľ neprejavia.',
-          '',
-          'Odložil som ich do tohto prehliadača. Nájdete ich v časti „Koncepty" '
-            + 'a po otvorení článku sa vás editor spýta, či ich má vrátiť.',
-        ].join(String.fromCharCode(10)),
-      );
-      if (!ist) return;
-    }
-    setRoute(id);
-  };
+  /* Odchod cez ľavú ponuku. Stráž (`smiemOdist`) sa pýta pri každej zmene
+     adresy, teda aj pri Späť v prehliadači — predtým obrazovka len zmizla
+     a vyzeralo to, že sa práca stratila. */
+  const prejdiNa = (id: AdminRoute) => setRoute(id);
 
   return (
     <div className="admin" style={{ display: 'flex', minHeight: '100vh' }}>
@@ -235,7 +322,7 @@ function AdminShell() {
           </div>
           {/* Klik na meno otvorí vlastný profil (zmena e-mailu a hesla). */}
           <button
-            onClick={() => setRoute('profile')}
+            onClick={() => prejdiNa('profile')}
             title="Môj profil — e-mail a heslo"
             style={{
               minWidth: 0, flex: 1, lineHeight: 1.3, textAlign: 'left',
@@ -292,7 +379,7 @@ function AdminShell() {
                 ? 'Niekto nahlásil príspevok.'
                 : `Pribudli ${noveNahlasenia} nahlásenia príspevkov.`}
             </span>
-            <button className="abtn abtn-primary" onClick={() => setRoute('nahlasenia')}>Pozrieť</button>
+            <button className="abtn abtn-primary" onClick={() => prejdiNa('nahlasenia')}>Pozrieť</button>
             <button className="ad-upoz-x" onClick={() => setNoveNahlasenia(0)} aria-label="Skryť upozornenie">×</button>
           </div>
         )}
@@ -304,10 +391,18 @@ function AdminShell() {
 
           {route === 'articles' && <ArticlesScreen onEdit={openEditor} />}
           {route === 'drafts' && <DraftsScreen onEdit={openEditor} />}
-          {route === "editor" && <EditorScreen articleId={editingId} onBack={() => setRoute("articles")} onSaved={setEditingId} />}
+          {route === "editor" && <EditorScreen articleId={editingId} onBack={() => setRoute("articles")} onSaved={(id) => { setEditingId(id); prejdi({ route: 'editor', id }, true); }} />}
+          {poloha.route === 'vzhlad' && (
+            <VzhladModul
+              stranka={poloha.stranka}
+              naStranku={(st) => prejdi({ route: 'vzhlad', stranka: st })}
+              upravitClanok={(id) => openEditor(id)}
+              spat={() => prejdi({ route: 'articles' })}
+            />
+          )}
           {route === 'analytics' && <AnalyticsScreen onEdit={openEditor} />}
           {route === 'media' && <MediaScreen />}
-          {route === 'categories' && <CategoriesScreen />}
+          {route === 'categories' && <CategoriesScreen onVzhlad={(slug) => prejdi({ route: 'vzhlad', stranka: { druh: 'kategoria', slug } })} />}
           {route === 'tags' && <TagsScreen />}
           {route === 'comments' && <CommentsScreen />}
           {route === 'pripomienky' && <PripomienkyScreen />}
