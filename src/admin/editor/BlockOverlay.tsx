@@ -426,7 +426,7 @@ export function BlockOverlay({
       {blocks.length > 0 && measured && Array.from({ length: blocks.length + 1 }, (_, i) => {
         const isLast = i === blocks.length;
         return (
-        <div key={`gap-${i}`} className={`ed-gap${isLast ? ' is-last' : ''}`} style={{ top: gapY(i) }}>
+        <div key={`gap-${i}`} className={`ed-gap${isLast ? ' is-last' : ''}${selectedIdx >= 0 && (i === selectedIdx || i === selectedIdx + 1) ? ' je-pri-vybranom' : ''}`} style={{ top: gapY(i) }}>
           <button className="ed-gap-btn" title="Vložiť blok sem" aria-label="Vložiť blok sem"
                   onClick={() => setMenuAt(menuAt === i ? null : i)}>
             <Plus className="w-3.5 h-3.5" />

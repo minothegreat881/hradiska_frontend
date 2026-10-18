@@ -25,6 +25,7 @@ import { EditorCanvas, type CanvasDevice, type CanvasZoom } from '../editor/Edit
 import { useHistory } from '../editor/state/useHistory';
 import { saveDraft, readDraft, clearDraft, timeOf } from '../editor/state/autosave';
 import { nastavNeulozene, nastavOdkladac } from '../editor/state/rozpracovane';
+import { jeTelefon } from '../lib/mobil';
 
 interface Block {
   uid: string;
@@ -120,7 +121,8 @@ export function EditorScreen({
     { target: 'cover' } | { target: 'galeria' } | { target: 'block'; uid: string; multiple?: boolean } | null
   >(null);
 
-  const [device, setDevice] = useState<CanvasDevice>('desktop');
+  /* Na telefóne sa článok predvolene ukazuje tak, ako ho uvidí čitateľ na telefóne. */
+  const [device, setDevice] = useState<CanvasDevice>(() => (jeTelefon() ? 'mobil' : 'desktop'));
   const [zoom, setZoom] = useState<CanvasZoom>('fit');
   /** Skrytý pravý panel = širšie plátno, teda väčšie písmo pri práci. */
   const [panelOpen, setPanelOpen] = useState(true);
@@ -650,7 +652,7 @@ export function EditorScreen({
       {/* ── Hlavička editora ──────────────────────────────────────────────
           Jeden riadok vysoký 60 px. Prepínače sú ikonové, aby sa všetko
           zmestilo aj pri užšom okne. */}
-      <div className="ad-editor-head">
+      <div className="ad-editor-head adm-m-hlava-clanku">
         <button className="abtn abtn-icon" onClick={leave} title="Späť na zoznam" aria-label="Späť na zoznam">
           <ArrowLeft className="w-4 h-4" />
         </button>
@@ -693,7 +695,7 @@ export function EditorScreen({
           </button>
         </div>
 
-        <div className="ad-seg" role="group" aria-label="Šírka a zväčšenie náhľadu">
+        <div className="ad-seg adm-m-zariadenie" role="group" aria-label="Šírka a zväčšenie náhľadu">
           <button className={device === 'desktop' ? 'is-on' : ''} onClick={() => setDevice('desktop')}
                   aria-label="Počítač" title="Ako to vyzerá na počítači">
             <Monitor className="w-4 h-4" />
@@ -702,7 +704,7 @@ export function EditorScreen({
                   aria-label="Mobil" title="Ako to vyzerá na telefóne (390 px) — obrázky sa správajú inak">
             <Smartphone className="w-4 h-4" />
           </button>
-          <button className={zoom === 'full' ? 'is-on' : ''}
+          <button className={`adm-m-zvacsenie${zoom === 'full' ? ' is-on' : ''}`}
                   onClick={() => setZoom(zoom === 'full' ? 'fit' : 'full')}
                   title={zoom === 'full' ? 'Zmenšiť tak, aby sa zmestil celý' : 'Skutočná veľkosť — posúva sa do strán'}>
             100 %
@@ -715,6 +717,12 @@ export function EditorScreen({
                 aria-label={panelOpen ? 'Skryť panel s údajmi' : 'Zobraziť panel s údajmi'}
                 title={panelOpen ? 'Skryť pravý panel — plátno bude väčšie' : 'Zobraziť panel s údajmi článku'}>
           {panelOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+        </button>
+
+        {/* Telefón a tablet: údaje článku sú pod plátnom — skok na ne. */}
+        <button type="button" className="abtn adm-m-iba" data-adm-m-udaje
+                onClick={() => { setPanelOpen(true); window.requestAnimationFrame(() => document.getElementById('adm-udaje-clanku')?.scrollIntoView({ block: 'start' })); }}>
+          Údaje článku
         </button>
 
         {akcieVydania()}
@@ -807,6 +815,7 @@ export function EditorScreen({
             </div>
           </div>
 
+          <div className="adm-m-platno">
           <EditorCanvas
               device={device}
               zoom={zoom}
@@ -845,10 +854,12 @@ export function EditorScreen({
               onTimelineChange={next => { setTimeline(next); touch(); }}
               blockTypes={BLOCK_TYPES as any}
             />
+          </div>
         </div>
 
         {/* ═══ Pravý stĺpec — metadáta ═══ */}
         {panelOpen && <aside
+          id="adm-udaje-clanku"
           className="acard ad-editor-side"
           style={{ width: 344, flexShrink: 0, background: 'var(--ad-surface)', position: 'sticky', top: 76, maxHeight: 'calc(100vh - 96px)', overflowY: 'auto' }}
         >
@@ -1043,12 +1054,12 @@ export function EditorScreen({
       {askDelete && (() => {
         const b = blocks.find(x => x.uid === askDelete);
         return (
-          <div
+          <div className="adm-m-zaves"
             onClick={() => setAskDelete(null)}
             style={{ position: 'fixed', inset: 0, zIndex: 120, background: 'rgba(30,22,12,.45)',
                      display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <div className="acard" onClick={e => e.stopPropagation()} style={{ width: 'min(420px, 92vw)', padding: 20 }}>
+            <div className="acard adm-m-okno" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={{ width: 'min(420px, 92vw)', padding: 20 }}>
               <h2 style={{ fontSize: 17, fontWeight: 600, margin: '0 0 8px' }}>Zmazať blok?</h2>
               <p style={{ fontSize: 13.5, color: 'var(--ad-secondary)', lineHeight: 1.55, margin: '0 0 16px' }}>
                 Blok „{labelOf(b?.type || '')}" sa z článku odstráni. Vrátiť sa dá tlačidlom

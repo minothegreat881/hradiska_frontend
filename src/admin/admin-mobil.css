@@ -177,3 +177,34 @@
   .admin.adm-koren .ad-page .ad-seg { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
   .admin.adm-koren .ad-page .ad-seg > button { flex: 0 0 auto; white-space: nowrap; }
 }
+
+/* ── Editor článku: plátno a pod ním údaje článku ────────────────────────── */
+@media (max-width: 1023px) {
+  .adm-koren .ad-editor-cols { flex-direction: column; align-items: stretch !important; }
+  .adm-koren .ad-editor-cols > aside.ad-editor-side {
+    width: auto !important; position: static !important; max-height: none !important; overflow: visible !important;
+    scroll-margin-top: 66px;
+  }
+  /* Akcie vydania na hornej hrane údajov ostanú pod hlavičkou administrácie. */
+  .adm-koren .ad-editor-side .ad-side-akcie { top: 57px; }
+  .adm-koren .adm-m-hlava-clanku { flex-wrap: wrap; height: auto; padding-bottom: 10px; row-gap: 8px; }
+  .adm-koren .adm-m-hlava-clanku > .ad-head-title { flex: 1 1 calc(100% - 64px); }
+  .adm-koren .adm-m-hlava-clanku > div[style*="flex: 1"],
+  .adm-koren .adm-m-hlava-clanku > .ad-vrule { display: none; }
+  .adm-koren .adm-m-hlava-clanku > .abtn:not(.abtn-icon) { flex: 1 1 auto; justify-content: center; }
+  /* Titulná fotka a fotogaléria v údajoch: odkazy a nástroje sa dajú trafiť prstom,
+     nástroje fotiek sú vidieť aj bez myši (predtým len pri prejdení myšou). */
+  .admin.adm-koren .ad-cover-links button { min-height: 44px; padding: 0 4px; }
+  .admin.adm-koren .ad-add { height: 44px; }
+  .admin.adm-koren .ad-gal-nastroje { opacity: 1; padding: 2px; }
+  .admin.adm-koren .ad-gal-nastroje button { min-width: 40px; height: 40px; font-size: 18px; }
+}
+@media (max-width: 767px) {
+  /* Plátno na celú šírku obrazovky — náhľad Mobil je tak v skutočnej veľkosti. */
+  .adm-koren .adm-m-platno { margin: 0 -12px; }
+  .adm-koren .adm-m-platno > div > div { border-radius: 0 !important; box-shadow: none !important; }
+  .adm-koren .adm-m-hlava-clanku .adm-m-zvacsenie { display: none; }
+  .adm-koren .adm-m-hlava-clanku .ad-title { max-width: none; }
+  .adm-koren .ad-editor-side div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+  .admin.adm-koren .ad-gal-mriezka { grid-template-columns: repeat(2, 1fr); }
+}

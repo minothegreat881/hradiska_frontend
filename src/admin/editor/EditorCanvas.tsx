@@ -873,4 +873,20 @@ const canvasCss = `
   .ed-grip { left: -28px; }
   .ed-toolbar { top: -34px; }
 }
+
+/* Dotyk (telefón, tablet): ovládanie sa dá trafiť prstom a nič neschováva
+   text. Pruhy na vkladanie medzi blokmi prekrývali okraj odseku a klepnutie
+   doň nič neurobilo — na dotyk prepúšťajú a „+" je viditeľné pri vybranom
+   bloku. Lišta bloku rastie nahor, keď sa zalomí. Počítač s myšou nič z toho
+   nedostane. */
+@media (pointer: coarse) {
+  .ed-overlay div.ed-gap:not(.is-last) { pointer-events: none !important; }
+  .ed-gap-btn { width: 36px; height: 36px; margin-left: -18px; top: -10px; }
+  .ed-gap.je-pri-vybranom .ed-gap-btn { opacity: 1; }
+  .ed-gap.is-last .ed-gap-btn { height: 44px; top: -4px; }
+  .ed-toolbar { top: auto; bottom: calc(100% + 8px); flex-wrap: wrap; justify-content: flex-end; max-width: calc(100vw - 24px); }
+  .ed-toolbar button { width: 44px; height: 44px; }
+  .ed-grip { width: 40px; height: 44px; left: -38px; }
+  .ed-gf-nastroje { opacity: 1; }
+}
 `;
