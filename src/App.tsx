@@ -40,6 +40,8 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { initConsent } from './lib/consent';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import './styles/globals.css';
+/* Úvod v troch farbách (vetva homepage-3-farby) – platí len pri data-stranka="domov". */
+import './design-lab/tri-farby.css';
 import { zapojSchranku } from './nativne/schranka';
 /* Vzhľad webu (dlaždice, sekcie domovskej, menu, päta…) — vložený do HTML
    pri builde, inak základný z kódu; hneď potom sa stiahne zverejnený. */
@@ -321,6 +323,13 @@ function App() {
      rodiny `--ck-*`, `--ch-*` a `--ad-*` sú definované priamo na svojich
      prvkoch, kde dedenie z `.lab` prehráva. */
   useEffect(() => { document.documentElement.dataset.sat = 'pecat'; }, []);
+  /* Značka úvodnej stránky na koreni dokumentu: úvod je v troch farbách
+     (src/design-lab/tri-farby.css), ostatné stránky nie. Na koreni preto, aby
+     ju videli aj prvky vykresľované portálom (cookie lišta). */
+  useEffect(() => {
+    if (route === 'home') document.documentElement.dataset.stranka = 'domov';
+    else delete document.documentElement.dataset.stranka;
+  }, [route]);
 
   // Admin má vlastný shell — bez NavBaru, pätičky a Toasteru webu.
   if (route === 'admin') {

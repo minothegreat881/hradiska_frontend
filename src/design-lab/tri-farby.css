@@ -1,0 +1,142 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   ÚVODNÁ STRÁNKA V TROCH FARBÁCH (vetva homepage-3-farby, 14. 11. 2026)
+
+   Zadanie: na úvode práve tri farby, nič viac, nič menej. Trojica je tá istá,
+   na ktorej šat Pečať stojí – len bez dvadsiatich odvodených odtieňov:
+
+     PAPIER    #f3ede1   každý podklad (stránka, karty, polia, hlavička)
+     ATRAMENT  #14161d   všetok text, linky, rámiky, tmavá päta
+     PEČAŤ     #b13d30   odkazy, tlačidlá, čísla, aktívny stav
+                         (5,0 : 1 na papieri, 3,1 : 1 na atramente – preto na
+                          päte len veľké prvky; drobný text na päte je papier)
+
+   Poradie dôležitosti nesie veľkosť a hrúbka písma, nie sivšie odtiene.
+   Tiene a papierové prechody sa vypínajú. Priehľadný atrament ostáva len ako
+   závoj pod textom na fotkách (bez neho by text na fotke nebol čitateľný).
+   Fotky, kresby a mapa sú obsah, nie farby rozhrania – mapa ostáva 1:1.
+
+   Platí len pri značke `data-stranka="domov"` na koreni (App.tsx), takže
+   ostatné stránky sa nemenia.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root[data-stranka='domov'] {
+  --tri-papier: #f3ede1;
+  --tri-atrament: #14161d;
+  --tri-pecat: #b13d30;
+}
+
+/* ── Premenné šatu: každá ukazuje na jednu z troch farieb ─────────────── */
+:root[data-stranka='domov'] .lab[data-theme='pecat'],
+:root[data-stranka='domov'][data-sat='pecat'] {
+  --l-paper: var(--tri-papier); --l-paper-2: var(--tri-papier); --l-card: var(--tri-papier);
+  --l-ink: var(--tri-atrament); --l-body: var(--tri-atrament);
+  --l-muted: var(--tri-atrament); --l-muted-2: var(--tri-atrament);
+  --l-line: var(--tri-atrament); --l-line-2: var(--tri-atrament);
+  --l-accent: var(--tri-atrament); --l-accent-soft: var(--tri-atrament); --l-accent-deep: var(--tri-atrament);
+  --l-accent-glow: transparent;
+  --l-second: var(--tri-pecat); --l-second-deep: var(--tri-pecat); --l-second-light: var(--tri-papier);
+  --l-dark: var(--tri-atrament); --l-dark-2: var(--tri-atrament); --l-dark-3: var(--tri-atrament);
+  --l-on-dark: var(--tri-papier); --l-on-dark-2: var(--tri-papier);
+  --l-on-dark-3: var(--tri-papier); --l-on-dark-line: var(--tri-papier);
+  /* tokeny s pevnou hodnotou (nie cez --l-*) */
+  --hr-accent-glow: transparent;
+  --hr-accent-border: var(--tri-pecat);
+  --hr-on-dark-strong: var(--tri-papier);
+  --hr-badge: var(--tri-pecat);
+  --hr-wash-tint: transparent; --hr-wash-glow: transparent;
+  /* Text na fotkách (kronika, galéria): plná atramentová podložka namiesto
+     priesvitného skla – na úvode tak nie je ani jedna priesvitná farba. */
+  --hr-glass: var(--tri-atrament);
+  --hr-glass-line: transparent;
+  --hr-on-photo: var(--tri-papier); --hr-on-photo-2: var(--tri-papier); --hr-on-photo-3: var(--tri-papier);
+}
+
+/* Sekcie, ktoré si časť premenných prepisujú podľa podkladu */
+:root[data-stranka='domov'] .lab :is(.ljoin, .lart-side, .lart-more) {
+  --l-muted: var(--tri-atrament); --l-muted-2: var(--tri-atrament);
+  --l-second: var(--tri-pecat); --hr-accent: var(--tri-pecat); --hr-accent-soft: var(--tri-pecat);
+}
+:root[data-stranka='domov'] .lab .lfoot {
+  --l-second: var(--tri-papier); --hr-accent: var(--tri-papier); --hr-accent-soft: var(--tri-papier);
+}
+
+/* ── Mapa ostáva 1:1 (pokyn zadávateľa): pôvodné premenné šatu Pečať ──── */
+:root[data-stranka='domov'] .lab .lmap {
+  --l-paper: #f3ede1; --l-paper-2: #e8e0cf; --l-card: #fffcf6;
+  --l-ink: #14161d; --l-body: #3e414a; --l-muted: #67696e; --l-muted-2: #6b6860;
+  --l-line: #ded5c2; --l-line-2: #c8bda7;
+  --l-accent: #1c1f28; --l-accent-soft: #343949; --l-accent-deep: #10131a;
+  --l-accent-glow: rgba(28,31,40,.12);
+  --l-second: #c9483a; --l-second-deep: #8f2c22; --l-second-light: #eda093;
+  --l-dark: #191c24; --l-dark-2: #11141a; --l-dark-3: #232733;
+  --l-on-dark: rgba(243,237,225,.82); --l-on-dark-2: #f3ede1;
+  --l-on-dark-3: rgba(243,237,225,.6); --l-on-dark-line: rgba(243,237,225,.15);
+}
+
+/* ── Bez tieňov a papierových prechodov (mimo mapy) ───────────────────── */
+:root[data-stranka='domov'] .lab *:not(.lmap, .lmap *) { box-shadow: none !important; }
+:root[data-stranka='domov'] .lab .parchment { background: var(--tri-papier) !important; }
+
+/* Sklo v kronike už nie je sklo: plná podložka, bez rozmazania pozadia. */
+:root[data-stranka='domov'] .lab .lakv-tile > span[style*='--hr-glass'] {
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+:root[data-stranka='domov'] .lab .lakv-place { background: var(--tri-atrament); }
+:root[data-stranka='domov'] .lab .lfoot-soc a { background: transparent; }
+
+/* ── Zvyšky odtieňov: linky a prechody v plnej farbe ──────────────────── */
+/* Pečatná linka nad hlavičkou bola priesvitná (ružová) – teraz plná pečať. */
+:root[data-stranka='domov'] .lab .lnav::before { background: var(--tri-pecat); opacity: 1; }
+/* Linky za nadpismi sekcií sa strácali do priehľadna – teraz plný atrament. */
+:root[data-stranka='domov'] .lab :is(.lcin-ciara, .lakt-rok-ciara) { background: var(--tri-atrament); }
+:root[data-stranka='domov'] .lab .lakv-fill { background: var(--tri-pecat); }
+/* Zástupný text v poli hľadania: atrament (nie hnedá), kurzívou. Vo formulári
+   „Pridajte sa“ sa vzorové hodnoty skryjú – v atramente vyzerali ako vyplnené
+   a každé pole má nad sebou popis. */
+:root[data-stranka='domov'] .lab .hero-search-input::placeholder {
+  color: var(--tri-atrament); opacity: 1; font-style: italic;
+}
+:root[data-stranka='domov'] .lab .ljoin-fld::placeholder { color: transparent; }
+
+/* ══ „STAŇTE SA NAŠIMI SPOLUPRACOVNÍKMI“ – citát a tlačidlo ══════════════
+   Citát vyzeral ako druhý podnadpis (tučná antikva v atramente hneď pod
+   nadpisom). Teraz je to citát: kurzíva, slovenské úvodzovky a pečatná linka
+   vľavo – červená nesie štruktúru, nie text (základ L15.01).
+   Tlačidlo „Pripraviť e-mail“ bola tmavá doska cez celú šírku s veľkým
+   zaoblením – jediné také na stránke. Teraz je rovnaké ako ostatné hlavné
+   tlačidlá úvodu („Hľadať“, „Čítať celé“): pečatná červená, papierové písmo,
+   po prejdení atrament. Formulár a polia bez veľkých zaoblení. */
+:root[data-stranka='domov'] .lab .ljoin-quote {
+  margin: 28px 0 0; padding: 4px 0 4px 22px;
+  border-left: 3px solid var(--tri-pecat);
+  font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 400;
+  font-size: clamp(21px, 2.3vw, 27px); line-height: 1.38; letter-spacing: -.005em;
+  color: var(--tri-atrament); max-width: 32ch;
+}
+:root[data-stranka='domov'] .lab .ljoin-quote::before { content: '„'; }
+:root[data-stranka='domov'] .lab .ljoin-quote::after { content: '“'; }
+
+:root[data-stranka='domov'] .lab .ljoin-card { border-radius: var(--hr-radius-xs); }
+:root[data-stranka='domov'] .lab .ljoin-fld { border-radius: var(--hr-radius-xs); background: var(--tri-papier); }
+:root[data-stranka='domov'] .lab .ljoin-fld:focus { border-color: var(--tri-pecat); outline: 1px solid var(--tri-pecat); outline-offset: 0; }
+:root[data-stranka='domov'] .lab .ljoin-send {
+  width: auto; height: 50px; padding: 0 28px;
+  border-radius: var(--hr-radius-pill);
+  background: var(--tri-pecat); color: var(--tri-papier);
+  font-family: 'Inter', system-ui, sans-serif; font-size: 15px; font-weight: 600;
+  transition: background .18s ease;
+}
+:root[data-stranka='domov'] .lab .ljoin-send:hover:not(:disabled) { background: var(--tri-atrament); }
+:root[data-stranka='domov'] .lab .ljoin-send:focus-visible { outline: 2px solid var(--tri-atrament); outline-offset: 2px; }
+:root[data-stranka='domov'] .lab .ljoin-send:disabled { opacity: 1; cursor: progress; }
+:root[data-stranka='domov'] .lab .ljoin-note { text-align: left; }
+
+/* ── Lišty cez portál (cookie lišta, výzva na appku, pripomienky) ──────── */
+:root[data-stranka='domov'][data-sat='pecat'] .ck-root { --ck-shield-border: var(--tri-papier); }
+:root[data-stranka='domov'] .ck-rim-bar path { opacity: 1; }
+/* Obal SVG sám nič nekreslí (vzor má vlastnú výplň); predvolená čierna by v súpise farieb mätla. */
+:root[data-stranka='domov'] .ck-rim-bar svg { fill: var(--tri-pecat); }
+:root[data-stranka='domov'] .pr-dock {
+  background: var(--tri-papier); color: var(--tri-atrament); border-color: var(--tri-atrament);
+}
+:root[data-stranka='domov'] .pr-dock:hover { background: var(--tri-papier); border-color: var(--tri-pecat); color: var(--tri-pecat); }
