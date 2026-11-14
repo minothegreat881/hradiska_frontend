@@ -587,6 +587,7 @@ export const DE: Record<string, string> = {
   'Zobraziť': 'Anzeigen',
   'Skryť': 'Ausblenden',
   'Ďalšie': 'Mehr',
+  'Načítavam register článkov…': 'Artikelverzeichnis wird geladen…',
   'Zobraziť 3D model': '3D-Modell anzeigen',
   'Zobraziť príspevok': 'Beitrag anzeigen',
   'Prehrať video': 'Video abspielen',

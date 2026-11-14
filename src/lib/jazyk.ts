@@ -636,6 +636,7 @@ const EN: Record<string, string> = {
   'Zobraziť': 'Show',
   'Skryť': 'Hide',
   'Ďalšie': 'More',
+  'Načítavam register článkov…': 'Loading the article index…',
   'Zobraziť 3D model': 'Show 3D model',
   'Zobraziť príspevok': 'Show post',
   'Prehrať video': 'Play video',

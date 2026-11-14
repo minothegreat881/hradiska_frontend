@@ -116,11 +116,14 @@ function GroupHeader({ label, count, withTopBorder }: { label: string; count: nu
 }
 
 function ResultRow({
+  id,
   result,
   kind,
   selected,
   onMouseEnter,
 }: {
+  /** Id voľby — pole ho nesie v `aria-activedescendant`, čítačka tak počuje vybraný výsledok. */
+  id: string;
   result: RowResult;
   kind: 'location' | 'article';
   selected: boolean;
@@ -133,6 +136,7 @@ function ResultRow({
 
   return (
     <a
+      id={id}
       href={result.href}
       role="option"
       aria-selected={selected}
@@ -253,6 +257,10 @@ export function HeroSearch() {
   const trimmed = query.trim();
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searching, setSearching] = useState(false);
+  /* Register článkov sa stiahne pri prvom zameraní poľa (~1,2 MB, prvé hľadanie
+     trvalo ~4 s). Kým nie je, roletka to povie — „Hľadám…" pôsobilo ako zaseknuté. */
+  const [indexPripraveny, setIndexPripraveny] = useState(false);
+  const pripravIndex = () => { getSearchIndex().then(() => setIndexPripraveny(true)).catch(() => {}); };
 
   // Hľadanie je async (index sa lenivo stiahne z backendu). Debounce 140 ms,
   // aby sme nespúšťali na každý úder klávesy.
@@ -421,7 +429,7 @@ export function HeroSearch() {
               prisloMysou.current = false;
               setPulseKey((k) => k + 1);
               // Zahrej index hneď pri fokuse, nech je prvé hľadanie okamžité.
-              getSearchIndex().catch(() => {});
+              pripravIndex();
               // Mobil: softvérová klávesnica prekrýva spodnú polovicu obrazovky a
               // s ňou aj dropdown s výsledkami. Vyscrollujeme input tesne pod horný
               // okraj, aby sa výsledky vykreslili nad klávesnicou.
@@ -443,6 +451,7 @@ export function HeroSearch() {
             aria-autocomplete="list"
             aria-controls="search-dropdown-results"
             aria-expanded={showPanel}
+            aria-activedescendant={showPanel && hasResults && allResults[selectedIndex] ? `search-opt-${selectedIndex}` : undefined}
             autoComplete="off"
           />
 
@@ -545,6 +554,9 @@ export function HeroSearch() {
               boxShadow: '0 26px 64px -24px rgba(60,40,15,.55), inset 0 1px 0 rgba(255,255,255,.75)',
               overflow: 'hidden',
               zIndex: 60,
+              /* Roletka stojí v centrovaných blokoch (úvod, hľadanie pod článkom) —
+                 bez tohto sa výsledky zarovnávali na stred (audit, úloha 3 bod 8). */
+              textAlign: 'left',
             }}
           >
             {/* Rovnaký zlatý vlások ako na bare — spája ich do jedného celku. */}
@@ -567,9 +579,10 @@ export function HeroSearch() {
                   {locationResults.length > 0 && (
                     <div>
                       <GroupHeader label="Lokality" count={locationResults.length} withTopBorder={false} />
-                      {locationResults.map((r) => (
+                      {locationResults.map((r, i) => (
                         <ResultRow
                           key={r.id}
+                          id={`search-opt-${i}`}
                           result={r}
                           kind="location"
                           selected={allResults[selectedIndex]?.id === r.id}
@@ -581,9 +594,10 @@ export function HeroSearch() {
                   {articleResults.length > 0 && (
                     <div>
                       <GroupHeader label={t('Články')} count={articleResults.length} withTopBorder={locationResults.length > 0} />
-                      {articleResults.map((r) => (
+                      {articleResults.map((r, i) => (
                         <ResultRow
                           key={r.id}
+                          id={`search-opt-${locationResults.length + i}`}
                           result={r}
                           kind="article"
                           selected={allResults[selectedIndex]?.id === r.id}
@@ -604,7 +618,7 @@ export function HeroSearch() {
                   }}
                 >
                   {searching
-                    ? t('Hľadám…')
+                    ? (indexPripraveny ? t('Hľadám…') : t('Načítavam register článkov…'))
                     : <>{t('Nenašli sme nič pre')} „<strong style={{ color: T.amber }}>{query}</strong>".</>}
                 </div>
               )}
@@ -637,7 +651,7 @@ export function HeroSearch() {
                   {t('Zobraziť všetky výsledky')}
                 </button>
               )}
-              <span style={{ marginLeft: 'auto' }}>{hits.length} výsledkov</span>
+              <span style={{ marginLeft: 'auto' }} role="status">{searching ? '' : `${hits.length} ${t('výsledkov')}`}</span>
             </div>
           </motion.div>
         )}
