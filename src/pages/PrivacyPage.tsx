@@ -346,7 +346,7 @@ export function PrivacyPage() {
           style={{
             background: 'var(--hr-surface)',
             border: '1px solid var(--hr-line)',
-            borderRadius: 12,
+            borderRadius: 'var(--hr-radius-m)',
             padding: '32px',
             boxShadow: 'var(--hr-shadow-sm)',
             color: 'var(--hr-body)',

@@ -32,14 +32,14 @@ function Row({ hit, query }: { hit: SearchHit; query: string }) {
       href={odkaz(`/blog/${hit.slug}`)}
       style={{
         display: 'flex', gap: 16, alignItems: 'flex-start', textDecoration: 'none',
-        background: T.panelBg, border: `1px solid ${T.border}`, borderRadius: 12,
+        background: T.panelBg, border: `1px solid ${T.border}`, borderRadius: 'var(--hr-radius-m)',
         padding: 16, transition: 'border-color .15s, box-shadow .15s',
       }}
       className="search-page-row"
     >
       <span
         style={{
-          flexShrink: 0, width: 92, height: 68, borderRadius: 8, backgroundColor: 'var(--hr-chip-bg)',
+          flexShrink: 0, width: 92, height: 68, borderRadius: 'var(--hr-radius-s)', backgroundColor: 'var(--hr-chip-bg)',
           backgroundImage: thumb ? `url(${thumb})` : 'repeating-linear-gradient(135deg,var(--hr-line-strong) 0 6px,var(--hr-chip-bg) 6px 12px)',
           backgroundSize: 'cover', backgroundPosition: 'center', border: `1px solid ${T.border}`,
         }}

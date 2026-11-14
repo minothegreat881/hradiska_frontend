@@ -54,9 +54,9 @@ interface ArticleSidebarProps {
 
 // Shared design tokens for sidebar cards
 const cardStyle: React.CSSProperties = {
-  background: '#fffdf8',
+  background: 'var(--hr-surface)',
   border: '1px solid var(--hr-line)',
-  borderRadius: 12,
+  borderRadius: 'var(--hr-radius-m)',
   boxShadow: '0 1px 2px rgba(70,40,20,0.06), 0 4px 12px rgba(70,40,20,0.05)',
   padding: 16,
   marginBottom: 20,
@@ -98,7 +98,7 @@ export function KeyFactsCard({ facts }: { facts: KeyFact[] }) {
                 width: 24,
                 height: 24,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--hr-accent-soft) 0%, #7d4f1d 100%)',
+                background: 'linear-gradient(135deg, var(--hr-accent-soft) 0%, var(--hr-accent-deep) 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -128,7 +128,7 @@ export function KeyFactsCard({ facts }: { facts: KeyFact[] }) {
                 style={{
                   fontFamily: 'Georgia, serif',
                   fontSize: 14,
-                  color: '#2d2418',
+                  color: 'var(--hr-ink)',
                   marginTop: 2,
                   lineHeight: 1.45,
                 }}
@@ -159,7 +159,7 @@ export function TimelineCard({ timeline }: { timeline: TimelineEvent[] }) {
                 fontFamily: 'Georgia, serif',
                 fontSize: 13,
                 fontWeight: 700,
-                color: '#7d4f1d',
+                color: 'var(--hr-ink)' /* L15.01: neklikateľný text */,
                 paddingTop: 1,
               }}
             >
@@ -194,7 +194,7 @@ export function TimelineCard({ timeline }: { timeline: TimelineEvent[] }) {
                 style={{
                   fontFamily: 'Georgia, serif',
                   fontSize: 14,
-                  color: '#2d2418',
+                  color: 'var(--hr-ink)',
                   fontWeight: 600,
                 }}
               >
@@ -205,7 +205,7 @@ export function TimelineCard({ timeline }: { timeline: TimelineEvent[] }) {
                   style={{
                     fontFamily: 'Georgia, serif',
                     fontSize: 12,
-                    color: '#6b5d4d',
+                    color: 'var(--hr-muted)',
                     marginTop: 2,
                     lineHeight: 1.4,
                   }}
@@ -251,7 +251,7 @@ export function ArticleSidebar({
               style={{
                 fontFamily: 'Georgia, serif',
                 fontSize: 18,
-                color: '#2d1810',
+                color: 'var(--hr-ink)',
                 fontWeight: 600,
                 margin: 0,
               }}
@@ -262,7 +262,7 @@ export function ArticleSidebar({
               style={{
                 fontFamily: 'Georgia, serif',
                 fontSize: 13,
-                color: '#8b7a5e',
+                color: 'var(--hr-muted)',
                 margin: 0,
                 marginTop: 4,
               }}
@@ -297,11 +297,11 @@ export function ArticleSidebar({
                   padding: '5px 12px',
                   background: 'var(--hr-line)',
                   border: '1px solid var(--hr-line)',
-                  color: '#7d4f1d',
+                  color: 'var(--hr-accent-deep)',
                   fontFamily: 'Georgia, serif',
                   fontSize: 12,
                   fontWeight: 500,
-                  borderRadius: 999,
+                  borderRadius: 'var(--hr-radius-pill)',
                   textDecoration: 'none',
                   transition: 'all 0.2s',
                 }}
@@ -334,10 +334,10 @@ export function ArticleSidebar({
                   alignItems: 'center',
                   gap: 12,
                   padding: 8,
-                  borderRadius: 10,
+                  borderRadius: 'var(--hr-radius-m)',
                   border: '1px solid var(--hr-line)',
                   textDecoration: 'none',
-                  background: '#fffdf8',
+                  background: 'var(--hr-surface)',
                   transition: 'all 0.2s',
                 }}
               >
@@ -345,7 +345,7 @@ export function ArticleSidebar({
                   style={{
                     width: 56,
                     height: 56,
-                    borderRadius: 8,
+                    borderRadius: 'var(--hr-radius-s)',
                     overflow: 'hidden',
                     flexShrink: 0,
                     background: 'var(--hr-line)',
@@ -366,7 +366,7 @@ export function ArticleSidebar({
                     style={{
                       fontFamily: 'Georgia, serif',
                       fontSize: 14,
-                      color: '#2d2418',
+                      color: 'var(--hr-ink)',
                       fontWeight: 600,
                       lineHeight: 1.35,
                       margin: 0,

@@ -30,7 +30,7 @@ interface HistoricalGalleryProps {
 }
 
 const headerBtnStyle: React.CSSProperties = {
-  flexShrink: 0, width: 34, height: 34, borderRadius: 999,
+  flexShrink: 0, width: 34, height: 34, borderRadius: 'var(--hr-radius-pill)',
   border: '1px solid var(--pl-field)', background: 'transparent', color: 'var(--pl-title)',
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
   transition: 'border-color 0.2s',
@@ -424,20 +424,20 @@ export function HistoricalGallery({ images, title, columns = 3 }: HistoricalGall
     <section id="photo-gallery" style={{ marginTop: 48, marginBottom: 48, scrollMarginTop: 32 }}>
       {/* Nadpis sekcie */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-        <h2 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 22, fontWeight: 600, color: '#2d1810', margin: 0 }}>
+        <h2 style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 22, fontWeight: 600, color: 'var(--hr-ink)', margin: 0 }}>
           {title || t('Fotogaléria')}
         </h2>
         <span
           style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            minWidth: 24, height: 24, padding: '0 8px', borderRadius: 9999,
+            minWidth: 24, height: 24, padding: '0 8px', borderRadius: 'var(--hr-radius-pill)',
             background: 'var(--hr-accent-soft)', color: 'var(--hr-on-photo)', fontFamily: 'Georgia, serif', fontSize: 12, fontWeight: 600,
           }}
         >
           {images.length}
         </span>
       </div>
-      <hr style={{ height: 1, background: 'linear-gradient(90deg, var(--hr-line-quiet) 0%, rgba(196,165,116,0) 100%)', margin: '8px 0 24px', border: 0 }} />
+      <hr style={{ height: 1, background: 'linear-gradient(90deg, var(--hr-line-quiet) 0%, transparent 100%)', margin: '8px 0 24px', border: 0 }} />
 
       {/* Grid miniatúr */}
       {/* Počet stĺpcov hovorí článok (`galleryColumns`); na užšom okne sa
@@ -451,7 +451,7 @@ export function HistoricalGallery({ images, title, columns = 3 }: HistoricalGall
             aria-label={image.alt || image.caption || `${t('Otvoriť obrázok')} ${idx + 1}`}
             style={{ background: 'transparent', border: 0, padding: 0, cursor: 'zoom-in', display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'left', font: 'inherit', color: 'inherit' }}
           >
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 8, border: '1px solid var(--hr-line)', pointerEvents: 'none' }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden', borderRadius: 'var(--hr-radius-s)', border: '1px solid var(--hr-line)', pointerEvents: 'none' }}>
               <ImageWithFallback
                 src={image.thumb || image.url}
                 alt={image.alt || image.caption || `${t('Obrázok')} ${idx + 1}`}
@@ -462,7 +462,7 @@ export function HistoricalGallery({ images, title, columns = 3 }: HistoricalGall
               />
             </div>
             {image.caption && (
-              <p style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, lineHeight: 1.5, color: '#7a6b56', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', pointerEvents: 'none' }}>
+              <p style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, lineHeight: 1.5, color: 'var(--hr-muted)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', pointerEvents: 'none' }}>
                 {image.caption}
               </p>
             )}

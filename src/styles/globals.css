@@ -692,12 +692,12 @@ p {
 
   .dropdown-scroll::-webkit-scrollbar-track {
     background: #fef3c7;
-    border-radius: 10px;
+    border-radius: var(--hr-radius-m);
   }
 
   .dropdown-scroll::-webkit-scrollbar-thumb {
     background: #f59e0b;
-    border-radius: 10px;
+    border-radius: var(--hr-radius-m);
     border: 2px solid #fef3c7;
   }
 
@@ -707,7 +707,7 @@ p {
 
   .dark .dropdown-scroll::-webkit-scrollbar-track {
     background: #292524;
-    border-radius: 10px;
+    border-radius: var(--hr-radius-m);
   }
 
   .dark .dropdown-scroll::-webkit-scrollbar-thumb {
@@ -899,7 +899,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
    ako podčiarknutá veta cez tri riadky. */
 .source-link {
   display: inline-flex; align-items: center; gap: 4px;
-  padding: 1px 7px 2px; border-radius: 999px;
+  padding: 1px 7px 2px; border-radius: var(--hr-radius-pill);
   border: 1px solid var(--hr-line, #e8dcc0);
   background: rgba(255, 253, 244, .6);
   font-family: Inter, system-ui, sans-serif; font-size: 12px; line-height: 1.6;
@@ -1139,14 +1139,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .pl-sheet-handle::before {
   content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
-  width: 40px; height: 4px; border-radius: 999px; background: var(--pl-field);
+  width: 40px; height: 4px; border-radius: var(--hr-radius-pill); background: var(--pl-field);
 }
 .pl-sheet-chev { font-size: 12px; color: var(--pl-amber-2); }
 
 @media (min-width: 560px) and (orientation: landscape) {
   .pl-card {
     width: 98vw; max-width: 1700px; height: 92vh; max-height: 92vh;
-    border-radius: 14px;
+    border-radius: var(--hr-radius-l);
     border: 1px solid var(--pl-border);
     box-shadow: 0 30px 70px -28px rgba(40, 26, 10, 0.6);
     display: grid;
@@ -1170,7 +1170,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 
 /* Avatar účtu v hlavičke — logo Slovanských hradísk (ako na homepage) */
 .pl-avatar-h {
-  width: 42px; height: 42px; border-radius: 999px; flex-shrink: 0;
+  width: 42px; height: 42px; border-radius: var(--hr-radius-pill); flex-shrink: 0;
   object-fit: contain; background: #f3e8cc; padding: 3px;
   border: 1.5px solid var(--pl-gold);
   display: block;
@@ -1199,7 +1199,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 /* Navigačné kruhy na fotke */
 .pl-navb {
   position: absolute; top: 50%; transform: translateY(-50%);
-  width: 40px; height: 40px; border-radius: 999px; z-index: 3;
+  width: 40px; height: 40px; border-radius: var(--hr-radius-pill); z-index: 3;
   background: rgba(20, 14, 8, 0.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   border: 1px solid rgba(240, 217, 168, 0.35); color: var(--pl-on-overlay);
   display: inline-flex; align-items: center; justify-content: center;
@@ -1207,7 +1207,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .pl-navb:hover { background: rgba(200, 134, 47, 0.55); }
 .pl-corner {
-  position: absolute; z-index: 3; width: 36px; height: 36px; border-radius: 10px;
+  position: absolute; z-index: 3; width: 36px; height: 36px; border-radius: var(--hr-radius-m);
   background: rgba(20, 14, 8, 0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   border: 1px solid rgba(240, 217, 168, 0.3); color: var(--pl-on-overlay);
   display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
@@ -1217,13 +1217,13 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   background: rgba(20, 14, 8, 0.55); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   color: var(--pl-on-overlay); border: 1px solid rgba(240, 217, 168, 0.3);
   font-family: var(--font-heading); font-size: 11px; letter-spacing: 0.06em;
-  padding: 4px 10px; border-radius: 999px;
+  padding: 4px 10px; border-radius: var(--hr-radius-pill);
 }
 
 /* Akčná lišta */
 .pl-act {
   flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  padding: 9px 6px; border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+  padding: 9px 6px; border: 0; border-radius: var(--hr-radius-m); background: transparent; cursor: pointer;
   font-family: var(--font-serif); font-size: 16px; font-weight: 600; color: var(--pl-muted);
   transition: background 0.15s, color 0.15s;
 }
@@ -1465,11 +1465,11 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .aktuality-list::-webkit-scrollbar-track {
   background: var(--hr-scroll-track);
-  border-radius: 5px;
+  border-radius: var(--hr-radius-xs);
 }
 .aktuality-list::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--hr-line-quiet), var(--hr-accent-mid));
-  border-radius: 5px;
+  border-radius: var(--hr-radius-xs);
   border: 2px solid var(--hr-scroll-edge);
   background-clip: padding-box;
 }
@@ -1543,7 +1543,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .aktualita-masonry-scroll::-webkit-scrollbar-thumb {
   background: #c8a15a;
-  border-radius: 11px;
+  border-radius: var(--hr-radius-m);
   border: 3px solid #f3ead6;
 }
 .aktualita-masonry-scroll::-webkit-scrollbar-thumb:hover {
@@ -1551,7 +1551,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .aktualita-masonry-scroll::-webkit-scrollbar-track {
   background: #e6d7b0;
-  border-radius: 11px;
+  border-radius: var(--hr-radius-m);
   margin: 4px 0;
 }
 
@@ -1605,7 +1605,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   gap: 14px;
   padding: 8px 12px;
   margin: 1px 10px;
-  border-radius: 10px;
+  border-radius: var(--hr-radius-m);
   text-decoration: none;
   background: transparent;
   transition: background 150ms ease;
@@ -1627,7 +1627,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .search-dropdown-scroll::-webkit-scrollbar-thumb {
   background: #c8a15a;
-  border-radius: 9px;
+  border-radius: var(--hr-radius-s);
 }
 
 /* Nav mega menu / mobile accordion dropdown scrollbar — vždy tmavohnedé pozadie
@@ -1641,11 +1641,11 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .nav-dropdown-scroll::-webkit-scrollbar-track {
   background: #2e2317;
-  border-radius: 8px;
+  border-radius: var(--hr-radius-s);
 }
 .nav-dropdown-scroll::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #c4a574, #a87437);
-  border-radius: 8px;
+  border-radius: var(--hr-radius-s);
   border: 1px solid #2e2317;
   background-clip: padding-box;
 }
@@ -1863,7 +1863,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .roletka-scroll::-webkit-scrollbar-thumb {
   background: #d9c391;
-  border-radius: 8px;
+  border-radius: var(--hr-radius-s);
   border: 2px solid #f6efdd;
   background-clip: padding-box;
 }
@@ -1951,7 +1951,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   color: var(--ju-text);
   background: var(--ju-field-bg);
   border: 1px solid var(--ju-border-field);
-  border-radius: 11px;
+  border-radius: var(--hr-radius-m);
   padding: 13px 15px;
   outline: none;
   transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
@@ -2010,7 +2010,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 
 /* Riadky „čo pomôže najviac" — jemné podfarbenie pri prejdení myšou, nech je
    zjavné, že sú to samostatné položky, nie súvislý text. */
-.joinus .ju-ask { transition: background 160ms ease; border-radius: 10px; }
+.joinus .ju-ask { transition: background 160ms ease; border-radius: var(--hr-radius-m); }
 .joinus .ju-ask:hover { background: rgba(200, 161, 90, 0.09); }
 @media (prefers-reduced-motion: reduce) {
   .joinus .ju-ask { transition: none; }
@@ -2035,7 +2035,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 
   position: relative;
   height: 440px;
-  border-radius: 18px;
+  border-radius: var(--hr-radius-xl);
   overflow: hidden;
   border: 1px solid var(--ch-border);
   box-shadow: 0 30px 66px -28px rgba(40, 26, 10, 0.55);
@@ -2045,7 +2045,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   position: absolute;
   inset: 14px;
   border: 1px solid var(--ch-frame);
-  border-radius: 12px;
+  border-radius: var(--hr-radius-m);
   pointer-events: none;
 }
 
@@ -2165,7 +2165,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 11px;
+  border-radius: var(--hr-radius-m);
   border: 1px solid var(--ft-edge);
   background: rgba(255, 247, 231, 0.03);
   color: var(--ft-link);
@@ -2186,7 +2186,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   letter-spacing: 0.06em;
   color: var(--ft-head);
   border: 1px solid var(--ft-edge);
-  border-radius: 999px;
+  border-radius: var(--hr-radius-pill);
   padding: 8px 15px;
   background: transparent;
   cursor: pointer;
@@ -2277,7 +2277,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   width: 100%;
   background: #fff;
   border: 1px solid var(--ad-field-border);
-  border-radius: 9px;
+  border-radius: var(--hr-radius-s);
   padding: 9px 12px;
   font: inherit;
   font-size: 14px;
@@ -2295,7 +2295,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 /* Tlačidlá */
 .admin .abtn {
   display: inline-flex; align-items: center; gap: 7px;
-  border-radius: 9px; padding: 9px 15px;
+  border-radius: var(--hr-radius-s); padding: 9px 15px;
   font: inherit; font-size: 14px; font-weight: 500;
   cursor: pointer; border: 1px solid var(--ad-field-border);
   background: var(--ad-card); color: var(--ad-text);
@@ -2316,7 +2316,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 /* Prepínače v lište editora (Formulár/Vizuálny, Počítač/Mobil). */
 .admin .ad-seg {
   display: inline-flex; border: 1px solid var(--ad-field-border);
-  border-radius: 9px; overflow: hidden; background: var(--ad-card);
+  border-radius: var(--hr-radius-s); overflow: hidden; background: var(--ad-card);
 }
 .admin .ad-seg button {
   display: inline-flex; align-items: center; gap: 6px;
@@ -2338,7 +2338,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .admin .abtn-primary:hover:not(:disabled) { filter: brightness(1.07); }
 .admin .abtn-icon {
   width: 30px; height: 30px; padding: 0;
-  justify-content: center; border-radius: 7px;
+  justify-content: center; border-radius: var(--hr-radius-s);
 }
 .admin .abtn-danger:hover { border-color: var(--ad-danger); color: var(--ad-danger); }
 
@@ -2346,7 +2346,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .admin .acard {
   background: var(--ad-card);
   border: 1px solid var(--ad-border);
-  border-radius: 12px;
+  border-radius: var(--hr-radius-m);
 
   /* ZHODA MIEN S WEBOM. `.acard` je aj na webe — je to karta článku
      v zoznamoch — a `design-lab/theme.css` sa načítava v celej aplikácii,
@@ -2362,7 +2362,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .admin .acard:hover { transform: none; }
 .admin .achip {
   display: inline-flex; align-items: center; gap: 6px;
-  border-radius: 999px; padding: 3px 10px;
+  border-radius: var(--hr-radius-pill); padding: 3px 10px;
   font-size: 12px; font-weight: 500;
 }
 .admin .achip-pub { color: var(--ad-pub-fg); background: var(--ad-pub-bg); border: 1px solid var(--ad-pub-br); }
@@ -2373,7 +2373,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .admin .ad-nav {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 14px; margin: 1px 8px;
-  border-radius: 8px; color: var(--ad-side-text);
+  border-radius: var(--hr-radius-s); color: var(--ad-side-text);
   font-size: 14px; text-decoration: none; cursor: pointer;
   border: none; background: transparent; width: calc(100% - 16px);
   text-align: left; transition: background .15s ease, color .15s ease;
@@ -2390,7 +2390,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 .admin .ad-badge {
   margin-left: auto; background: var(--ad-amber-bright); color: #1c1510;
-  border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600;
+  border-radius: var(--hr-radius-pill); padding: 1px 8px; font-size: 11px; font-weight: 600;
 }
 
 /* Budíček pošty — pruh nad obsahom, keď odosielanie e-mailov nefunguje.
@@ -2400,7 +2400,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   margin-bottom: 20px; padding: 14px 16px;
   border: 1px solid var(--ad-danger, #b3261e);
   border-left-width: 4px;
-  border-radius: 10px;
+  border-radius: var(--hr-radius-m);
   background: color-mix(in srgb, var(--ad-danger, #b3261e) 8%, transparent);
   color: var(--ad-primary);
   font-size: 14px; line-height: 1.5;
@@ -2446,7 +2446,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .admin .ablock {
   background: var(--ad-card); border: 1px solid var(--ad-border);
   border-left: 3px solid var(--ad-blk-rich);
-  border-radius: 12px; margin-bottom: 14px;
+  border-radius: var(--hr-radius-m); margin-bottom: 14px;
 }
 .admin .ablock-head {
   display: flex; align-items: center; gap: 10px;
@@ -2460,7 +2460,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 
 /* Scrollbar */
 .admin ::-webkit-scrollbar { width: 10px; height: 10px; }
-.admin ::-webkit-scrollbar-thumb { background: #c8a15a; border-radius: 10px; border: 3px solid var(--ad-app); }
+.admin ::-webkit-scrollbar-thumb { background: #c8a15a; border-radius: var(--hr-radius-m); border: 3px solid var(--ad-app); }
 .admin ::-webkit-scrollbar-track { background: transparent; }
 
 /* Editor rich-textu v admine (TipTap) */
@@ -2469,7 +2469,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   padding: 12px 14px;
   background: #fff;
   border: 1px solid var(--ad-field-border);
-  border-radius: 9px;
+  border-radius: var(--hr-radius-s);
   font-family: var(--font-serif);
   font-size: 17px;
   line-height: 1.6;
@@ -2536,7 +2536,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   max-width: calc(100vw - 32px);
   background: linear-gradient(180deg, var(--ck-card-top) 0%, var(--ck-card-bottom) 100%);
   border: 1px solid var(--ck-card-border);
-  border-radius: 16px;
+  border-radius: var(--hr-radius-l);
   box-shadow: 0 34px 80px -24px rgba(10, 6, 2, .75), inset 0 1px 0 rgba(255, 251, 240, .8);
   animation: ckBannerIn .4s ease-out both;
   overflow: hidden;
@@ -2547,7 +2547,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 }
 
 /* Zlatý horný lem s vlnovkou */
-.ck-rim-bar { height: 12px; background: var(--ck-rim); border-radius: 15px 15px 0 0; overflow: hidden; }
+.ck-rim-bar { height: 12px; background: var(--ck-rim); border-radius: var(--hr-radius-l) var(--hr-radius-l) 0 0; overflow: hidden; }
 .ck-rim-bar svg { display: block; }
 
 /* Telo */
@@ -2570,7 +2570,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
   font-family: var(--font-heading);
   font-size: 8px; letter-spacing: .12em; font-weight: 600;
   color: var(--ck-pill-text); background: var(--ck-pill-bg);
-  border: 1px solid var(--ck-pill-border); border-radius: 999px;
+  border: 1px solid var(--ck-pill-border); border-radius: var(--hr-radius-pill);
   padding: 2px 6px; position: relative; z-index: 1;
 }
 
@@ -2587,7 +2587,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .ck-actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .ck-btn {
   font-family: var(--font-heading); font-size: 12.5px; font-weight: 600; letter-spacing: .04em;
-  border-radius: 999px; padding: 9px 14px; cursor: pointer;
+  border-radius: var(--hr-radius-pill); padding: 9px 14px; cursor: pointer;
   flex: 1 1 auto; justify-content: center;
   display: inline-flex; align-items: center; gap: 6px;
   transition: filter .16s ease, background .16s ease, border-color .16s ease, color .16s ease, transform .06s ease;
@@ -2621,14 +2621,14 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 
 /* Panel nastavení (kategórie) */
 .ck-settings { padding: 4px 16px 16px; }
-.ck-cat { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: rgba(255, 253, 248, .6); border: 1px solid var(--ck-pill-border); border-radius: 10px; margin-bottom: 10px; }
+.ck-cat { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: rgba(255, 253, 248, .6); border: 1px solid var(--ck-pill-border); border-radius: var(--hr-radius-m); margin-bottom: 10px; }
 .ck-cat h3 { font-family: var(--font-heading); font-size: 13.5px; font-weight: 700; color: var(--ck-title); margin: 0 0 3px; }
 .ck-cat p { font-family: var(--font-serif); font-size: 12.5px; line-height: 1.4; color: var(--ck-body); margin: 0; }
 .ck-cat-ctl { flex-shrink: 0; margin-left: auto; }
-.ck-fixed-tag { font-family: var(--font-heading); font-size: 10px; letter-spacing: .1em; color: var(--ck-pill-text); background: var(--ck-pill-bg); border: 1px solid var(--ck-pill-border); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+.ck-fixed-tag { font-family: var(--font-heading); font-size: 10px; letter-spacing: .1em; color: var(--ck-pill-text); background: var(--ck-pill-bg); border: 1px solid var(--ck-pill-border); border-radius: var(--hr-radius-pill); padding: 4px 10px; white-space: nowrap; }
 
 /* Prepínač (toggle) */
-.ck-toggle { position: relative; width: 46px; height: 26px; border-radius: 999px; border: 1px solid var(--ck-btn2-border); background: #e7dcc4; cursor: pointer; transition: background .18s ease, border-color .18s ease; padding: 0; }
+.ck-toggle { position: relative; width: 46px; height: 26px; border-radius: var(--hr-radius-pill); border: 1px solid var(--ck-btn2-border); background: #e7dcc4; cursor: pointer; transition: background .18s ease, border-color .18s ease; padding: 0; }
 .ck-toggle[aria-checked="true"] { background: linear-gradient(180deg, var(--ck-btn-top), var(--ck-btn-bottom)); border-color: var(--ck-btn-border); }
 .ck-toggle:focus-visible { outline: 2px solid var(--ck-rim); outline-offset: 2px; }
 .ck-toggle-knob { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fffdf8; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); transition: transform .18s ease; }
@@ -2667,21 +2667,21 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
 .pwa-card {
   pointer-events: auto; width: 380px; max-width: calc(100vw - 32px);
   background: linear-gradient(180deg, var(--ck-card-top) 0%, var(--ck-card-bottom) 100%);
-  border: 1px solid var(--ck-card-border); border-radius: 16px;
+  border: 1px solid var(--ck-card-border); border-radius: var(--hr-radius-l);
   box-shadow: 0 34px 80px -24px rgba(10, 6, 2, .75), inset 0 1px 0 rgba(255, 251, 240, .8);
   animation: ckBannerIn .4s ease-out both; overflow: hidden;
 }
 .pwa-body { display: flex; align-items: flex-start; gap: 14px; padding: 16px 16px 16px; }
 .pwa-icon { flex-shrink: 0; width: 56px; height: 56px; }
 .pwa-icon img {
-  width: 56px; height: 56px; object-fit: cover; border-radius: 14px;
+  width: 56px; height: 56px; object-fit: cover; border-radius: var(--hr-radius-l);
   border: 1px solid var(--ck-shield-border);
   box-shadow: 0 8px 18px -8px rgba(40, 20, 5, .5), inset 0 1px 0 rgba(255, 255, 255, .3);
 }
 .pwa-share {
   display: inline-flex; align-items: center; justify-content: center;
   width: 20px; height: 20px; vertical-align: -4px; color: var(--ck-accent);
-  border: 1px solid var(--ck-pill-border); border-radius: 5px; background: var(--ck-pill-bg);
+  border: 1px solid var(--ck-pill-border); border-radius: var(--hr-radius-xs); background: var(--ck-pill-bg);
 }
 @media (max-width: 640px) {
   .pwa-dock { justify-content: center; padding: 0 10px 12px; }
@@ -2697,7 +2697,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
      tlačidlo v pravom dolnom rohu nedá kliknúť. */
   position: fixed; right: 16px; bottom: 16px; z-index: 10005;
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 9px 13px; border-radius: 999px;
+  padding: 9px 13px; border-radius: var(--hr-radius-pill);
   border: 1px solid var(--hr-line, #e8dcc0); background: #fffdf7;
   color: #8a5316; font: 600 13px Inter, system-ui, sans-serif;
   box-shadow: 0 10px 26px rgba(40, 24, 8, .22); cursor: pointer;
@@ -2710,7 +2710,7 @@ a, button, input, textarea, select, [role="button"], [tabindex] {
    Dve snímky nad sebou (satelit + priehľadné popisy) a naša značka v strede. */
 .lok-mapa {
   position: relative; display: block; overflow: hidden;
-  border-radius: 10px; border: 1px solid var(--hr-line, #e0d6c2);
+  border-radius: var(--hr-radius-m); border: 1px solid var(--hr-line, #e0d6c2);
   box-shadow: 0 6px 16px -10px rgba(40, 26, 10, .5);
   aspect-ratio: 1000 / 580; background: var(--hr-surface-3, #efe8da);
   text-decoration: none;

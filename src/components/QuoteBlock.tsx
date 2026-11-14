@@ -30,7 +30,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
             background: 'var(--hr-line)',
             borderLeft: '3px solid var(--hr-accent-soft)',
             borderRadius: '0 8px 8px 0',
-            color: '#2d2418',
+            color: 'var(--hr-ink)',
             width: '100%',
           }}
         >
@@ -52,7 +52,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
                   fontStyle: 'italic',
                   fontSize: '16px',
                   lineHeight: 1.55,
-                  color: '#2d2418',
+                  color: 'var(--hr-ink)',
                   margin: 0,
                   marginBottom: '0.15rem',
                   textAlign: 'left',
@@ -72,13 +72,13 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
                 borderTop: '1px solid var(--hr-accent-border)',
               }}
             >
-              <Feather style={{ width: 14, height: 14, color: '#7d4f1d' }} />
+              <Feather style={{ width: 14, height: 14, color: 'var(--hr-accent-deep)' }} />
               <cite
                 className="not-italic"
                 style={{
                   fontFamily: 'Georgia, "Times New Roman", serif',
                   fontSize: 13,
-                  color: '#7d4f1d',
+                  color: 'var(--hr-ink)' /* L15.01: neklikateľný text */,
                   fontWeight: 600,
                 }}
               >
@@ -103,7 +103,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
           background: 'var(--hr-line)',
           borderLeft: '3px solid var(--hr-accent-soft)',
           borderRadius: '0 8px 8px 0',
-          color: '#2d2418',
+          color: 'var(--hr-ink)',
           width: '100%',
         }}
       >
@@ -111,7 +111,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
           className="text-base md:text-lg italic leading-relaxed"
           style={{
             fontFamily: 'Georgia, "Times New Roman", serif',
-            color: '#2d2418',
+            color: 'var(--hr-ink)',
             margin: 0,
           }}
         >
@@ -126,7 +126,7 @@ export function QuoteBlock({ text, author, source, variant = 'default' }: QuoteB
               style={{
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 fontSize: 13,
-                color: '#7d4f1d',
+                color: 'var(--hr-ink)' /* L15.01: neklikateľný text */,
                 fontWeight: 600,
               }}
             >

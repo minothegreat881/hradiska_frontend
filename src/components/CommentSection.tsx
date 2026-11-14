@@ -98,9 +98,9 @@ function CommentItem({
           display: 'flex',
           gap: 12,
           alignItems: 'flex-start',
-          background: '#fffdf8',
+          background: 'var(--hr-surface)',
           border: `1px solid ${isBeingRepliedTo ? 'var(--hr-accent-soft)' : 'var(--hr-line)'}`,
-          borderRadius: 10,
+          borderRadius: 'var(--hr-radius-m)',
           padding: 16,
           transition: 'border-color 0.2s',
         }}
@@ -109,7 +109,7 @@ function CommentItem({
           style={{
             width: 36,
             height: 36,
-            borderRadius: 9999,
+            borderRadius: 'var(--hr-radius-pill)',
             background: 'linear-gradient(135deg, var(--hr-line-quiet) 0%, var(--hr-accent-soft) 100%)',
             color: 'var(--hr-on-photo)',
             display: 'flex',
@@ -140,7 +140,7 @@ function CommentItem({
               style={{
                 fontFamily: 'Georgia, serif',
                 fontSize: 14,
-                color: '#2d1810',
+                color: 'var(--hr-ink)',
               }}
             >
               {comment.author}
@@ -149,7 +149,7 @@ function CommentItem({
               style={{
                 fontFamily: 'Georgia, serif',
                 fontSize: 12,
-                color: '#7a6b56',
+                color: 'var(--hr-muted)',
               }}
             >
               {comment.date}
@@ -164,7 +164,7 @@ function CommentItem({
                   letterSpacing: '0.06em',
                   background: 'var(--hr-line)',
                   padding: '2px 6px',
-                  borderRadius: 4,
+                  borderRadius: 'var(--hr-radius-xs)',
                 }}
               >
                 {t('z pôvodného blogu')}
@@ -176,7 +176,7 @@ function CommentItem({
               fontFamily: 'Georgia, serif',
               fontSize: 14,
               lineHeight: 1.6,
-              color: '#2d2418',
+              color: 'var(--hr-ink)',
               margin: 0,
               whiteSpace: 'pre-wrap',
               overflowWrap: 'anywhere',
@@ -214,7 +214,7 @@ function CommentItem({
                 cursor: 'pointer',
                 fontFamily: 'Georgia, serif',
                 fontSize: 12,
-                color: liked ? 'var(--hr-accent-soft)' : '#7a6b56',
+                color: liked ? 'var(--hr-accent-soft)' : 'var(--hr-muted)',
                 fontWeight: liked ? 600 : 400,
                 transition: 'color 0.15s',
               }}
@@ -244,7 +244,7 @@ function CommentItem({
                 cursor: 'pointer',
                 fontFamily: 'Georgia, serif',
                 fontSize: 12,
-                color: '#7a6b56',
+                color: 'var(--hr-muted)',
               }}
             >
               <Reply style={{ width: 14, height: 14 }} />
@@ -276,7 +276,7 @@ function CommentItem({
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6, background: 'transparent',
                   border: 0, padding: 0, cursor: 'pointer', fontFamily: 'Georgia, serif',
-                  fontSize: 12, color: '#7a6b56',
+                  fontSize: 12, color: 'var(--hr-muted)',
                 }}
               >
                 <Flag style={{ width: 13, height: 13 }} />
@@ -297,9 +297,9 @@ function CommentItem({
                   rows={2}
                   maxLength={5000}
                   style={{
-                    width: '100%', padding: '9px 12px', background: '#fdfbf6',
-                    border: '1px solid var(--hr-accent-soft)', borderRadius: 8, outline: 'none',
-                    fontFamily: 'Georgia, serif', fontSize: 14, color: '#2d2418', resize: 'vertical',
+                    width: '100%', padding: '9px 12px', background: 'var(--hr-bg)',
+                    border: '1px solid var(--hr-accent-soft)', borderRadius: 'var(--hr-radius-s)', outline: 'none',
+                    fontFamily: 'Georgia, serif', fontSize: 14, color: 'var(--hr-ink)', resize: 'vertical',
                   }}
                 />
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -314,7 +314,7 @@ function CommentItem({
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px',
                       background: replyText.trim() ? 'var(--hr-accent-soft)' : 'var(--hr-accent-border)', color: 'var(--hr-on-photo)',
-                      border: 0, borderRadius: 8, fontFamily: 'Georgia, serif', fontSize: 13, fontWeight: 600,
+                      border: 0, borderRadius: 'var(--hr-radius-s)', fontFamily: 'Georgia, serif', fontSize: 13, fontWeight: 600,
                       cursor: replyText.trim() ? 'pointer' : 'not-allowed',
                     }}
                   >
@@ -322,13 +322,13 @@ function CommentItem({
                     {t('Odoslať odpoveď')}
                   </button>
                   <button type="button" onClick={onCancelReply}
-                          style={{ background: 'transparent', border: 0, color: '#7a6b56', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, textDecoration: 'underline' }}>
+                          style={{ background: 'transparent', border: 0, color: 'var(--hr-muted)', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: 13, textDecoration: 'underline' }}>
                     {t('Zrušiť')}
                   </button>
                 </div>
               </div>
             ) : (
-              <div style={{ marginTop: 10, fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
+              <div style={{ marginTop: 10, fontFamily: 'Georgia, serif', fontSize: 13, color: 'var(--hr-muted)' }}>
                 <button type="button" onClick={() => goTo(odkaz('/prihlasenie'))}
                         style={{ color: 'var(--hr-accent-soft)', background: 'none', border: 0, cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'Georgia, serif', fontSize: 13 }}>
                   {t('Prihláste sa')}
@@ -589,13 +589,13 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '10px 14px',
-    background: '#fdfbf6',
+    background: 'var(--hr-bg)',
     border: '1px solid var(--hr-line)',
-    borderRadius: 8,
+    borderRadius: 'var(--hr-radius-s)',
     outline: 'none',
     fontFamily: 'Georgia, serif',
     fontSize: 14,
-    color: '#2d2418',
+    color: 'var(--hr-ink)',
     transition: 'border-color 0.2s',
     boxSizing: 'border-box',
   };
@@ -767,7 +767,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              color: '#7a6b56',
+              color: 'var(--hr-muted)',
               fontFamily: 'Georgia, serif',
               fontSize: 14,
               fontStyle: 'italic',
@@ -787,7 +787,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               padding: 16,
               background: 'var(--hr-surface)',
               border: '1px dashed var(--hr-line)',
-              borderRadius: 10,
+              borderRadius: 'var(--hr-radius-m)',
               margin: 0,
             }}
           >
@@ -832,9 +832,9 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
         viewport={{ once: true }}
         style={{
           marginTop: 32,
-          background: '#fffdf8',
+          background: 'var(--hr-surface)',
           border: '1px solid var(--hr-line)',
-          borderRadius: 12,
+          borderRadius: 'var(--hr-radius-m)',
           padding: 20,
         }}
       >
@@ -874,8 +874,8 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               pointerEvents: postDocumentId ? 'auto' : 'none',
             }}
           >
-            <div style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#7a6b56' }}>
-              {t('Píšete ako')} <strong style={{ color: '#5d3a14' }}>{member?.displayName || member?.username}</strong>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: 'var(--hr-muted)' }}>
+              {t('Píšete ako')} <strong style={{ color: 'var(--hr-ink)' /* L15.01: neklikateľný text */ }}>{member?.displayName || member?.username}</strong>
             </div>
             <textarea
               value={newComment}
@@ -893,7 +893,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               style={{
                 alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8,
                 padding: '10px 24px', background: canSubmit ? 'var(--hr-accent-soft)' : 'var(--hr-accent-border)',
-                color: 'var(--hr-on-photo)', border: 0, borderRadius: 8, fontFamily: 'Georgia, serif',
+                color: 'var(--hr-on-photo)', border: 0, borderRadius: 'var(--hr-radius-s)', fontFamily: 'Georgia, serif',
                 fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
                 cursor: canSubmit ? 'pointer' : 'not-allowed', transition: 'background 0.2s',
               }}
@@ -905,7 +905,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
         ) : (
           <div
             style={{
-              marginTop: 16, padding: '18px 20px', borderRadius: 10,
+              marginTop: 16, padding: '18px 20px', borderRadius: 'var(--hr-radius-m)',
               background: 'var(--hr-line)', border: '1px dashed var(--hr-line)',
               textAlign: 'center', fontFamily: 'Georgia, serif',
             }}
@@ -916,7 +916,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 onClick={() => goTo(odkaz('/prihlasenie'))}
-                style={{ padding: '9px 20px', borderRadius: 999, border: '1px solid #7c4a13',
+                style={{ padding: '9px 20px', borderRadius: 'var(--hr-radius-pill)', border: '1px solid #7c4a13',
                   background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
                   fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
               >
@@ -924,7 +924,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
               </button>
               <button
                 onClick={() => goTo(odkaz('/registracia'))}
-                style={{ padding: '9px 20px', borderRadius: 999, border: '1px solid #d9c69a',
+                style={{ padding: '9px 20px', borderRadius: 'var(--hr-radius-pill)', border: '1px solid #d9c69a',
                   background: 'transparent', color: '#9a5d1f', fontFamily: 'Georgia, serif',
                   fontSize: 14, cursor: 'pointer' }}
               >

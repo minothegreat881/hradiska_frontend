@@ -49,8 +49,8 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
   };
 
   const style: React.CSSProperties = compact
-    ? { ...base, width: 38, height: 38, borderRadius: 8, background: 'transparent', border: 0 }
-    : { ...base, gap: 7, padding: '7px 14px', borderRadius: 999,
+    ? { ...base, width: 38, height: 38, borderRadius: 'var(--hr-radius-s)', background: 'transparent', border: 0 }
+    : { ...base, gap: 7, padding: '7px 14px', borderRadius: 'var(--hr-radius-pill)',
         background: 'rgba(255,247,231,0.08)', border: '1px solid var(--hr-line)' };
 
   return (
@@ -79,7 +79,7 @@ export function AccountNavLink({ compact = false }: { compact?: boolean }) {
       {isLoggedIn && unread > 0 && (
         <span aria-label={`${unread} neprečítaných`} style={{
           position: 'absolute', top: -5, right: -5, minWidth: 18, height: 18, padding: '0 5px',
-          borderRadius: 999, background: '#7c1f24', color: '#fff', fontSize: 11, fontWeight: 700,
+          borderRadius: 'var(--hr-radius-pill)', background: '#7c1f24', color: '#fff', fontSize: 11, fontWeight: 700,
           display: 'grid', placeItems: 'center', border: '1px solid #c8a15a', fontFamily: 'system-ui',
         }}>{unread > 99 ? '99+' : unread}</span>
       )}

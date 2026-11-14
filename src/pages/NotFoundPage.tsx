@@ -34,7 +34,7 @@ export function NotFoundPage({ clanok = false }: {
 
   const btn: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 22px',
-    borderRadius: 999, fontFamily: 'var(--font-serif, Georgia, serif)', fontSize: 15,
+    borderRadius: 'var(--hr-radius-pill)', fontFamily: 'var(--font-serif, Georgia, serif)', fontSize: 15,
     fontWeight: 600, cursor: 'pointer', textDecoration: 'none',
   };
 

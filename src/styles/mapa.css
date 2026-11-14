@@ -241,7 +241,7 @@
   position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%);
   display: flex; flex-direction: column; pointer-events: none;
   background: rgba(245,241,233,.96); border: 1px solid rgba(20,18,15,.14);
-  border-radius: 999px; padding: 4px 13px; box-shadow: 0 3px 10px rgba(20,18,15,.14);
+  border-radius: var(--hr-radius-pill); padding: 4px 13px; box-shadow: 0 3px 10px rgba(20,18,15,.14);
 }
 .lmap-pill-n { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #14120F; line-height: 1.25; white-space: nowrap; }
 .lmap-pill-c { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--hr-muted); white-space: nowrap; } /* Z5.03 */
@@ -349,14 +349,14 @@
   width: 260px; z-index: 40; pointer-events: auto; cursor: default;
   filter: drop-shadow(0 18px 30px rgba(20,18,15,.28));
 }
-.lmap-card-in { background: var(--l-card); border: 1px solid rgba(20,18,15,.16); border-radius: 14px; overflow: hidden; }
+.lmap-card-in { background: var(--l-card); border: 1px solid rgba(20,18,15,.16); border-radius: var(--hr-radius-l); overflow: hidden; }
 .lmap-card-photo {
   position: relative; height: 130px; background: var(--l-paper-2) center/cover no-repeat;
 }
 .lmap-card-veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,18,15,.28), transparent 45%); }
 .lmap-card-cat {
   position: absolute; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px 4px 8px; border-radius: 999px; background: rgba(245,241,233,.95); color: #3A342C;
+  padding: 4px 10px 4px 8px; border-radius: var(--hr-radius-pill); background: rgba(245,241,233,.95); color: #3A342C;
   font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
 }
 .lmap-card-x {
@@ -388,7 +388,7 @@
 .lmap-zoom { position: absolute; right: 40px; bottom: 34px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 4; }
 .lmap-zoom-box {
   display: flex; flex-direction: column; overflow: hidden;
-  background: rgba(245,241,233,.95); border: 1px solid rgba(20,18,15,.3); border-radius: 10px;
+  background: rgba(245,241,233,.95); border: 1px solid rgba(20,18,15,.3); border-radius: var(--hr-radius-m);
   box-shadow: 0 4px 14px rgba(20,18,15,.15);
 }
 .lmap-zoom-box button {
@@ -502,7 +502,7 @@
 .lmap-locator {
   position: relative; width: 148px; aspect-ratio: 1000 / 485;
   background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
-  border-radius: 10px; overflow: hidden; cursor: crosshair;
+  border-radius: var(--hr-radius-m); overflow: hidden; cursor: crosshair;
   box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
 }
 .lmap-locator svg { position: absolute; inset: 0; width: 100%; height: 100%; padding: 6px; box-sizing: border-box; }
@@ -516,7 +516,7 @@
 .lmap-pad {
   display: grid; grid-template-columns: repeat(3, 34px); grid-template-rows: repeat(3, 28px);
   background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
-  border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
+  border-radius: var(--hr-radius-m); overflow: hidden; box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
 }
 .lmap-pad button {
   display: grid; place-items: center; background: none; border: 0; cursor: pointer;
@@ -558,7 +558,7 @@
    Ikona v 26 px krúžku sama nepovie, ktorá kategória to je. Riadok legendy
    sa preto rozsvieti podľa bodu pod kurzorom (a podľa kliknutého, kým je
    karta otvorená). */
-.lmap-legend-row { padding: 3px 8px; margin: -3px -8px; border-radius: 8px; transition: background .16s ease; }
+.lmap-legend-row { padding: 3px 8px; margin: -3px -8px; border-radius: var(--hr-radius-s); transition: background .16s ease; }
 .lmap-legend-row.is-active { background: rgba(255, 255, 255, .07); }
 .lmap-legend-row.is-active .lmap-legend-name { color: var(--l-on-dark-2); font-weight: 600; }
 .lmap-legend-row.is-active .lmap-legend-n { color: var(--l-second); }
@@ -610,7 +610,7 @@
     touch-action: manipulation;
   }
   .lmap-open span {
-    padding: 10px 18px; border-radius: 999px;
+    padding: 10px 18px; border-radius: var(--hr-radius-pill);
     background: rgba(20, 18, 15, .82); color: var(--l-on-dark-2);
     font-family: 'Archivo', 'Inter', sans-serif; font-size: 13.5px; font-weight: 600;
     box-shadow: 0 6px 18px rgba(20, 18, 15, .35);
@@ -695,7 +695,7 @@
 }
 .lmap-sheet .lmap-card-in {
   display: grid; grid-template-columns: 122px minmax(0, 1fr);
-  align-items: stretch; border-radius: 16px;
+  align-items: stretch; border-radius: var(--hr-radius-l);
 }
 .lmap-sheet .lmap-card-photo { height: auto; min-height: 138px; }
 /* Závoj sprava, nie zhora — fotka teraz susedí s textom, nie s popisom. */
@@ -736,8 +736,8 @@
   background: rgba(20, 18, 15, .85); border: 0;
   appearance: none; -webkit-appearance: none; touch-action: none;
 }
-.lmap-fz-slider::-webkit-slider-runnable-track { width: 3px; border-radius: 999px; background: rgba(243, 237, 225, .35); }
-.lmap-fz-slider::-moz-range-track { width: 3px; border-radius: 999px; background: rgba(243, 237, 225, .35); }
+.lmap-fz-slider::-webkit-slider-runnable-track { width: 3px; border-radius: var(--hr-radius-pill); background: rgba(243, 237, 225, .35); }
+.lmap-fz-slider::-moz-range-track { width: 3px; border-radius: var(--hr-radius-pill); background: rgba(243, 237, 225, .35); }
 .lmap-fz-slider::-webkit-slider-thumb {
   appearance: none; -webkit-appearance: none;
   width: 22px; height: 22px; border-radius: 50%; margin-left: -10px;
@@ -853,7 +853,7 @@
    vyzerajú obe ako zapnuté. */
 .lmap-podklad {
   display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
-  margin: 0 0 14px; padding: 2px; border-radius: 10px;
+  margin: 0 0 14px; padding: 2px; border-radius: var(--hr-radius-m);
   background: rgba(255, 255, 255, .06);
   border: 1px solid rgba(255, 255, 255, .16);
 }
@@ -861,7 +861,7 @@
   padding: 8px 6px; border: 0; cursor: pointer;
   background: transparent; color: rgba(243, 237, 225, .55);
   font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em;
-  text-transform: uppercase; border-radius: 8px;
+  text-transform: uppercase; border-radius: var(--hr-radius-s);
   transition: background .16s ease, color .16s ease;
 }
 .lmap-podklad button:hover { color: rgba(243, 237, 225, .9); background: rgba(255, 255, 255, .07); }

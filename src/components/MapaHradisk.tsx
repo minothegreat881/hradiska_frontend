@@ -1320,7 +1320,7 @@ export function MapaHradisk({ zvyraznene }: {
               position: 'absolute', zIndex: 4100,
               right: 12, bottom: 'calc(16px + env(safe-area-inset-bottom))',
               display: 'flex', flexDirection: 'column', gap: 1,
-              borderRadius: 12, overflow: 'hidden',
+              borderRadius: 'var(--hr-radius-m)', overflow: 'hidden',
               border: '1px solid rgba(255,255,255,.25)', pointerEvents: 'auto',
             }}
           >

@@ -101,7 +101,7 @@ function PasNahladu() {
   return (
     <div role="status" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 10005, display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', padding: '8px 14px', background: '#2f2418', color: '#f7efdc', font: '500 13px Inter, system-ui, sans-serif' }}>
       <span>Náhľad konceptu vzhľadu — takto bude web vyzerať po zverejnení. Návštevníci ho zatiaľ nevidia.</span>
-      <button type="button" onClick={ukonciNahlad} style={{ border: '1px solid #c98a3c', background: 'none', color: '#f7efdc', borderRadius: 7, padding: '4px 10px', cursor: 'pointer', font: 'inherit' }}>
+      <button type="button" onClick={ukonciNahlad} style={{ border: '1px solid #c98a3c', background: 'none', color: '#f7efdc', borderRadius: 'var(--hr-radius-s)', padding: '4px 10px', cursor: 'pointer', font: 'inherit' }}>
         Ukončiť náhľad
       </button>
     </div>

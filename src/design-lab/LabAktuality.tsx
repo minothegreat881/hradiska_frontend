@@ -45,7 +45,7 @@ const GOLD_GRAD = 'linear-gradient(180deg,var(--hr-accent-soft),var(--hr-accent)
 const GLASS: React.CSSProperties = {
   position: 'absolute', left: 11, right: 11, bottom: 11,
   background: 'var(--hr-glass)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid var(--hr-glass-line)', borderRadius: 17, padding: '13px 16px',
+  border: '1px solid var(--hr-glass-line)', borderRadius: 'var(--hr-radius-l)', padding: '13px 16px',
 };
 
 /** Šírka karty + medzera — o toľko posunie jedno kliknutie na šípku. */
@@ -439,7 +439,7 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
                   {intro.author} · {formatSkDate(intro.datum)} · {intro.readingTime} {t('min čítania')}
                 </span>
               )}
-              <span style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.08em', color: 'var(--hr-surface)', background: GOLD_GRAD, borderRadius: 999, padding: '11px 20px' }}>
+              <span style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading)', fontSize: 11, letterSpacing: '.08em', color: 'var(--hr-surface)', background: GOLD_GRAD, borderRadius: 'var(--hr-radius-pill)', padding: '11px 20px' }}>
                 {t('ČÍTAŤ CELÉ')} <span style={{ fontSize: 14 }}>→</span>
               </span>
             </a>

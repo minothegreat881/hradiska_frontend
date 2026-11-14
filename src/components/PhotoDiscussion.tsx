@@ -183,7 +183,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
         <div
           aria-hidden="true"
           style={{
-            flexShrink: 0, width: 34, height: 34, borderRadius: 999, marginTop: 2, overflow: 'hidden',
+            flexShrink: 0, width: 34, height: 34, borderRadius: 'var(--hr-radius-pill)', marginTop: 2, overflow: 'hidden',
             background: avatarBg(c.authorName), color: '#fff',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700,
@@ -194,7 +194,7 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
             : c.authorName.charAt(0).toUpperCase()}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ background: 'var(--pl-bubble)', borderRadius: 14, padding: '9px 13px' }}>
+          <div style={{ background: 'var(--pl-bubble)', borderRadius: 'var(--hr-radius-l)', padding: '9px 13px' }}>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 700, color: 'var(--pl-title)' }}>
               {c.authorName}
             </div>
@@ -336,9 +336,9 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
         <div
           aria-hidden="true"
           style={{
-            flexShrink: 0, width: 34, height: 34, borderRadius: 999,
-            background: isLoggedIn ? 'linear-gradient(135deg,var(--hr-accent-soft),#7d4f1d)' : '#e6d7b0',
-            color: isLoggedIn ? '#fffdf8' : '#8a795e',
+            flexShrink: 0, width: 34, height: 34, borderRadius: 'var(--hr-radius-pill)',
+            background: isLoggedIn ? 'linear-gradient(135deg,var(--hr-accent-soft),var(--hr-accent-deep))' : '#e6d7b0',
+            color: isLoggedIn ? 'var(--hr-surface)' : '#8a795e',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700,
           }}
@@ -384,20 +384,20 @@ export function PhotoDiscussion({ fileId, onShare }: { fileId: number; onShare?:
 /* ── Zdieľané štýly ─────────────────────────────────────────────────────── */
 const pillInputStyle: React.CSSProperties = {
   flex: 1, minWidth: 0,
-  background: '#fff', border: '1px solid var(--pl-field)', borderRadius: 999,
+  background: '#fff', border: '1px solid var(--pl-field)', borderRadius: 'var(--hr-radius-pill)',
   padding: '9px 14px', color: 'var(--pl-title)',
   fontFamily: 'var(--font-serif)', fontSize: 16, outline: 'none',
 };
 
 const sendBtnStyle: React.CSSProperties = {
-  flexShrink: 0, width: 38, height: 38, borderRadius: 999, cursor: 'pointer', border: 'none',
+  flexShrink: 0, width: 38, height: 38, borderRadius: 'var(--hr-radius-pill)', cursor: 'pointer', border: 'none',
   background: 'linear-gradient(180deg,#b0813a,#8a5316)', color: '#fbf3e2',
   display: 'flex', alignItems: 'center', justifyContent: 'center',
 };
 
 function reactChip(bg: string): React.CSSProperties {
   return {
-    width: 22, height: 22, borderRadius: 999, background: bg,
+    width: 22, height: 22, borderRadius: 'var(--hr-radius-pill)', background: bg,
     border: '1.5px solid var(--pl-card)',
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
   };

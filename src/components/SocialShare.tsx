@@ -101,7 +101,7 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: 9999,
+                borderRadius: 'var(--hr-radius-pill)',
                 border: '1px solid var(--hr-accent-border)',
                 background: 'transparent',
                 color: 'var(--hr-ink)',
@@ -130,10 +130,10 @@ export function SocialShare({ title, url = '', postDocumentId }: SocialShareProp
             style={{
               width: 40,
               height: 40,
-              borderRadius: 9999,
+              borderRadius: 'var(--hr-radius-pill)',
               border: '1px solid var(--hr-accent-border)',
               background: copied ? 'var(--hr-accent-soft)' : 'transparent',
-              color: copied ? '#fffdf8' : '#3a2a1a',
+              color: copied ? 'var(--hr-surface)' : '#3a2a1a',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',

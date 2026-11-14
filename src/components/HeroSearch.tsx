@@ -104,7 +104,7 @@ function GroupHeader({ label, count, withTopBorder }: { label: string; count: nu
           color: T.countChipText,
           background: T.chipBg,
           border: `1px solid ${T.chipBorder}`,
-          borderRadius: 999,
+          borderRadius: 'var(--hr-radius-pill)',
           padding: '1px 7px',
         }}
       >
@@ -150,7 +150,7 @@ function ResultRow({
           flexShrink: 0,
           width: 52,
           height: 40,
-          borderRadius: 8,
+          borderRadius: 'var(--hr-radius-s)',
           border: `1px solid ${T.chipBorder}`,
           backgroundImage: result.thumbnail ? `url(${result.thumbnail})` : fallbackBg,
           backgroundSize: 'cover',
@@ -212,7 +212,7 @@ function ResultRow({
             color: T.amber,
             background: T.chipBg,
             border: `1px solid ${T.chipBorder}`,
-            borderRadius: 999,
+            borderRadius: 'var(--hr-radius-pill)',
             padding: '3px 10px',
           }}
         >
@@ -368,7 +368,7 @@ export function HeroSearch() {
           // vidieť, kde stojí. Preto svieti celý bar.
           background: T.panelBg,
           border: `1.5px solid ${ramKlavesnicou ? T.amberLight : T.panelBorder}`,
-          borderRadius: 999,
+          borderRadius: 'var(--hr-radius-pill)',
           boxShadow: ramKlavesnicou
             ? `0 0 0 4px ${T.focusGlow}, 0 24px 48px -14px rgba(74,52,18,.32)`
             : '0 24px 48px -14px rgba(74,52,18,.32)',
@@ -391,7 +391,7 @@ export function HeroSearch() {
               justifyContent: 'center',
               width: 30,
               height: 30,
-              borderRadius: 8,
+              borderRadius: 'var(--hr-radius-s)',
               flexShrink: 0,
               transition: 'background 250ms ease, color 250ms ease, border-color 250ms ease, box-shadow 250ms ease',
               /* Rovnako ako rám baru: myšou sa nerozsvieti. Červený krúžok
@@ -475,7 +475,7 @@ export function HeroSearch() {
                 color: T.countChipText,
                 background: T.chipBg,
                 border: `1px solid ${T.chipBorder}`,
-                borderRadius: 999,
+                borderRadius: 'var(--hr-radius-pill)',
                 padding: '4px 9px',
               }}
             >
@@ -495,7 +495,7 @@ export function HeroSearch() {
                 color: T.clearText,
                 width: 28,
                 height: 28,
-                borderRadius: 999,
+                borderRadius: 'var(--hr-radius-pill)',
                 fontSize: 13,
                 lineHeight: 1,
                 cursor: 'pointer',
@@ -550,7 +550,7 @@ export function HeroSearch() {
               background: T.panelBg,
               border: `1px solid ${T.panelBorder}`,
               // Zladené s barom (18), inak roletka pôsobí ako cudzí prvok pod ním.
-              borderRadius: 18,
+              borderRadius: 'var(--hr-radius-xl)',
               boxShadow: '0 26px 64px -24px rgba(60,40,15,.55), inset 0 1px 0 rgba(255,255,255,.75)',
               overflow: 'hidden',
               zIndex: 60,

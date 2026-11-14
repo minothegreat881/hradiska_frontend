@@ -180,7 +180,7 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
           hint="Vložte odkaz na YouTube, Vimeo alebo Sketchfab do poľa „Adresa“ pod článkom."
         />
         {caption && (
-          <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}>
+          <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: 'var(--hr-muted)', textAlign: 'center', marginTop: 8 }}>
             {caption}
           </figcaption>
         )}
@@ -205,7 +205,7 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
             maxWidth: 500,
             height: 320,
             border: 0,
-            borderRadius: 12,
+            borderRadius: 'var(--hr-radius-m)',
             overflow: 'hidden',
             boxShadow: '0 4px 12px rgba(70,40,20,.12)',
           }}
@@ -214,7 +214,7 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
         />
         )}</NahladVlozenia>
         {caption && (
-          <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}>
+          <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: 'var(--hr-muted)', textAlign: 'center', marginTop: 8 }}>
             {caption}
           </figcaption>
         )}
@@ -229,7 +229,7 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
           position: 'relative',
           width: '100%',
           paddingBottom: '56.25%',
-          borderRadius: 12,
+          borderRadius: 'var(--hr-radius-m)',
           overflow: 'hidden',
           boxShadow: '0 4px 12px rgba(70,40,20,.12)',
         }}
@@ -247,7 +247,7 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
       </div>
       {caption && (
         <figcaption
-          style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}
+          style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: 'var(--hr-muted)', textAlign: 'center', marginTop: 8 }}
         >
           {caption}
         </figcaption>
@@ -359,7 +359,7 @@ function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps
             paddingBottom,
             // Pri zastropovanom vysokom obrázku ostane po stranách voľné miesto
             // (object-contain) — podfarbíme ho pergamenom, nech to pôsobí zámerne.
-            ...(isTallCapped ? { background: '#f0e9dc' } : {}),
+            ...(isTallCapped ? { background: 'var(--hr-surface-3)' } : {}),
           }}
           title={t('Kliknutím zobraziť v galérii')}
         >
@@ -585,7 +585,7 @@ function renderRichText(body: any[], isFirstRichTextBlock: boolean = false, hasP
                   top: '0.75em',
                   width: 6,
                   height: 6,
-                  borderRadius: 9999,
+                  borderRadius: 'var(--hr-radius-pill)',
                   background: 'var(--hr-accent-soft)',
                 }}
               />
@@ -797,7 +797,7 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
               <span
                 style={{
                   position: 'relative', width: '100%', aspectRatio: '4 / 3', overflow: 'hidden',
-                  borderRadius: 8, border: '1px solid var(--hr-line)', display: 'block', pointerEvents: 'none',
+                  borderRadius: 'var(--hr-radius-s)', border: '1px solid var(--hr-line)', display: 'block', pointerEvents: 'none',
                 }}
               >
                 <ImageWithFallback
@@ -812,7 +812,7 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
                 <span
                   style={{
                     fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 13, lineHeight: 1.5,
-                    color: '#7a6b56', display: '-webkit-box', WebkitLineClamp: 2,
+                    color: 'var(--hr-muted)', display: '-webkit-box', WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical', overflow: 'hidden', pointerEvents: 'none',
                   }}
                 >
@@ -850,7 +850,7 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
         maxWidth: 520,
         background: 'var(--hr-line)',
         border: '1px solid var(--hr-accent-border)',
-        borderRadius: 10,
+        borderRadius: 'var(--hr-radius-m)',
         padding: '2.1rem 2.4rem 1.8rem',
         textAlign: 'center',
       }}
@@ -868,7 +868,7 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
             fontStyle: 'normal',
             fontWeight: 600,
             fontSize: '1.05em',
-            color: '#3d3020',
+            color: 'var(--hr-body)',
             marginBottom: '0.9rem',
             letterSpacing: '0.02em',
           }}
@@ -880,7 +880,7 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
         style={{
           fontFamily: 'Georgia, "Times New Roman", serif',
           fontStyle: 'italic',
-          color: '#3d3020',
+          color: 'var(--hr-body)',
           lineHeight: 1.85,
           fontSize: '15.5px',
         }}
@@ -902,7 +902,7 @@ function PoemRenderer({ block, needsClearBefore }: { block: PoemBlock; needsClea
             fontFamily: 'Georgia, "Times New Roman", serif',
             fontStyle: 'normal',
             fontSize: '12.5px',
-            color: '#7d4f1d',
+            color: 'var(--hr-ink)' /* L15.01: neklikateľný text */,
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
             fontWeight: 600,
