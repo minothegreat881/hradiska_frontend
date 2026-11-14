@@ -1,0 +1,341 @@
+{
+  "nazov": "Hradiská – celý web (všetky typy stránok), vzorka 6 článkov, EN a DE",
+  "adresa": "http://127.0.0.1:5401/",
+  "ostry": false,
+  "spustenie": {
+    "prikaz": "node C:/Users/milan/Desktop/Git-Projects/zalohy-hradiska/zaklad-2026-11-14/nahlad-server.mjs dist 5401",
+    "priecinok": ".",
+    "cakat_s": 30
+  },
+  "zdrojovy_kod": [
+    "src/",
+    "scripts/",
+    "public/",
+    "index.html"
+  ],
+  "dokument_stylu": null,
+  "stranky": [
+    {
+      "id": "uvod",
+      "cesta": "/",
+      "typ": "úvod",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-kniezacie-sidla",
+      "cesta": "/category/kniezacie-sidla",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-mocenske-centra",
+      "cesta": "/category/mocenske-centra",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-strazna-funkcia",
+      "cesta": "/category/strazna-funkcia",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-refugia",
+      "cesta": "/category/refugia",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-staroveke-sidla",
+      "cesta": "/category/staroveke-sidla",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-ostatne",
+      "cesta": "/category/ostatne",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-vseobecne-o-hradiskach",
+      "cesta": "/category/vseobecne-o-hradiskach",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-svatyne-a-sakralne-objekty",
+      "cesta": "/category/svatyne-a-sakralne-objekty",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-povesti",
+      "cesta": "/category/povesti",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-listiny-a-pisomne-zdroje",
+      "cesta": "/category/listiny-a-pisomne-zdroje",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-odborne-texty",
+      "cesta": "/category/odborne-texty",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-3d-modely",
+      "cesta": "/category/3d-modely",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-aktuality",
+      "cesta": "/category/aktuality",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "kat-informacne-tabule",
+      "cesta": "/category/informacne-tabule",
+      "typ": "zoznam",
+      "skupina": "web"
+    },
+    {
+      "id": "galeria",
+      "cesta": "/galeria",
+      "typ": "zoznam",
+      "skupina": "web",
+      "vyber": "fotoarchív"
+    },
+    {
+      "id": "aktuality",
+      "cesta": "/aktuality",
+      "typ": "zoznam",
+      "skupina": "web",
+      "vyber": "kronika združenia"
+    },
+    {
+      "id": "hladat",
+      "cesta": "/hladat",
+      "typ": "zoznam",
+      "skupina": "web",
+      "vyber": "hľadanie bez výrazu"
+    },
+    {
+      "id": "hladat-vysledky",
+      "cesta": "/hladat?q=devin",
+      "typ": "zoznam",
+      "skupina": "web",
+      "vyber": "výsledky hľadania"
+    },
+    {
+      "id": "hladat-nic",
+      "cesta": "/hladat?q=xqzvwj",
+      "typ": "zoznam",
+      "skupina": "web",
+      "vyber": "prázdne výsledky"
+    },
+    {
+      "id": "prihlasenie",
+      "cesta": "/prihlasenie",
+      "typ": "formulár",
+      "skupina": "web"
+    },
+    {
+      "id": "registracia",
+      "cesta": "/registracia",
+      "typ": "formulár",
+      "skupina": "web"
+    },
+    {
+      "id": "zabudnute-heslo",
+      "cesta": "/zabudnute-heslo",
+      "typ": "formulár",
+      "skupina": "web"
+    },
+    {
+      "id": "reset-hesla",
+      "cesta": "/reset-hesla",
+      "typ": "formulár",
+      "skupina": "web"
+    },
+    {
+      "id": "profil",
+      "cesta": "/profil",
+      "typ": "formulár",
+      "skupina": "web",
+      "vyber": "profil bez prihlásenia"
+    },
+    {
+      "id": "ochrana",
+      "cesta": "/ochrana-osobnych-udajov",
+      "typ": "právne",
+      "skupina": "web"
+    },
+    {
+      "id": "podmienky",
+      "cesta": "/podmienky-pouzivania",
+      "typ": "právne",
+      "skupina": "web"
+    },
+    {
+      "id": "aplikacia",
+      "cesta": "/aplikacia",
+      "typ": "detail",
+      "skupina": "web",
+      "vyber": "stránka aplikácie"
+    },
+    {
+      "id": "chyba404",
+      "cesta": "/neexistuje-zaklad-404",
+      "typ": "404",
+      "skupina": "web"
+    },
+    {
+      "id": "clanok-404",
+      "cesta": "/blog/neexistuje-zaklad",
+      "typ": "404",
+      "skupina": "web",
+      "vyber": "neexistujúci článok"
+    },
+    {
+      "id": "cl-titulok",
+      "cesta": "/blog/z-stegmann-rajtar-predbezne-vysledky-archeologickeho-vyskumu-na-zibrici-vyskumy-v-r-2002-2003-a-2005-2006",
+      "typ": "detail",
+      "skupina": "clanok",
+      "vyber": "najdlhší titulok (111 znakov)"
+    },
+    {
+      "id": "cl-galeria",
+      "cesta": "/blog/bojna-vyznamne-velkomoravske-centrum",
+      "typ": "detail",
+      "skupina": "clanok",
+      "vyber": "dlhý článok s galériou (4916 slov, 99 fotiek)"
+    },
+    {
+      "id": "cl-diskusia",
+      "cesta": "/blog/nelegalny-detektorizmus-skodi-nasej-historii",
+      "typ": "detail",
+      "skupina": "clanok",
+      "vyber": "veľká diskusia (209 komentárov)"
+    },
+    {
+      "id": "cl-bez-fotky",
+      "cesta": "/blog/alexander-ruttkay-o-svatoplukovi-a-nitre",
+      "typ": "detail",
+      "skupina": "clanok",
+      "vyber": "bez titulnej fotky"
+    },
+    {
+      "id": "cl-aktuality",
+      "cesta": "/blog/vyprava-polske-hradiska-2-biskupin-wenecja-wiszogrod-gora-zamkowa",
+      "typ": "detail",
+      "skupina": "clanok",
+      "vyber": "zápis z aktualít"
+    },
+    {
+      "id": "cl-poloha",
+      "cesta": "/blog/nitra",
+      "typ": "detail",
+      "skupina": "clanok",
+      "vyber": "poloha a časová os (20)"
+    },
+    {
+      "id": "en-uvod",
+      "cesta": "/en/",
+      "typ": "úvod",
+      "skupina": "en"
+    },
+    {
+      "id": "en-kat",
+      "cesta": "/en/category/mocenske-centra",
+      "typ": "zoznam",
+      "skupina": "en"
+    },
+    {
+      "id": "en-clanok",
+      "cesta": "/en/blog/nitra-principality-hillforts",
+      "typ": "detail",
+      "skupina": "en"
+    },
+    {
+      "id": "en-prihlasenie",
+      "cesta": "/en/prihlasenie",
+      "typ": "formulár",
+      "skupina": "en"
+    },
+    {
+      "id": "en-ochrana",
+      "cesta": "/en/ochrana-osobnych-udajov",
+      "typ": "právne",
+      "skupina": "en"
+    },
+    {
+      "id": "en-404",
+      "cesta": "/en/neexistuje-zaklad-404",
+      "typ": "404",
+      "skupina": "en"
+    },
+    {
+      "id": "de-uvod",
+      "cesta": "/de/",
+      "typ": "úvod",
+      "skupina": "de"
+    },
+    {
+      "id": "de-kat",
+      "cesta": "/de/category/mocenske-centra",
+      "typ": "zoznam",
+      "skupina": "de"
+    },
+    {
+      "id": "de-clanok",
+      "cesta": "/de/blog/nitra-fuerstentum-neutra-burganlagen",
+      "typ": "detail",
+      "skupina": "de"
+    },
+    {
+      "id": "de-prihlasenie",
+      "cesta": "/de/prihlasenie",
+      "typ": "formulár",
+      "skupina": "de"
+    },
+    {
+      "id": "de-ochrana",
+      "cesta": "/de/ochrana-osobnych-udajov",
+      "typ": "právne",
+      "skupina": "de"
+    },
+    {
+      "id": "de-404",
+      "cesta": "/de/neexistuje-zaklad-404",
+      "typ": "404",
+      "skupina": "de"
+    }
+  ],
+  "kontroly": {},
+  "pravidla_projektu": [],
+  "povolene_poziadavky": [],
+  "skryt_pri_merani": [
+    {
+      "selektor": ".ck-root.ck-dock",
+      "dovod": "lišta cookies – zadanie 14. 11.: pri meraní skryť (rieši sa osobitne, úloha 3 bod 6)",
+      "schvalil": "Milan (zadanie 14. 11. 2026)"
+    },
+    {
+      "selektor": ".ck-root.pwa-dock",
+      "dovod": "výzva na inštaláciu aplikácie – zadanie 14. 11.: pri meraní skryť",
+      "schvalil": "Milan (zadanie 14. 11. 2026)"
+    },
+    {
+      "selektor": ".pr-dock",
+      "dovod": "panel pripomienok (technický, pred spustením sa skryje) – zadanie 14. 11.: pri meraní skryť",
+      "schvalil": "Milan (zadanie 14. 11. 2026)"
+    }
+  ]
+}

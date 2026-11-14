@@ -53,3 +53,5 @@ app-balik/
 
 # Výstupy testov a prevodu vzhľadu webu (snímky, DOM, vzhlad-v1*.json)
 scripts/vzhlad/vystup/
+# výstupy nástroja základu webov (záznamy a snímky)
+kontrola/behy/
