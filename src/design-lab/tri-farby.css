@@ -140,3 +140,26 @@
   background: var(--tri-papier); color: var(--tri-atrament); border-color: var(--tri-atrament);
 }
 :root[data-stranka='domov'] .pr-dock:hover { background: var(--tri-papier); border-color: var(--tri-pecat); color: var(--tri-pecat); }
+
+/* ══ BEZ LINIEK (pokyn zadávateľa 14. 11.: „tie lajny preč“) ═════════════
+   Deliace linky a rámiky boli v pôvodnom šate béžové; v troch farbách z nich
+   vyšli tvrdé atramentové čiary. Preč sú všetky: v hlavičke, pri nadčiarach,
+   za nadpismi sekcií, okolo kroniky a štatistík, v „Pridajte sa“, v päte,
+   aj červené ozdobné. Rámik sa nemaže, len zprůhľadní, aby sa nič neposunulo.
+   Ostáva okraj polí na písanie (formulár, hľadanie) – bez neho by pole na
+   papieri nebolo vidieť (WCAG 1.4.11) – a kruhové tlačidlá so šípkami. */
+:root[data-stranka='domov'] .lab :is(
+  .lnav, .lnav-right, .dob-hlavicka, .lakv-more, .lakv-kronika, .lakv-logo, .lakv-pinned,
+  .lakv-stats, .lakv-stat, .ljoin, .ljoin-ask, .ljoin-mail, .ljoin-card, .lfoot, .lfoot-bar,
+  .hero-search-lupa
+) { border-color: transparent !important; }
+:root[data-stranka='domov'] .lab :is(.lnav, .lfoot)::before { display: none; }
+:root[data-stranka='domov'] .lab :is(.lkat-predel span, .dob-predel span, .lhero-nadciara span, .lcin-ciara, .ljoin-askrule) { visibility: hidden; }
+:root[data-stranka='domov'] .lab .ljoin-num::after { display: none; }
+/* Citát bez linky: kurzíva a úvodzovky ho nesú samy. */
+:root[data-stranka='domov'] .lab .ljoin-quote { border-left: 0; padding-left: 0; }
+
+/* ══ Bez radu „Populárne: Bojná · Devín · Molpír“ (pokyn zadávateľa 14. 11.) ═
+   Na webe ho natrvalo vypne editor vzhľadu (Úvod → Hľadanie → Populárne), keď
+   bude nasadený; dovtedy ho na úvode skrýva toto pravidlo. */
+:root[data-stranka='domov'] .lab .lhero-rychle { display: none; }
