@@ -781,10 +781,11 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
             style={{
               fontFamily: 'Georgia, serif',
               fontSize: 14,
-              color: '#7a6b56',
+              /* Text tela namiesto tichého odtieňa: 4,18 : 1 na tmavšom papieri (základ Z5.03). */
+              color: 'var(--hr-body)',
               fontStyle: 'italic',
               padding: 16,
-              background: '#fffdf8',
+              background: 'var(--hr-surface)',
               border: '1px dashed var(--hr-line)',
               borderRadius: 10,
               margin: 0,

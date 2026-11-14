@@ -244,7 +244,7 @@
   border-radius: 999px; padding: 4px 13px; box-shadow: 0 3px 10px rgba(20,18,15,.14);
 }
 .lmap-pill-n { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #14120F; line-height: 1.25; white-space: nowrap; }
-.lmap-pill-c { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: rgba(20,18,15,.55); white-space: nowrap; }
+.lmap-pill-c { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--hr-muted); white-space: nowrap; } /* Z5.03 */
 
 /* ── Zhluk: „geodetická pečať" ─────────────────────────────────────────── */
 .lmap-cluster {
@@ -268,7 +268,8 @@
   width: var(--core); height: var(--core); border-radius: 50%;
   display: grid; place-items: center;
   font-family: var(--mono); font-size: 13px; color: #14120F;
-  background: linear-gradient(155deg, rgba(255,255,255,.55), rgba(255,255,255,.12) 45%, rgba(255,255,255,.28));
+  /* Sklo hustejšie: číslo zhluku malo na reliéfe 3,7 : 1 (základ Z5.03 žiada 4,5 : 1). */
+  background: linear-gradient(155deg, rgba(255,255,255,.88), rgba(255,255,255,.7) 45%, rgba(255,255,255,.78));
   -webkit-backdrop-filter: blur(7px) saturate(1.3); backdrop-filter: blur(7px) saturate(1.3);
   border: 1px solid rgba(255,255,255,.75);
   box-shadow: inset 0 1px 2px rgba(255,255,255,.9), inset 0 -2px 4px rgba(58,52,44,.18), 0 4px 12px rgba(20,18,15,.25);
@@ -519,7 +520,7 @@
 }
 .lmap-pad button {
   display: grid; place-items: center; background: none; border: 0; cursor: pointer;
-  color: rgba(20, 18, 15, .7); font-size: 10px; font-family: inherit;
+  color: var(--hr-body); font-size: 10px; font-family: inherit; /* Z5.03: bolo 70 % priehľadné */
   transition: background .14s ease, color .14s ease;
 }
 .lmap-pad button:hover { background: rgba(20, 18, 15, .07); color: #14120F; }
@@ -830,11 +831,12 @@
   position: absolute; left: 7px; top: -7px;
   font-family: var(--mono); font-size: 9.5px; font-weight: 500;
   letter-spacing: .13em; text-transform: uppercase; white-space: nowrap;
-  color: rgba(20, 18, 15, .7);
+  /* Plná farba namiesto 70 % priehľadnej: na reliéfe mala menovka 2,3 : 1 (základ Z5.03). */
+  color: var(--hr-body);
   text-shadow: 0 0 3px var(--l-paper), 0 0 3px var(--l-paper), 0 0 7px var(--l-paper), 0 0 10px var(--l-paper);
 }
 .lmap-mesto.is-velke .lmap-mesto-b { width: 5px; height: 5px; background: rgba(20, 18, 15, .62); }
-.lmap-mesto.is-velke .lmap-mesto-n { font-size: 10.5px; font-weight: 600; color: rgba(20, 18, 15, .78); }
+.lmap-mesto.is-velke .lmap-mesto-n { font-size: 10.5px; font-weight: 600; color: var(--hr-ink); }
 
 /* Na snímke je pod textom fotografia, nie papier — obrys sa preto obracia. */
 .lmap.is-satelit .lmap-mesto-b { background: rgba(255, 255, 255, .9); box-shadow: 0 0 2px rgba(0, 0, 0, .8); }
