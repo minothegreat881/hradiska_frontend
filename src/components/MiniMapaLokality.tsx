@@ -86,6 +86,8 @@ export function MiniMap({ coordinates, locationName }: { coordinates: { lat: num
     <div>
       <a
         href={vonku}
+        target="_blank"
+        rel="noopener noreferrer"
         title={`${locationName} — ${t('otvoriť v Google Mapách')}`}
         className={hotovo ? 'lok-mapa je-tu' : 'lok-mapa'}
       >
@@ -127,7 +129,7 @@ export function MiniMap({ coordinates, locationName }: { coordinates: { lat: num
         <span className="lok-mapa-zdroj">Esri · Maxar</span>
       </a>
       <span className="lok-mapa-odkaz">
-        <a href={vonku}>
+        <a href={vonku} target="_blank" rel="noopener noreferrer">
           {t('Otvoriť v Google Mapách')} <ExternalLink className="w-3 h-3" aria-hidden="true" />
         </a>
       </span>

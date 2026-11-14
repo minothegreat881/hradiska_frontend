@@ -217,7 +217,7 @@
               0 4px 12px rgba(20,18,15,.25), 0 1px 2px rgba(20,18,15,.15);
   transition: transform .18s ease, background .18s ease, color .18s ease;
 }
-.lmap-pin:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 3px; box-shadow: 0 0 0 2px var(--hr-surface); }
+.lmap-pin:focus-visible { outline: 2px solid var(--l-second); outline-offset: 3px; }
 /* Vybrany bod. Handoff ho preklapal do tmaveho skla — na atramentovej mape,
    kde su vsetky body rovnake, sa ale tmavy od svetleho na prvy pohlad nelisi.
    Berie preto pecatnu cervenu zo satu: klik je vidno okamzite. */
@@ -241,10 +241,10 @@
   position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%);
   display: flex; flex-direction: column; pointer-events: none;
   background: rgba(245,241,233,.96); border: 1px solid rgba(20,18,15,.14);
-  border-radius: var(--hr-radius-pill); padding: 4px 13px; box-shadow: 0 3px 10px rgba(20,18,15,.14);
+  border-radius: 999px; padding: 4px 13px; box-shadow: 0 3px 10px rgba(20,18,15,.14);
 }
 .lmap-pill-n { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #14120F; line-height: 1.25; white-space: nowrap; }
-.lmap-pill-c { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--hr-muted); white-space: nowrap; } /* Z5.03 */
+.lmap-pill-c { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: rgba(20,18,15,.55); white-space: nowrap; }
 
 /* ── Zhluk: „geodetická pečať" ─────────────────────────────────────────── */
 .lmap-cluster {
@@ -256,8 +256,7 @@
 .lmap-cluster:hover,
 .lmap-cluster.is-hot { transform: translate(-50%, -50%) scale(1.08) rotate(6deg); }
 
-/* Dvojitý rám (svetlý vnútri, tmavý zvonka): pečatná červená na reliéfe nemala 3 : 1 (základ Z5.03). */
-.lmap-cluster:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 2px; border-radius: 50%; box-shadow: 0 0 0 2px var(--hr-surface); }
+.lmap-cluster:focus-visible { outline: 2px solid var(--l-second); outline-offset: 2px; border-radius: 50%; }
 .lmap-cluster-halo {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   width: calc(var(--core) + 8px); height: calc(var(--core) + 8px);
@@ -268,8 +267,7 @@
   width: var(--core); height: var(--core); border-radius: 50%;
   display: grid; place-items: center;
   font-family: var(--mono); font-size: 13px; color: #14120F;
-  /* Sklo hustejšie: číslo zhluku malo na reliéfe 3,7 : 1 (základ Z5.03 žiada 4,5 : 1). */
-  background: linear-gradient(155deg, rgba(255,255,255,.88), rgba(255,255,255,.7) 45%, rgba(255,255,255,.78));
+  background: linear-gradient(155deg, rgba(255,255,255,.55), rgba(255,255,255,.12) 45%, rgba(255,255,255,.28));
   -webkit-backdrop-filter: blur(7px) saturate(1.3); backdrop-filter: blur(7px) saturate(1.3);
   border: 1px solid rgba(255,255,255,.75);
   box-shadow: inset 0 1px 2px rgba(255,255,255,.9), inset 0 -2px 4px rgba(58,52,44,.18), 0 4px 12px rgba(20,18,15,.25);
@@ -349,14 +347,14 @@
   width: 260px; z-index: 40; pointer-events: auto; cursor: default;
   filter: drop-shadow(0 18px 30px rgba(20,18,15,.28));
 }
-.lmap-card-in { background: var(--l-card); border: 1px solid rgba(20,18,15,.16); border-radius: var(--hr-radius-l); overflow: hidden; }
+.lmap-card-in { background: var(--l-card); border: 1px solid rgba(20,18,15,.16); border-radius: 14px; overflow: hidden; }
 .lmap-card-photo {
   position: relative; height: 130px; background: var(--l-paper-2) center/cover no-repeat;
 }
 .lmap-card-veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,18,15,.28), transparent 45%); }
 .lmap-card-cat {
   position: absolute; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px 4px 8px; border-radius: var(--hr-radius-pill); background: rgba(245,241,233,.95); color: #3A342C;
+  padding: 4px 10px 4px 8px; border-radius: 999px; background: rgba(245,241,233,.95); color: #3A342C;
   font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
 }
 .lmap-card-x {
@@ -388,7 +386,7 @@
 .lmap-zoom { position: absolute; right: 40px; bottom: 34px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 4; }
 .lmap-zoom-box {
   display: flex; flex-direction: column; overflow: hidden;
-  background: rgba(245,241,233,.95); border: 1px solid rgba(20,18,15,.3); border-radius: var(--hr-radius-m);
+  background: rgba(245,241,233,.95); border: 1px solid rgba(20,18,15,.3); border-radius: 10px;
   box-shadow: 0 4px 14px rgba(20,18,15,.15);
 }
 .lmap-zoom-box button {
@@ -502,7 +500,7 @@
 .lmap-locator {
   position: relative; width: 148px; aspect-ratio: 1000 / 485;
   background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
-  border-radius: var(--hr-radius-m); overflow: hidden; cursor: crosshair;
+  border-radius: 10px; overflow: hidden; cursor: crosshair;
   box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
 }
 .lmap-locator svg { position: absolute; inset: 0; width: 100%; height: 100%; padding: 6px; box-sizing: border-box; }
@@ -516,11 +514,11 @@
 .lmap-pad {
   display: grid; grid-template-columns: repeat(3, 34px); grid-template-rows: repeat(3, 28px);
   background: rgba(245, 241, 233, .95); border: 1px solid rgba(20, 18, 15, .3);
-  border-radius: var(--hr-radius-m); overflow: hidden; box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
+  border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(20, 18, 15, .15);
 }
 .lmap-pad button {
   display: grid; place-items: center; background: none; border: 0; cursor: pointer;
-  color: var(--hr-body); font-size: 10px; font-family: inherit; /* Z5.03: bolo 70 % priehľadné */
+  color: rgba(20, 18, 15, .7); font-size: 10px; font-family: inherit;
   transition: background .14s ease, color .14s ease;
 }
 .lmap-pad button:hover { background: rgba(20, 18, 15, .07); color: #14120F; }
@@ -558,7 +556,7 @@
    Ikona v 26 px krúžku sama nepovie, ktorá kategória to je. Riadok legendy
    sa preto rozsvieti podľa bodu pod kurzorom (a podľa kliknutého, kým je
    karta otvorená). */
-.lmap-legend-row { padding: 3px 8px; margin: -3px -8px; border-radius: var(--hr-radius-s); transition: background .16s ease; }
+.lmap-legend-row { padding: 3px 8px; margin: -3px -8px; border-radius: 8px; transition: background .16s ease; }
 .lmap-legend-row.is-active { background: rgba(255, 255, 255, .07); }
 .lmap-legend-row.is-active .lmap-legend-name { color: var(--l-on-dark-2); font-weight: 600; }
 .lmap-legend-row.is-active .lmap-legend-n { color: var(--l-second); }
@@ -610,7 +608,7 @@
     touch-action: manipulation;
   }
   .lmap-open span {
-    padding: 10px 18px; border-radius: var(--hr-radius-pill);
+    padding: 10px 18px; border-radius: 999px;
     background: rgba(20, 18, 15, .82); color: var(--l-on-dark-2);
     font-family: 'Archivo', 'Inter', sans-serif; font-size: 13.5px; font-weight: 600;
     box-shadow: 0 6px 18px rgba(20, 18, 15, .35);
@@ -695,7 +693,7 @@
 }
 .lmap-sheet .lmap-card-in {
   display: grid; grid-template-columns: 122px minmax(0, 1fr);
-  align-items: stretch; border-radius: var(--hr-radius-l);
+  align-items: stretch; border-radius: 16px;
 }
 .lmap-sheet .lmap-card-photo { height: auto; min-height: 138px; }
 /* Závoj sprava, nie zhora — fotka teraz susedí s textom, nie s popisom. */
@@ -736,8 +734,8 @@
   background: rgba(20, 18, 15, .85); border: 0;
   appearance: none; -webkit-appearance: none; touch-action: none;
 }
-.lmap-fz-slider::-webkit-slider-runnable-track { width: 3px; border-radius: var(--hr-radius-pill); background: rgba(243, 237, 225, .35); }
-.lmap-fz-slider::-moz-range-track { width: 3px; border-radius: var(--hr-radius-pill); background: rgba(243, 237, 225, .35); }
+.lmap-fz-slider::-webkit-slider-runnable-track { width: 3px; border-radius: 999px; background: rgba(243, 237, 225, .35); }
+.lmap-fz-slider::-moz-range-track { width: 3px; border-radius: 999px; background: rgba(243, 237, 225, .35); }
 .lmap-fz-slider::-webkit-slider-thumb {
   appearance: none; -webkit-appearance: none;
   width: 22px; height: 22px; border-radius: 50%; margin-left: -10px;
@@ -831,12 +829,11 @@
   position: absolute; left: 7px; top: -7px;
   font-family: var(--mono); font-size: 9.5px; font-weight: 500;
   letter-spacing: .13em; text-transform: uppercase; white-space: nowrap;
-  /* Plná farba namiesto 70 % priehľadnej: na reliéfe mala menovka 2,3 : 1 (základ Z5.03). */
-  color: var(--hr-body);
+  color: rgba(20, 18, 15, .7);
   text-shadow: 0 0 3px var(--l-paper), 0 0 3px var(--l-paper), 0 0 7px var(--l-paper), 0 0 10px var(--l-paper);
 }
 .lmap-mesto.is-velke .lmap-mesto-b { width: 5px; height: 5px; background: rgba(20, 18, 15, .62); }
-.lmap-mesto.is-velke .lmap-mesto-n { font-size: 10.5px; font-weight: 600; color: var(--hr-ink); }
+.lmap-mesto.is-velke .lmap-mesto-n { font-size: 10.5px; font-weight: 600; color: rgba(20, 18, 15, .78); }
 
 /* Na snímke je pod textom fotografia, nie papier — obrys sa preto obracia. */
 .lmap.is-satelit .lmap-mesto-b { background: rgba(255, 255, 255, .9); box-shadow: 0 0 2px rgba(0, 0, 0, .8); }
@@ -853,7 +850,7 @@
    vyzerajú obe ako zapnuté. */
 .lmap-podklad {
   display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
-  margin: 0 0 14px; padding: 2px; border-radius: var(--hr-radius-m);
+  margin: 0 0 14px; padding: 2px; border-radius: 10px;
   background: rgba(255, 255, 255, .06);
   border: 1px solid rgba(255, 255, 255, .16);
 }
@@ -861,7 +858,7 @@
   padding: 8px 6px; border: 0; cursor: pointer;
   background: transparent; color: rgba(243, 237, 225, .55);
   font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em;
-  text-transform: uppercase; border-radius: var(--hr-radius-s);
+  text-transform: uppercase; border-radius: 8px;
   transition: background .16s ease, color .16s ease;
 }
 .lmap-podklad button:hover { color: rgba(243, 237, 225, .9); background: rgba(255, 255, 255, .07); }
