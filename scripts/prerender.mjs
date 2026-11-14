@@ -174,7 +174,7 @@ const STATIC_CUDZIE = {
     { path: '/aplikacia', title: 'Phone app — Hradiská.sk', description: 'The hillfort encyclopedia as an Android app. The hillfort map works without signal, with notifications about replies and new articles.' },
   ],
   de: [
-    { path: '/', title: 'Hradiská.sk — Enzyklopädie der slawischen Burganlagen in der Slowakei', description: 'Enzyklopädie der slawischen und urgeschichtlichen Burganlagen in der Slowakei — Geschichte, Archäologie, Fundorte und Schriftquellen. Über 300 Artikel über Burganlagen, ihre Bewohner und Funde.' },
+    { path: '/', title: 'Hradiská.sk — Enzyklopädie der Burgwälle der Slowakei', description: 'Enzyklopädie der slawischen und urgeschichtlichen Burganlagen in der Slowakei — Geschichte, Archäologie, Fundorte und Schriftquellen. Über 300 Artikel über Burganlagen, ihre Bewohner und Funde.' },
     { path: '/galeria', title: 'Galerie der Burganlagen und Funde', description: 'Fotogalerie der Burganlagen, archäologischen Funde, Zeichnungen und 3D-Rekonstruktionen von Hradiska.sk.' },
     { path: '/aktuality', title: 'Aktuelles — Chronik des Vereins Hradiská', description: 'Neuigkeiten, Veranstaltungen und Tätigkeit des Bürgervereins Hradiská bei der Erforschung und dem Schutz der Burganlagen.' },
     { path: '/ochrana-osobnych-udajov', title: 'Datenschutz — Hradiská.sk', description: 'Wie personenbezogene Daten verarbeitet werden (DSGVO) — Konten, Kommentare, Cookies und Rechte der betroffenen Personen.' },
