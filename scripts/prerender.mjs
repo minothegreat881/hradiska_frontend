@@ -124,8 +124,11 @@ function buildHead({ title, description, canonical, ogType = 'website', image = 
   return lines.join('\n      ');
 }
 
-function writePage(urlPath, head) {
-  const html = before + '\n      ' + head + '\n      ' + after;
+/* `<html lang>` podľa jazyka stránky (audit, úloha 3 bod 4): anglická a nemecká
+   verzia dostanú správny jazyk dokumentu už zo servera, nie až po spustení JS. */
+function writePage(urlPath, head, jazyk = 'sk') {
+  const zaciatok = jazyk === 'sk' ? before : before.replace('<html lang="sk">', `<html lang="${jazyk}">`);
+  const html = zaciatok + '\n      ' + head + '\n      ' + after;
   const dir = urlPath === '/' ? dist : join(dist, urlPath.replace(/^\//, ''));
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'index.html'), html, 'utf8');
@@ -293,7 +296,7 @@ async function main() {
       description: en.metaDescription || en.excerpt || '',
       canonical, ogType: 'article', image, publishedTime: en.date, ld: [article],
       alternaty, jazyk: jazykVerzie,
-    }));
+    }), jazykVerzie);
     m++;
   }
   }

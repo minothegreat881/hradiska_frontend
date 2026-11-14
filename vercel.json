@@ -2037,6 +2037,14 @@
       "destination": "http://188.245.47.29/:path*"
     },
     {
+      "source": "/en/(.*)",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/de/(.*)",
+      "destination": "/de/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
