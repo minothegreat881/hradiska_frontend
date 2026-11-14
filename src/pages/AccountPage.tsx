@@ -134,7 +134,7 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
     <div style={wrap}>
       <form style={card} onSubmit={submit} noValidate>
         <h1 style={H1}>{titles[mode][0]}</h1>
-        <p style={sub}>{titles[mode][1]}</p>
+        <p className="lacc-sub" style={sub}>{titles[mode][1]}</p>
 
         {ok && <Notice tone="ok">{ok}</Notice>}
         {err && <Notice tone="err">{err}</Notice>}

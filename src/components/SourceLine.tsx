@@ -93,7 +93,7 @@ export function SourceLine({ text, url }: { text: string; url?: string }) {
   if ((!text.trim() || holaAdresa) && (odkaz || holaAdresa)) {
     const href = odkaz || holaAdresa;
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="source-link" title={href}>
+      <a href={href} className="source-link" title={href}>
         <ExternalLink aria-hidden="true" style={{ width: 13, height: 13, flexShrink: 0 }} />
         {shortUrl(href)}
       </a>
@@ -109,7 +109,7 @@ export function SourceLine({ text, url }: { text: string; url?: string }) {
       {odkaz && (
         <>
           {' '}
-          <a href={odkaz} target="_blank" rel="noopener noreferrer" className="source-link" title={odkaz}>
+          <a href={odkaz} className="source-link" title={odkaz}>
             <ExternalLink aria-hidden="true" style={{ width: 13, height: 13, flexShrink: 0 }} />
             {shortUrl(odkaz)}
           </a>

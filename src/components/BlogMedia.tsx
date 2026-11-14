@@ -151,8 +151,6 @@ function Figcaption({ caption, credit, sourceUrl, align = 'center', show = true 
         sourceUrl ? (
           <a
             href={sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             className="text-amber-700 dark:text-amber-500 hover:underline"
           >
             {credit}

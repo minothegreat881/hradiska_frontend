@@ -94,7 +94,7 @@ function TeloSK() {
             </ul>
             <p style={{ marginTop: 8 }}>
               Máte tiež právo podať sťažnosť dozornému orgánu — <strong>Úrad na ochranu osobných údajov SR</strong>{' '}
-              (<a href="https://dataprotection.gov.sk" target="_blank" rel="noopener noreferrer" style={LINK}>dataprotection.gov.sk</a>).
+              (<a href="https://dataprotection.gov.sk" style={LINK}>dataprotection.gov.sk</a>).
             </p>
           </section>
 
@@ -196,7 +196,7 @@ function TeloEN() {
             <p style={{ marginTop: 8 }}>
               You also have the right to lodge a complaint with the supervisory authority — the{' '}
               <strong>Office for Personal Data Protection of the Slovak Republic</strong>{' '}
-              (<a href="https://dataprotection.gov.sk" target="_blank" rel="noopener noreferrer" style={LINK}>dataprotection.gov.sk</a>).
+              (<a href="https://dataprotection.gov.sk" style={LINK}>dataprotection.gov.sk</a>).
             </p>
           </section>
 
@@ -298,7 +298,7 @@ function TeloDE() {
             <p style={{ marginTop: 8 }}>
               Ihnen steht außerdem das Recht auf Beschwerde bei der Aufsichtsbehörde zu — beim{' '}
               <strong>Amt für den Schutz personenbezogener Daten der Slowakischen Republik</strong>{' '}
-              (<a href="https://dataprotection.gov.sk" target="_blank" rel="noopener noreferrer" style={LINK}>dataprotection.gov.sk</a>).
+              (<a href="https://dataprotection.gov.sk" style={LINK}>dataprotection.gov.sk</a>).
             </p>
           </section>
 

@@ -341,7 +341,13 @@ export function HeroSearch() {
     /* Šírka a tvar podľa handoffu „Celé hradisko": pilulka 780 × 72.
        Zaoblenie 999 px namiesto 18 — bar leží na spodnej hrane fotografie
        a hranatý roh tam pôsobil ako odrezaný kus obrazu. */
-    <div className="relative w-full max-w-[780px] mx-auto">
+    /* `form role="search"`: jediné pole s viditeľným tlačidlom „Hľadať" — tlačidlo
+       je jeho popis (WCAG G167, základ Z3.10); Enter bez otvorenej roletky odošle. */
+    <form
+      role="search"
+      className="relative w-full max-w-[780px] mx-auto"
+      onSubmit={(e) => { e.preventDefault(); if (trimmed) openResultsPage(); else inputRef.current?.focus(); }}
+    >
       <div
         onPointerDown={() => { prisloMysou.current = true; }}
         style={{
@@ -508,11 +514,10 @@ export function HeroSearch() {
               objaví až keď je čo odoslať, a na dotykovej obrazovke klávesu
               Enter nikto nehľadá. */}
           <button
-            type="button"
+            type="submit"
             /* Prázdne pole tlačidlo NEVYPÍNA — zoslabnutá terakota vyzerala
-               ako chyba a v handoffe je tlačidlo stále plné. Klik bez zadania
-               postaví kurzor do poľa, čo je to jediné zmysluplné. */
-            onClick={() => (trimmed ? openResultsPage() : inputRef.current?.focus())}
+               ako chyba a v handoffe je tlačidlo stále plné. Odoslanie bez
+               zadania postaví kurzor do poľa (`onSubmit` formulára). */
             className="hero-search-odoslat"
           >
             {t('Hľadať')}
@@ -637,6 +642,6 @@ export function HeroSearch() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </form>
   );
 }

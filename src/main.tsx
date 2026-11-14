@@ -17,10 +17,14 @@
 
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import { MotionConfig } from "motion/react";
 import "./index.css";
 import { initPwa } from "./lib/pwa";
 
 // PWA: service worker + odchyt inštalačnej ponuky + počítadlo návštev.
 initPwa();
 
-createRoot(document.getElementById("root")!).render(<App />);
+/* `reducedMotion="user"`: pri systémovom „obmedziť pohyb" knižnica animácií
+   vypne posuny a zmeny mierky (základ Z10.02, WCAG 2.3.3). CSS animácie
+   rieši pravidlo na konci `theme.css`. */
+createRoot(document.getElementById("root")!).render(<MotionConfig reducedMotion="user"><App /></MotionConfig>);

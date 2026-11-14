@@ -147,9 +147,7 @@ export function LabFooter() {
                     key={`${i}:${s.druh}`}
                     href={s.url}
                     aria-label={ikona.label}
-                    {...(s.url.startsWith('http')
-                      ? { target: '_blank', rel: 'noopener noreferrer' }
-                      : {})}
+                    /* V tom istom okne (základ Z1.01) — aj odkaz na sieť. */
                     data-vw={vw(upravy, `pata:siet:${s.druh}`)}
                   >
                     <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

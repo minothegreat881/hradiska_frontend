@@ -404,8 +404,6 @@ function renderInlineChildren(children: any[] = []): React.ReactNode[] {
         <a
           key={ci}
           href={child.url}
-          target="_blank"
-          rel="noopener noreferrer"
           className="text-amber-700 dark:text-amber-400 underline hover:text-amber-900 dark:hover:text-amber-300 break-words"
         >
           {linkText}
