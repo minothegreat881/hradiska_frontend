@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { ArticleCard } from '../components/ArticleCard';
 import { hradiskaCategories } from '../data/categories';
 import { useBlogPosts, useCategory } from '../hooks/useStrapi';
+import { getBlogPosts, convertStrapiPostToArticle } from '../lib/strapi';
 import { Crown, Scroll } from 'lucide-react';
 import { Nacitavanie } from '../design-lab/Nacitavanie';
 import { t, odkaz } from '../lib/jazyk';
@@ -22,6 +23,9 @@ interface CategoryPageProps {
 }
 
 /** Zoradenie vzhľadu → `sort` pre Strapi. Predvolené je dnešné správanie. */
+/** Koľko článkov sa načíta naraz (prvá strana aj každé „Zobraziť ďalšie"). */
+const STRANA = 50;
+
 const RADENIE: Record<ZoradenieClankov, string> = {
   zverejnenie: 'publishedAt:desc',
   'povodny-datum': 'originalPublishedDate:desc',
@@ -43,11 +47,35 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
 
   // Fetch articles for this category from Strapi
   const zoradenie = vk?.clanky.zoradenie ?? 'zverejnenie';
-  const { posts: strapiArticles, loading: articlesLoading, error } = useBlogPosts({
+  const { posts: strapiArticles, pagination, loading: articlesLoading, error } = useBlogPosts({
     categorySlug: categorySlug,
-    pageSize: 50,
+    pageSize: STRANA,
     sort: RADENIE[zoradenie],
   });
+
+  /* „Zobraziť ďalšie" (základ: zoznam = karty → „Zobraziť ďalšie“ alebo stránkovanie;
+     audit, úloha 3 bod 5). Predtým sa ukázalo najviac 50 článkov a zvyšok
+     nebolo vidno vôbec (Aktuality 50 z 80). Ďalšie strany sa pripájajú pod
+     doterajšie, poradie a pripnuté ostávajú. */
+  const [dalsie, setDalsie] = useState<ReturnType<typeof convertStrapiPostToArticle>[]>([]);
+  const [nacitavaDalsie, setNacitavaDalsie] = useState(false);
+  const [chybaDalsich, setChybaDalsich] = useState(false);
+  useEffect(() => { setDalsie([]); setChybaDalsich(false); }, [categorySlug, zoradenie]);
+  const celkom: number | null = typeof pagination?.total === 'number' ? pagination.total : null;
+  const nacitanych = (strapiArticles?.length ?? 0) + dalsie.length;
+  const zobrazitDalsie = async () => {
+    setNacitavaDalsie(true);
+    setChybaDalsich(false);
+    try {
+      const strana = Math.floor(nacitanych / STRANA) + 1;
+      const r = await getBlogPosts({ categorySlug, page: strana, pageSize: STRANA, sort: RADENIE[zoradenie] });
+      setDalsie((d) => [...d, ...r.posts.map(convertStrapiPostToArticle)]);
+    } catch {
+      setChybaDalsich(true);
+    } finally {
+      setNacitavaDalsie(false);
+    }
+  };
 
   /* Obrázok z médií, ktorý sa nenačíta, vymení záložný obrázok kategórie.
      Hlavička je CSS pozadie (nemá `onError`), preto sa súbor overí vopred. */
@@ -105,7 +133,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
   /* Pripnuté články idú na začiatok v zadanom poradí; zvyšok podľa radenia.
      Pripnutý článok, ktorý v jazyku stránky nie je, sa preskočí. */
   const pripnute = (vk?.clanky.pripnute ?? []).filter((c) => !!clanokVJazyku(c, rozriesene));
-  const vsetky = strapiArticles || [];
+  const vsetky = [...(strapiArticles || []), ...dalsie.filter((a) => !(strapiArticles || []).some((b) => b.id === a.id))];
   const napred = pripnute
     .map((c) => vsetky.find((a) => (c.dokument ? a.id === c.dokument : a.slug === c.slug)))
     .filter((a): a is (typeof vsetky)[number] => !!a);
@@ -301,6 +329,20 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
                 <ArticleCard key={article.id} article={article} stitok={false} znak={skusobnyZnak} dataVw={vw(upravy, `kategoria:clanok:${i}`)} dataVwDokument={upravy ? String(article.id) : undefined} />
               ))}
             </div>
+
+            {celkom !== null && celkom > STRANA && (
+              <div className="cat-dalsie">
+                <p className="cat-dalsie-pocet" aria-live="polite">
+                  {t('Zobrazených')} {Math.min(nacitanych, celkom)} {t('z')} {celkom}
+                </p>
+                {nacitanych < celkom && (
+                  <button type="button" className="cat-dalsie-btn" onClick={() => void zobrazitDalsie()} disabled={nacitavaDalsie}>
+                    {nacitavaDalsie ? t('Načítavam…') : `${t('Zobraziť ďalšie')} (${Math.min(STRANA, celkom - nacitanych)})`}
+                  </button>
+                )}
+                {chybaDalsich && <p role="alert" className="cat-dalsie-chyba">{t('Ďalšie články sa nepodarilo načítať. Skúste to znova.')}</p>}
+              </div>
+            )}
           </div>
         </section>
       )}

@@ -3671,6 +3671,19 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 }
 .disk:not(.is-otvorena) .disk-ciara { margin-bottom: 0; }
 
+/* ── Zoznam kategórie: „Zobraziť ďalšie" (audit, úloha 3 bod 5) ───────────── */
+.cat-dalsie { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 40px 0 8px; }
+.cat-dalsie-pocet { margin: 0; font-family: var(--font-body); font-size: 14px; color: var(--hr-muted); }
+.cat-dalsie-btn {
+  min-height: 48px; padding: 0 28px; border-radius: var(--hr-radius-pill); cursor: pointer;
+  border: 1px solid var(--hr-line-gold); background: var(--hr-surface); color: var(--hr-ink);
+  font-family: var(--font-body); font-size: 15px; font-weight: 600;
+}
+.cat-dalsie-btn:hover { background: var(--hr-surface-3); }
+.cat-dalsie-btn:disabled { cursor: progress; opacity: .7; }
+.cat-dalsie-btn:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 2px; }
+.cat-dalsie-chyba { margin: 0; font-family: var(--font-body); font-size: 14px; color: var(--hr-error-text); }
+
 .lakt-rok { margin-bottom: 54px; }
 .lakt-rok-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }
 .lakt-rok-h h2 {
