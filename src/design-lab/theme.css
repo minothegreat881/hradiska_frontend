@@ -2506,6 +2506,10 @@ body[data-lab-theme='pecat'],
   columns: var(--hgal-stlpcov, 3); column-gap: 12px;
 }
 .lart .hgal-mriezka > * { break-inside: avoid; margin: 0 0 12px; display: block; }
+/* Tlačidlo fotky sa prispôsobovalo obsahu: kým sa odložená fotka nestiahla,
+   malo 2 px na šírku (cieľ pod 24 px, WCAG 2.5.8). Po stiahnutí má aj tak šírku
+   stĺpca – teraz ju má od začiatku, vzhľad sa nemení. */
+.lart .hgal-mriezka > button { width: 100%; }
 .lart [style*='aspect-ratio: 4 / 3'] { aspect-ratio: auto !important; height: auto !important; }
 .lart [style*='aspect-ratio: 4 / 3'] > img,
 .lart [style*='aspect-ratio: 4 / 3'] .absolute {
@@ -3142,6 +3146,9 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
   text-transform: uppercase; color: var(--l-muted);
 }
 .lgal-omrvinky a { color: var(--l-second-deep); text-decoration: none; }
+/* Cieľ aspoň 24 px (WCAG 2.5.8): odkaz mal 12 px na výšku. Plocha rastie vnútorným
+   odsadením, záporný okraj drží riadok – nič sa neposunie. */
+.lgal-omrvinky a { display: inline-block; padding-block: 6px; margin-block: -6px; }
 .lgal-omrvinky a:hover { text-decoration: underline; }
 
 .lgal-hlava { max-width: 62ch; margin-bottom: 30px; }

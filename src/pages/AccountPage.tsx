@@ -38,6 +38,9 @@ const linkBtn: React.CSSProperties = {
   background: 'none', border: 'none', color: 'var(--hr-accent)', cursor: 'pointer',
   fontFamily: 'Georgia, serif', fontSize: 14, textDecoration: 'underline', padding: 0,
 };
+/* Samostatné tlačidlo-odkaz (nie vo vete): cieľ aspoň 24 px (WCAG 2.5.8) – mal 21 px.
+   Plocha rastie odsadením, záporný okraj drží rozloženie. */
+const linkBtnSam: React.CSSProperties = { ...linkBtn, display: 'inline-block', padding: '2px 0', margin: '-2px 0' };
 const H1: React.CSSProperties = {
   fontFamily: 'Georgia, "Times New Roman", serif', fontSize: 26, fontWeight: 600,
   color: 'var(--hr-ink)', margin: '0 0 6px', textAlign: 'center',
@@ -205,13 +208,13 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
             </span>
           )}
           {(mode === 'forgot' || mode === 'reset') && (
-            <button type="button" style={linkBtn} onClick={() => go(odkaz('/prihlasenie'))}>{t('Späť na prihlásenie')}</button>
+            <button type="button" style={linkBtnSam} onClick={() => go(odkaz('/prihlasenie'))}>{t('Späť na prihlásenie')}</button>
           )}
         </div>
 
         {mode === 'register' && ok && (
           <div style={{ textAlign: 'center', marginTop: 14 }}>
-            <button type="button" style={linkBtn}
+            <button type="button" style={linkBtnSam}
                     onClick={() => resendConfirmation(email.trim()).then(() => setOk(t('Overovací e-mail sme poslali znova.'))).catch(() => {})}>
               {t('Neprišiel e-mail? Poslať znova')}
             </button>
