@@ -28,11 +28,15 @@ aktuality `vyprava-polske-hradiska-2-…` · poloha a časová os `nitra`.
 ## Postup
 
 - [x] Vetva, pracovný strom, merací projekt
-- [ ] Východisko (úplné meranie) – beží
+- [x] Východisko: 1680 výsledkov – prešlo 681, neprešlo 617 (chyby 92, odporúčania 525), na posúdenie 13, neuplatňuje sa 325, nezmerané 44
 - [x] Úloha 1: K1 – K5 (web, editor, backend na vetve, testy) – pozri nižšie
-- [ ] Úloha 2: posudok, zjednotenie, dávky opráv, overenie
-- [ ] Úloha 3: nálezy z auditu 1 – 10, zoznam na rozhodnutie
-- [ ] Správa (súbor + chat)
+- [x] Úloha 2: posudok (`docs/POSUDOK.md`), zjednotenie (`docs/STYL.md`), dávky 1 – 5, overenie (konečné meranie `projekt-konecny`)
+- [x] Konečné meranie: 52 zhoršení voči východisku → 19 z vetvy opravených (1305522, fe1af9a), 2 chyba nástroja (opravená
+  v zaklad-webov d65f7f7). Úplné premeranie opravenej stavby `projekt-oprava` beh 2026-11-14T16-51-25: prešlo 880, neprešlo 424
+  (chyby 38, odporúčania 386), na posúdenie 72, neuplatňuje sa 266, nezmerané 38. Zostáva 31 „zhoršení“, nie webu:
+  28 navštívené odkazy (zmerateľné až s `<main>`), 2 kontrast mapy pod článkom (K5; oprava 2a), 1 prvý Tab (nástroj; oprava 2d)
+- [x] Úloha 3: body 1 – 10 (každý vlastný commit), zoznam na rozhodnutie a „Pred spustením“ v správe
+- [x] Správa: `SPRAVA-ZAKLAD-2026-11-14.md`
 
 ## Úloha 1 – čo je hotové
 
@@ -82,7 +86,26 @@ Bočný panel starého webu (www.hradiska.sk, Blogger) → nové adresy podľa p
 
 ## Rozhodnutia a konflikty
 
-(zapisujú sa priebežne)
+(zapisujú sa priebežne; úloha 2 a 3 – súhrn aj v správe, sekcia 5)
+
+- **Úloha 2 – rozsah zjednotenia:** zaoblenia na stupnicu tokenov, staré inline farby článku → tokeny podľa prekladovej vrstvy.
+  Veľkosti písma a odstupy NEzjednotené (menili by schválený vzhľad) – návrh v docs/STYL.md.
+- **„Jedno meno pre kategóriu“** – zadanie úlohy 2 ho žiada zjednotiť, doplnok z auditu „navrhni, rozhodne Peter“. Platí doplnok
+  (konkrétnejší): len návrh v docs/STYL.md, nič premenované.
+- **L15.01 (farba odkazov)** – menovky kroniky, citát „Pridajte sa“, nadpisy a menovky pobočného stĺpca, zdroje citátov,
+  roky časovej osi: z pečatnej červenej do --hr-ink / --hr-body. Pravidlo vysokej závažnosti, recept mechanický.
+- **Z1.01 (nové okná)** – odkazy v obsahu, zdroje, mapa, päta, ochrana údajov v tom istom okne; zdieľanie na siete ostáva
+  v novom okne (zdieľacie okno, používateľ ostáva pri článku) – výnimka.
+- **Z10.03 (16 px na mobile)** – len text tela; nadčiary, menovky, dátumy, súradnice, atribúcia mapy nie sú text tela.
+- **Kontrast „text nad obrázkom“ pri kartách článkov** – nález nástroja (1,03 : 1) je chybné zaradenie papierovej textúry
+  ako obrázka; text na snímke stojí na papieri pod fotkou. Nemenené, zapísané.
+- **Úloha 3 bod 6** – náhľad pred vloženým obsahom je neutrálny (bez obrázka zo služby – aj ten by bol požiadavkou na YouTube).
+- **Úloha 3 bod 10** – formulár pripraví e-mail (mailto s predmetom a textom). Čo treba na skutočné odosielanie: endpoint
+  v Strapi (`POST /api/kontakt` – overenie polí, limit požiadaviek, captcha alebo časová pasca), odosielanie cez nodemailer
+  (SMTP 587 STARTTLS – Hetzner blokuje 465), adresát z vzhľadu (`domov.pridajteSa.email`), záznam do DB pre prípad výpadku
+  pošty, odpoveď 202 a až potom „Správu sme prijali“.
+- **Úloha 3 bod 5** – „Zobraziť ďalšie“ po 50 (prvá strana ako predtým), nie stránkovanie: základ pripúšťa obe, tlačidlo
+  nemení adresy ani prerender.
 
 - Mŕtva cesta `/sites/<slug>` (SiteDetailPage nad mock dátami) – žiadny živý odkaz na ňu nevedie; nemeria sa, ide do zoznamu mŕtveho kódu.
 - „Prevziať dobré vizuálne prvky zo ZaPA“ (pokyn Milana) len tam, kde nejde o zmenu rozloženia, písma ani farebnosti
