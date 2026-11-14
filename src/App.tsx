@@ -343,12 +343,18 @@ function App() {
        Starý zlatohnedý šat je v značke `stary-sat-2026-08-18`. */
     <VzhladProvider>
     <div className="min-h-screen lab" data-theme="pecat">
+      {/* Prvá zastávka klávesnice: preskočí hlavičku s dvanástimi kategóriami
+          (základ KG.02, WCAG 2.4.1). Mimo obrazovky, kým nie je zameraný. */}
+      <a className="lab-skip" href="#lab-obsah">{t('Preskočiť na obsah')}</a>
       <LabNav />
 
       {/* Rozcestník kategórií, ktorý sa vysunie pri posune nahor — na celom
           webe, teda aj v článku a na stránke kategórie. Viď komponent. */}
       <LabKategorieVysuv />
 
+      {/* Hlavný obsah stránky (základ KG.04): cieľ odkazu „Preskočiť na obsah"
+          a orientačný bod pre čítačku. Hlavička, päta a lišty sú mimo. */}
+      <main id="lab-obsah" tabIndex={-1}>
       <Suspense fallback={
         /* Celá výška okna, nie 60 vh: pri nižšej hodnote sa počas načítania
            vysunie do obrazu pätička a po dotiahnutí stránky zasa odskočí. */
@@ -367,6 +373,7 @@ function App() {
         {route === 'hladat' && <SearchResultsPage query={params.q} />}
         {route === 'notfound' && <NotFoundPage />}
       </Suspense>
+      </main>
 
       <Toaster position="top-center" />
 

@@ -108,7 +108,9 @@ function PrepinacJazyka() {
       hrefLang={cielovyJazyk}
       lang={cielovyJazyk}
       title={popis}
-      aria-label={popis}
+      /* Viditeľná skratka musí byť v prístupnom názve (WCAG 2.5.3) —
+         hlasové ovládanie hľadá „EN", nie „Switch to English". */
+      aria-label={`${skratka} – ${popis}`}
     >
       {/* Zemeguľa s poludníkmi — zrozumiteľná bez textu a bez vlajky
           (vlajka by jazyk zamieňala s krajinou). */}
