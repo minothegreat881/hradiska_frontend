@@ -194,6 +194,15 @@ export function vycistiNeplatne(v: Vzhlad, k: { kategorie: Set<string>; clanky: 
   for (const s of v.pata.stlpce) {
     s.odkazy = s.odkazy.filter((o) => (o.ciel.druh === 'kategoria' ? katOk(o.ciel.kategoria) : o.ciel.druh === 'clanok' ? clOk(o.ciel.clanok) : true));
   }
+  /* Voľné odkazy ostávajú aj bez cieľa či obrázka — web ich vtedy nenakreslí
+     a editor ich ukáže na doplnenie (zmazať ich má redaktor, nie program). */
+  for (const z of [v.domov.odkazy, v.cinnost.tlacidla, v.cinnost.odkazy]) {
+    for (const o of z?.polozky ?? []) {
+      if (o.ciel?.druh === 'kategoria' && !katOk(o.ciel.kategoria)) o.ciel = null;
+      if (o.ciel?.druh === 'clanok' && !clOk(o.ciel.clanok)) o.ciel = null;
+      if (!obrOk(o.obrazok as never)) o.obrazok = null;
+    }
+  }
 }
 
 /* ───────────────────────── Menu ───────────────────────── */

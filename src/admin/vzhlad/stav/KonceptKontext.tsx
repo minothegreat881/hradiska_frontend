@@ -32,6 +32,7 @@ import type { KonfliktDb } from '../../../lib/vzhlad/zlucenie';
 import type { Vzhlad, ZakladDb, OdpovedKonceptu, Rozriesene, ChybaVzhladu, Subor } from '../../../lib/vzhlad/typy';
 import { kopia, type KategoriaVDb } from './operacie';
 import { prevezmiZDb, prevezmiKonflikty, ponechajMoje } from './rebase';
+import { doplnVolneOdkazy } from './volneOdkazy';
 
 /* ───────────────────────── Typy ───────────────────────── */
 
@@ -215,6 +216,21 @@ export function KonceptProvider({ children }: { children: ReactNode }) {
       }
       const zakladServera = o.koncept ? o.zakladDb : o.db;
       const rb = prevezmiZDb(zaklad, zakladServera, o.db, kat);
+      /* Rad odkazov pod hľadaním a tlačidlá pod činnosťou: staršie koncepty
+         ich nemajú (web vtedy kreslí základ z kódu) — doplnia sa z toho istého
+         základu, aby editor ukazoval to, čo web. Uloží sa to ako zmena. */
+      const dopl = await doplnVolneOdkazy(tok, rb.koncept, kat, o.db.fotogaleria);
+      if (dopl.doplnene.length) {
+        rb.koncept = dopl.koncept;
+        rb.prevzate = [...rb.prevzate, ...dopl.doplnene.map((d) => `${d} zo základného vzhľadu`)];
+        setNavyse((n) => {
+          const clanky = { ...n.clanky };
+          for (const c of dopl.clanky) clanky[c.dokument] = { ...(clanky[c.dokument] ?? {}), ...c.jazyky };
+          const subory = { ...n.subory };
+          for (const f of dopl.subory) subory[String(f.id)] = f;
+          return { ...n, clanky, subory };
+        });
+      }
       historia.reset(rb.koncept);
       setZakladDb(rb.zakladDb);
       /* Prevzatie hodnôt z DB, ktoré zmenilo koncept, treba uložiť — nech ho

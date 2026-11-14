@@ -15,8 +15,14 @@ import { useKoncept, type Stranka } from './stav/KonceptKontext';
 import type { OpisPrvku } from './prvky';
 import {
   PoliaPrvku, EditorUvodu, EditorDlazdic, EditorHladania, EditorSekcii, EditorDalsiehoObsahu, EditorCinnosti,
-  EditorKroniky, EditorPridajteSa, EditorKategorie, EditorMenu, EditorPaty,
+  EditorKroniky, EditorPridajteSa, EditorKategorie, EditorMenu, EditorPaty, EditorVolnychOdkazov,
 } from './oblasti';
+import type { KdeOdkazy } from './stav/volneOdkazy';
+
+/** Značka voľného odkazu → zoznam (rad pod hľadaním, tlačidlá, odkazy pod činnosťou). */
+const KDE: Record<string, KdeOdkazy> = {
+  odkazy: 'domov', odkaz: 'domov', tlacidla: 'tlacidla', tlacidlo: 'tlacidla', 'odkazy-cinnosti': 'cinnost', 'odkaz-cinnosti': 'cinnost',
+};
 import { Prepinac } from './polia';
 import { indexZaznamu } from './stav/operacie';
 
@@ -77,6 +83,8 @@ export function PravyPanel({ stranka, opis, jazyk, onJazyk, onZrusVyber, upozorn
       case 'menu': case 'menu-riadok': return <EditorMenu {...p} />;
       case 'pata-stlpec': case 'pata-odkaz': return <EditorPaty {...p} lenStlpec={c[0] === 'pata' ? c[2] : undefined} />;
       case 'pata-siet': return <EditorPaty {...p} />;
+      case 'volne-odkazy': return <EditorVolnychOdkazov {...p} kde={KDE[c[0]]} />;
+      case 'volny-odkaz': return <EditorVolnychOdkazov {...p} kde={KDE[c[0]]} lenId={c[1]} />;
       case 'lista': return <EditorKategorie {...p} slug={c.slice(1).join(':')} />;
       case 'kategoria-clanok': return stranka.druh === 'kategoria' ? <EditorKategorie {...p} slug={stranka.slug} /> : null;
       default:

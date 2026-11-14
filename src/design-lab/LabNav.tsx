@@ -21,7 +21,7 @@ import { poSlovensky, t, kategoria, odkaz, rozdelAdresu, druhyJazyk, odkazDoJazy
  * Farby idú výhradne cez tokeny `--hr-*`.
  */
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { useNavigationData } from '../hooks/useNavigationData';
 import { AccountNavLink } from '../components/AccountNavLink';
 import { Nacitavanie } from './Nacitavanie';
@@ -154,6 +154,15 @@ export function LabNav({ rozbalene = false }: {
   const [overflow, setOverflow] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   /**
+   * Prvá kategória hlavného radu, ktorá sa už nezmestí celá (priority+).
+   * Pri 1440 px sa rad šiestich typov odrezal za „Staroveké sídla" a dala sa
+   * len uhádnuť; s ďalšou kategóriou (požiadavka K1, „Stredoveké hrádky")
+   * by sa odrezalo ešte viac. Čo sa nezmestí, sa skryje a na konci radu je
+   * tlačidlo „Ďalšie", ktoré otvorí register všetkých kategórií.
+   * Na plátne editora nie — tam sa kategórie ťahajú medzi radmi.
+   */
+  const [prvaMimo, setPrvaMimo] = useState<{ i: number; x: number } | null>(null);
+  /**
    * Mobilná ponuka. Dva rady kategórií, ktoré sa na počítači vysúvajú myšou,
    * sú na dotyku nedosiahnuteľné — druhý rad sa rozvinie iba pri `hover`,
    * ktorý na telefóne neexistuje. Preto má telefón vlastnú ponuku: zoznam
@@ -178,6 +187,30 @@ export function LabNav({ rozbalene = false }: {
       document.removeEventListener('keydown', onEsc);
     };
   }, [open]);
+
+  /* Priority+: koľko kategórií hlavného radu sa zmestí celých. Kategórie
+     mimo sa len skrývajú (`visibility`), takže šírky sa dajú merať znova. */
+  useEffect(() => {
+    const row = catsRef.current?.querySelector('.lnav-cats-row') as HTMLElement | null;
+    if (!row || upravy) { setPrvaMimo(null); return; }
+    const REZERVA = 112; /* tlačidlo „Ďalšie" */
+    const meraj = () => {
+      const r = row.getBoundingClientRect();
+      if (!r.width) return;
+      const kat = Array.from(row.querySelectorAll<HTMLElement>(':scope > .lnav-cat'));
+      const pravy = (el: HTMLElement) => el.getBoundingClientRect().right - r.left;
+      const posledna = kat[kat.length - 1];
+      if (!posledna || pravy(posledna) <= r.width + 1) { setPrvaMimo(null); return; }
+      const i = Math.max(1, kat.findIndex((el) => pravy(el) > r.width - REZERVA));
+      /* Tlačidlo hneď za poslednou viditeľnou kategóriou, nie na kraji radu. */
+      const x = Math.round(pravy(kat[i - 1]) + 4);
+      setPrvaMimo((p) => (p && p.i === i && p.x === x ? p : { i, x }));
+    };
+    meraj();
+    const ro = new ResizeObserver(meraj);
+    ro.observe(row);
+    return () => ro.disconnect();
+  }, [items, upravy, vzhlad, rozriesene]);
 
   useEffect(() => {
     const el = catsRef.current?.querySelector('.lnav-cats-row') as HTMLElement | null;
@@ -247,14 +280,21 @@ export function LabNav({ rozbalene = false }: {
             obsah") z nej odišiel: to isté je v roletke, kde má aj miesto na
             poriadny register. Hlavička tým získala riadok a prestala sa
             zalamovať. */}
-        <div className="lnav-cats" ref={catsRef} data-overflow={overflow ? 'true' : undefined} data-scrolled={scrolled ? 'true' : undefined}>
-          {(rozvinute ? rows : rows.slice(0, 1)).map(row => (
+        <div
+          className="lnav-cats"
+          ref={catsRef}
+          data-overflow={overflow && prvaMimo === null ? 'true' : undefined}
+          data-scrolled={scrolled ? 'true' : undefined}
+          data-priority={prvaMimo !== null ? 'true' : undefined}
+          style={prvaMimo ? ({ '--lnav-viac-x': `${prvaMimo.x}px` } as CSSProperties) : undefined}
+        >
+          {(rozvinute ? rows : rows.slice(0, 1)).map((row, ri) => (
             <div className="lnav-cats-row" key={row.label} data-secondary={row.label === t('Ďalší obsah') ? 'true' : undefined} data-vw={vw(upravy, row.znacka)}>
               {/* Názov nesie len druhý rad — ten sa vysúva a treba povedať, čo
                   pribudlo. Prvý rad je hlavná navigácia a popisovať ju je šum;
                   navyše tým získa 122 px, vďaka čomu sa zmestí na jeden riadok. */}
               {row.label === t('Ďalší obsah') && <span className="lnav-rowlabel">{row.label}</span>}
-              {row.items.map(cat => (
+              {row.items.map((cat, ci) => (
                 <CatButton
                   key={cat.label}
                   cat={cat}
@@ -262,6 +302,7 @@ export function LabNav({ rozbalene = false }: {
                   plny={plnyNazov(cat, vzhlad, rozriesene)}
                   znacka={vw(upravy, `menu:${catSlug(cat)}`)}
                   skryta={jeSkryta(cat)}
+                  mimo={ri === 0 && prvaMimo !== null && ci >= prvaMimo.i}
                   open={open?.label === cat.label}
                   onToggle={(left) => {
                     // Zoznam článkov sa ťahá až tu — pri štarte stránky má
@@ -273,6 +314,22 @@ export function LabNav({ rozbalene = false }: {
               ))}
             </div>
           ))}
+          {prvaMimo !== null && rows[0].items[prvaMimo.i] && (
+            <button
+              type="button"
+              className="lnav-viac"
+              aria-haspopup="menu"
+              aria-expanded={!!open && rows[0].items.slice(prvaMimo.i).some(c => c.label === open.label)}
+              onClick={() => {
+                const prva = rows[0].items[prvaMimo.i];
+                nacitajClanky(catSlug(prva));
+                setOpen(prev => (prev && rows[0].items.slice(prvaMimo.i).some(c => c.label === prev.label) ? null : { label: prva.label, left: 0 }));
+              }}
+            >
+              {t('Ďalšie')} <span className="lnav-count">{rows[0].items.length - prvaMimo.i}</span>
+              <svg className="lnav-viac-i" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6" /></svg>
+            </button>
+          )}
         </div>
 
         <div className="lnav-right">
@@ -361,14 +418,17 @@ export function LabNav({ rozbalene = false }: {
   );
 }
 
-function CatButton({ cat, kratky, plny, znacka, skryta, open, onToggle }: {
+function CatButton({ cat, kratky, plny, znacka, skryta, mimo, open, onToggle }: {
   cat: NavigationItem; kratky: string; plny: string; znacka?: string; skryta?: '1';
+  /** Nezmestí sa do radu (priority+) — skrytá, dostupná cez „Ďalšie". */
+  mimo?: boolean;
   open: boolean; onToggle: (left: number) => void;
 }) {
   return (
-    <div className="lnav-cat" data-vw={znacka} data-vw-skryte={skryta}>
+    <div className="lnav-cat" data-vw={znacka} data-vw-skryte={skryta} data-mimo={mimo ? 'true' : undefined} aria-hidden={mimo || undefined}>
       <button
         type="button"
+        tabIndex={mimo ? -1 : undefined}
         className="lnav-cat-btn"
         data-open={open ? 'true' : undefined}
         aria-haspopup="menu"

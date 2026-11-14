@@ -305,10 +305,34 @@ function idPrvku(ch: Chyby, cesta: string, x: unknown, videne: Set<string>, druh
   videne.add(x);
 }
 
+/**
+ * Voľné odkazy (rad pod hľadaním, tlačidlá a odkazy činnosti). Pole je voliteľné
+ * (vzhľady uložené pred jeho zavedením ho nemajú); keď je, kontroluje sa celé.
+ * Cieľ a obrázok smú byť null — taký odkaz web nenakreslí, editor ho ukáže na doplnenie.
+ */
+function volneOdkazy(ch: Chyby, c: string, x: unknown): void {
+  if (x === undefined) return;
+  if (!objekt(ch, c, x, ['viditelne', 'polozky'])) return;
+  bool(ch, pod(c, 'viditelne'), x.viditelne);
+  const cp = pod(c, 'polozky');
+  if (!zoznam(ch, cp, x.polozky, 0, LIMITY.volnychOdkazov)) return;
+  const idOdkazov = new Set<string>();
+  kazdy(x.polozky, LIMITY.volnychOdkazov, (p, i) => {
+    const ci = prvok(cp, i);
+    if (!objekt(ch, ci, p, ['id', 'text', 'obrazok', 'ciel', 'viditelny'], ['hlavny'])) return;
+    idPrvku(ch, pod(ci, 'id'), p.id, idOdkazov, 'odkazmi');
+    text(ch, pod(ci, 'text'), p.text, LIMITY.nazov);
+    if (ma(p, 'obrazok')) obrazokAleboNull(ch, pod(ci, 'obrazok'), p.obrazok);
+    if (p.ciel !== null && p.ciel !== undefined) ciel(ch, pod(ci, 'ciel'), p.ciel);
+    bool(ch, pod(ci, 'viditelny'), p.viditelny);
+    bool(ch, pod(ci, 'hlavny'), p.hlavny);
+  });
+}
+
 /* ───────────────────────── Časti vzhľadu ───────────────────────── */
 
 function domov(ch: Chyby, c: string, x: unknown): void {
-  if (!objekt(ch, c, x, ['uvod', 'dlazdice', 'hladanie', 'sekcie', 'fotogaleria', 'pridajteSa'])) return;
+  if (!objekt(ch, c, x, ['uvod', 'dlazdice', 'hladanie', 'sekcie', 'fotogaleria', 'pridajteSa'], ['odkazy'])) return;
 
   const u = x.uvod;
   const cu = pod(c, 'uvod');
@@ -361,6 +385,7 @@ function domov(ch: Chyby, c: string, x: unknown): void {
     }
   }
 
+  volneOdkazy(ch, pod(c, 'odkazy'), x.odkazy);
   sekcie(ch, pod(c, 'sekcie'), x.sekcie);
 
   const f = x.fotogaleria;
@@ -510,8 +535,10 @@ function kategorie(ch: Chyby, c: string, x: unknown): void {
 }
 
 function cinnost(ch: Chyby, c: string, x: unknown): void {
-  if (!objekt(ch, c, x, ['nadpis', 'polozky'])) return;
+  if (!objekt(ch, c, x, ['nadpis', 'polozky'], ['tlacidla', 'odkazy'])) return;
   text(ch, pod(c, 'nadpis'), x.nadpis, LIMITY.nadpis);
+  volneOdkazy(ch, pod(c, 'tlacidla'), x.tlacidla);
+  volneOdkazy(ch, pod(c, 'odkazy'), x.odkazy);
   const cp = pod(c, 'polozky');
   if (!zoznam(ch, cp, x.polozky, KLUCE_CINNOSTI.length, KLUCE_CINNOSTI.length)) return;
   const videne = new Set<string>();
@@ -666,8 +693,21 @@ export function zbierajOdkazy(v: Vzhlad | null | undefined): OdkazyVzhladu {
   const pole = (x: unknown): unknown[] => (Array.isArray(x) ? x : []);
   const obj = (x: unknown): O => (jeObjekt(x) ? x : {});
 
+  /** Cieľ odkazu (päta, voľné odkazy): kategória alebo článok. */
+  const cielOdk = (cesta: string, c0: unknown) => {
+    const c = obj(c0);
+    if (c.druh === 'kategoria') kat(`${cesta}.kategoria`, c.kategoria);
+    if (c.druh === 'clanok') cl(`${cesta}.clanok`, c.clanok);
+  };
+  const volne = (cesta: string, x: unknown) => pole(obj(x).polozky).forEach((p0, i) => {
+    const p = obj(p0);
+    ob(`${cesta}.polozky[${i}].obrazok`, p.obrazok);
+    cielOdk(`${cesta}.polozky[${i}].ciel`, p.ciel);
+  });
+
   const d = obj(v.domov);
   ob('domov.uvod.znak', obj(d.uvod).znak);
+  volne('domov.odkazy', d.odkazy);
   pole(obj(d.dlazdice).skupiny).forEach((s, i) =>
     pole(obj(s).polozky).forEach((p, j) => kat(`domov.dlazdice.skupiny[${i}].polozky[${j}].kategoria`, obj(p).kategoria)),
   );
@@ -704,15 +744,12 @@ export function zbierajOdkazy(v: Vzhlad | null | undefined): OdkazyVzhladu {
     pole(obj(k.clanky).pripnute).forEach((a, j) => cl(`kategorie[${i}].clanky.pripnute[${j}]`, a));
   });
   pole(obj(v.cinnost).polozky).forEach((p, i) => ob(`cinnost.polozky[${i}].obrazok`, obj(p).obrazok));
+  volne('cinnost.tlacidla', obj(v.cinnost).tlacidla);
+  volne('cinnost.odkazy', obj(v.cinnost).odkazy);
   const m = obj(v.menu);
   for (const k of ['poradie', 'hlavnyRiadok', 'skryte'] as const) pole(m[k]).forEach((o, i) => kat(`menu.${k}[${i}]`, o));
   pole(obj(v.pata).stlpce).forEach((s, i) =>
-    pole(obj(s).odkazy).forEach((o, j) => {
-      const c = obj(obj(o).ciel);
-      const cesta = `pata.stlpce[${i}].odkazy[${j}].ciel`;
-      if (c.druh === 'kategoria') kat(`${cesta}.kategoria`, c.kategoria);
-      if (c.druh === 'clanok') cl(`${cesta}.clanok`, c.clanok);
-    }),
+    pole(obj(s).odkazy).forEach((o, j) => cielOdk(`pata.stlpce[${i}].odkazy[${j}].ciel`, obj(o).ciel)),
   );
   return out;
 }

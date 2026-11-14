@@ -16,12 +16,15 @@ import { clanokVJazyku, adresaCiela } from '../../lib/vzhlad/citaj';
 import { LIMITY } from '../../lib/vzhlad/typy';
 import type {
   Vzhlad, Rozriesene, Jazyk, Text, TextVolitelny, Obrazok, OdkazClanku, SekciaDomov, RiadokClankov,
-  VzhladKategorie, OdkazKategorie,
+  VzhladKategorie, OdkazKategorie, Ciel,
 } from '../../lib/vzhlad/typy';
 import {
   zaznamKategorie, indexZaznamu, slugOdkazu, presunVPoli, noveZnenie, noveZnenieVolitelne, radyMenu, nastavRadyMenu,
-  NAZVY_SEKCII, klucOdkazu, type KategoriaVDb,
+  NAZVY_SEKCII, klucOdkazu, noveId, type KategoriaVDb,
 } from './stav/operacie';
+import {
+  zoznamOdkazov, zoznamNaZapis, najdiOdkaz, sObrazkom, NAZVY_ZOZNAMOV, type KdeOdkazy,
+} from './stav/volneOdkazy';
 import type { Stranka } from './stav/KonceptKontext';
 
 /* ───────────────────────── Typy ───────────────────────── */
@@ -107,6 +110,7 @@ export type PridavanaHodnota =
   | { druh: 'kategoria'; kategoria: KategoriaVDb }
   | { druh: 'clanok'; clanok: OdkazClanku; nazov: string }
   | { druh: 'fotka'; id: number }
+  | { druh: 'ciel'; text: string; ciel: Ciel }
   | { druh: 'nic' };
 
 export interface OpisPrvku {
@@ -646,7 +650,7 @@ function opis(nazov: string, x: KontextPrvku): OpisPrvku | null {
         o.odstranit = { popis: `stĺpec „${s.nadpis.sk}“ aj s odkazmi`, vykonaj: (w) => { w.pata.stlpce = w.pata.stlpce.filter((y) => y.id !== s.id); } };
         o.pridat = {
           popis: 'Pridať odkaz do stĺpca', vyber: 'ciel', zaZoznamom: `pata-odkazy:${s.id}`,
-          vykonaj: () => { /* cieľ vyberá panel (dialóg „Pridať odkaz“), zápis robí on */ },
+          vykonaj: (w, h) => { if (h.druh === 'ciel') najdi(w)?.odkazy.push({ text: { sk: h.text }, ciel: h.ciel }); },
         };
         return o;
       }
@@ -739,9 +743,75 @@ function opis(nazov: string, x: KontextPrvku): OpisPrvku | null {
       return null;
     }
 
+    /* ── Voľné odkazy ── */
+    case 'odkazy':
+    case 'tlacidla':
+    case 'odkazy-cinnosti':
+      return opisZoznamuOdkazov(nazov, KDE_ODKAZOV[c[0]], v);
+    case 'odkaz':
+    case 'tlacidlo':
+    case 'odkaz-cinnosti':
+      return opisVolnehoOdkazu(nazov, KDE_ODKAZOV[c[0]], c[1], x);
+
     default:
       return null;
   }
+}
+
+/** Druh značky voľného odkazu → zoznam vo vzhľade. */
+const KDE_ODKAZOV: Record<string, KdeOdkazy> = {
+  odkazy: 'domov', odkaz: 'domov',
+  tlacidla: 'tlacidla', tlacidlo: 'tlacidla',
+  'odkazy-cinnosti': 'cinnost', 'odkaz-cinnosti': 'cinnost',
+};
+
+/** Rad odkazov pod hľadaním, tlačidlá a odkazy pod činnosťou: celý zoznam. */
+function opisZoznamuOdkazov(nazov: string, kde: KdeOdkazy, v: Vzhlad): OpisPrvku {
+  const z = zoznamOdkazov(v, kde);
+  const meno = NAZVY_ZOZNAMOV[kde];
+  const o: OpisPrvku = { nazov, druh: 'volne-odkazy', stitok: meno, texty: [] };
+  o.skryt = { skryty: z?.viditelne === false, popis: meno.toLowerCase(), prepni: (w) => { const q = zoznamNaZapis(w, kde); q.viditelne = !q.viditelne; } };
+  if ((z?.polozky.length ?? 0) < LIMITY.volnychOdkazov) {
+    o.pridat = {
+      popis: 'Pridať odkaz', vyber: 'ciel', zaZoznamom: `volne:${kde}`,
+      vykonaj: (w, h) => {
+        if (h.druh !== 'ciel') return;
+        const q = zoznamNaZapis(w, kde);
+        q.polozky.push({ id: noveId(h.text, q.polozky.map((x) => x.id)), text: { sk: h.text.slice(0, LIMITY.nazov) }, obrazok: null, ciel: h.ciel, viditelny: true });
+      },
+    };
+  }
+  return o;
+}
+
+/** Jeden voľný odkaz: text, obrázok (okrem textových), poradie, skrytie, odstránenie. */
+function opisVolnehoOdkazu(nazov: string, kde: KdeOdkazy, id: string, x: KontextPrvku): OpisPrvku | null {
+  const z = zoznamOdkazov(x.v, kde);
+  const i = z ? z.polozky.findIndex((p) => p.id === id) : -1;
+  if (!z || i < 0) return null;
+  const p = z.polozky[i];
+  const najdi = (w: Vzhlad) => najdiOdkaz(w, kde, id);
+  const o: OpisPrvku = { nazov, druh: 'volny-odkaz', stitok: `${NAZVY_ZOZNAMOV[kde]} · ${p.text.sk}`, texty: [] };
+  const selektor = kde === 'domov' ? '.lodk-text' : kde === 'tlacidla' ? '.lcin-tlacidlo-text' : undefined;
+  o.texty = [text('text', 'Text odkazu', LIMITY.nazov, (w) => najdi(w)?.text, (w, t) => { const q = najdi(w); if (q && t) q.text = t; }, { selektor })];
+  if (sObrazkom(kde)) {
+    o.obrazok = {
+      nazov: 'Obrázok odkazu', vyrez: true,
+      ziskaj: (w) => najdi(w)?.obrazok ?? null,
+      nastav: (w, ob) => { const q = najdi(w); if (q) q.obrazok = ob; },
+      nahlady: [kde === 'domov' ? { nazov: 'Rad pod hľadaním (16 : 10)', pomer: 16 / 10 } : { nazov: 'Tlačidlo (široké)', pomer: 2 }],
+      bezObrazka: 'bez obrázka — na webe sa odkaz neukáže',
+    };
+  }
+  o.zoznam = { rodina: `volne:${kde}`, zoznam: `volne:${kde}`, index: i, dlzka: z.polozky.length, smer: 'vodorovne' };
+  o.skryt = { skryty: !p.viditelny, popis: 'odkaz', prepni: (w) => { const q = najdi(w); if (q) q.viditelny = !q.viditelny; } };
+  o.odstranit = { popis: `odkaz „${p.text.sk}“`, vykonaj: (w) => { const q = zoznamOdkazov(w, kde); if (q) q.polozky = q.polozky.filter((y) => y.id !== id); } };
+  if (p.ciel?.druh === 'clanok') o.clanok = p.ciel.clanok.dokument;
+  if (p.ciel?.druh === 'kategoria') o.kategoria = slugOdkazu(p.ciel.kategoria, x.r);
+  if (!p.ciel) o.neplatny = 'Odkaz nemá cieľ — na webe sa neukáže. Cieľ nastavíte v paneli vpravo.';
+  else if (!adresaCiela(p.ciel, x.r, x.j)) o.neplatny = 'Cieľ odkazu v tomto jazyku neexistuje — na webe sa neukáže.';
+  else if (sObrazkom(kde) && !p.obrazok) o.neplatny = 'Odkaz nemá obrázok — na webe sa neukáže.';
+  return o;
 }
 
 function noveIdSkupiny(v: Vzhlad): string {
@@ -807,6 +877,7 @@ function zoznamPola(v: Vzhlad, zoznam: string, x: Pick<KontextPrvku, 'r' | 'db'>
     case 'kronika-pripnute': return sekciaPodlaTypu(v, 'kronika')?.pripnute ?? null;
     case 'fotogaleria': return v.domov.fotogaleria?.fotky ?? null;
     case 'pata-stlpce': return v.pata.stlpce;
+    case 'volne': return zoznamOdkazov(v, c[1] as KdeOdkazy)?.polozky ?? null;
     case 'prosby': return v.domov.pridajteSa.prosby;
     case 'kategoria-pripnute': {
       const slug = c.slice(1).join(':');
@@ -829,6 +900,7 @@ export function obalZoznamu(zoznam: string): string | null {
     case 'riadok-clanky': return `riadok:${c[1]}:${c[2]}`;
     case 'popularne': return 'popularne';
     case 'fotogaleria': return 'kronika:fotogaleria';
+    case 'volne': return c[1] === 'domov' ? 'odkazy' : c[1] === 'tlacidla' ? 'tlacidla' : 'odkazy-cinnosti';
     default: return null;
   }
 }

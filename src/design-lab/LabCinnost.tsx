@@ -19,6 +19,11 @@
  * (`cinnost`); `viditelna` platí všade, `naDomovskej` len na domovskej.
  * Zaraďovanie zápisov kroniky a to, ktorá činnosť vedie do vlastnej
  * kategórie, ostáva v kóde (`data/cinnost.ts`).
+ *
+ * Pod dlaždicami sú obrázkové tlačidlá a textové odkazy (požiadavka K3,
+ * `cinnost.tlacidla` a `cinnost.odkazy`) — všade, kde sa činnosť kreslí.
+ * V kronike (`onVyber`) nie: tam dlaždice zužujú zápisy a odkazy von by
+ * stáli medzi filtrom a tým, čo filtruje.
  */
 
 import { odkaz, t } from '../lib/jazyk';
@@ -28,6 +33,7 @@ import { textVzhladu } from '../lib/vzhlad/texty';
 import { adresaObrazka, jeSuborMedii, priChybeVymen, poziciaObrazka } from '../lib/vzhlad/obrazky';
 import { ZAKLADNY_VZHLAD } from '../lib/vzhlad/zakladny';
 import { vw, vwSkryte } from '../lib/vzhlad/upravy';
+import { TlacidlaCinnosti, OdkazyCinnosti } from './LabOdkazy';
 
 /** Kam vedie dlaždica činnosti, ktorá má vlastnú kategóriu (tabule, 3D). */
 const KATEGORIA_CINNOSTI = new Map(CINNOSTI.filter((c) => c.kategoria).map((c) => [c.kluc, c.kategoria as string]));
@@ -64,7 +70,7 @@ export function LabCinnost({ pocty, poctyKategorii, vybrana = null, onVyber, tic
         <span className="lcin-ciara" aria-hidden="true" />
       </div>
 
-      <div className="lcin-rad">
+      <div className="lcin-rad" data-pocet={dlazdice.length}>
         {dlazdice.map(({ c, skryta }) => {
           const kategoria = KATEGORIA_CINNOSTI.get(c.kluc);
           const pocet = kategoria ? poctyKategorii?.[kategoria] : pocty?.[c.kluc];
@@ -125,6 +131,13 @@ export function LabCinnost({ pocty, poctyKategorii, vybrana = null, onVyber, tic
           );
         })}
       </div>
+
+      {!onVyber && (
+        <>
+          <TlacidlaCinnosti />
+          <OdkazyCinnosti />
+        </>
+      )}
     </section>
   );
 }

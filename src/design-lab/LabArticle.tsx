@@ -39,6 +39,8 @@ import { ArticleCard } from '../components/ArticleCard';
 import LabKategorieLista from './LabKategorieLista';
 import { MapaAzKedTreba } from './MapaAzKedTreba';
 import { LabCinnost } from './LabCinnost';
+import { BlokHladania } from './LabHladanie';
+import { RadOdkazov } from './LabOdkazy';
 
 function skDate(iso?: string | null): string {
   if (!iso) return '';
@@ -410,14 +412,10 @@ export function LabArticle({ slug }: { slug: string }) {
         </article>
       </section>
 
-      {/* Mapa hradísk pod komentármi — posledná vec, ktorú článok ponúkne:
-          „a kde sú ďalšie". Vykreslí sa až vtedy, keď sa k nej čitateľ
-          priblíži: mapa si stiahne 44 dlaždíc podkladu (486 kB namerané)
-          a väčšina čitateľov k nej nedôjde. */}
-      {/* Mapa dostane slug článku: ak má článok lokalitu, jej značka bude
-          v mape červená a s menovkou, takže čitateľ hneď vidí, kde to je. */}
-      <MapaAzKedTreba zvyraznene={post.slug} />
-
+      {/* Súvisiace články hneď za článkom a diskusiou: základ (KT.03) dáva
+          stránke detailu poradie obsah → súvisiace → ďalšie kroky. Klient
+          chcel blok „ako na domovskej" hneď za diskusiou (K5) — ten preto
+          ide hneď za súvisiace, nie pred ne (rozhodnutie v STAV.md). */}
       {related.length > 0 && (
         <section className="lart-more">
           <div className="container">
@@ -433,13 +431,26 @@ export function LabArticle({ slug }: { slug: string }) {
         </section>
       )}
 
+      {/* To isté, čo na domovskej, bez dvoch radov dlaždíc (požiadavka K5):
+          hľadanie, rad odkazov, mapa, činnosť združenia s tlačidlami
+          a odkazmi. Index hľadania sa stiahne až pri prvom hľadaní. */}
+      <section className="lart-hladanie" aria-label={t('Hľadanie')}>
+        <BlokHladania />
+      </section>
+
+      <RadOdkazov trieda="lodk--clanok" />
+
+      {/* Mapa sa vykreslí až vtedy, keď sa k nej čitateľ priblíži: stiahne
+          si 44 dlaždíc podkladu (486 kB namerané) a väčšina čitateľov k nej
+          nedôjde. Dostane slug článku: ak má článok lokalitu, jej značka je
+          v mape červená a s menovkou. */}
+      <MapaAzKedTreba zvyraznene={post.slug} />
+
       {/* Činnosť združenia — posledná vec pod článkom. Kto dočítal text
           o hradisku, je presne ten, komu stojí za to povedať, že tabuľu pri
           ňom osadilo združenie, že o ňom vyšiel zborník a že sa to platí
-          z 2 % z daní. Do kroniky, kde to všetko je, zájde málokto.
-          Dlaždice sú tu odkazy — kronika na stránke článku nie je, takže
-          niet čo zúžiť; počty by znamenali stiahnuť osemdesiat zápisov
-          kvôli siedmim číslam. */}
+          z 2 % z daní. Dlaždice sú tu odkazy — kronika na stránke článku
+          nie je, takže niet čo zúžiť. */}
       <section className="lart-cinnost">
         <div className="container">
           <LabCinnost tichy />

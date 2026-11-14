@@ -13,7 +13,12 @@
 import { useMemo, type ReactNode } from 'react';
 import { MapPin, Plus, ExternalLink, FileEdit } from 'lucide-react';
 import { LIMITY, KLUCE_CINNOSTI } from '../../lib/vzhlad/typy';
-import type { Jazyk, Vzhlad, SekciaDomov, ZoradenieClankov, RiadokClankov } from '../../lib/vzhlad/typy';
+import type { Jazyk, Vzhlad, SekciaDomov, ZoradenieClankov, RiadokClankov, Ciel } from '../../lib/vzhlad/typy';
+import { useAuth } from '../AuthContext';
+import { clankyPodlaDokumentu } from '../api/vzhlad';
+import {
+  zoznamOdkazov, zoznamNaZapis, najdiOdkaz, sObrazkom, NAZVY_ZOZNAMOV, type KdeOdkazy,
+} from './stav/volneOdkazy';
 import { useKoncept, type Stranka } from './stav/KonceptKontext';
 import { useEditorUI } from './ui';
 import { useAkciePrvkov } from './akcie';
@@ -357,6 +362,12 @@ export function EditorCinnosti(p: OblastProps & { lenKluc?: string }) {
             onKlik={p.naPlatne ? (i) => p.naPlatne!(DOMOV, `cinnost:${c.polozky[i].kluc}`) : undefined}
           />
           <div className="vw-pomoc">Očko = viditeľnosť na domovskej. Kľúče činností sú pevné ({KLUCE_CINNOSTI.length}) — triedenie kroniky podľa činnosti ostáva v kóde.</div>
+          <Skupina nadpis={NAZVY_ZOZNAMOV.tlacidla} akcia={<OtvoritNaPlatne naPlatne={p.naPlatne} stranka={DOMOV} nazov="tlacidla" />}>
+            <EditorVolnychOdkazov {...p} kde="tlacidla" />
+          </Skupina>
+          <Skupina nadpis={NAZVY_ZOZNAMOV.cinnost} akcia={<OtvoritNaPlatne naPlatne={p.naPlatne} stranka={DOMOV} nazov="odkazy-cinnosti" />}>
+            <EditorVolnychOdkazov {...p} kde="cinnost" />
+          </Skupina>
         </>
       )}
       {(p.lenKluc || p.naPlatne) && polozky.map((q) => (
@@ -366,6 +377,88 @@ export function EditorCinnosti(p: OblastProps & { lenKluc?: string }) {
           <Prepinac popis="Ukázať aj na domovskej" hodnota={q.naDomovskej} onZmena={(b) => nastav(q.kluc, 'činnosť na domovskej', (y) => { y.naDomovskej = b; })} />
         </div>
       ))}
+    </>
+  );
+}
+
+/* ───────────────────────── Voľné odkazy ───────────────────────── */
+
+const ZNACKA_ZOZNAMU: Record<KdeOdkazy, string> = { domov: 'odkazy', tlacidla: 'tlacidla', cinnost: 'odkazy-cinnosti' };
+const ZNACKA_POLOZKY: Record<KdeOdkazy, string> = { domov: 'odkaz', tlacidla: 'tlacidlo', cinnost: 'odkaz-cinnosti' };
+
+/**
+ * Rad odkazov pod hľadaním (K2), tlačidlá a odkazy pod činnosťou (K3):
+ * poradie, viditeľnosť, text v troch jazykoch, obrázok, cieľ, hlavné tlačidlo.
+ */
+export function EditorVolnychOdkazov(p: OblastProps & { kde: KdeOdkazy; lenId?: string }) {
+  const k = useKoncept();
+  const a = useAkciePrvkov();
+  const { token } = useAuth();
+  const x = useKontextPrvku(DOMOV, p.jazyk);
+  if (!k.koncept || !x) return null;
+  const z = zoznamOdkazov(k.koncept, p.kde);
+  const polozky = z?.polozky ?? [];
+  const meno = NAZVY_ZOZNAMOV[p.kde];
+  const zmenOdkaz = (id: string, popis: string, fn: (q: NonNullable<ReturnType<typeof najdiOdkaz>>) => void) =>
+    k.zmen(popis, (w) => { const q = najdiOdkaz(w, p.kde, id); if (q) fn(q); });
+  const popisCiela = (c: Ciel | null) => (!c ? 'bez cieľa — na webe sa neukáže'
+    : c.druh === 'kategoria' ? `kategória /${slugOdkazu(c.kategoria, k.rozriesene)}`
+      : c.druh === 'clanok' ? `článok ${(c.clanok.dokument && k.rozriesene.clanky[c.clanok.dokument]?.sk?.nazov) || c.clanok.slug}`
+        : c.druh === 'cesta' ? c.cesta : c.url);
+  /* Článok vybraný ako cieľ: slug a preklady pre plátno (server ich dodá až po uložení). */
+  const doplnClanok = (c: Ciel) => {
+    if (c.druh !== 'clanok' || !c.clanok.dokument || !token || k.rozriesene.clanky[c.clanok.dokument]) return;
+    clankyPodlaDokumentu(token, [c.clanok.dokument]).then((n) => k.doplnClanky(n)).catch(() => { /* ukáže sa po uložení */ });
+  };
+  return (
+    <>
+      {!p.lenId && (
+        <>
+          <Prepinac popis={`${meno}: na webe viditeľné`} hodnota={z?.viditelne !== false}
+                    onZmena={(b) => k.zmen(b ? `zobrazenie: ${meno}` : `skrytie: ${meno}`, (w) => { zoznamNaZapis(w, p.kde).viditelne = b; })} />
+          <ZoznamPoloziek
+            polozky={polozky.map((o) => ({
+              uid: o.id, nazov: o.text.sk,
+              pod: `${popisCiela(o.ciel)}${o.hlavny ? ' · hlavné' : ''}`,
+              skryta: !o.viditelny,
+              neplatna: !o.ciel || (sObrazkom(p.kde) && !o.obrazok),
+              obrazok: sObrazkom(p.kde) ? adresaNahladu(o.obrazok, k.rozriesene, 'thumbnail') : undefined,
+            }))}
+            onPoradie={(zi, na) => k.zmen(`poradie: ${meno}`, (w) => presunVPoli(zoznamNaZapis(w, p.kde).polozky, zi, na))}
+            onSkryt={(i) => zmenOdkaz(polozky[i].id, `viditeľnosť odkazu ${polozky[i].text.sk}`, (q) => { q.viditelny = !q.viditelny; })}
+            onOdstranit={(i) => k.zmen(`odstránenie odkazu ${polozky[i].text.sk}`, (w) => { zoznamNaZapis(w, p.kde).polozky.splice(i, 1); })}
+            onKlik={p.naPlatne ? (i) => p.naPlatne!(DOMOV, `${ZNACKA_POLOZKY[p.kde]}:${polozky[i].id}`) : undefined}
+            prazdny="Zatiaľ bez odkazov."
+          />
+          <div className="vw-pomoc">Odkaz bez cieľa{sObrazkom(p.kde) ? ' alebo bez obrázka' : ''} sa na webe neukáže. Rovnaké odkazy sú na domovskej aj pod každým článkom.</div>
+        </>
+      )}
+      {(p.lenId || p.naPlatne) && polozky.filter((o) => !p.lenId || o.id === p.lenId).map((o) => (
+        <div key={o.id}>
+          <PoliaZnacky {...p} stranka={DOMOV} nazov={`${ZNACKA_POLOZKY[p.kde]}:${o.id}`} />
+          {p.kde === 'tlacidla' && (
+            <Prepinac popis="Hlavné tlačidlo (širšie)" hodnota={!!o.hlavny}
+                      onZmena={(b) => zmenOdkaz(o.id, b ? `hlavné tlačidlo ${o.text.sk}` : `bežné tlačidlo ${o.text.sk}`, (q) => { if (b) q.hlavny = true; else delete q.hlavny; })} />
+          )}
+          {o.ciel ? (
+            <CielOdkazu ciel={o.ciel} kategorie={k.kategorieDb} rozriesene={k.rozriesene}
+                        onZmena={(c) => { doplnClanok(c); zmenOdkaz(o.id, `cieľ odkazu ${o.text.sk}`, (q) => { q.ciel = c; }); }} />
+          ) : (
+            <div className="vw-pomoc">
+              Odkaz nemá cieľ — na webe sa neukáže.{' '}
+              <button type="button" className="abtn" style={{ padding: '2px 8px', fontSize: 12 }} disabled={!k.kategorieDb[0]}
+                      onClick={() => { const kat = k.kategorieDb[0]; if (kat) zmenOdkaz(o.id, `cieľ odkazu ${o.text.sk}`, (q) => { q.ciel = { druh: 'kategoria', kategoria: { dokument: kat.documentId, slug: kat.slug } }; }); }}>
+                Nastaviť cieľ
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
+      {!p.lenId && polozky.length < LIMITY.volnychOdkazov && (
+        <button type="button" className="vw-pridat" onClick={() => { const o = opisPrvku(ZNACKA_ZOZNAMU[p.kde], x); if (o) void a.pridaj(o); }}>
+          <Plus className="w-3.5 h-3.5" /> Pridať odkaz
+        </button>
+      )}
     </>
   );
 }

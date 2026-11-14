@@ -618,6 +618,24 @@ const EN: Record<string, string> = {
 
   /* Diskusia */
   'Diskusia': 'Discussion',
+  /* Voľné odkazy (rad pod hľadaním, tlačidlá a odkazy pod činnosťou) a zbalená diskusia — požiadavka klienta 14. 11. 2026. */
+  'Pôvod Slovanov': 'Origin of the Slavs',
+  'Archeologické obdobia': 'Archaeological periods',
+  'Občianske združenie Hradiská': 'Hradiská civic association',
+  'Nálezné vo výške 100 %': 'A finder’s reward of 100%',
+  'Detektor': 'Metal detector',
+  'Naša facebooková skupina': 'Our Facebook group',
+  'Naše ďalšie blogy': 'Our other blogs',
+  'Mapy': 'Maps',
+  'Archeoskanzeny': 'Archaeological open-air museums',
+  'Knihy': 'Books',
+  'Odporúčané stránky k dejinám Slovanov': 'Recommended websites on Slavic history',
+  'Užitočné odkazy': 'Useful links',
+  'Ďalšie odkazy': 'More links',
+  'Hľadanie': 'Search',
+  'Zobraziť': 'Show',
+  'Skryť': 'Hide',
+  'Ďalšie': 'More',
   'Načítavam komentáre…': 'Loading comments…',
   'Zatiaľ tu nie sú žiadne komentáre. Buďte prvý, kto napíše svoj názor.':
     'There are no comments yet. Be the first to share your thoughts.',

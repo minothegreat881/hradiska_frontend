@@ -25,7 +25,11 @@
  *   • adresa obrázka z `formats` namiesto skladanej cesty (ten istý súbor) —
  *     pri dnešných súboroch sú obe adresy zhodné, pravidlo sa neuplatní.
  *
- *   node scripts/vzhlad/test-zhoda.mjs [--rezim 1,2,2v] [--len <regex>] [--sucasne 3]
+ *   node scripts/vzhlad/test-zhoda.mjs [--rezim 1,2,2v] [--len <regex>] [--sucasne 3] [--zamerne <selektory>]
+ *
+ * `--zamerne .a,.b` — ZÁMERNÉ zmeny vzhľadu (napr. hlavička s „Ďalšie"): prvky sa v OBOCH
+ * weboch skryjú (`visibility`, rozloženie ostáva) a v DOM nahradia značkou; zvyšok stránky
+ * musí byť zhodný. Zoznam zámerných rozdielov patrí do správy k zmene.
  */
 import { readFileSync, existsSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -39,6 +43,8 @@ const a = process.argv.slice(2);
 const arg = (k, d) => { const i = a.indexOf(k); return i >= 0 ? a[i + 1] : d; };
 const REZIMY = arg('--rezim', '1,2,2v').split(',');
 const LEN = arg('--len', null);
+const ZAMERNE = (arg('--zamerne', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+const CSS_ZAMERNE = ZAMERNE.length ? `${ZAMERNE.map((x) => `${x}, ${x} *`).join(', ')} { visibility: hidden !important; }` : '';
 const SUCASNE = Number(arg('--sucasne', '3'));
 const DIST_DNES = resolve(KOREN, '..', 'hradiska-web-zaklad', 'dist');
 /* `--url-dnes` / `--url-novy`: namiesto lokálneho buildu porovnať nasadený web (napr. ostrý a náhľad na Verceli). */
@@ -117,9 +123,9 @@ async function zachyt(prehliadac, port, p, rezim) {
   /* Odložené obrázky načítať pred zachytením DOM (mŕtva fotka → kresba). */
   await nacitajObrazky(page);
   await ustal(page, { pokoj: 3 });
-  const celyDom = await dom(page);
+  const celyDom = await dom(page, { nahradit: ZAMERNE });
   const domAkcept = jeKronikaVCudzomJazyku(p.s, rezim) || (rezim === 'dnes' && p.s.druh === 'domov' && p.s.jazyk !== 'sk')
-    ? await dom(page, { nahradit: AKCEPTOVANE_KRONIKA }) : null;
+    ? await dom(page, { nahradit: [...AKCEPTOVANE_KRONIKA, ...ZAMERNE] }) : null;
   /* Pás kroniky (dokumentové súradnice) — pre porovnanie pixelov mimo neho. */
   const kronika = await page.evaluate(() => {
     const el = document.querySelector('section.lakv');
@@ -136,9 +142,9 @@ async function zachyt(prehliadac, port, p, rezim) {
   /* Dnešný web potrebuje obe snímky (režim 1 celú, režimy 2/2v so zakrytou
      kronikou v cudzom jazyku); nový len tú, ktorú porovnáva. */
   const cudziDomov = p.s.druh === 'domov' && p.s.jazyk !== 'sk';
-  const png = rezim === 'dnes' || !jeKronikaVCudzomJazyku(p.s, rezim) ? await snimka(page) : null;
+  const png = rezim === 'dnes' || !jeKronikaVCudzomJazyku(p.s, rezim) ? await snimka(page, { css: CSS_ZAMERNE }) : null;
   const pngAkcept = (rezim === 'dnes' && cudziDomov) || jeKronikaVCudzomJazyku(p.s, rezim)
-    ? await snimka(page, { css: CSS_KRONIKA }) : null;
+    ? await snimka(page, { css: CSS_KRONIKA + CSS_ZAMERNE }) : null;
   await ctx.close();
   return { dom: celyDom.html, vw: celyDom.vw, domAkcept: domAkcept?.html ?? null, png, pngAkcept, kronika, kronikaStav, ...z };
 }

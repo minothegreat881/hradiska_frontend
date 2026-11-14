@@ -3,7 +3,7 @@
 import { narodneProstredie, odkaz, t, poAnglicky } from '../lib/jazyk';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
-import { ThumbsUp, Reply, Loader2, Trash2, Flag } from 'lucide-react';
+import { ThumbsUp, Reply, Loader2, Trash2, Flag, ChevronDown } from 'lucide-react';
 import { Nacitavanie } from '../design-lab/Nacitavanie';
 import { toast } from 'sonner';
 import { useMember } from '../auth/MemberAuth';
@@ -13,6 +13,10 @@ import { NahlasitDialog } from './NahlasitDialog';
 import { useBlokovani, bezBlokovanych } from '../lib/blokovania';
 
 const goTo = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')); };
+
+/** Adresa mieri na diskusiu alebo na konkrétny komentár (`#discussion`, `#k-<documentId>`). */
+const adresaNaDiskusiu = (): boolean =>
+  typeof window !== 'undefined' && (window.location.hash === '#discussion' || window.location.hash.startsWith('#k-'));
 
 interface Comment {
   id: string;
@@ -446,6 +450,20 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   const [myLikes, setMyLikes] = useState<Map<string, string>>(new Map());
   const [replyingTo, setReplyingTo] = useState<{ docId: string; author: string } | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
+  /* Diskusia je zbalená (požiadavka K4): pod článkom s dvesto komentármi
+     by inak všetko ďalšie — súvisiace, mapa, činnosť — bolo o desiatky
+     obrazoviek nižšie. Rozbalí sa kliknutím, sama vtedy, keď adresa mieri
+     na diskusiu alebo na komentár, a po odoslaní vlastného komentára. */
+  const [otvorena, setOtvorena] = useState<boolean>(adresaNaDiskusiu);
+  /* Počet príspevkov zo servera (`meta.pagination.total`) — kým je diskusia
+     zbalená, zoznam sa nesťahuje, stačí jedna malá požiadavka na číslo. */
+  const [celkom, setCelkom] = useState<number | null>(null);
+  const [nacitane, setNacitane] = useState(false);
+  useEffect(() => {
+    const priZmene = () => { if (adresaNaDiskusiu()) setOtvorena(true); };
+    window.addEventListener('hashchange', priZmene);
+    return () => window.removeEventListener('hashchange', priZmene);
+  }, []);
 
   const fetchComments = useCallback(async () => {
     if (!postDocumentId) {
@@ -454,20 +472,28 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
     }
     setLoading(true);
     try {
-      const url = new URL(`${STRAPI_URL}/api/blog-comments`);
-      url.searchParams.set('filters[post][documentId][$eq]', postDocumentId);
-      url.searchParams.set('sort[0]', 'originalDate:desc');
-      url.searchParams.set('sort[1]', 'createdAt:desc');
-      url.searchParams.set('pagination[pageSize]', '100');
       // GET je verejný a ide BEZ tokenu — pri Member role Strapi sanitizácia
       // odmieta filter cez reláciu `post` („Invalid key post"). Príznak „môj
       // komentár" doťahujeme zvlášť cez /blog-comments/mine (nižšie).
-      const res = await fetch(url.toString(), {
-        headers: { 'ngrok-skip-browser-warning': 'true' },
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const list: StrapiComment[] = json.data || [];
+      /* Po stranách po 100, kým neprídu všetky: s jednou stranou sa pri
+         článku s 209 komentármi ukázalo len prvých 100. */
+      const list: StrapiComment[] = [];
+      for (let strana = 1; strana <= 20; strana++) {
+        const url = new URL(`${STRAPI_URL}/api/blog-comments`);
+        url.searchParams.set('filters[post][documentId][$eq]', postDocumentId);
+        url.searchParams.set('sort[0]', 'originalDate:desc');
+        url.searchParams.set('sort[1]', 'createdAt:desc');
+        url.searchParams.set('pagination[pageSize]', '100');
+        url.searchParams.set('pagination[page]', String(strana));
+        const res = await fetch(url.toString(), {
+          headers: { 'ngrok-skip-browser-warning': 'true' },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        list.push(...((json.data || []) as StrapiComment[]));
+        const pocetStran = Number(json.meta?.pagination?.pageCount) || 1;
+        if (strana >= pocetStran) break;
+      }
 
       // documentId vlastných komentárov (len ak je člen prihlásený) — server
       // vráti iba pole ID, žiadne údaje účtu.
@@ -495,6 +521,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
         m.mine = mineSet.has(m.documentId);
         return m;
       }), blokovaniRef.current)));
+      setNacitane(true);
 
       /* Ak adresa nesie kotvu komentára, prejdi naň — až TERAZ, keď je
          v dokumente. Prehliadač si hash spracuje pri načítaní stránky, keď
@@ -520,9 +547,24 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
     }
   }, [postDocumentId, token]);
 
+  /* Zoznam sa sťahuje až po rozbalení (a po každej zmene prihlásenia, kým je
+     rozbalený); zbalená diskusia potrebuje len počet. */
   useEffect(() => {
-    fetchComments();
-  }, [fetchComments]);
+    if (otvorena) fetchComments();
+  }, [fetchComments, otvorena]);
+  useEffect(() => {
+    if (!postDocumentId) return;
+    let zrusene = false;
+    const url = new URL(`${STRAPI_URL}/api/blog-comments`);
+    url.searchParams.set('filters[post][documentId][$eq]', postDocumentId);
+    url.searchParams.set('fields[0]', 'documentId');
+    url.searchParams.set('pagination[pageSize]', '1');
+    fetch(url.toString(), { headers: { 'ngrok-skip-browser-warning': 'true' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { const n = Number(j?.meta?.pagination?.total); if (!zrusene && Number.isFinite(n)) setCelkom(n); })
+      .catch(() => { /* bez čísla — ukáže sa po rozbalení */ });
+    return () => { zrusene = true; };
+  }, [postDocumentId]);
 
   // Načítaj, ktoré komentáre už prihlásený člen lajkol (z kolekcie reaction).
   useEffect(() => {
@@ -646,6 +688,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setReplyingTo(null);
+      setOtvorena(true);
       toast.success(t('Odpoveď pridaná.'));
       fetchComments();
     } catch (e) {
@@ -675,6 +718,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
       }
       setNewComment('');
       setReplyingTo(null);
+      setOtvorena(true);
       toast.success(t('Komentár pridaný.'));
       // Komentár sa zobrazí HNEĎ (status=visible) — načítame zoznam nanovo,
       // aby sa zaradil na správne miesto (aj ako odpoveď).
@@ -689,51 +733,32 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
   };
 
   return (
-    <section id="discussion" style={{ margin: '48px 0 0', scrollMarginTop: 32 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-        <h2
-          style={{
-            fontFamily: 'Georgia, "Times New Roman", serif',
-            fontSize: 22,
-            fontWeight: 600,
-            color: '#2d1810',
-            margin: 0,
-          }}
+    <section id="discussion" className={otvorena ? 'disk is-otvorena' : 'disk'}>
+      {/* Hlavička je zároveň prepínač: celý riadok je jeden cieľ, počet
+          príspevkov je v ňom, aby bolo vidno, či sa oplatí rozbaliť. */}
+      <h2 className="disk-h">
+        <button
+          type="button"
+          className="disk-prepinac"
+          aria-expanded={otvorena}
+          aria-controls="diskusia-telo"
+          onClick={() => setOtvorena((o) => !o)}
         >
-          {t('Diskusia')}
-        </h2>
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 24,
-            height: 24,
-            padding: '0 8px',
-            borderRadius: 9999,
-            background: 'var(--hr-accent-soft)',
-            color: 'var(--hr-on-photo)',
-            fontFamily: 'Georgia, serif',
-            fontSize: 12,
-            fontWeight: 600,
-          }}
-        >
-          {loading
-            ? '…'
-            : (function countAll(list: Comment[]): number {
+          <span className="disk-nazov">{t('Diskusia')}</span>
+          <span className="disk-pocet">
+            {nacitane
+              ? (function countAll(list: Comment[]): number {
                 return list.reduce((sum, c) => sum + 1 + countAll(c.replies || []), 0);
-              })(comments)}
-        </span>
-      </div>
-      <hr
-        style={{
-          height: 1,
-          background: 'linear-gradient(90deg, var(--hr-line-quiet) 0%, rgba(196,165,116,0) 100%)',
-          margin: '8px 0 24px',
-          border: 0,
-        }}
-      />
+              })(comments)
+              : celkom ?? '…'}
+          </span>
+          <span className="disk-akcia">{otvorena ? t('Skryť') : t('Zobraziť')}</span>
+          <ChevronDown className="disk-sipka" aria-hidden="true" />
+        </button>
+      </h2>
+      <hr className="disk-ciara" />
 
+      <div id="diskusia-telo" hidden={!otvorena}>
       {/* Komentáre */}
       <div>
         {loading && comments.length === 0 ? (
@@ -908,6 +933,7 @@ export function CommentSection({ postDocumentId }: CommentSectionProps) {
           </div>
         )}
       </motion.div>
+      </div>
     </section>
   );
 }

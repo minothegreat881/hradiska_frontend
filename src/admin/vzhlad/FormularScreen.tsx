@@ -16,7 +16,7 @@ import { Panel } from '../components/Panel';
 import { useKoncept, type Stranka } from './stav/KonceptKontext';
 import {
   EditorUvodu, EditorDlazdic, EditorHladania, EditorSekcii, EditorDalsiehoObsahu, EditorCinnosti, EditorKroniky,
-  EditorPridajteSa, EditorKategorie, EditorMenu, EditorPaty,
+  EditorPridajteSa, EditorKategorie, EditorMenu, EditorPaty, EditorVolnychOdkazov,
 } from './oblasti';
 import { zmenyVzhladu } from '../../lib/vzhlad/zmeny';
 import { pocetVyhrad } from './stav/preklady';
@@ -69,6 +69,7 @@ export function FormularScreen({ naPlatne, otvorVizualny }: { naPlatne: (s: Stra
         <div className="vw-panel-telo"><EditorDlazdic {...p} /></div>
       </Panel>
       <Panel title="Hľadanie a populárne" summary={`${v.domov.hladanie.popularne.length} populárnych`}><div className="vw-panel-telo"><EditorHladania {...p} /></div></Panel>
+      <Panel title="Odkazy pod hľadaním" summary={`${v.domov.odkazy?.polozky.length ?? 0} odkazov · aj pod článkami`}><div className="vw-panel-telo"><EditorVolnychOdkazov {...p} kde="domov" /></div></Panel>
       <Panel title="Sekcie domovskej" summary={v.domov.sekcie.map((s) => `${s.typ === 'dalsi-obsah' && s.nadpis?.sk ? s.nadpis.sk : NAZVY_SEKCII[s.typ]}${s.viditelna ? '' : ' (skrytá)'}`).join(' · ')}>
         <div className="vw-panel-telo" data-vw-formular-sekcie><EditorSekcii {...p} /></div>
       </Panel>

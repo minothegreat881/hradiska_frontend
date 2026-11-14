@@ -66,6 +66,13 @@
   --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-body: 'Inter', ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
 
+  /* Zaoblenie: štyri stupne, ktoré web už používa (zjednotenie, docs/STYL.md). */
+  --hr-radius-s: 8px;
+  --hr-radius-m: 12px;
+  --hr-radius-l: 16px;
+  --hr-radius-xl: 20px;
+  --hr-radius-pill: 999px;
+
   /* ── Mapovanie tokenov na sémantické premenné ───────────────────────── */
   --hr-bg: var(--l-paper);
   --hr-surface: var(--l-card);
@@ -689,6 +696,25 @@ body[data-lab-theme='pecat'],
 .lnav-cats[data-overflow='true']::after { opacity: 1; }
 .lnav-cats[data-scrolled='true']::before { opacity: 1; }
 
+/* ── Priority+: čo sa do radu nezmestí, je za tlačidlom „Ďalšie" ───────────
+   Rad sa už neposúva do strany (posuvník bol skrytý a koniec radu sa dal len
+   uhádnuť); kategórie, ktoré by sa odrezali, sa skryjú a tlačidlo na konci
+   otvorí register všetkých kategórií (požiadavka K1, audit: hlavička). */
+.lnav-cats[data-priority] > .lnav-cats-row:first-child { overflow: hidden; }
+.lnav-cat[data-mimo] { visibility: hidden; pointer-events: none; }
+.lnav-viac {
+  position: absolute; left: var(--lnav-viac-x, auto); top: 50%; transform: translateY(-50%); z-index: 3;
+  display: inline-flex; align-items: baseline; gap: 7px; min-height: 36px; padding: 6px 10px;
+  border: 0; border-radius: var(--hr-radius-s); background: transparent; cursor: pointer; white-space: nowrap;
+  font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--hr-body);
+  transition: color .18s ease, background .18s ease;
+}
+.lnav-viac:hover { color: var(--hr-ink); }
+.lnav-viac[aria-expanded='true'] { color: var(--hr-accent-deep); background: var(--hr-surface-3); }
+.lnav-viac:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 2px; }
+.lnav-viac-i { width: 14px; height: 14px; align-self: center; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-reduced-motion: reduce) { .lnav-viac { transition: none; } }
+
 /* ── Účet v lište ───────────────────────────────────────────────────────
    `AccountNavLink` je produkčný komponent kreslený pre TMAVÚ lištu: má
    natvrdo krémovú farbu a takmer priehľadné pozadie, takže na svetlej lište
@@ -1077,8 +1103,10 @@ body[data-lab-theme='pecat'],
 }
 
 .lkat-rad { display: grid; gap: 28px 24px; justify-content: center; }
-.lkat-rad--typy { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.lkat-rad--pramene { grid-template-columns: repeat(4, calc((100% - 96px) / 5)); }
+/* Počty z komponentu: `--lkat-n` = dlaždice v rade, `--lkat-s` = stĺpce najdlhšieho
+   radu (aspoň 5). Dnes 5 a 4 — to isté ako pevné `repeat(5)` a `repeat(4, (100% − 96px) / 5)`. */
+.lkat-rad--typy { grid-template-columns: repeat(var(--lkat-n, 5), minmax(0, 1fr)); }
+.lkat-rad--pramene { grid-template-columns: repeat(var(--lkat-n, 4), calc((100% - (var(--lkat-s, 5) - 1) * 24px) / var(--lkat-s, 5))); }
 
 .lkat-dlazdica {
   display: flex; flex-direction: column; gap: 14px; min-width: 0;
@@ -3477,6 +3505,166 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
     width: calc(50% - 7px);
   }
 }
+
+/* ── Činnosť pod článkom: sedem dlaždíc ────────────────────────────────────
+   Pod článkom je činností sedem (na domovskej päť). Mriežka `auto-fill`
+   s dlaždicou od 190 px ich pri 1440 px dala šesť a siedmu samu do druhého
+   radu. Pri známom počte siedmich sa rad delí presne: na širokej obrazovke
+   všetky v jednom rade, na strednej štyri a tri. */
+@media (min-width: 1200px) {
+  .lcin--ticha .lcin-rad[data-pocet="7"] { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
+@media (min-width: 701px) and (max-width: 1199px) {
+  .lcin--ticha .lcin-rad[data-pocet="7"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ── Tlačidlá a odkazy pod činnosťou (požiadavka K3) ──────────────────────
+   Tlačidlo je karta: obrázok vľavo, názov vpravo — číta sa ako tlačidlo, nie
+   ako ďalšia dlaždica činnosti. Hlavné (informačné tabule) má dvojnásobnú
+   šírku, väčší obrázok aj názov. Pod nimi textové odkazy v jednom riadku. */
+.lcin-tlacidla {
+  display: grid; gap: 16px; margin: 28px 0 0; padding: 0; list-style: none;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.lcin-tlacidla > li { min-width: 0; display: flex; }
+.lcin-tlacidla > li.is-hlavne { grid-column: span 2; }
+.lcin-tlacidlo {
+  flex: 1; display: flex; align-items: center; gap: 16px; min-width: 0; min-height: 44px; padding: 10px;
+  text-decoration: none; color: inherit;
+  background: var(--hr-surface); border-radius: var(--hr-radius-l); box-shadow: var(--hr-shadow-sm);
+  transition: box-shadow .3s ease;
+}
+.lcin-tlacidlo-ram {
+  position: relative; display: block; flex: none; width: 120px; aspect-ratio: 4 / 3; overflow: hidden;
+  border-radius: var(--hr-radius-m); background: var(--hr-surface-3);
+}
+.lcin-tlacidla > li.is-hlavne .lcin-tlacidlo-ram { width: 184px; }
+.lcin-tlacidlo-ram img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 1s cubic-bezier(.2, .8, .2, 1);
+}
+.lcin-tlacidlo-text {
+  font-family: var(--font-heading); font-weight: 600; font-size: 17px; line-height: 1.25; color: var(--hr-ink);
+}
+.lcin-tlacidla > li.is-hlavne .lcin-tlacidlo-text { font-size: 21px; }
+
+.lcin-odkazy {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
+  margin: 20px 0 0; padding: 0; list-style: none;
+  font-family: var(--font-body); font-size: 15px;
+}
+.lcin-odkazy a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  font-weight: 500; color: var(--hr-accent-deep); text-decoration: underline;
+  text-decoration-color: var(--hr-line-gold); text-underline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .lcin-tlacidlo:hover { box-shadow: var(--hr-shadow-md); }
+  .lcin-tlacidlo:hover .lcin-tlacidlo-ram img { transform: scale(1.04); }
+  .lcin-tlacidlo:hover .lcin-tlacidlo-text { color: var(--hr-accent-deep); }
+  .lcin-odkazy a:hover { text-decoration-color: currentColor; }
+}
+.lcin-tlacidlo:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 4px; border-radius: var(--hr-radius-l); }
+
+@media (max-width: 700px) {
+  .lcin-tlacidla { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 22px; }
+  .lcin-tlacidla > li.is-hlavne { grid-column: auto; }
+  .lcin-tlacidlo-ram { width: 96px; }
+  .lcin-tlacidla > li.is-hlavne .lcin-tlacidlo-ram { width: 120px; }
+  .lcin-tlacidlo-text { font-size: 16px; }
+  .lcin-tlacidla > li.is-hlavne .lcin-tlacidlo-text { font-size: 18px; }
+  .lcin-odkazy { gap: 0 20px; margin-top: 14px; }
+}
+
+/* ── Rad odkazov pod hľadaním (požiadavka K2) ─────────────────────────────
+   Na domovskej aj pod článkom medzi hľadaním a mapou. Stojí hneď pod
+   dlaždicami kategórií, preto hovorí ich jazykom: rovnaká šírka mriežky
+   (1264 px, päť stĺpcov), rám 3 : 2 na karte, názov v strede. Obrázky sú
+   väčšinou grafiky s textom (logo, tabuľka, značka), preto sa neorežú —
+   celé sedia na karte. */
+.lodk { position: relative; z-index: 10; max-width: 1320px; margin: 0 auto; padding: 0 28px 56px; }
+.lodk-rad {
+  display: grid; gap: 28px 24px; margin: 0 auto; padding: 0; list-style: none; max-width: 1264px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+@media (min-width: 1100px) {
+  .lodk-rad { justify-content: center; grid-template-columns: repeat(var(--lodk-n, 5), calc((100% - (var(--lodk-s, 5) - 1) * 24px) / var(--lodk-s, 5))); }
+}
+.lodk-rad > li { min-width: 0; }
+.lodk-polozka { display: flex; flex-direction: column; gap: 14px; min-width: 0; text-decoration: none; color: inherit; }
+.lodk-ram {
+  position: relative; display: block; aspect-ratio: 3 / 2; overflow: hidden;
+  border-radius: var(--hr-radius-xl); background: var(--hr-surface); box-shadow: var(--hr-shadow-sm);
+}
+.lodk-ram img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block;
+  transition: transform 1s cubic-bezier(.2, .8, .2, 1);
+}
+.lodk-text {
+  font-family: var(--font-body); font-size: clamp(14px, 1.3vw, 17px); font-weight: 700; line-height: 1.25;
+  color: var(--hr-ink); text-align: center; text-wrap: balance; padding: 0 4px;
+}
+@media (hover: hover) {
+  .lodk-polozka:hover .lodk-ram img { transform: scale(1.025); }
+  .lodk-polozka:hover .lodk-text { color: var(--hr-accent-deep); }
+}
+.lodk-polozka:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 4px; border-radius: var(--hr-radius-xl); }
+/* Pod článkom je rad súčasťou pásu s hľadaním (rovnaký papier, plná šírka). */
+.lodk--clanok {
+  max-width: none; background: var(--hr-bg);
+  padding-left: max(28px, calc((100% - 1264px) / 2)); padding-right: max(28px, calc((100% - 1264px) / 2));
+}
+@media (max-width: 700px) {
+  .lodk { padding: 0 16px 36px; }
+  .lodk--clanok { padding-left: 16px; padding-right: 16px; }
+  .lodk-rad { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .lodk-text { font-size: 14.5px; }
+  /* Nepárny počet: posledná do stredu, ako pri dlaždiciach činnosti. */
+  .lodk-rad > li:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 7px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lcin-tlacidlo-ram img, .lodk-ram img { transition: none; }
+  .lcin-tlacidlo:hover .lcin-tlacidlo-ram img, .lodk-polozka:hover .lodk-ram img { transform: none; }
+}
+
+/* ── Hľadanie pod článkom (požiadavka K5) ───────────────────────────────── */
+.lart > .lart-hladanie {
+  position: relative; z-index: 30; /* roletka hľadania nad radom odkazov a mapou */
+  padding: 56px 16px 32px; text-align: center;
+  background: var(--hr-bg); border-top: 1px solid var(--hr-line);
+}
+.lart-hladanie .lhero-vyzva { margin-top: 0; }
+@media (max-width: 767px) {
+  .lart > .lart-hladanie { padding: 40px 16px 24px; }
+}
+
+/* ── Diskusia: zbalená, s počtom (požiadavka K4) ───────────────────────── */
+.disk { margin: 48px 0 0; scroll-margin-top: 32px; }
+.disk-h { margin: 0; }
+.disk-prepinac {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px;
+  padding: 4px 0; border: 0; background: none; cursor: pointer; text-align: left;
+  color: var(--hr-ink); font: inherit;
+}
+.disk-nazov { font-family: var(--font-heading); font-size: 22px; font-weight: 600; line-height: 1.2; }
+.disk-pocet {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 24px; padding: 0 8px; border-radius: var(--hr-radius-pill);
+  background: var(--hr-accent-soft); color: var(--hr-on-photo);
+  font-family: var(--font-body); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.disk-akcia { margin-left: auto; font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--hr-accent-deep); }
+.disk-sipka { width: 20px; height: 20px; flex: none; color: var(--hr-accent-deep); transition: transform .2s ease; }
+.disk.is-otvorena .disk-sipka { transform: rotate(180deg); }
+.disk-prepinac:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 4px; border-radius: var(--hr-radius-s); }
+@media (hover: hover) { .disk-prepinac:hover .disk-akcia { text-decoration: underline; } }
+@media (prefers-reduced-motion: reduce) { .disk-sipka { transition: none; } }
+.disk-ciara {
+  height: 1px; margin: 8px 0 24px; border: 0;
+  background: linear-gradient(90deg, var(--hr-line-quiet) 0%, transparent 100%);
+}
+.disk:not(.is-otvorena) .disk-ciara { margin-bottom: 0; }
 
 .lakt-rok { margin-bottom: 54px; }
 .lakt-rok-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }

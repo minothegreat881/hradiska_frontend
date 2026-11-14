@@ -69,6 +69,9 @@ Service worker API nekešuje, takže starý vzhľad z neho nepríde.
 | článok nie je v `rozriesene.clanky` pre jazyk stránky | vynechá sa (populárne, pripnutý, úvodný článok kroniky); riadok „vybrané ručne“ doplní najnovšími |
 | neznámy typ sekcie | preskočí sa |
 | prázdna skupina dlaždíc (aj po vynechaní zmazaných) | nezobrazí sa ani jej nadpis |
+| chýba `domov.odkazy`, `cinnost.tlacidla` alebo `cinnost.odkazy` (vzhľad uložený pred ich zavedením, 14. 11. 2026) | ten zoznam zo základného vzhľadu (`data/odkazy.ts`) |
+| voľný odkaz bez cieľa, cieľ zmazaný alebo v jazyku stránky chýba, obrázkový bez obrázka | odkaz sa nenakreslí (editor ho ukáže na doplnenie) |
+| zlý záznam voľného odkazu (id, text) | vynechá sa; zlý cieľ či obrázok = bez neho |
 
 Nič z vrstvy vzhľadu nevyhodí výnimku do Reactu. Overuje to `scripts/vzhlad/test-odolnost.mjs`.
 
@@ -147,6 +150,9 @@ Na skúšku bez editora je vo vývojovom serveri (`npm run dev`) prepínač `?vz
 | `riadok-nadpis:<sekciaId>:<riadokId>` | `h2.dob-titul` |
 | `riadok-clanok:<sekciaId>:<riadokId>:<index>` | `a.dob-clanok` |
 | `cinnost:nadpis`, `cinnost:<kluc>` | `h2` v `.lcin-h`, `.lcin-dlazdica` |
+| `odkazy`, `odkaz:<id>` | rad odkazov pod hľadaním `nav.lodk`, `a.lodk-polozka` |
+| `tlacidla`, `tlacidlo:<id>` | tlačidlá pod činnosťou `ul.lcin-tlacidla`, `a.lcin-tlacidlo` |
+| `odkazy-cinnosti`, `odkaz-cinnosti:<id>` | textové odkazy pod činnosťou `ul.lcin-odkazy`, ich `a` |
 | `kronika:uvod` | `a.lakv-pinned` |
 | `kronika:obrazok` | `div.lakv-logo` |
 | `kronika:pripnuty:<index>` | prvé karty pásu `a.lakv-card`, ktoré sú pripnuté |
@@ -343,11 +349,12 @@ Po builde vrátiť `git checkout public/sitemap.xml`.
 
 | skript | čo overí |
 |---|---|
-| `test-zhoda.mjs [--rezim 1,2,2v]` | DOM tela a pixely snímky dnešného a nového webu: domovská, všetky kategórie, článok, `/aktuality`; sk/en/de; 1440 a 390. Režim 1 bez vzhľadu z API, režim 2 s v1 z API, režim 2v s v1 vloženým do HTML. `--samo` porovná dnešný web so sebou (stálosť merania). |
+| `test-zhoda.mjs [--rezim 1,2,2v]` | DOM tela a pixely snímky dnešného a nového webu: domovská, všetky kategórie, článok, `/aktuality`; sk/en/de; 1440 a 390. Režim 1 bez vzhľadu z API, režim 2 s v1 z API, režim 2v s v1 vloženým do HTML. `--samo` porovná dnešný web so sebou (stálosť merania). `--zamerne .a,.b` skryje zámerne zmenené prvky v oboch weboch (rozloženie ostáva) — zvyšok stránky musí byť zhodný. |
 | `test-odolnost.mjs` | prípady z tabuľky 6.4 |
 | `test-vykon.mjs` | hlavný balík gzip (strop +15 kB) a LCP domovskej (Performance API, 3 behy, medián) |
 | `test-admin-smoke.mjs` | administrácia sa načíta a editor otvorí článok; referenčné Strapi smie dostať len GET, preto je relácia podstrčená (`users/me`), ostatné GET idú do Strapi bez tokenu a každý zápis sa zahodí |
 | `snimky-upravy.mjs` | snímky domovskej v režime úprav (1440, 390) a zoznam značiek `data-vw` |
+| `test-volne-odkazy.mjs` | voľné odkazy (rad pod hľadaním, tlačidlá a odkazy pod činnosťou) bez prehliadača: tolerantné čítanie, kontrola, `zbierajOdkazy`, prevod, zoznam zmien a **starý web/appka z `main`** — nový tvar prečíta bez pádu, stará kontrola ho odmietne (backend sa nasadzuje prvý) |
 | `prevod.mjs` | prevod F3 |
 | `test-editor.mjs` | editor vzhľadu proti lokálnemu backendu (plán, časť 10.3): založenie z dnešného webu, 30 rôznych úprav myšou a klávesnicou (presun, skrytie, text v troch jazykoch, obrázok z médií a nahratý, výrez, „Vrátiť pôvodný“, riadok, pripnutie, kategória, menu, päta), Ctrl+Z / Ctrl+Y, uloženie, záloha a obnova po zatvorení karty, konflikt dvoch redaktorov (409), chyba kontroly, zverejnenie so zoznamom zmien a overenie verejného webu, náhľad, história a obnovenie verzie, klasická úprava, Kategórie a Médiá; snímky do `vystup/snimky-editor/` (1440 a 390). Na konci vráti DB do stavu pred testom a porovná všetky tabuľky. |
 | `test-editor-clankov.mjs` | editor článkov po presune `CanvasFrame`: 20 článkov, klik do každého textového bloku, uloženie konceptu, obsah v DB sa nesmie zmeniť. Mení v DB časy a id komponentov — po teste vrátiť DB zo zálohy. |

@@ -11,7 +11,7 @@
 
 import type {
   Vzhlad, Text, TextVolitelny, Obrazok, OdkazKategorie, OdkazClanku, Rozriesene, SekciaDomov,
-  VzhladKategorie, Ciel,
+  VzhladKategorie, Ciel, VolneOdkazy,
 } from './typy';
 
 const JAZYKY_TEXTU = [['sk', ''], ['en', ' (EN)'], ['de', ' (DE)']] as const;
@@ -192,6 +192,30 @@ export function zmenyVzhladu(a: Vzhlad | null | undefined, b: Vzhlad | null | un
     if (s) zmenyTextu(z, `Populárne – ${menoCl(p.clanok)}`, s.text, p.text);
   }
 
+  /* ── Voľné odkazy (rad pod hľadaním, tlačidlá a odkazy pod činnosťou) ── */
+  const volne = (meno: string, x: VolneOdkazy | undefined, y: VolneOdkazy | undefined) => {
+    if (!x && !y) return;
+    if (!x) { z.push(`${meno}: pribudli (${y!.polozky.length})`); return; }
+    if (!y) { z.push(`${meno}: odstránené — web kreslí základ z kódu`); return; }
+    if (x.viditelne !== y.viditelne) z.push(`${meno}: ${y.viditelne ? 'zobrazené' : 'skryté'}`);
+    zmenyZoznamu(z, x.polozky, y.polozky, (o) => o.id, (o) => `„${o.text.sk}“`, {
+      pridane: (m) => `${meno}: pridaný odkaz ${m}`,
+      odobrate: (m) => `${meno}: odkaz ${m} odstránený`,
+      miesto: (m, n) => `${meno}: odkaz ${m} na ${n}. mieste`,
+    });
+    for (const o of y.polozky) {
+      const q = x.polozky.find((w) => w.id === o.id);
+      if (!q) continue;
+      const mo = `${meno} – ${q.text.sk}`;
+      zmenyTextu(z, `${mo} – text`, q.text, o.text);
+      zmenaObrazka(z, mo, q.obrazok, o.obrazok);
+      if (!rovnake(q.ciel, o.ciel)) z.push(o.ciel ? `${mo}: cieľ ${menoCiela(o.ciel)}` : `${mo}: bez cieľa`);
+      if (q.viditelny !== o.viditelny) z.push(`${mo}: ${o.viditelny ? 'zobrazený' : 'skrytý'}`);
+      if (!!q.hlavny !== !!o.hlavny) z.push(`${mo}: ${o.hlavny ? 'hlavné tlačidlo' : 'bežné tlačidlo'}`);
+    }
+  };
+  volne('Odkazy pod hľadaním', da.odkazy, db.odkazy);
+
   /* ── Sekcie ── */
   const menoSekcie = (s: SekciaDomov) => (s.typ === 'dalsi-obsah' && s.nadpis?.sk ? s.nadpis.sk : NAZVY_SEKCII[s.typ]);
   zmenyZoznamu(z, da.sekcie, db.sekcie, (s) => s.id, menoSekcie, {
@@ -302,6 +326,9 @@ export function zmenyVzhladu(a: Vzhlad | null | undefined, b: Vzhlad | null | un
     if (p.viditelna !== c.viditelna) z.push(`Činnosť ${c.nazov.sk}: ${c.viditelna ? 'zobrazená' : 'skrytá všade'}`);
     if (p.naDomovskej !== c.naDomovskej) z.push(`Činnosť ${c.nazov.sk}: ${c.naDomovskej ? 'zobrazená' : 'skrytá'} na domovskej`);
   }
+
+  volne('Tlačidlá pod činnosťou', a.cinnost.tlacidla, b.cinnost.tlacidla);
+  volne('Odkazy pod činnosťou', a.cinnost.odkazy, b.cinnost.odkazy);
 
   /* ── Menu ── */
   if (a.menu.poradie.length || b.menu.poradie.length) {

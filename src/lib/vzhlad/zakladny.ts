@@ -31,10 +31,12 @@ import {
 } from '../../data/domovska';
 import { PRIMARY_SLUGS, EXCLUDE_SLUGS, SHORT, SHORT_EN, SHORT_DE } from '../../data/menu';
 import { PATA_KATEGORIE, PATA_CLANKY, PATA_NADPISY, PATA_SIETE } from '../../data/pata';
+import { ODKAZY_POD_HLADANIM, TLACIDLA_CINNOSTI, ODKAZY_CINNOSTI, type VolnyOdkazVKode } from '../../data/odkazy';
 import {
   SCHEMA_VZHLADU,
   type Vzhlad, type Text, type OdkazKategorie, type OdkazClanku, type Obrazok,
   type VzhladKategorie, type SkupinaDlazdic, type PolozkaCinnosti, type KlucCinnosti,
+  type VolneOdkazy, type Ciel,
 } from './typy';
 
 const sk = (s: string): Text => ({ sk: s });
@@ -74,6 +76,27 @@ function skupina(id: string, nadpis: Text | null, polozky: { slug: string }[]): 
   return { id, nadpis, polozky: polozky.map((p) => ({ id: p.slug, kategoria: kat(p.slug), pocet: true })) };
 }
 
+/** Voľné odkazy z kódu (`data/odkazy.ts`): články a kategórie slugom, obrázky cestou. */
+function volneOdkazy(zoznam: VolnyOdkazVKode[]): VolneOdkazy {
+  return {
+    viditelne: true,
+    polozky: zoznam.map((o) => {
+      const ciel: Ciel | null = !o.ciel ? null
+        : o.ciel.druh === 'clanok' ? { druh: 'clanok', clanok: cl(o.ciel.slug) }
+          : o.ciel.druh === 'kategoria' ? { druh: 'kategoria', kategoria: kat(o.ciel.slug) }
+            : { druh: 'url', url: o.ciel.url };
+      return {
+        id: o.id,
+        text: sk(o.text),
+        obrazok: o.obrazok ? obr(o.obrazok) : null,
+        ciel,
+        viditelny: o.viditelny,
+        ...(o.hlavny ? { hlavny: true } : {}),
+      };
+    }),
+  };
+}
+
 const obrazokKroniky = hradiskaCategories.find((c) => c.slug === KRONIKA_OBRAZOK_KATEGORIE)?.image;
 
 export const ZAKLADNY_VZHLAD: Vzhlad = {
@@ -99,6 +122,7 @@ export const ZAKLADNY_VZHLAD: Vzhlad = {
          takže `t()` by ich vrátil nezmenené — výsledok je ten istý. */
       popularne: POPULARNE.map((p) => ({ text: sk(p.text), clanok: cl(p.slug) })),
     },
+    odkazy: volneOdkazy(ODKAZY_POD_HLADANIM),
     sekcie: [
       { id: 'mapa', typ: 'mapa', viditelna: true },
       {
@@ -153,6 +177,8 @@ export const ZAKLADNY_VZHLAD: Vzhlad = {
       viditelna: true,
       naDomovskej: !CINNOSTI_MIMO_DOMOVSKEJ.includes(c.kluc),
     })),
+    tlacidla: volneOdkazy(TLACIDLA_CINNOSTI),
+    odkazy: volneOdkazy(ODKAZY_CINNOSTI),
   },
   menu: {
     /* Poradie menu je z databázy (`order`); prázdne = nemeniť. */

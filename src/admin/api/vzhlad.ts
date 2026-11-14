@@ -10,7 +10,7 @@
 
 import { strapiFetch, StrapiError, STRAPI_URL } from './client';
 import type {
-  Vzhlad, ZakladDb, OdpovedKonceptu, OdpovedVzhladu, ChybaVzhladu, Rozriesene, ClanokVJazyku, Jazyk,
+  Vzhlad, ZakladDb, OdpovedKonceptu, OdpovedVzhladu, ChybaVzhladu, Rozriesene, ClanokVJazyku, Jazyk, Subor,
 } from '../../lib/vzhlad/typy';
 import type { KonfliktDb, ZapisDoDb } from '../../lib/vzhlad/zlucenie';
 
@@ -210,6 +210,27 @@ export async function suboryPodlaCesty(token: string, cesty: string[]): Promise<
     const pole: { id: number; url: string }[] = Array.isArray(r) ? r : r?.data ?? [];
     /* Pri viacerých záznamoch s rovnakou adresou berie prevod prvý (najnižšie id). */
     for (const f of [...pole].sort((a, b) => a.id - b.id)) if (!von.has(f.url)) von.set(f.url, f.id);
+  }
+  return von;
+}
+
+/** Súbory knižnice médií podľa id — adresa a zmenšeniny pre `rozriesene.subory`. */
+export async function suboryPodlaId(token: string, ids: number[]): Promise<Subor[]> {
+  const zoznam = [...new Set(ids)].filter((id) => Number.isInteger(id) && id > 0);
+  const von: Subor[] = [];
+  for (let i = 0; i < zoznam.length; i += 40) {
+    const davka = zoznam.slice(i, i + 40);
+    const q = davka.map((id, k) => `filters[id][$in][${k}]=${id}`).join('&');
+    const r = await strapiFetch<any>(`/api/upload/files?${q}&limit=${davka.length}`, { token });
+    const pole: any[] = Array.isArray(r) ? r : r?.data ?? [];
+    for (const f of pole) {
+      const formats: Subor['formats'] = {};
+      for (const v of ['thumbnail', 'small', 'medium', 'large'] as const) {
+        const x = f.formats?.[v];
+        if (x?.url) formats[v] = { url: x.url, width: x.width, height: x.height };
+      }
+      von.push({ id: f.id, url: f.url, width: f.width ?? null, height: f.height ?? null, alt: f.alternativeText ?? null, formats });
+    }
   }
   return von;
 }

@@ -24,7 +24,7 @@
  * nedorazí, riadok s počtom sa nevykreslí; nepodsúva sa nula.
  */
 
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { getCategoryPostCounts } from '../lib/strapi';
 import { odkaz, t } from '../lib/jazyk';
 import { useVzhlad } from '../lib/vzhlad/VzhladContext';
@@ -111,7 +111,15 @@ export function LabKategorieRychle() {
   if (!viditelne && !upravy) return null;
 
   return (
-    <nav className="lkat" aria-label={t('Kategórie hradísk')} data-vw={vw(upravy, 'dlazdice')} data-vw-skryte={vwSkryte(upravy, !viditelne)}>
+    <nav
+      className="lkat"
+      aria-label={t('Kategórie hradísk')}
+      data-vw={vw(upravy, 'dlazdice')}
+      data-vw-skryte={vwSkryte(upravy, !viditelne)}
+      /* Počet stĺpcov podľa najdlhšieho radu (aspoň päť): s ďalšou kategóriou
+         v prvom rade (K1) sa dlaždice zúžia, nezalomí sa jedna do nového riadka. */
+      style={{ '--lkat-s': Math.max(5, ...skupiny.map((s) => s.polozky.length)) } as CSSProperties}
+    >
       {skupiny.map((s, i) => (
         <Fragment key={s.id}>
           {/* Nadpis oddeľovača nesie len skupina, ktorá ho má — prvá nie. */}
@@ -122,7 +130,7 @@ export function LabKategorieRychle() {
               <span aria-hidden="true" />
             </div>
           )}
-          <div className={`lkat-rad lkat-rad--${s.id}`} data-vw={vw(upravy, `skupina:${s.id}`)}>
+          <div className={`lkat-rad lkat-rad--${s.id}`} data-vw={vw(upravy, `skupina:${s.id}`)} style={{ '--lkat-n': s.polozky.length } as CSSProperties}>
             {s.polozky.map((d) => (
               <Dlazdica
                 key={d.id}

@@ -109,17 +109,15 @@ export function useAkciePrvkov() {
       case 'ciel': {
         const c = await ui.vyberCiel({ nadpis: p.popis });
         if (!c) return;
-        const id = o.nazov.split(':')[2];
-        k.zmen(p.popis.toLowerCase(), (w: Vzhlad) => {
-          const s = w.pata.stlpce.find((x) => x.id === id);
-          if (s) s.odkazy.push({ text: { sk: c.text }, ciel: c.ciel });
-        });
+        /* Článok: slovenský slug a preklady, aby ho plátno hneď nakreslilo. */
+        if (c.ciel.druh === 'clanok' && c.ciel.clanok.dokument) await slugClanku(c.ciel.clanok.dokument);
+        k.zmen(p.popis.toLowerCase(), (w: Vzhlad) => p.vykonaj(w, { druh: 'ciel', text: c.text, ciel: c.ciel }));
         return;
       }
       default:
         k.zmen(p.popis.toLowerCase(), (w) => p.vykonaj(w, { druh: 'nic' }));
     }
-  }, [k, ui]);
+  }, [k, ui, slugClanku]);
 
   /* Pripnutie článku z plátna: článok (slovenský slug, preklady) sa dotiahne,
      aby ho web vedel nakresliť v každom jazyku a server prijal odkaz. */

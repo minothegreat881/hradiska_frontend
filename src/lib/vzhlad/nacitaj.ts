@@ -29,6 +29,7 @@ import {
   type SkupinaDlazdic, type Dlazdica, type Popularne, type RiadokClankov, type SekciaDomov,
   type PolozkaCinnosti, type Domov, type Cinnost, type Menu, type Pata, type PridajteSa,
   type ZoradenieClankov, type DruhSiete, type Subor, type ClanokVJazyku, type Jazyk,
+  type VolneOdkazy, type VolnyOdkaz,
 } from './typy';
 
 export type ZdrojVzhladu = 'zakladny' | 'vlozeny' | 'api' | 'zvonka';
@@ -111,6 +112,30 @@ const zoradenie = (x: unknown): ZoradenieClankov => (ZORADENIA.includes(x as Zor
 function jedinecne<T extends { id: string }>(zoznam: T[]): T[] {
   const videne = new Set<string>();
   return zoznam.filter((p) => (videne.has(p.id) ? false : (videne.add(p.id), true)));
+}
+
+/**
+ * Voľné odkazy (rad pod hľadaním, tlačidlá a odkazy činnosti). Chýbajúci alebo
+ * nečitateľný zoznam = zo základného vzhľadu (vzhľady uložené pred jeho
+ * zavedením ho nemajú). Zlý záznam sa vynechá; zlý cieľ či obrázok = bez neho
+ * (web taký odkaz nenakreslí, editor ho ukáže na doplnenie).
+ */
+function volneOdkazy(x: unknown, z: VolneOdkazy | undefined): VolneOdkazy | undefined {
+  if (!jeObj(x) || !Array.isArray(x.polozky)) return z;
+  const polozky = jedinecne(x.polozky.map((p): VolnyOdkaz | null => {
+    if (!jeObj(p) || !jeStr(p.id) || !ID.test(p.id)) return null;
+    const t = text(p.text);
+    if (!t) return null;
+    return {
+      id: p.id,
+      text: t,
+      obrazok: obrazok(p.obrazok),
+      ciel: ciel(p.ciel),
+      viditelny: bool(p.viditelny, true),
+      ...(p.hlavny === true ? { hlavny: true } : {}),
+    };
+  }).filter((p): p is VolnyOdkaz => !!p));
+  return { viditelne: bool(x.viditelne, true), polozky };
 }
 
 /* ───────────────────────── Časti vzhľadu ───────────────────────── */
@@ -217,6 +242,7 @@ function domov(x: unknown, z: Domov): Domov {
       popularneViditelne: bool(hl?.popularneViditelne, true),
       popularne,
     },
+    odkazy: volneOdkazy(x.odkazy, z.odkazy),
     sekcie,
     fotogaleria,
     pridajteSa: pridajteSa(x.pridajteSa, z.pridajteSa),
@@ -285,7 +311,12 @@ function cinnost(x: unknown, z: Cinnost): Cinnost {
       naDomovskej: bool(p.naDomovskej, zp.naDomovskej),
     };
   }).filter((p): p is PolozkaCinnosti => !!p);
-  return { nadpis: textZ(x.nadpis, z.nadpis), polozky };
+  return {
+    nadpis: textZ(x.nadpis, z.nadpis),
+    polozky,
+    tlacidla: volneOdkazy(x.tlacidla, z.tlacidla),
+    odkazy: volneOdkazy(x.odkazy, z.odkazy),
+  };
 }
 
 function menu(x: unknown, z: Menu): Menu {

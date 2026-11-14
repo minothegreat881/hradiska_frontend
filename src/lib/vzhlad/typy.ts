@@ -83,6 +83,33 @@ export type Ciel =
   | { druh: 'cesta'; cesta: string } // cesta webu: '/aktuality', '/galeria', '/aktuality?cinnost=vyskumy' …
   | { druh: 'url'; url: string }; // 'https://…' alebo 'mailto:…'
 
+/* ───────────────────────── Voľné odkazy ───────────────────────── */
+
+/**
+ * Voľný odkaz: obrázok, text a cieľ. Kreslí ho rad odkazov pod hľadaním
+ * (`domov.odkazy`), tlačidlá a textové odkazy pod činnosťou združenia
+ * (`cinnost.tlacidla`, `cinnost.odkazy`) — na domovskej aj pod článkom.
+ *
+ * Web odkaz nenakreslí, keď je skrytý, keď nemá cieľ (`ciel: null`) alebo
+ * keď cieľ už neexistuje; obrázkový odkaz ani vtedy, keď nemá obrázok.
+ * Textové odkazy obrázok nemajú (`obrazok: null`).
+ */
+export interface VolnyOdkaz {
+  /** Jedinečné v rámci zoznamu, [a-z0-9-]{1,40}. */
+  id: string;
+  text: Text;
+  obrazok: Obrazok | null;
+  ciel: Ciel | null;
+  viditelny: boolean;
+  /** Hlavné (väčšie) tlačidlo v rade. Chýba = nie. */
+  hlavny?: boolean;
+}
+
+export interface VolneOdkazy {
+  viditelne: boolean;
+  polozky: VolnyOdkaz[];
+}
+
 /* ───────────────────────── Kategórie ───────────────────────── */
 
 export type ZoradenieClankov = 'zverejnenie' | 'povodny-datum' | 'abecedne';
@@ -199,6 +226,12 @@ export interface Domov {
     popularneViditelne: boolean;
     popularne: Popularne[];
   };
+  /**
+   * Rad obrázkových odkazov pod hľadaním, pred prvou sekciou (na domovskej aj pod
+   * článkom). Dá sa skryť, nie presunúť. Chýba = zo základného vzhľadu (vzhľady
+   * uložené pred jeho zavedením ho nemajú).
+   */
+  odkazy?: VolneOdkazy;
   /** Sekcie medzi úvodom a „Pridajte sa“, v poradí na stránke. Každý typ najviac raz, okrem 'dalsi-obsah'. */
   sekcie: SekciaDomov[];
   /** Vybraná fotogaléria v kronike. Zverejnenie ju zapíše do `domovska-galeria.fotky`. null = nemeniť. */
@@ -230,6 +263,10 @@ export interface Cinnost {
   nadpis: Text;
   /** Poradie = poradie zobrazenia. Každý kľúč práve raz. */
   polozky: PolozkaCinnosti[];
+  /** Obrázkové tlačidlá pod dlaždicami činnosti. Chýba = zo základného vzhľadu. */
+  tlacidla?: VolneOdkazy;
+  /** Textové odkazy pod tlačidlami. Chýba = zo základného vzhľadu. */
+  odkazy?: VolneOdkazy;
 }
 
 /* ───────────────────────── Menu a päta ───────────────────────── */
@@ -351,6 +388,8 @@ export const LIMITY = {
   stlpcovPaty: 4,
   odkazovVStlpci: 12,
   prosieb: 6,
+  /** Voľné odkazy v jednom zozname (rad pod hľadaním, tlačidlá, textové odkazy). */
+  volnychOdkazov: 8,
   historia: 100,
 } as const;
 

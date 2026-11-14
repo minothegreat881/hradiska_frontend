@@ -109,6 +109,19 @@ export function prevedVzhlad(vstup: VstupPrevodu): VysledokPrevodu {
     return id ? { id, ...(o.pozicia ? { pozicia: o.pozicia } : {}) } : o;
   };
 
+  /** Cieľ odkazu: kategória a článok dostanú documentId, cesta a adresa ostávajú. */
+  const ciel = (c: Lubovolny) => (!c ? null
+    : c.druh === 'kategoria' ? { druh: 'kategoria', kategoria: odkazKat(c.kategoria) }
+      : c.druh === 'clanok' ? { druh: 'clanok', clanok: odkazCl(c.clanok) } : { ...c });
+  /** Voľné odkazy (rad pod hľadaním, tlačidlá a odkazy činnosti). */
+  const volne = (x: Lubovolny) => x && ({
+    viditelne: x.viditelne,
+    polozky: x.polozky.map((p: Lubovolny) => ({
+      id: p.id, text: text(p.text), obrazok: p.obrazok ? obrazok(p.obrazok) : null, ciel: ciel(p.ciel), viditelny: p.viditelny,
+      ...(p.hlavny ? { hlavny: true } : {}),
+    })),
+  });
+
   const Z: Lubovolny = structuredClone(vstup.zakladny);
   const d = Z.domov;
   const v1: Lubovolny = {
@@ -128,6 +141,7 @@ export function prevedVzhlad(vstup: VstupPrevodu): VysledokPrevodu {
         popularneViditelne: d.hladanie.popularneViditelne,
         popularne: d.hladanie.popularne.map((p: Lubovolny) => ({ text: text(p.text), clanok: odkazCl(p.clanok) })),
       },
+      ...(d.odkazy ? { odkazy: volne(d.odkazy) } : {}),
       sekcie: d.sekcie.map((s: Lubovolny) => {
         if (s.typ === 'dalsi-obsah') {
           return {
@@ -158,6 +172,8 @@ export function prevedVzhlad(vstup: VstupPrevodu): VysledokPrevodu {
     cinnost: {
       nadpis: text(Z.cinnost.nadpis),
       polozky: Z.cinnost.polozky.map((p: Lubovolny) => ({ ...p, nazov: text(p.nazov), popis: text(p.popis), obrazok: obrazok(p.obrazok) })),
+      ...(Z.cinnost.tlacidla ? { tlacidla: volne(Z.cinnost.tlacidla) } : {}),
+      ...(Z.cinnost.odkazy ? { odkazy: volne(Z.cinnost.odkazy) } : {}),
     },
     menu: {
       poradie: kat.map((k) => ({ dokument: k.documentId, slug: k.slug })),
@@ -167,11 +183,7 @@ export function prevedVzhlad(vstup: VstupPrevodu): VysledokPrevodu {
     pata: {
       stlpce: Z.pata.stlpce.map((s: Lubovolny) => ({
         ...s, nadpis: text(s.nadpis),
-        odkazy: s.odkazy.map((o: Lubovolny) => ({
-          text: text(o.text),
-          ciel: o.ciel.druh === 'kategoria' ? { druh: 'kategoria', kategoria: odkazKat(o.ciel.kategoria) }
-            : o.ciel.druh === 'clanok' ? { druh: 'clanok', clanok: odkazCl(o.ciel.clanok) } : o.ciel,
-        })),
+        odkazy: s.odkazy.map((o: Lubovolny) => ({ text: text(o.text), ciel: ciel(o.ciel) })),
       })),
       siete: Z.pata.siete.map((s: Lubovolny) => ({ ...s })),
     },
