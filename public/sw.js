@@ -19,15 +19,17 @@
    shell z cache si pýtal súbory, ktoré už na serveri nie sú. Spolu s touto
    verziou pribudla v `pwa.ts` záchytka, ktorá cache zmaže a stránku raz
    obnoví. */
-const CACHE = 'hradiska-v7';
+const CACHE = 'hradiska-v8';
+/* Písma: len tie, ktoré šat naozaj používa (Fraunces a Inter). Cinzel a Cormorant
+   zo starého šatu sa sťahovali pri inštalácii zbytočne (audit, úloha 3 bod 9). */
 const PRECACHE = [
   '/',
   '/offline.html',
   '/logo_slovanske_hradiska_256.webp',
   '/favicon-192.png',
   '/apple-touch-icon.png',
-  '/fonts/cinzel-400-latin.woff2',
-  '/fonts/cormorant-400-latin.woff2',
+  '/fonts/fraunces-latin-wght-normal.woff2',
+  '/fonts/inter-latin-400-normal.woff2',
 ];
 
 self.addEventListener('install', (event) => {
