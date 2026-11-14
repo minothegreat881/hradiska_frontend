@@ -54,10 +54,15 @@ export function LabJoinUs() {
     if (!form.message.trim()) next.message = t('Správa nesmie byť prázdna');
     setErrors(next);
     if (Object.keys(next).length) return;
+    /* Formulár doteraz hlásil „Vašu správu sme prijali", hoci nič neodoslal
+       (atrapa s 700 ms čakaním; audit, úloha 3 bod 10). Kým backend nevie
+       správu doručiť (STAV.md: čo treba), formulár pripraví e-mail: otvorí
+       poštový program s vyplneným adresátom, predmetom a textom. Hlásenie
+       hovorí presne to, čo sa stalo. */
     setBusy(true);
-    // Rovnako ako pôvodný formulár správu zatiaľ NIKAM neodosiela — je to
-    // atrapa aj v produkcii (viď poznámka v JoinUs.tsx).
-    await new Promise(r => setTimeout(r, 700));
+    const predmet = `${t('Spolupráca s Hradiskami')} – ${form.name.trim()}`;
+    const telo = [form.message.trim(), '', form.name.trim(), form.email.trim()].join('\n');
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(predmet)}&body=${encodeURIComponent(telo)}`;
     setBusy(false);
     setSent(true);
   };
@@ -116,8 +121,8 @@ export function LabJoinUs() {
               {sent ? (
                 <div className="ljoin-done" role="status" aria-live="polite">
                   <div className="ljoin-done-mark" aria-hidden="true">✓</div>
-                  <h3>{t('Ďakujeme!')}</h3>
-                  <p>{t('Vašu správu sme prijali. Ozveme sa vám čo najskôr s ďalšími informáciami o spolupráci.')}</p>
+                  <h3>{t('Správa je pripravená v e-maile')}</h3>
+                  <p>{t('Otvorili sme váš poštový program s vyplnenou správou — odošlite ju tam. Ak sa neotvoril, napíšte nám priamo na')} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
                   <button type="button" className="ljoin-ghost" onClick={() => { setSent(false); setForm({ name: '', email: '', message: '' }); }}>
                     {t('Poslať ďalšiu správu')}
                   </button>
@@ -146,7 +151,7 @@ export function LabJoinUs() {
                   {errors.message && <span className="ljoin-err">{errors.message}</span>}
 
                   <button type="submit" className="ljoin-send" disabled={busy} aria-busy={busy}>
-                    {busy ? t('Odosielam…') : t('Odoslať správu')}
+                    {busy ? t('Pripravujem…') : t('Pripraviť e-mail')}
                   </button>
                   <p className="ljoin-note">
                     {t('Vaše údaje použijeme len na odpoveď na túto správu. Neposkytujeme ich tretím stranám.')}
