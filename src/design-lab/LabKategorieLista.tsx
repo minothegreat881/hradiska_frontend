@@ -54,6 +54,8 @@ function Mini({ d, aktivna, vzhlad, rozriesene, znacka }: {
             srcSet={srcSet ?? undefined}
             sizes="(max-width: 600px) 96px, (max-width: 1060px) 126px, 156px"
             alt=""
+            width={312}
+            height={208}
             loading="lazy"
             decoding="async"
             style={pozicia ? { objectPosition: pozicia } : undefined}

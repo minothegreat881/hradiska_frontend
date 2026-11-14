@@ -102,6 +102,9 @@ function ObrazokOdkazu({ x, trieda }: { x: OdkazNaWebe; trieda: string }) {
         <img
           src={x.src}
           alt=""
+          /* Rozmery podľa rámu (rad odkazov 3 : 2, tlačidlo 4 : 3); obrázok rám vypĺňa, vzhľad sa nemení (Z7.03). */
+          width={trieda === 'lodk-ram' ? 600 : 480}
+          height={trieda === 'lodk-ram' ? 400 : 360}
           loading="lazy"
           decoding="async"
           style={x.pozicia ? { objectPosition: x.pozicia } : undefined}

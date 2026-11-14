@@ -88,6 +88,8 @@ export function LabCinnost({ pocty, poctyKategorii, vybrana = null, onVyber, tic
                   <img
                     src={obrazok}
                     alt=""
+                    width={640}
+                    height={400}
                     loading="lazy"
                     decoding="async"
                     style={pozicia ? { objectPosition: pozicia } : undefined}

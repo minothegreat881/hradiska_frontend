@@ -368,6 +368,8 @@ function PairedImageRow({ leftBlock, rightBlock, editMode }: PairedImageRowProps
             srcSet={sadaZdrojov(block.image)}
             sizes="(max-width: 860px) 100vw, 800px"
             alt={altText}
+            width={block.image?.width || undefined}
+            height={block.image?.height || undefined}
             loading={editMode ? 'eager' : 'lazy'}
             decoding="async"
             className={`absolute inset-0 w-full h-full ${isTallCapped ? 'object-contain' : 'object-cover'} transition-transform duration-300 group-hover:scale-105`}
@@ -803,6 +805,8 @@ function ImageGalleryRenderer({ block, needsClearBefore }: { block: ImageGallery
                 <ImageWithFallback
                   src={url}
                   alt={image.alternativeText || caption || `Obrázok ${idx + 1}`}
+                  width={image.width || undefined}
+                  height={image.height || undefined}
                   loading={editMode ? 'eager' : 'lazy'}
                   decoding="async"
                   className="absolute inset-0 w-full h-full object-cover"

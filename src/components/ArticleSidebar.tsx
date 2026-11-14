@@ -354,6 +354,8 @@ export function ArticleSidebar({
                   <img
                     src={related.coverImage}
                     alt={related.title}
+                    width={56}
+                    height={56}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     className="group-hover:scale-105 transition-transform"
                     onError={(e) => {

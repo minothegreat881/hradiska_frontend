@@ -63,6 +63,8 @@ function Dlazdica({ d, skupina, pocet, vzhlad, rozriesene, upravy }: {
             srcSet={srcSet ?? undefined}
             sizes="(max-width: 720px) 45vw, 240px"
             alt=""
+            width={600}
+            height={400}
             loading="lazy"
             decoding="async"
             style={pozicia ? { objectPosition: pozicia } : undefined}

@@ -123,6 +123,8 @@ export function ArticleCard({ article, stitok = true, znak = false, dataVw, data
             className="acard-obraz"
             src={article.coverImage}
             alt=""
+            width={600}
+            height={400}
             loading="lazy"
             decoding="async"
             onError={() => setFotkaZlyhala(true)}
@@ -134,6 +136,8 @@ export function ArticleCard({ article, stitok = true, znak = false, dataVw, data
             srcSet={`${zaklad}${variant(malba, 'small')} 500w, ${zaklad}${variant(malba, 'medium')} 750w`}
             sizes="(max-width: 720px) 92vw, 380px"
             alt=""
+            width={750}
+            height={500}
             aria-hidden="true"
             loading="lazy"
             decoding="async"

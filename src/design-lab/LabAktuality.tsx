@@ -412,6 +412,8 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
               src={obrazokSekcie}
               alt=""
               aria-hidden="true"
+              width={900}
+              height={886}
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               loading="lazy"
               decoding="async"
@@ -486,7 +488,7 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
                `kronika:zapis:<i>` (dajú sa pripnúť), obe s documentId. */
             <a key={item.documentId} href={odkaz(`/blog/${item.slug}`)} className="lakv-tile lakv-card" data-vw={vw(upravy, poradie < pocetPripnutych ? `kronika:pripnuty:${poradie}` : `kronika:zapis:${poradie - pocetPripnutych}`)} data-vw-dokument={upravy ? item.documentId : undefined}>
               {item.coverUrl ? (
-                <img src={item.coverUrl} alt="" loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={item.coverUrl} alt="" width={600} height={400} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <span style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 40%, var(--hr-wash-4) 0%, var(--hr-wash-5) 55%, var(--hr-on-dark) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: 96 }}>
                   <picture style={{ display: 'contents' }}>
@@ -572,7 +574,7 @@ export default function LabAktuality({ sekcia: zadana }: { sekcia?: SekciaKronik
               data-vw-subor={upravy && klucKonceptu && i < curated.length && g.fileId !== undefined ? String(g.fileId) : undefined}
               style={{ position: 'relative', display: 'block', borderRadius: i === 0 ? 26 : 20, overflow: 'hidden', gridColumn: i === 0 ? 'span 2' : undefined, gridRow: i === 0 ? 'span 2' : undefined }}
             >
-              <img src={g.src} alt={g.alt} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={g.src} alt={g.alt} width={600} height={400} loading="lazy" decoding="async" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               {g.place && <span className="lakv-place">◍ {g.place}</span>}
             </a>
           ))}

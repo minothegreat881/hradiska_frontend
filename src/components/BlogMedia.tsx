@@ -230,6 +230,8 @@ function ImageWrapper({
         srcSet={srcSet}
         sizes={sizes}
         {...imgProps}
+        width={width}
+        height={height}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         style={{ objectPosition }}
         /* V editore vždy `eager`. Plátno je jedno vysoké okno bez vlastného

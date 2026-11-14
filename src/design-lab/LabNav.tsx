@@ -272,7 +272,7 @@ export function LabNav({ rozbalene = false }: {
           <span className="lnav-mark">
             <picture>
               <source srcSet="/znak_nausnica.webp" type="image/webp" />
-              <img src="/znak_nausnica.png" alt="" aria-hidden="true" />
+              <img src="/znak_nausnica.png" alt="" aria-hidden="true" width={280} height={271} />
             </picture>
           </span>
           <span>{t('Hradiská')}</span>

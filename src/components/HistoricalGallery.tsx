@@ -13,6 +13,9 @@ export interface GalleryImage {
   /** Zmenšenina pre mriežku. Bez nej sa do dlaždice 4:3 ťahal originál —
       na článku o Devíne to bolo 38 fotografií a 57 MB. */
   thumb?: string;
+  /** Rozmery originálu (pomer strán) – `<img>` si nimi vyhradí miesto pred načítaním (Z7.03). */
+  width?: number;
+  height?: number;
   caption?: string;
   alt?: string;
   author?: string;
@@ -455,6 +458,8 @@ export function HistoricalGallery({ images, title, columns = 3 }: HistoricalGall
               <ImageWithFallback
                 src={image.thumb || image.url}
                 alt={image.alt || image.caption || `${t('Obrázok')} ${idx + 1}`}
+                width={image.width || undefined}
+                height={image.height || undefined}
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ pointerEvents: 'none' }}
                 loading="lazy"

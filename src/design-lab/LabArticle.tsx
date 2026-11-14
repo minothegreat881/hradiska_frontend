@@ -226,6 +226,8 @@ export function LabArticle({ slug }: { slug: string }) {
       thumb: img.formats?.small?.url || img.formats?.medium?.url || img.formats?.thumbnail?.url
         ? getStrapiImageUrl(img, img.formats?.small ? 'small' : img.formats?.medium ? 'medium' : 'thumbnail')
         : getStrapiImageUrl(img),
+      width: img.width || undefined,
+      height: img.height || undefined,
       /* Poradie je dôležité: čo je v jazyku stránky, ide prvé, a slovenský
          popis z knižnice médií sa v angličtine použije až vtedy, keď niet
          ničoho iného — predtým sa cez neho preskakoval anglický `alt`
@@ -274,6 +276,8 @@ export function LabArticle({ slug }: { slug: string }) {
                 className="lart-hero-mini"
                 src={miniatura}
                 alt=""
+                width={(post.coverImage as any)?.width || 1600}
+                height={(post.coverImage as any)?.height || 900}
                 aria-hidden="true"
                 decoding="async"
                 style={{ objectPosition: post.coverPosition || 'center center' }}
@@ -293,6 +297,8 @@ export function LabArticle({ slug }: { slug: string }) {
                  nedá — prednosť pri sťahovaní by sa tým stratila. */
               {...{ fetchpriority: 'high' }}
               decoding="async"
+              width={(post.coverImage as any)?.width || 1600}
+              height={(post.coverImage as any)?.height || 900}
               onLoad={() => setOstraTu(true)}
               /* Keď sa fotografia nestiahne, nech ostane vidieť aspoň to, čo
                  je — inak by ostala priehľadná navždy. */
@@ -380,7 +386,7 @@ export function LabArticle({ slug }: { slug: string }) {
 
                 {gallery.length > 0 && (
                   <HistoricalGallery
-                    images={gallery as { url: string; thumb?: string; caption?: string; alt?: string }[]}
+                    images={gallery as { url: string; thumb?: string; width?: number; height?: number; caption?: string; alt?: string }[]}
                     columns={(post as any).galleryColumns || 3}
                   />
                 )}

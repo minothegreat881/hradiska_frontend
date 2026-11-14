@@ -79,7 +79,7 @@ function Karta({ c, znacka }: { c: Clanok; znacka?: string }) {
     <a className="dob-clanok" href={odkaz(`/blog/${c.slug}`)} data-vw={znacka} data-vw-dokument={znacka ? c.documentId : undefined}>
       <span className="dob-ram">
         {c.obrazok && (
-          <img className="dob-obraz" src={c.obrazok} alt="" loading="lazy" decoding="async" />
+          <img className="dob-obraz" src={c.obrazok} alt="" width={600} height={400} loading="lazy" decoding="async" />
         )}
       </span>
       <span className="dob-nazov">{c.title}</span>
