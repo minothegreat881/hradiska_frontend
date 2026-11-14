@@ -66,7 +66,7 @@ const cardTitleStyle: React.CSSProperties = {
   fontFamily: 'Georgia, serif',
   fontSize: 13,
   fontWeight: 600,
-  color: 'var(--hr-accent-soft)',
+  color: 'var(--hr-body)', /* L15.01: nadpis karty nie je odkaz */
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
   marginBottom: 12,
@@ -117,7 +117,7 @@ export function KeyFactsCard({ facts }: { facts: KeyFact[] }) {
                   fontFamily: 'Georgia, serif',
                   fontSize: 11,
                   fontWeight: 600,
-                  color: 'var(--hr-accent-soft)',
+                  color: 'var(--hr-body)', /* L15.01 */
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                 }}
