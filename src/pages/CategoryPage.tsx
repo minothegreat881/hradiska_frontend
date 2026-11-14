@@ -163,7 +163,7 @@ export function CategoryPage({ categorySlug }: CategoryPageProps) {
             transition={{ duration: 0.5 }}
           >
             {/* Omrvinky (breadcrumbs): Domov › Kategória */}
-            <nav aria-label="Omrvinky" style={{ marginBottom: 16 }}>
+            <nav aria-label="Omrvinky" className="cat-crumbs" style={{ marginBottom: 16 }}>
               <ol style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, listStyle: 'none', margin: 0, padding: 0, fontFamily: 'var(--font-heading)', fontSize: 13, letterSpacing: '0.03em', color: 'var(--hr-clear-text)' }}>
                 <li>
                   <a

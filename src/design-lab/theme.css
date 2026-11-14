@@ -4900,3 +4900,16 @@ html { scroll-padding-top: 104px; }
   .lapp-text, .lapp-kroky, .lapp-pata, .lapp-poznamka { font-size: 16px; }
   .prose-content, .lacc-sub { font-size: 16px !important; }
 }
+
+/* ── Dotykové ciele (základ L07.01, Z6.01; úloha 2, dávka 4) ───────────────
+   Malé odkazy (populárne hradiská, „Zobraziť všetky“, omrvinky, „Čítať článok“
+   v galérii, odkazy pod prihlásením) mali 17 – 22 px na výšku. Všade aspoň
+   24 px (WCAG 2.5.8), na dotyku 44 px; rastie plocha riadka, nie písmo.
+   Prepínač jazyka 39 × 35 → 44 × 44. */
+.lhero-rychle a, .dob-vsetky, .lart-crumbs a, .cat-crumbs a, .lgal-skupina-o, .lacc-odkaz {
+  display: inline-flex; align-items: center; min-height: 24px;
+}
+.lnav-jazyk { min-width: 44px; min-height: 44px; justify-content: center; }
+@media (pointer: coarse), (any-pointer: coarse), (hover: none) {
+  .lhero-rychle a, .dob-vsetky, .lart-crumbs a, .cat-crumbs a, .lgal-skupina-o, .lacc-odkaz { min-height: 44px; }
+}

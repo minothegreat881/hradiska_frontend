@@ -194,9 +194,9 @@ export function AccountPage({ mode }: { mode: AccountMode }) {
           {mode === 'login' && (
             <>
               <span style={{ fontFamily: 'Georgia, serif', fontSize: 14, color: 'var(--hr-clear-text)' }}>
-                {t('Nemáte účet?')} <button type="button" style={linkBtn} onClick={() => go(odkaz('/registracia'))}>{t('Zaregistrujte sa')}</button>
+                {t('Nemáte účet?')} <button type="button" className="lacc-odkaz" style={linkBtn} onClick={() => go(odkaz('/registracia'))}>{t('Zaregistrujte sa')}</button>
               </span>
-              <button type="button" style={linkBtn} onClick={() => go(odkaz('/zabudnute-heslo'))}>{t('Zabudli ste heslo?')}</button>
+              <button type="button" className="lacc-odkaz" style={linkBtn} onClick={() => go(odkaz('/zabudnute-heslo'))}>{t('Zabudli ste heslo?')}</button>
             </>
           )}
           {mode === 'register' && (
