@@ -26,11 +26,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const outPath = resolve(__dirname, '..', 'public', 'sitemap.xml');
 
 // Statické cesty webu (verejné, indexovateľné). Bez /admin a účtových ciest.
+/* /hradiska, /kultura, /archeologia, /pramene, /pravek boli mŕtve (audit, úloha 3 bod 3). */
 const STATIC_PATHS = [
   '/', '/galeria', '/aktuality',
-  '/hradiska', '/kultura', '/archeologia', '/pramene', '/pravek',
   '/ochrana-osobnych-udajov', '/podmienky-pouzivania', '/aplikacia',
 ];
+const CUDZIE = ['en', 'de'];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -41,6 +42,24 @@ function urlEntry(path, priority) {
 async function main() {
   const entries = [];
   for (const p of STATIC_PATHS) entries.push(urlEntry(p, p === '/' ? '1.0' : '0.7'));
+  /* Statické stránky v angličtine a nemčine (majú vlastné hlavičky z prerenderu). */
+  for (const j of CUDZIE) for (const p of STATIC_PATHS) entries.push(urlEntry(`/${j}${p === '/' ? '' : p}`, p === '/' ? '0.9' : '0.6'));
+
+  /* Kategórie vo všetkých troch jazykoch. */
+  let kategorii = 0;
+  try {
+    const r = await fetch(`${STRAPI}/api/blog-categories?sort=order:asc&pagination[pageSize]=100&fields[0]=slug`, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    for (const k of (await r.json()).data || []) {
+      if (!k.slug) continue;
+      entries.push(urlEntry(`/category/${k.slug}`, '0.8'));
+      for (const j of CUDZIE) entries.push(urlEntry(`/${j}/category/${k.slug}`, '0.7'));
+      kategorii++;
+    }
+  } catch (e) {
+    console.warn(`[sitemap] kategórie sa nestiahli (${e.message}).`);
+  }
+  console.log(`[sitemap] kategórií: ${kategorii} × 3 jazyky`);
 
   let articleCount = 0;
   try {

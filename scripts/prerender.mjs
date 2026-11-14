@@ -137,11 +137,8 @@ function writePage(urlPath, head, jazyk = 'sk') {
 // ── Statické stránky ─────────────────────────────────────────────────────────
 const STATIC = [
   { path: '/', title: 'Hradiská.sk — encyklopédia slovanských hradísk na Slovensku', description: 'Encyklopédia slovanských a pravekých hradísk na Slovensku — dejiny, archeológia, lokality a pramene. Vyše 300 článkov o hradiskách, ich obyvateľoch a nálezoch.' },
-  { path: '/hradiska', title: 'Hradiská na Slovensku — prehľad lokalít', description: 'Prehľad slovanských, keltských a pravekých hradísk na Slovensku — mocenské centrá, strážne hradiská, refugiá a ich dejiny.' },
-  { path: '/kultura', title: 'Kultúra a život na hradiskách', description: 'Kultúra, remeslá, šperky, viera a každodenný život obyvateľov hradísk od praveku po včasný stredovek.' },
-  { path: '/archeologia', title: 'Archeológia hradísk a nálezov', description: 'Archeologické výskumy, nálezy a odborné texty o hradiskách na Slovensku a v okolitých krajinách.' },
-  { path: '/pramene', title: 'Písomné pramene a listiny', description: 'Dobové listiny, kroniky a písomné pramene k dejinám Veľkej Moravy, Nitrianskeho kniežatstva a Slovanov.' },
-  { path: '/pravek', title: 'Praveké hradiská a kultúry', description: 'Praveké hradiská na Slovensku — lužická, púchovská, otomanská a ďalšie kultúry doby bronzovej a železnej.' },
+  /* /hradiska, /kultura, /archeologia, /pramene, /pravek sú odstránené: web také stránky
+     nemá (vrátili by prázdnu domovskú pod iným titulkom). Audit, úloha 3 bod 3. */
   { path: '/galeria', title: 'Galéria hradísk a nálezov', description: 'Fotogaléria hradísk, archeologických nálezov, kresieb a 3D rekonštrukcií z dielne Hradiska.sk.' },
   { path: '/aktuality', title: 'Aktuality — kronika OZ Hradiská', description: 'Aktuality, podujatia a činnosť Občianskeho združenia Hradiská pri objavovaní a ochrane hradísk.' },
   { path: '/ochrana-osobnych-udajov', title: 'Ochrana osobných údajov — Hradiská.sk', description: 'Zásady spracovania osobných údajov (GDPR) — kontá, komentáre, cookies, práva dotknutých osôb.' },
@@ -164,6 +161,82 @@ for (const s of STATIC) {
     ld: [website],
   }));
 }
+
+/* Statické stránky v angličtine a nemčine — vlastný titulok, popis, canonical,
+   hreflang a jazyk dokumentu. Texty sú preklady slovenských vyššie. */
+const STATIC_CUDZIE = {
+  en: [
+    { path: '/', title: 'Hradiská.sk — encyclopedia of Slavic hillforts in Slovakia', description: 'Encyclopedia of Slavic and prehistoric hillforts in Slovakia — history, archaeology, sites and written sources. Over 300 articles about hillforts, their inhabitants and finds.' },
+    { path: '/galeria', title: 'Gallery of hillforts and finds', description: 'Photo gallery of hillforts, archaeological finds, drawings and 3D reconstructions by Hradiska.sk.' },
+    { path: '/aktuality', title: 'News — chronicle of the Hradiská association', description: 'News, events and activities of the Hradiská civic association in discovering and protecting hillforts.' },
+    { path: '/ochrana-osobnych-udajov', title: 'Privacy policy — Hradiská.sk', description: 'How personal data are processed (GDPR) — accounts, comments, cookies and the rights of data subjects.' },
+    { path: '/podmienky-pouzivania', title: 'Terms of use — Hradiská.sk', description: 'Terms of use of Hradiská.sk — content and copyright, accounts, comments and liability.' },
+    { path: '/aplikacia', title: 'Phone app — Hradiská.sk', description: 'The hillfort encyclopedia as an Android app. The hillfort map works without signal, with notifications about replies and new articles.' },
+  ],
+  de: [
+    { path: '/', title: 'Hradiská.sk — Enzyklopädie der slawischen Burganlagen in der Slowakei', description: 'Enzyklopädie der slawischen und urgeschichtlichen Burganlagen in der Slowakei — Geschichte, Archäologie, Fundorte und Schriftquellen. Über 300 Artikel über Burganlagen, ihre Bewohner und Funde.' },
+    { path: '/galeria', title: 'Galerie der Burganlagen und Funde', description: 'Fotogalerie der Burganlagen, archäologischen Funde, Zeichnungen und 3D-Rekonstruktionen von Hradiska.sk.' },
+    { path: '/aktuality', title: 'Aktuelles — Chronik des Vereins Hradiská', description: 'Neuigkeiten, Veranstaltungen und Tätigkeit des Bürgervereins Hradiská bei der Erforschung und dem Schutz der Burganlagen.' },
+    { path: '/ochrana-osobnych-udajov', title: 'Datenschutz — Hradiská.sk', description: 'Wie personenbezogene Daten verarbeitet werden (DSGVO) — Konten, Kommentare, Cookies und Rechte der betroffenen Personen.' },
+    { path: '/podmienky-pouzivania', title: 'Nutzungsbedingungen — Hradiská.sk', description: 'Nutzungsbedingungen von Hradiská.sk — Inhalte und Urheberrecht, Konten, Kommentare und Haftung.' },
+    { path: '/aplikacia', title: 'App für das Telefon — Hradiská.sk', description: 'Die Enzyklopädie der Burganlagen als Android-App. Die Karte funktioniert auch ohne Empfang, mit Benachrichtigungen über Antworten und neue Artikel.' },
+  ],
+};
+const altStatickej = (cesta) => [
+  { jazyk: 'sk', url: SITE + cesta },
+  ...CUDZIE_JAZYKY.map((j) => ({ jazyk: j, url: `${SITE}/${j}${cesta === '/' ? '' : cesta}` })),
+  { jazyk: 'x-default', url: SITE + cesta },
+];
+for (const j of CUDZIE_JAZYKY) {
+  for (const s of STATIC_CUDZIE[j]) {
+    const cesta = `/${j}${s.path === '/' ? '' : s.path}`;
+    writePage(cesta, buildHead({ title: s.title, description: s.description, canonical: SITE + cesta, alternaty: altStatickej(s.path), jazyk: j }), j);
+  }
+}
+
+/* ── Kategórie (audit, úloha 3 bod 3) ─────────────────────────────────────
+   Každá kategória v slovenčine, angličtine a nemčine: vlastný titulok, popis,
+   canonical a hreflang. Názov a popis vo všetkých jazykoch berie z vloženého
+   vzhľadu webu (`kategorie[].nazov`, `popis` — výslovné EN/DE), inak z databázy. */
+async function kategorie() {
+  let zoznam = [];
+  try {
+    const r = await fetch(`${STRAPI}/api/blog-categories?sort=order:asc&pagination[pageSize]=100&fields[0]=name&fields[1]=slug&fields[2]=description`, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }, signal: AbortSignal.timeout(15000),
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    zoznam = (await r.json()).data || [];
+  } catch (e) {
+    console.warn(`[prerender] kategórie sa nestiahli (${e.message}) — bez hlavičiek kategórií.`);
+    return 0;
+  }
+  const zaznamy = new Map();
+  for (const k of vzhlad?.data?.kategorie || []) {
+    const slug = (k.kategoria?.dokument && vzhlad.kategorie?.[k.kategoria.dokument]?.slug) || k.kategoria?.slug;
+    if (slug) zaznamy.set(slug, k);
+  }
+  const textJ = (t, j) => (t && typeof t === 'object' ? (j === 'sk' ? t.sk : t[j]) || null : null);
+  let n = 0;
+  for (const k of zoznam) {
+    const z = zaznamy.get(k.slug);
+    const alt = [
+      { jazyk: 'sk', url: `${SITE}/category/${k.slug}` },
+      ...CUDZIE_JAZYKY.map((j) => ({ jazyk: j, url: `${SITE}/${j}/category/${k.slug}` })),
+      { jazyk: 'x-default', url: `${SITE}/category/${k.slug}` },
+    ];
+    for (const j of ['sk', ...CUDZIE_JAZYKY]) {
+      const nazov = textJ(z?.nazov, j) || (j === 'sk' ? k.name : textJ(z?.nazov, 'sk') || k.name);
+      const popis = textJ(z?.popis, j) || (j === 'sk' ? k.description : null) || textJ(z?.popis, 'sk') || k.description || nazov;
+      const cesta = j === 'sk' ? `/category/${k.slug}` : `/${j}/category/${k.slug}`;
+      const zoznamLd = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: nazov, url: SITE + cesta, inLanguage: j, isPartOf: { '@type': 'WebSite', name: 'Hradiská.sk', url: SITE + '/' } };
+      writePage(cesta, buildHead({ title: `${nazov} — Hradiská.sk`, description: popis, canonical: SITE + cesta, alternaty: alt, jazyk: j, ld: [zoznamLd] }), j);
+      n++;
+    }
+  }
+  return n;
+}
+const pocetKategorii = await kategorie();
+console.log(`[prerender] hlavičky kategórií: ${pocetKategorii} (sk, ${CUDZIE_JAZYKY.join(', ')})`);
 
 // ── Články ───────────────────────────────────────────────────────────────────
 async function main() {
