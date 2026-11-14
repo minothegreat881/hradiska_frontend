@@ -358,7 +358,11 @@ export function LabNav({ rozbalene = false }: {
           {rows.map(row => (
             <div className="lnav-m-group" key={row.label} data-vw={vw(upravy, row.znacka)}>
               <span className="lnav-m-label">{row.label}</span>
-              {row.items.map(cat => {
+              {/* Kategória „Aktuality" je v ponuke len raz — ako služobný odkaz
+                  nižšie (kronika s tými istými zápismi). Dvakrát „Aktuality"
+                  s dvomi rôznymi cieľmi mátlo (audit, úloha 3 bod 1). Na plátne
+                  editora ostáva, aby sa dala presúvať. */}
+              {row.items.filter(cat => upravy || catSlug(cat) !== 'aktuality').map(cat => {
                 const isOpen = openMobileCat === cat.label;
                 return (
                   <div className="lnav-m-cat" key={cat.label} data-vw={vw(upravy, `menu:${catSlug(cat)}`)} data-vw-skryte={jeSkryta(cat)}>
