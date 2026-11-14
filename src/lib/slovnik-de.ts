@@ -587,6 +587,10 @@ export const DE: Record<string, string> = {
   'Zobraziť': 'Anzeigen',
   'Skryť': 'Ausblenden',
   'Ďalšie': 'Mehr',
+  'Článok sa nenašiel (404) — Hradiská.sk': 'Artikel nicht gefunden (404) — Hradiská.sk',
+  'Tento článok sa nenašiel': 'Dieser Artikel wurde nicht gefunden',
+  'Článok mohol byť premenovaný alebo presunutý. Skúste ho nájsť hľadaním, alebo pokračujte cez kategórie.': 'Der Artikel wurde möglicherweise umbenannt oder verschoben. Versuchen Sie ihn über die Suche zu finden, oder gehen Sie über die Kategorien weiter.',
+  'Preskočiť na obsah': 'Zum Inhalt springen',
   'Načítavam komentáre…': 'Kommentare werden geladen …',
   'Zatiaľ tu nie sú žiadne komentáre. Buďte prvý, kto napíše svoj názor.':
     'Hier gibt es noch keine Kommentare. Schreiben Sie als Erste oder Erster Ihre Meinung.',

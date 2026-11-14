@@ -113,6 +113,7 @@ export function LabKategorieRychle() {
   return (
     <nav
       className="lkat"
+      id="kategorie"
       aria-label={t('Kategórie hradísk')}
       data-vw={vw(upravy, 'dlazdice')}
       data-vw-skryte={vwSkryte(upravy, !viditelne)}

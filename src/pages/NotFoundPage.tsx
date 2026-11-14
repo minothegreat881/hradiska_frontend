@@ -15,10 +15,13 @@ const go = (p: string) => { window.history.pushState({}, '', p); window.dispatch
  *  - dočasne pridá `<meta name="robots" content="noindex">`, aby sa neindexovala,
  *  - ponúkne cestu späť (domov, vyhľadávanie, kategórie).
  */
-export function NotFoundPage() {
+export function NotFoundPage({ clanok = false }: {
+  /** Neexistujúci článok (`/blog/<slug>`): iný nadpis a text, inak to isté. */
+  clanok?: boolean;
+} = {}) {
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = t('Stránka sa nenašla (404) — Hradiská.sk');
+    document.title = clanok ? t('Článok sa nenašiel (404) — Hradiská.sk') : t('Stránka sa nenašla (404) — Hradiská.sk');
     const meta = document.createElement('meta');
     meta.name = 'robots';
     meta.content = 'noindex';
@@ -27,7 +30,7 @@ export function NotFoundPage() {
       document.title = prevTitle;
       meta.remove();
     };
-  }, []);
+  }, [clanok]);
 
   const btn: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 22px',
@@ -40,10 +43,12 @@ export function NotFoundPage() {
       <div style={{ maxWidth: 560, textAlign: 'center', fontFamily: 'var(--font-serif, Georgia, serif)' }}>
         <div style={{ fontSize: 84, fontWeight: 700, color: 'var(--hr-accent)', lineHeight: 1, fontFamily: 'var(--font-heading, Cinzel, serif)' }}>404</div>
         <h1 style={{ fontSize: 28, fontWeight: 600, color: 'var(--hr-ink-3)', margin: '14px 0 10px' }}>
-          {t('Táto stránka sa nenašla')}
+          {clanok ? t('Tento článok sa nenašiel') : t('Táto stránka sa nenašla')}
         </h1>
         <p style={{ fontSize: 16, color: 'var(--hr-clear-text)', lineHeight: 1.6, margin: '0 0 28px' }}>
-          {t('Odkaz je možno starý alebo neúplný. Skúste hľadať konkrétne hradisko, alebo sa vráťte na úvod.')}
+          {clanok
+            ? t('Článok mohol byť premenovaný alebo presunutý. Skúste ho nájsť hľadaním, alebo pokračujte cez kategórie.')
+            : t('Odkaz je možno starý alebo neúplný. Skúste hľadať konkrétne hradisko, alebo sa vráťte na úvod.')}
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href={odkaz('/')} onClick={(e) => { e.preventDefault(); go(odkaz('/')); }}
@@ -54,9 +59,11 @@ export function NotFoundPage() {
              style={{ ...btn, background: 'transparent', color: 'var(--hr-accent)', border: '1px solid var(--hr-chip-border)' }}>
             <Search style={{ width: 17, height: 17 }} /> {t('Vyhľadávanie')}
           </a>
-          <a href={odkaz('/hradiska')} onClick={(e) => { e.preventDefault(); go(odkaz('/hradiska')); }}
+          {/* Predtým viedlo na `/hradiska` — cesta, ktorá na webe nie je (audit,
+              úloha 3 bod 3). Teraz na dlaždice kategórií na úvode. */}
+          <a href={`${odkaz('/')}#kategorie`} onClick={(e) => { e.preventDefault(); go(`${odkaz('/')}#kategorie`); }}
              style={{ ...btn, background: 'transparent', color: 'var(--hr-accent)', border: '1px solid var(--hr-chip-border)' }}>
-            <Compass style={{ width: 17, height: 17 }} /> {t('Hradiská')}
+            <Compass style={{ width: 17, height: 17 }} /> {t('Kategórie')}
           </a>
         </div>
       </div>

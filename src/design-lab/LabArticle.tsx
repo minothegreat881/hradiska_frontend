@@ -39,6 +39,7 @@ import { ArticleCard } from '../components/ArticleCard';
 import LabKategorieLista from './LabKategorieLista';
 import { MapaAzKedTreba } from './MapaAzKedTreba';
 import { LabCinnost } from './LabCinnost';
+import { NotFoundPage } from '../pages/NotFoundPage';
 import { BlokHladania } from './LabHladanie';
 import { RadOdkazov } from './LabOdkazy';
 
@@ -175,7 +176,8 @@ export function LabArticle({ slug }: { slug: string }) {
   }, [loading, post, slug]);
 
   if (loading || (post && !fotkaPripravena)) return <CakanieNaClanok />;
-  if (!post) return <div className="lart-wait">{t('Článok sa nenašiel.')}</div>;
+  /* Neexistujúci článok: nadpis, cesty ďalej a noindex (základ KG.04, 404; audit úloha 3 bod 7). */
+  if (!post) return <NotFoundPage clanok />;
 
   const article = convertStrapiPostToArticle(post);
 
