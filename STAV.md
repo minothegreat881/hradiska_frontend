@@ -35,6 +35,9 @@ aktuality `vyprava-polske-hradiska-2-…` · poloha a časová os `nitra`.
   v zaklad-webov d65f7f7). Úplné premeranie opravenej stavby `projekt-oprava` beh 2026-11-14T16-51-25: prešlo 880, neprešlo 424
   (chyby 38, odporúčania 386), na posúdenie 72, neuplatňuje sa 266, nezmerané 38. Zostáva 31 „zhoršení“, nie webu:
   28 navštívené odkazy (zmerateľné až s `<main>`), 2 kontrast mapy pod článkom (K5; oprava 2a), 1 prvý Tab (nástroj; oprava 2d)
+- [x] Pokyny zo 14. 11. (večer): 2a kontrast mapy ZRUŠENÝ – zadávateľ chce mapu 1:1 ako na main (vrátené 7d2b63e: mapa.css,
+  MapaHradisk, MiniMapaLokality, .lok-mapa; overené pixelmi). 2b rozmery obrázkov, 2c ciele pod 24 px (WCAG 2.5.8, bez viditeľnej
+  zmeny), 2d prvý Tab = chyba nástroja (zaklad-webov 30304a7). K1 postup `docs/K1-STREDOVEKE-HRADKY.md`, odovzdanie `docs/ODOVZDANIE.md`.
 - [x] Úloha 3: body 1 – 10 (každý vlastný commit), zoznam na rozhodnutie a „Pred spustením“ v správe
 - [x] Správa: `SPRAVA-ZAKLAD-2026-11-14.md`
 

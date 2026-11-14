@@ -93,9 +93,68 @@ názov všade, kde je málo miesta (lišta, dlaždica, mobilné menu).
 
 Zmena je v editore vzhľadu (krátky názov v menu, popisok dlaždice, názov) – bez zásahu do kódu.
 
+## Návrhy, ktoré menia vzhľad (nemenené, rozhodne zadávateľ)
+
+Podľa pokynu zo 14. 11. ostávajú len ako návrh. Čísla sú z konečného merania (beh 2026-11-14T16-51-25).
+
+**Navštívené odkazy** (L29.01, odporúčanie; 34 výsledkov pri 1440 px)
+- Navštívený odkaz vyzerá rovnako ako nenavštívený.
+- Väčšina nálezov je navigácia:
+  - lišta kategórií `cat-mini` 60×;
+  - dlaždice `lkat-dlazdica`;
+  - omrvinky;
+  - dlaždice činnosti.
+- Návrh: rozlišovať len odkazy v texte článku a zoznamy článkov, napríklad
+  `.article-content a:visited { color: var(--hr-accent-deep) }` a pri karte článku jemná značka „prečítané“.
+  Navigácia ostane bez rozlíšenia.
+- Kým sa nezmení, kontrola ostane „neprešlo“. Pred pridaním `<main>` ju nástroj nevedel zmerať („neuplatňuje sa“).
+
+**Prvá obrazovka** (Z8.01, odporúčanie; 18 výsledkov)
+- Nadpis článku `h1.lart-title` (12×) a kategórie `h1.cat-uvod-titul` (6×) končí tesne pod prvou obrazovkou.
+  Príklad: 827 – 937 px pri okne 900 px. Hlavná fotka a hlavička nad ním zaberajú takmer celé okno.
+- Návrh:
+  - nižšia hlavná fotka článku (napríklad `max-height: 62vh`), alebo nadpis nad fotkou;
+  - pri kategóriách menší úvodný blok na úzkych oknách.
+
+**Rozostup dotykových cieľov** (Z6.02, odporúčanie podľa Material 8 dp; 96 výsledkov)
+- Ani jeden nález nie je chybou podľa WCAG 2.5.8. Všetky dotknuté ciele majú aspoň 24 × 24 px a pri takej veľkosti
+  norma rozostup nežiada.
+- Ide o:
+  - odkazy v stĺpcoch päty (dotýkajú sa, každý 44 px vysoký);
+  - zhluky na mape (na dotyku sa nedajú ťukať, otvára ich ťuk do mapy);
+  - odkazy právnej lišty v päte (2 px);
+  - štítky pobočného stĺpca (6 px);
+  - prepínač Reliéf / Satelit (2 px);
+  - „Celá galéria“ (2 px).
+- Návrh: medzera 8 px na rodičovi (`gap`). Rozostup by sa viditeľne zmenil, preto len návrh.
+
+**Mapa** (vrátená 1:1 do stavu main na pokyn zadávateľa 14. 11., commit 7d2b63e). Mapa sa nemení, nálezy ostávajú
+ako východisko:
+- mená miest na reliéfe 2,3 – 2,4 : 1 (žiada sa 4,5 : 1);
+- čísla zhlukov 3,7 – 4,4 : 1;
+- vodotlač „SK“ (dekorácia, norma ju vyníma, nástroj ju ráta);
+- rám fokusu bodov a zhlukov v pečatnej červenej nemá na reliéfe 3 : 1;
+- zdroj satelitnej snímky 2,6 : 1.
+
+Návrh, ak sa zadávateľ rozhodne: hustejší papierový obrys pod menami, hustejšie sklo zhlukov a dvojitý rám fokusu
+(svetlý vnútri, tmavý zvonka). Všetky tri boli vyskúšané a vrátené.
+
+**Dĺžka riadku** (L03.02, 50 – 75 znakov; 11 výsledkov): odseky tela článku, perex a úvod kategórie majú pri 1440 px
+76 – 89 znakov. Návrh: `max-width: 68ch` na odsekoch tela. Rozhodnúť spolu so stupnicou písma.
+
 ## Zostáva (nezjednotené, s dôvodom)
 
 - Veľkosti písma a odstupy – menili by vzhľad (vyššie).
 - Prekladová vrstva `.lart [style*=…]` a staré inline farby v ďalších komponentoch (`AccountPage`, `AccountNavLink`,
   `MapaHradisk`, cookie lišta `--ck-*`) – zjednotiť pri ich prepise; cookie lišta má vlastnú paletu pergamenu.
 - Palety nepoužívaných laboratórnych šiat v `theme.css` (ďalšie bloky `--l-*`) – mŕtvy kód, nemaže sa bez rozhodnutia.
+- Mŕtvy kód a nepoužité závislosti (nič som nemazal):
+  - 72 súborov v `src/` nedosiahnuteľných z `main.tsx`, napr.:
+    - `components/ui/*` (shadcn);
+    - staré mapy (Cesium, Mapbox, Slovakia3D…);
+    - `TwoTierNav`, `MegaMenu`, `JoinUs`, `AktualityFeed*`, `pages/SearchPage`.
+  - kandidáti nepoužitých závislostí:
+    - `mapbox-gl`, `three`, `@react-three/fiber`, `@react-three/drei`;
+    - `lightgallery`, `react-responsive-masonry`;
+    - `clsx`, `tailwind-merge` (len v mŕtvych ui súboroch).
+  - Capacitor balíky (appka), `tailwindcss` (stavba CSS) a `@tiptap/pm` (administrácia) sa používajú.
