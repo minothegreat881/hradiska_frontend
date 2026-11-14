@@ -4810,3 +4810,20 @@ html .ck-settings-btn {
   color: #6d6f74; font: 600 13px Inter, system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase;
 }
 @media (max-width: 900px) { .vw-mapa-zastup { height: 650px; } }
+
+/* ── Fokus viditeľný a nezakrytý (základ Z5.03, WCAG 2.4.7, 2.4.11) ────────
+   Dávka 1 úlohy 2 (14. 11. 2026), merané nástrojom základu:
+   • prilepená hlavička (~97 px) zakrývala zameraný prvok pri posune klávesom
+     Tab a pri skoku na kotvu → `scroll-padding-top` na dokumente,
+   • karty kroniky v posuvnom páse a fotky galérie: rám fokusu orezal pás,
+     resp. zakryla ho prilepená hlavička skupiny → rám dovnútra a väčší odstup,
+   • zhluky na mape: rám v pečatnej červenej na reliéfe nemal 3 : 1 → dvojitý
+     rám (svetlý vnútri, tmavý zvonka), viditeľný na každom podklade,
+   • odkazy v päte na dotyku: plochy 44 px sa pri zalomení prekrývali
+     → riadková medzera tak, aby sa plochy nedotýkali. */
+html { scroll-padding-top: 104px; }
+.lakv-card:focus-visible { outline: 2px solid var(--hr-accent-deep); outline-offset: -3px; }
+.lgal-plat { scroll-margin-top: calc(var(--lgal-lep, 68px) + 64px); }
+@media (pointer: coarse), (any-pointer: coarse), (hover: none) {
+  .lfoot-legal { row-gap: 26px; }
+}
