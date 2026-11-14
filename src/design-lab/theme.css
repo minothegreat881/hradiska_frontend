@@ -3702,6 +3702,12 @@ figure > .vloz-nahlad { position: relative; min-height: 220px; max-width: 500px;
 .vloz-nahlad-pozn { font-size: 13px; color: var(--hr-on-dark); max-width: 46ch; }
 .vloz-nahlad:hover .vloz-nahlad-ikona { background: var(--hr-on-photo); }
 .vloz-nahlad:focus-visible { outline: 3px solid var(--hr-on-dark-2); outline-offset: -6px; }
+/* Telo článku vnucuje farbu všetkému (globals.css: `.article-content * { color … !important }`),
+   náhľad je však tmavá plocha – bez tohto bol text #2d2418 na #191c24 (1,11 : 1). Z5.03 */
+.article-content .vloz-nahlad,
+.article-content .vloz-nahlad .vloz-nahlad-vyzva { color: var(--hr-on-dark-2) !important; }
+.article-content .vloz-nahlad .vloz-nahlad-pozn { color: var(--hr-on-dark) !important; }
+.article-content .vloz-nahlad .vloz-nahlad-ikona { color: var(--hr-dark) !important; }
 
 /* ── Cookie lišta na mobile (audit, úloha 3 bod 6) ─────────────────────────
    Pri 412 px zaberala lišta väčšinu obrazovky (dva odseky, tri tlačidlá
@@ -4880,12 +4886,15 @@ html { scroll-padding-top: 104px; }
 /* ── Obmedzený pohyb (základ Z10.02, WCAG 2.3.3) ───────────────────────────
    Záchranná sieť pre všetko, čo si to nerieši samo: animácie a prechody
    pri `prefers-reduced-motion: reduce` prebehnú okamžite (jeden snímok),
-   takže konečný stav ostane rovnaký a nič sa nehýbe. */
+   takže konečný stav ostane rovnaký a nič sa nehýbe. Prechody 0 s, nie .01 ms:
+   pri .01 ms by každá zmena vlastnosti (počiatočné transition-property: all)
+   vyrobila prechod aj tam, kde žiadny nebol; na transitionend nič nečaká. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }
@@ -4912,4 +4921,7 @@ html { scroll-padding-top: 104px; }
 .lnav-jazyk { min-width: 44px; min-height: 44px; justify-content: center; }
 @media (pointer: coarse), (any-pointer: coarse), (hover: none) {
   .lhero-rychle a, .dob-vsetky, .lart-crumbs a, .cat-crumbs a, .lgal-skupina-o, .lacc-odkaz { min-height: 44px; }
+  /* Omrvinky: plocha 44 px, ale riadok ostáva 24 px (záporný okraj) – inak by
+     pri 320 × 640 zostúpil nadpis kategórie pod prvú obrazovku (Z8.01). */
+  .lart-crumbs a, .cat-crumbs a { margin-block: -10px; }
 }
