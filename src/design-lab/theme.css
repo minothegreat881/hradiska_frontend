@@ -3706,13 +3706,13 @@ figure > .vloz-nahlad { position: relative; min-height: 220px; max-width: 500px;
 /* ── Cookie lišta na mobile (audit, úloha 3 bod 6) ─────────────────────────
    Pri 412 px zaberala lišta väčšinu obrazovky (dva odseky, tri tlačidlá
    pod sebou). Na mobile: jeden odsek, dve tlačidlá vedľa seba, výška
-   najviac 45 % okna (zvyšok sa posúva v lište). */
+   najviac 45 % okna (zvyšok sa posúva v lište). Obvyklé slová „Súhlasím /
+   Nesúhlasím“ v tlačidlách ostávajú (L05.04). */
 @media (max-width: 640px) {
   html .ck-card { max-height: 45vh; overflow-y: auto; }
   html .ck-text .ck-p + .ck-p { display: none; }
   html .ck-shield-wrap { display: none; }
   html .ck-btn { flex-basis: calc(50% - 5px); }
-  html .ck-btn .ck-note { display: none; }
 }
 
 .lakt-rok { margin-bottom: 54px; }
