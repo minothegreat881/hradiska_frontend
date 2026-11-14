@@ -18,7 +18,7 @@ import { BlockShell } from '../admin/editor/BlockShell';
 import { EditModeContext, useEditMode } from './EditModeContext';
 import { BodyPhotosContext, useOpenBodyPhoto, type BodyPhoto } from './BodyPhotos';
 import { SourceLine } from './SourceLine';
-import { embedSrc } from '../lib/embed';
+import { embedSrc, menoSluzby, sAutoplay } from '../lib/embed';
 
 // =============================================================================
 // TYPES
@@ -141,6 +141,28 @@ function EmptyBlockNotice({ title, hint }: { title: string; hint: string }) {
   );
 }
 
+/**
+ * NÁHĽAD PRED VLOŽENÝM OBSAHOM (audit, úloha 3 bod 6). YouTube, Vimeo, Sketchfab
+ * a Facebook sa načítajú až po kliknutí — dovtedy stránka cudziu službu
+ * nekontaktuje (žiadne cookies ani prenos adresy bez súhlasu). Náhľad je
+ * neutrálny (bez náhľadového obrázka zo služby, ten by bol tiež požiadavkou).
+ * V editore článkov sa prehrávač načíta hneď, ako doteraz.
+ */
+function NahladVlozenia({ src, caption, druh, children }: { src: string; caption?: string; druh: 'video' | 'model' | 'prispevok'; children: (adresa: string) => React.ReactNode }) {
+  const editMode = useEditMode();
+  const [nacitat, setNacitat] = React.useState(false);
+  if (editMode || nacitat) return <>{children(nacitat ? sAutoplay(src) : src)}</>;
+  const sluzba = menoSluzby(src);
+  const vyzva = druh === 'model' ? t('Zobraziť 3D model') : druh === 'prispevok' ? t('Zobraziť príspevok') : t('Prehrať video');
+  return (
+    <button type="button" className="vloz-nahlad" onClick={() => setNacitat(true)}>
+      <span className="vloz-nahlad-ikona" aria-hidden="true">{druh === 'model' ? '◈' : '▶'}</span>
+      <span className="vloz-nahlad-vyzva">{vyzva}{caption ? `: ${caption}` : ''}</span>
+      <span className="vloz-nahlad-pozn">{t('Načíta sa zo služby')} {sluzba}. {t('Po kliknutí si služba môže uložiť cookies.')}</span>
+    </button>
+  );
+}
+
 function EmbedRenderer({ block }: { block: EmbedBlock }) {
   const { url, caption } = block;
   const editMode = useEditMode();
@@ -172,8 +194,9 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
   if (isFacebook) {
     return (
       <figure className="my-8 clear-both not-prose" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <NahladVlozenia src={src} caption={caption} druh="prispevok">{(adresa) => (
         <iframe
-          src={src}
+          src={adresa}
           title={caption || 'Facebook'}
           loading="lazy"
           scrolling="no"
@@ -189,6 +212,7 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
           allow="encrypted-media; picture-in-picture; clipboard-write"
           allowFullScreen
         />
+        )}</NahladVlozenia>
         {caption && (
           <figcaption style={{ fontFamily: 'Georgia, serif', fontSize: 13, color: '#8b7a5e', textAlign: 'center', marginTop: 8 }}>
             {caption}
@@ -210,14 +234,16 @@ function EmbedRenderer({ block }: { block: EmbedBlock }) {
           boxShadow: '0 4px 12px rgba(70,40,20,.12)',
         }}
       >
+        <NahladVlozenia src={src} caption={caption} druh={/sketchfab/.test(src) ? 'model' : 'video'}>{(adresa) => (
         <iframe
-          src={src}
+          src={adresa}
           title={caption || 'Video'}
           loading="lazy"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
+        )}</NahladVlozenia>
       </div>
       {caption && (
         <figcaption

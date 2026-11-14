@@ -3684,6 +3684,36 @@ body[data-lab-theme] .pl-overlay [style*='Georgia'] { font-family: 'Inter', sans
 .cat-dalsie-btn:focus-visible { outline: 2px solid var(--hr-ink); outline-offset: 2px; }
 .cat-dalsie-chyba { margin: 0; font-family: var(--font-body); font-size: 14px; color: var(--hr-error-text); }
 
+/* ── Náhľad pred vloženým videom / 3D modelom (audit, úloha 3 bod 6) ─────── */
+.vloz-nahlad {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 20px; border: 0; cursor: pointer; text-align: center;
+  background: var(--hr-dark); color: var(--hr-on-dark-2);
+  font-family: var(--font-body);
+}
+figure > .vloz-nahlad { position: relative; min-height: 220px; max-width: 500px; border-radius: var(--hr-radius-m); }
+.vloz-nahlad-ikona {
+  display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
+  background: var(--hr-on-dark-2); color: var(--hr-dark); font-size: 24px; line-height: 1;
+}
+.vloz-nahlad-vyzva { font-size: 17px; font-weight: 600; max-width: 40ch; }
+.vloz-nahlad-pozn { font-size: 13px; color: var(--hr-on-dark); max-width: 46ch; }
+.vloz-nahlad:hover .vloz-nahlad-ikona { background: var(--hr-on-photo); }
+.vloz-nahlad:focus-visible { outline: 3px solid var(--hr-on-dark-2); outline-offset: -6px; }
+
+/* ── Cookie lišta na mobile (audit, úloha 3 bod 6) ─────────────────────────
+   Pri 412 px zaberala lišta väčšinu obrazovky (dva odseky, tri tlačidlá
+   pod sebou). Na mobile: jeden odsek, dve tlačidlá vedľa seba, výška
+   najviac 45 % okna (zvyšok sa posúva v lište). */
+@media (max-width: 640px) {
+  html .ck-card { max-height: 45vh; overflow-y: auto; }
+  html .ck-text .ck-p + .ck-p { display: none; }
+  html .ck-shield-wrap { display: none; }
+  html .ck-btn { flex-basis: calc(50% - 5px); }
+  html .ck-btn .ck-note { display: none; }
+}
+
 .lakt-rok { margin-bottom: 54px; }
 .lakt-rok-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }
 .lakt-rok-h h2 {

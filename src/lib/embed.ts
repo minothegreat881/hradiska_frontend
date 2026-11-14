@@ -42,13 +42,30 @@ export function parseEmbedUrl(raw: string | null | undefined): EmbedRef | null {
  * Vkladací odkaz pre `<iframe>`. `null` znamená, že blok ešte nemá čo prehrať —
  * volajúci má namiesto prehrávača ukázať výzvu na doplnenie adresy.
  */
+/** Meno služby pre náhľad pred načítaním („Načíta sa z YouTube“). */
+export function menoSluzby(src: string): string {
+  if (/youtube/.test(src)) return 'YouTube';
+  if (/vimeo/.test(src)) return 'Vimeo';
+  if (/sketchfab/.test(src)) return 'Sketchfab';
+  if (/facebook/.test(src)) return 'Facebook';
+  try { return new URL(src).hostname.replace(/^www\./, ''); } catch { return ''; }
+}
+
+/** Adresa, ktorá po kliknutí na náhľad rovno spustí prehrávanie. */
+export function sAutoplay(src: string): string {
+  if (!/youtube|vimeo/.test(src)) return src;
+  return src + (src.includes('?') ? '&' : '?') + 'autoplay=1';
+}
+
 export function embedSrc(block: { provider?: string; embedId?: string; url?: string }): string | null {
   const provider = String(block.provider || '').trim();
   // Identifikátor z poľa, inak z adresy — staršie články mávajú vyplnené len jedno.
   const id = String(block.embedId || '').trim() || parseEmbedUrl(block.url)?.embedId || '';
   const url = String(block.url || '').trim();
 
-  if (provider === 'youtube') return id ? `https://www.youtube.com/embed/${id}` : null;
+  /* youtube-nocookie: YouTube si cookies uloží až pri prehratí, nie pri načítaní
+     stránky (audit, úloha 3 bod 6). */
+  if (provider === 'youtube') return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
   if (provider === 'vimeo') return id ? `https://player.vimeo.com/video/${id}` : null;
   if (provider === 'sketchfab') return id ? `https://sketchfab.com/models/${id}/embed` : null;
   // Blogger a ostatné: adresa sa používa tak, ako je uložená.
